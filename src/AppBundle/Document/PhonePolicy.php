@@ -17,7 +17,7 @@ use AppBundle\Annotation\DataChange;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
-class PhonePolicy extends Policy
+abstract class PhonePolicy extends Policy
 {
     use CurrencyTrait;
     use ImeiTrait;

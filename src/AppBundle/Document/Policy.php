@@ -27,7 +27,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
-use AppBundle\Classes\Salva;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
@@ -47,7 +46,10 @@ use AppBundle\Annotation\DataChange;
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("policy_type")
- * @MongoDB\DiscriminatorMap({"phone"="PhonePolicy","salva-phone"="SalvaPhonePolicy"})
+ * @MongoDB\DiscriminatorMap({
+ *      Policy::TYPE_SALVA_PHONE="SalvaPhonePolicy",
+ *      Policy::TYPE_HELVETIA_PHONE="HelvetiaPhonePolicy"
+ * })
  * @MongoDB\Index(keys={"policyNumber"="asc","end"="asc"},
  *     unique="false", sparse="true")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
@@ -57,6 +59,9 @@ abstract class Policy
     use ArrayToApiArrayTrait;
     use CurrencyTrait;
     use DateTrait;
+
+    const TYPE_SALVA_PHONE = 'salva-phone';
+    const TYPE_HELVETIA_PHONE = 'helvetia-phone';
 
     const ADJUST_TIMEZONE = false;
     const RENEWAL_DAYS = 21;
@@ -2894,10 +2899,8 @@ abstract class Policy
             $prefix = $this->getPolicyNumberPrefix();
         }
 
-        // TODO: move to SalvaPhonePolicy
-        // salva needs a end time of 23:59 in local time
-        $startDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
-        $issueDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+        $startDate->setTimezone($this->getUnderwriterTimeZone());
+        $issueDate->setTimezone($this->getUnderwriterTimeZone());
 
         $this->setStart($startDate);
         $this->setIssueDate($issueDate);
@@ -3115,18 +3118,15 @@ abstract class Policy
         if (!$this->isCancelled()) {
             return 0;
         }
-
         if (!$skipAllowedCheck) {
             if (!$this->isRefundAllowed()) {
                 return 0;
             }
         }
-
         $offset = 0;
         if ($countScheduled) {
             $offset = $this->getScheduledPaymentRefundAmount();
         }
-
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
         $reason = $this->getCancelledReason();
@@ -3143,20 +3143,18 @@ abstract class Policy
         if (!$this->isCancelled()) {
             return 0;
         }
-
         if (!$skipAllowedCheck) {
             if (!$this->isRefundAllowed()) {
                 return 0;
             }
         }
-
         // 3 factors determine refund amount
         // Cancellation Reason, Monthly/Annual, Claimed/NotClaimed
-
         if ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             return $this->getCooloffCommissionRefund($skipValidate);
         } else {
-            return $this->getProratedCommissionRefund($this->getEnd());
+            return $this->getProratedCoverholderCommissionRefund($this->getEnd()) +
+                $this->getProratedBrokerCommissionRefund($this->getEnd());
         }
     }
 
@@ -3220,47 +3218,76 @@ abstract class Policy
         return $commissionToRefund;
     }
 
+    /**
+     * Gives you the total amount of commission that the policy should have paid up so far on a pro rata basis.
+     * @param \DateTime|null $date is the date at which this should be correct with null meaning right now.
+     * @return float the total amount of pro rata commission.
+     */
     public function getProratedCommission(\DateTime $date = null)
     {
-        // TODO: either make abstract to get the total commission, or move to a db collection
-        $used = Salva::YEARLY_TOTAL_COMMISSION * $this->getProrataMultiplier($date);
-
-        return $this->toTwoDp($used);
+        return $this->toTwoDp($this->getYearlyTotalCommission() * $this->getProrataMultiplier($date));
     }
 
+    /**
+     * Calculates the amount of coverholder commission that should have been paid so far on a pro rata basis.
+     * @param \DateTime|null $date is the date at which this calculation should be accurate, with null meaning now.
+     * @return float the pro rata amount of coverholder commission.
+     */
     public function getProratedCoverholderCommission(\DateTime $date = null)
     {
-        // TODO: either make abstract to get the total commission, or move to a db collection
-        $used = Salva::YEARLY_COVERHOLDER_COMMISSION * $this->getProrataMultiplier($date);
-
-        return $this->toTwoDp($used);
+        return $this->toTwoDp($this->getYearlyCoverholderCommission() * $this->getProrataMultiplier($date));
     }
 
+    /**
+     * Calculates the amount of broker commission that should have been paid so far on a pro rata basis.
+     * @param \DateTime|null $date is the date at which this calculation should be accurate, with null meaning now.
+     * @return float the pro rata amount of broker commission.
+     */
     public function getProratedBrokerCommission(\DateTime $date = null)
     {
-        return $this->toTwoDp(
-            $this->getProratedCommission($date) - $this->getProratedCoverholderCommission($date)
-        );
+        return $this->toTwoDp($this->getYearlyBrokerCommission() * $this->getProrataMultiplier($date));
     }
 
     /**
-     * Get the commission that is owed at a given time.
+     * Get the coverholder commission that is outstanding at the given time on a pro rata basis.
      * @param \DateTime $date is the time at which the calculation is accurate.
-     * @return float the amount of commission due.
+     * @return float the amount of coverholder commission due.
      */
-    public function getProratedCommissionPayment(\DateTime $date)
+    public function getProratedCoverholderCommissionPayment(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
+        return $this->toTwoDp($this->getProratedCoverholderCommission($date) -
+            $this->getCoverholderCommissionPaid());
     }
 
     /**
-     * Gets the commission beyond a given point in time to refund.
-     * @param \DateTime $date is the date up to which commission is valid.
-     * @return float the amount of commission due on a refund for payments past the given date.
+     * Gives the amount of outstanding broker commission at the current time on a pro rata basis.
+     * @param \DateTime $date is the time at which the calculation is accurate.
+     * @return float the amount of broker commission due.
      */
-    public function getProratedCommissionRefund(\DateTime $date)
+    public function getProratedBrokerCommissionPayment(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedCommission($date) - $this->getTotalCommissionPaid());
+        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getBrokerCommissionPaid());
+    }
+
+    /**
+     * Gives you the amount of coverholder commission that should be refunded on a pro rata basis.
+     * @param \DateTime $date is the date at which this calculation should be accurate.
+     * @return float the amount of coverholder commission in the refund.
+     */
+    public function getProratedCoverholderCommissionRefund(\DateTime $date)
+    {
+        return $this->toTwoDp($this->getProratedCoverholderCommission($date) -
+            $this->getCoverholderCommissionPaid());
+    }
+
+    /**
+     * Gives you the amount of broker commission that should be refunded on a pro rata basis.
+     * @param \DateTime $date is the date at which this calculation should be accurate.
+     * @return float the amount of broker commission in the refund.
+     */
+    public function getProratedBrokerCommissionRefund(\DateTime $date)
+    {
+        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getBrokerCommissionPaid());
     }
 
     public function getDaysInPolicyYear()
@@ -4910,6 +4937,19 @@ abstract class Policy
         }
     }
 
+
+    /**
+     * Gives you this policy's underwriter's timezone.
+     * @return \DateTimeZone the timezone the underwriter operates in.
+     */
+    abstract public function getUnderwriterTimeZone();
+
+    /**
+     * Gives you the policy's underwriter.
+     * @return string the name of the underwriter.
+     */
+    abstract public function getUnderwriterName();
+
     /**
      * Get the current max connection for this policy
      * @return mixed
@@ -5831,64 +5871,55 @@ abstract class Policy
         }
     }
 
-    public function getExpectedCommission(\DateTime $date = null)
+    /**
+     * Sets commission the normal way and then subtracts it from 0.
+     * @param Payment        $payment       is the payment that is going to get refund commission.
+     * @param boolean        $allowFraction is whether to allow fractional payments to calculate their commission.
+     * @param \DateTime|null $date          is the date at which the calculation should be accurate, null meaning now.
+     */
+    public function setCommissionInverted($payment, $allowFraction = false, \DateTime $date = null)
     {
-        $salva = new Salva();
-        $premium = $this->getPremium();
-
-        $expectedCommission = null;
-        $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
-        // TODO: do we need to see if cancelled and if so use policy end date?
-        $expectedPayments = $this->getTotalExpectedPaidToDate($date);
-        $isMoneyOwed = !$this->areEqualToTwoDp($totalPayments, $expectedPayments) && $totalPayments < $expectedPayments;
-
-        $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
-        if ($numPayments > 12 || $numPayments < 0) {
-            throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
-        }
-        $expectedMonthlyCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
-        $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
-
-        // active/unpaid should be on a cash received based
-        // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
-        // also if a policy has been cancelled and there is money owed
-        if ($this->isCooloffCancelled()) {
-            return 0;
-        } elseif (in_array($this->getStatus(), [
-            self::STATUS_ACTIVE,
-            self::STATUS_UNPAID,
-            self::STATUS_PICSURE_REQUIRED
-        ])) {
-            $expectedCommission = $expectedMonthlyCommission;
-        } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
-            // if there's a refund, the number of payments won't be equal and so we need to calculate based on received
-            // funds, rather than monthly
-            if ($numPayments) {
-                $expectedCommission = $expectedMonthlyCommission;
-            } else {
-                $expectedCommission = $commissionReceived;
-            }
-        } elseif (in_array($this->getStatus(), [
-            self::STATUS_EXPIRED,
-            self::STATUS_EXPIRED_CLAIMABLE,
-            self::STATUS_EXPIRED_WAIT_CLAIM]) && $numPayments == 11) {
-            // we've had a historical issue where if a policy has had 11 payments, and the cancellation date is at the
-            // same day as the expiration date, we dont' quite cancel in time.
-            $expectedCommission = $expectedMonthlyCommission;
-        } else {
-            if (!$date) {
-                $date = \DateTime::createFromFormat('U', time());
-            }
-            // policy is not active (above if statement)
-            // so at most we should only be calculating to the end of the policy
-            if ($date > $this->getEnd()) {
-                $date = $this->getEnd();
-            }
-            $expectedCommission = $this->getProratedCommission($date);
-        }
-
-        return $expectedCommission;
+        $this->setCommission($payment, $allowFraction, $date);
+        $payment->setCoverholderCommission(0 - $payment->getCoverholderCommission());
+        $payment->setBrokerCommission(0 - $payment->getBrokerCommission());
+        $payment->setTotalCommission(0 - $payment->getTotalCommission());
     }
+
+    /**
+     * Sets the commission of a payment belonging to this policy because the policy knows the coverholder and their
+     * commission rules.
+     * @param Payment        $payment       is the payment that we are setting the commission for.
+     * @param boolean        $allowFraction is whether to allow fractional payments and calculate fractional commission
+     *                                      for them.
+     * @param \DateTime|null $date          is the date at which pro rata things will be calculated.
+     */
+    abstract public function setCommission($payment, $allowFraction = false, \DateTime $date = null);
+
+    /**
+     * Gives you the total amount of commission this policy should pay.
+     * @return float the amount.
+     */
+    abstract public function getYearlyTotalCommission(): float;
+
+    /**
+     * Gives you the yearly coverholder commission for this policy.
+     * @return float the amount.
+     */
+    abstract public function getYearlyCoverholderCommission(): float;
+
+    /**
+     * Gives you the yearly broker commission for this policy.
+     * @return float the amount.
+     */
+    abstract public function getYearlyBrokerCommission(): float;
+
+    /**
+     * Calculates the amount of commission that this policy should have paid currently based on their underwriter's
+     * rules.
+     * @param \DateTime|null $date is the date at which this amount should be valid, with null meaning right now.
+     * @return float the expected amount.
+     */
+    abstract public function getExpectedCommission(\DateTime $date = null);
 
     public function hasCorrectCommissionPayments(
         \DateTime $date = null,

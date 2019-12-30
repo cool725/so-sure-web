@@ -4,7 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
-use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\SalvaPhonePolicyRepository;
 use Aws\S3\S3Client;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
@@ -16,13 +16,14 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
 use AppBundle\Document\Feature;
 use AppBundle\Document\File\SalvaPolicyFile;
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 
 class SalvaExportService
 {
@@ -231,11 +232,11 @@ class SalvaExportService
         $lines = [];
         $paidPremium = 0;
         $paidBrokerFee = 0;
-        /** @var PhonePolicyRepository $repo */
+        /** @var SalvaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPolicy(null)));
+        /** @var SalvaPhonePolicy $policy */
         foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
-            /** @var SalvaPhonePolicy $policy */
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $data = $this->transformPolicy($policy, $version);
                 $paidPremium += $data[16];
@@ -284,7 +285,8 @@ class SalvaExportService
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
-        $payments = $repo->getAllPaymentsForExport($date);
+        $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_SALVA_PHONE);
+        /** @var Payment $payment */
         foreach ($payments as $payment) {
             if (!$payment->getPolicy()) {
                 throw new \Exception(sprintf('Payment %s is missing policy', $payment->getId()));
@@ -334,6 +336,7 @@ class SalvaExportService
 
     public function exportClaims($s3, \DateTime $date = null, $days = null)
     {
+        NoOp::ignore($days);
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
             $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
@@ -342,9 +345,9 @@ class SalvaExportService
         $lines = [];
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
-        $lines[] =  sprintf("%s", $this->formatLine($this->transformClaim(null)));
-        foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
-            /** @var Claim $claim */
+        $lines[] =  sprintf('%s', $this->formatLine($this->transformClaim(null)));
+        /** @var Claim $claim */
+        foreach ($repo->getAllClaimsForExport(Policy::TYPE_SALVA_PHONE) as $claim) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$claim->getPolicy()->isValidPolicy()) {
                 continue;
@@ -360,7 +363,7 @@ class SalvaExportService
             }
 
             $data = $this->transformClaim($claim);
-            $lines[] = sprintf("%s", $this->formatLine($data));
+            $lines[] = sprintf('%s', $this->formatLine($data));
         }
 
         if ($s3) {
@@ -385,9 +388,10 @@ class SalvaExportService
         }
 
         $lines = [];
-        /** @var PhonePolicyRepository $repo */
-        $repo = $this->dm->getRepository(PhonePolicy::class);
-        $lines[] =  sprintf("%s", $this->formatLine($this->transformRenewal(null)));
+        /** @var SalvaPhonePolicyRepository $repo */
+        $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        $lines[] =  sprintf('%s', $this->formatLine($this->transformRenewal(null)));
+        /** @var SalvaPhonePolicy $policy */
         foreach ($repo->getAllExpiredPoliciesForExport($date, $this->environment) as $policy) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
@@ -757,7 +761,7 @@ class SalvaExportService
                 if (!isset($data['policyId']) || !$data['policyId'] || !isset($data['action']) || !$data['action']) {
                     throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
-                /** @var PhonePolicyRepository $repo */
+                /** @var SalvaPhonePolicyRepository $repo */
                 $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
                 /** @var SalvaPhonePolicy $policy */
                 $policy = $repo->find($data['policyId']);

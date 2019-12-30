@@ -7,12 +7,11 @@ use AppBundle\Service\SixpackService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
 use AppBundle\Listener\SixpackListener;
-
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 
 /**
  * @group functional-net
@@ -91,7 +90,7 @@ class SixpackListenerTest extends WebTestCase
             static::generateEmail('testSixpackListener', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 

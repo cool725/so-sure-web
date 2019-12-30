@@ -792,8 +792,6 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2016-10-01'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
-        //static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice(), Salva::MONTHLY_TOTAL_COMMISSION);
-
         // Initial payment applied - nothing to adjust
         $this->assertNull(self::$policyService->adjustScheduledPayments($policy));
         $this->assertEquals(0, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
@@ -819,7 +817,7 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         // additional payment should require an adjustment a scheduledpayment cancellation
-        static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice(), Salva::MONTHLY_TOTAL_COMMISSION);
+        static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice());
 
         // 1 scheduled payment should be cancelled to offset the additional payment received
         $this->assertTrue(self::$policyService->adjustScheduledPayments($policy));
@@ -882,7 +880,6 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-02-28')
         );
@@ -896,7 +893,6 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-04-12')
         );
@@ -1001,7 +997,6 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-05-22 00:22:00', new \DateTimeZone('Europe/London'))
         );
@@ -1013,7 +1008,6 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-06-15 00:20:00', new \DateTimeZone('Europe/London'))
         );
@@ -1026,7 +1020,6 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-07-15 00:20:00', new \DateTimeZone('Europe/London'))
         );
@@ -1039,7 +1032,6 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-08-30 14:52:00', new \DateTimeZone('Europe/London'))
         );
@@ -1052,7 +1044,6 @@ class PolicyServiceTest extends WebTestCase
         static::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-09-15 00:20:00', new \DateTimeZone('Europe/London'))
         );
@@ -1176,12 +1167,7 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         // additional payment with a 1p diff should result in unable to find a scheduled payment to cancel
-        static::addPayment(
-            $policy,
-            $policy->getPremium()->getMonthlyPremiumPrice()  + 0.01,
-            Salva::MONTHLY_TOTAL_COMMISSION
-        );
-
+        static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice()  + 0.01);
         $this->assertFalse(self::$policyService->adjustScheduledPayments($policy));
         $this->assertEquals(0, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
@@ -1239,15 +1225,10 @@ class PolicyServiceTest extends WebTestCase
         for ($i = 1; $i <= 10; $i++) {
             static::addPayment(
                 $policy,
-                $policy->getPremium()->getMonthlyPremiumPrice(),
-                Salva::MONTHLY_TOTAL_COMMISSION
+                $policy->getPremium()->getMonthlyPremiumPrice()
             );
         }
-        static::addPayment(
-            $policy,
-            $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::FINAL_MONTHLY_TOTAL_COMMISSION
-        );
+        static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice());
 
         $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice());
         $this->assertEquals($policy->getPremium()->getYearlyGwp(), $policy->getTotalGwp());
@@ -1273,11 +1254,7 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         for ($i = 1; $i <= 10; $i++) {
-            static::addPayment(
-                $policy,
-                $policy->getPremium()->getMonthlyPremiumPrice(),
-                Salva::MONTHLY_TOTAL_COMMISSION
-            );
+            static::addPayment($policy, $policy->getPremium()->getMonthlyPremiumPrice());
         }
         static::addPayment(
             $policy,
@@ -6254,10 +6231,10 @@ class PolicyServiceTest extends WebTestCase
         $phoneB->addPhonePrice($priceC);
         $phoneB->addPhonePrice($priceE);
         $user = Create::user();
-        $oldA = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneA);
-        $oldB = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneA);
-        $oldC = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneB);
-        $oldD = Create::phonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneB);
+        $oldA = Create::salvaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneA);
+        $oldB = Create::salvaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneA);
+        $oldC = Create::helvetiaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 1, $phoneB);
+        $oldD = Create::helvetiaPhonePolicy($user, '2018-03-06', Policy::STATUS_ACTIVE, 12, $phoneB);
         Create::save(static::$dm, $phoneA, $phoneB, $user, $oldA, $oldB, $oldC, $oldD);
         static::$policyService->createPendingRenewalPolicies('TEST', false, new \DateTime('2019-03-01'));
         Create::refresh(static::$dm, $oldA, $oldB, $oldC, $oldD);

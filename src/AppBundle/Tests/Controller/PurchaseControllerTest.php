@@ -483,6 +483,7 @@ class PurchaseControllerTest extends BaseControllerTest
             $url,
             mb_stripos($url, '/step-pledge/') + mb_strlen('/step-pledge/')
         );
+        $policy = $this->assertPolicyByIdExists($this->container, $policyId);
 
         //print $crawler->html();
         $crawler = $this->agreePledge($crawler);
@@ -516,6 +517,7 @@ class PurchaseControllerTest extends BaseControllerTest
         }
 
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
@@ -560,6 +562,7 @@ class PurchaseControllerTest extends BaseControllerTest
             $url,
             mb_stripos($url, '/step-pledge/') + mb_strlen('/step-pledge/')
         );
+        $policy = $this->assertPolicyByIdExists($this->container, $policyId);
 
         //print $crawler->html();
         $crawler = $this->agreePledge($crawler);
@@ -608,6 +611,7 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         $token = self::$checkoutService->createCardToken(
+            $policy,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_NUM,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_EXP,
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_PIN

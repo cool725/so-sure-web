@@ -3,37 +3,27 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 
 class ClaimRepository extends DocumentRepository
 {
-    public function getAllClaimsForExport(\DateTime $date, $days = null)
+    /**
+     * Gives you all claims for underwriter export.
+     * @param string|null $underwriter is the underwriter to find claims for. null to ignore.
+     * @return Cursor over the claims.
+     */
+    public function getAllClaimsForExport($underwriter = null)
     {
-        if (!$days) {
-            $days = 7;
-        }
-        $endWeek = new \DateTime(sprintf(
-            '%d-%d-%d 00:00:00',
-            $date->format('Y'),
-            $date->format('m'),
-            $date->format('d')
-        ));
-        $startWeek = clone $endWeek;
-        $startWeek->sub(new \DateInterval(sprintf('P%dD', $days)));
-
         $qb = $this->createQueryBuilder();
         $qb->field('notificationDate')->notEqual(null);
         $qb->field('status')->notIn([Claim::STATUS_FNOL, Claim::STATUS_SUBMITTED, null]);
         $qb->field('number')->notEqual(null);
+        if ($underwriter) {
+            $qb->field('policy.policy_type')->equals($underwriter);
+        }
         $qb->sort('underwriterLastUpdated', 'desc');
-
-        /*
-         * Aleks requested to see all claims for the time being...
-        $qb->addOr($qb->expr()->field('closedDate')->gte($startWeek));
-        $qb->addOr($qb->expr()->field('recordedDate')->gte($startWeek));
-        $qb->addOr($qb->expr()->field('status')->in([Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED]));
-        */
         return $qb->getQuery()->execute();
     }
 

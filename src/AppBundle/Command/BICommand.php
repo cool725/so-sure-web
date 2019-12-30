@@ -42,6 +42,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\SoSure;
+use AppBundle\Helpers\CsvHelper;
 
 /**
  * Command for exporting CSV reports on various collections of company data.
@@ -390,7 +391,7 @@ class BICommand extends ContainerAwareCommand
         $rewardRepo = $this->dm->getRepository(Reward::class);
         $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
-        $lines[] = $this->makeLine(
+        $lines[] = CsvHelper::line(
             'Policy Number',
             'Policy Holder Id',
             'Age of Policy Holder',
@@ -468,7 +469,7 @@ class BICommand extends ContainerAwareCommand
                 $reschedule = $scheduledPaymentRepo->getRescheduledBy($lastReverted);
             }
             $company = $policy->getCompany();
-            $lines[] = $this->makeLine(
+            $lines[] = CsvHelper::line(
                 $policy->getPolicyNumber(),
                 $user->getId(),
                 $user->getAge(),
@@ -757,7 +758,7 @@ class BICommand extends ContainerAwareCommand
         $connectionRepo = $this->dm->getRepository(Connection::class);
         $policies = $policyRepo->findScodePolicies();
         $lines = [];
-        $lines[] = $this->makeLine(
+        $lines[] = CsvHelper::line(
             "Scode",
             "Scode Type",
             "User Id",
@@ -776,7 +777,7 @@ class BICommand extends ContainerAwareCommand
                     $connection = $connectionRepo->connectedByPolicy($policy, $other);
                 }
                 if ($connection) {
-                    $lines[] = $this->makeLine(
+                    $lines[] = CsvHelper::line(
                         $scode->getCode(),
                         $scode->getType(),
                         $policy->getUser()->getId(),
@@ -859,11 +860,11 @@ class BICommand extends ContainerAwareCommand
         }
 
         //Transform data arrays tp csv lines
-        $lines[] = $this->makeLine(...$headers);
+        $lines[] = CsvHelper::line(...$headers);
         foreach ($data as $line) {
-            $lines[] = $this->makeLine(...$line);
+            $lines[] = CsvHelper::line(...$line);
         }
-        $lines[] = $this->makeLine(...$monthTotal);
+        $lines[] = CsvHelper::line(...$monthTotal);
 
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'rewards.csv');
@@ -974,14 +975,14 @@ class BICommand extends ContainerAwareCommand
         }
 
         //Transform data arrays in csv lines
-        $lines[] = $this->makeLine(...$headers);
+        $lines[] = CsvHelper::line(...$headers);
         foreach ($data as $line) {
             foreach ($line as $key => $val) {
                 if (!$key==0) {
                     $line[$key] = "£" . number_format(floatval($val), 2, '.', ',');
                 }
             }
-            $lines[] = $this->makeLine(...$line);
+            $lines[] = CsvHelper::line(...$line);
         }
         foreach ($monthBudget as $key => $val) {
             if (!$key==0) {
@@ -993,9 +994,9 @@ class BICommand extends ContainerAwareCommand
                 $cpa[$key] = "£" . number_format(floatval($val), 2, '.', ',');
             }
         }
-        $lines[] = $this->makeLine(...$monthBudget);
-        $lines[] = $this->makeLine(...$monthPolicies);
-        $lines[] = $this->makeLine(...$cpa);
+        $lines[] = CsvHelper::line(...$monthBudget);
+        $lines[] = CsvHelper::line(...$monthPolicies);
+        $lines[] = CsvHelper::line(...$cpa);
 
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'rewardsbudget.csv');
@@ -1169,14 +1170,5 @@ class BICommand extends ContainerAwareCommand
         ));
         unlink($tmpFile);
         return $s3Key;
-    }
-
-    /**
-     * Makes a line of the csv with quotes around the items and commas between them.
-     * @param mixed ...$item are all of the string items to concatenate of variable number.
-     */
-    private function makeLine(...$item)
-    {
-        return '"'.implode('","', func_get_args()).'"';
     }
 }

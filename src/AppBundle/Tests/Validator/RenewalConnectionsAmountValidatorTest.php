@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Validator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePremium;
@@ -40,13 +41,13 @@ class RenewalConnectionsAmountValidatorTest extends \PHPUnit\Framework\TestCase
         $premium = new PhonePremium();
         $premium->setGwp(10);
         $premium->setIpt(1);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         $policy->setPremium($premium);
         $user = new User();
         $policy->setUser($user);
         for ($i = 1; $i < 5; $i++) {
-            $policyB = new PhonePolicy();
+            $policyB = new HelvetiaPhonePolicy();
             $user = new User();
             $policyB->setUser($user);
             $connection = new RenewalConnection();
@@ -64,13 +65,13 @@ class RenewalConnectionsAmountValidatorTest extends \PHPUnit\Framework\TestCase
         $premium = new PhonePremium();
         $premium->setGwp(10);
         $premium->setIpt(1);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         $policy->setPremium($premium);
         $user = new User();
         $policy->setUser($user);
         for ($i = 1; $i < 15; $i++) {
-            $policyB = new PhonePolicy();
+            $policyB = new HelvetiaPhonePolicy();
             $user = new User();
             $policyB->setUser($user);
             $connection = new RenewalConnection();

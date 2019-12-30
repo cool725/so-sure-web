@@ -761,8 +761,6 @@ class JudopayService
             throw new PaymentDeclinedException();
         }
 
-        $this->setCommission($payment);
-
         return $payment;
     }
 
@@ -1383,8 +1381,6 @@ class JudopayService
         if (isset($refundModelDetails["riskScore"])) {
             $refund->setRiskScore($refundModelDetails["riskScore"]);
         }
-
-        $refund->setRefundTotalCommission($totalCommision);
 
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 

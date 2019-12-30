@@ -8,6 +8,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
@@ -66,7 +67,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
     public function testGetFirstPaymentDatePolicyUnpaid()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(5);
         $premium->setIpt(1);
@@ -95,7 +96,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
     public function testGetFirstPaymentDateForPolicyPaid()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(5);
         $premium->setIpt(1);
@@ -128,7 +129,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
     public function testGetFirstPaymentDateForPolicyCloseToBacs()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(5);
         $premium->setIpt(1);

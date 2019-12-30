@@ -15,9 +15,11 @@ use AppBundle\Service\JudopayService;
 use com\checkout\ApiServices\Cards\ResponseModels\Card;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Feature;
@@ -1008,8 +1010,9 @@ class CheckoutServiceTest extends WebTestCase
             ->getMock();
         $dispatcher->expects($this->exactly($times))
             ->method('dispatch');
+        /** @var EventDispatcherInterface $dispatcher */
+        $dispatcher = $dispatcher;
         self::$checkout->setDispatcher($dispatcher);
-
         return $dispatcher;
     }
 
@@ -1986,6 +1989,7 @@ class CheckoutServiceTest extends WebTestCase
         $this->assertEquals(CheckoutPayment::RESULT_CAPTURED, $details->getStatus());
 
         $token = self::$checkout->createCardToken(
+            $policy,
             self::$CHECKOUT_TEST_CARD2_NUM,
             self::$CHECKOUT_TEST_CARD2_EXP,
             self::$CHECKOUT_TEST_CARD2_PIN
@@ -2038,6 +2042,7 @@ class CheckoutServiceTest extends WebTestCase
 
         $this->assertEquals(PhonePolicy::STATUS_UNPAID, $policy->getStatus());
         $token = self::$checkout->createCardToken(
+            $policy,
             self::$CHECKOUT_TEST_CARD2_NUM,
             self::$CHECKOUT_TEST_CARD2_EXP,
             self::$CHECKOUT_TEST_CARD2_PIN
@@ -2072,7 +2077,7 @@ class CheckoutServiceTest extends WebTestCase
         $paymentA->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $paymentA->setSource(Payment::SOURCE_WEB);
         $policy->addPayment($paymentA);
-        $paymentA->setCommission(true);
+        $policy->setCommission($paymentA, true);
         $paymentA->setSuccess(true);
         $paymentA->setReceipt($payment);
 
@@ -2099,7 +2104,7 @@ class CheckoutServiceTest extends WebTestCase
         $paymentA->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $paymentA->setSource(Payment::SOURCE_WEB);
         $policy->addPayment($paymentA);
-        $paymentA->setCommission(true);
+        $policy->setCommission($paymentA, true);
         $paymentA->setSuccess(true);
         $paymentA->setReceipt($payment);
 

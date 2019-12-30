@@ -3,6 +3,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\Salva;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Feature;
@@ -34,6 +35,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
@@ -356,8 +358,13 @@ class PolicyService
                 $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
             }
 
-            // TODO: items in POST /policy should be moved to service and service called here
-            $policy = new SalvaPhonePolicy();
+            $date = new \DateTime();
+            $policy = null;
+            if ($date > Salva::getSalvaBinderEndDate()) {
+                $policy = new HelvetiaPhonePolicy();
+            } else {
+                $policy = new SalvaPhonePolicy();
+            }
             $policy->setPhone($phone);
             if ($imei) {
                 $policy->setImei($imei);
@@ -1666,7 +1673,7 @@ class PolicyService
     public function getPoliciesPendingCancellation($includeFuture = false, $prefix = null, \DateTime $date = null)
     {
         if (!$prefix) {
-            $policy = new PhonePolicy();
+            $policy = new HelvetiaPhonePolicy();
             $prefix = $policy->getPolicyPrefix($this->environment);
             if (!$prefix) {
                 $prefix = $policy->getPolicyNumberPrefix();
@@ -1674,7 +1681,6 @@ class PolicyService
         }
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
-
         return $repo->findPoliciesForPendingCancellation($prefix, $includeFuture, $date);
     }
 

@@ -9,6 +9,7 @@ use AppBundle\Classes\DaviesHandlerClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Feature;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;

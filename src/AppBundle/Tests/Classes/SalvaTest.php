@@ -13,65 +13,42 @@ use AppBundle\Document\Payment\JudoPayment;
  */
 class SalvaTest extends \PHPUnit\Framework\TestCase
 {
-    public static function setUpBeforeClass()
-    {
-    }
-
-    public function tearDown()
-    {
-    }
-
-    public function testSumBrokerFee()
-    {
-        $salva = new Salva();
-
-        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $salva->sumBrokerFee(12, false));
-        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $salva->sumBrokerFee(12, true));
-        $this->assertEquals(0, $salva->sumBrokerFee(0, false));
-        $this->assertEquals(0, $salva->sumBrokerFee(0, true));
-        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $salva->sumBrokerFee(1, false));
-        $this->assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $salva->sumBrokerFee(1, true));
-
-        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION * 2, $salva->sumBrokerFee(2, false));
-        $this->assertEquals(
-            Salva::MONTHLY_TOTAL_COMMISSION + Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
-            $salva->sumBrokerFee(2, true)
-        );
-
-        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION * 3, $salva->sumBrokerFee(3, false));
-        $this->assertEquals(
-            Salva::MONTHLY_TOTAL_COMMISSION * 2+ Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
-            $salva->sumBrokerFee(3, true)
-        );
-    }
-
-    public function testProrataSplit()
-    {
-        $salva = new Salva();
-
-        // max
-        $this->assertEquals(10, $salva->getProrataSplit(10.72)['coverholder']);
-        $this->assertEquals(0.72, $salva->getProrataSplit(10.72)['broker']);
-
-        // min
-        $this->assertEquals(0, $salva->getProrataSplit(0)['coverholder']);
-        $this->assertEquals(0, $salva->getProrataSplit(0)['broker']);
-
-        // middle
-        $this->assertEquals(4.78, $salva->getProrataSplit(5.12)['coverholder']);
-        $this->assertEquals(0.34, $salva->getProrataSplit(5.12)['broker']);
-
-        // exception
-        $this->assertEquals(0.62, $salva->getProrataSplit(0.67)['coverholder']);
-        $this->assertEquals(0.05, $salva->getProrataSplit(0.67)['broker']);
-    }
-
     /**
-     * @expectedException \InvalidArgumentException
+     * Makes sure that sum coverholder commission works correctly.
      */
-    public function testProrataSplitExceeded()
+    public function testSumCoverholderCommission()
     {
+        $normal = Salva::MONTHLY_COVERHOLDER_COMMISSION;
+        $last = Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION;
+        $yearly = Salva::YEARLY_COVERHOLDER_COMMISSION;
         $salva = new Salva();
-        $salva->getProrataSplit(10.73);
+        $this->assertEquals(0, $salva->sumCoverholderCommission(0, false));
+        $this->assertEquals(0, $salva->sumCoverholderCommission(0, true));
+        $this->assertEquals($normal, $salva->sumCoverholderCommission(1, false));
+        $this->assertEquals($last, $salva->sumCoverholderCommission(1, true));
+        $this->assertEquals($normal * 2, $salva->sumCoverholderCommission(2, false));
+        $this->assertEquals($normal + $last, $salva->sumCoverholderCommission(2, true));
+        $this->assertEquals($normal * 3, $salva->sumCoverholderCommission(3, false));
+        $this->assertEquals($normal * 2 + $last, $salva->sumCoverholderCommission(3, true));
+        $this->assertEquals($normal * 4, $salva->sumCoverholderCommission(4, false));
+        $this->assertEquals($normal * 3 + $last, $salva->sumCoverholderCommission(4, true));
+        $this->assertEquals($normal * 5, $salva->sumCoverholderCommission(5, false));
+        $this->assertEquals($normal * 4 + $last, $salva->sumCoverholderCommission(5, true));
+        $this->assertEquals($normal * 6, $salva->sumCoverholderCommission(6, false));
+        $this->assertEquals($normal * 5 + $last, $salva->sumCoverholderCommission(6, true));
+        $this->assertEquals($normal * 7, $salva->sumCoverholderCommission(7, false));
+        $this->assertEquals($normal * 6 + $last, $salva->sumCoverholderCommission(7, true));
+        $this->assertEquals($normal * 8, $salva->sumCoverholderCommission(8, false));
+        $this->assertEquals($normal * 7 + $last, $salva->sumCoverholderCommission(8, true));
+        $this->assertEquals($normal * 9, $salva->sumCoverholderCommission(9, false));
+        $this->assertEquals($normal * 8 + $last, $salva->sumCoverholderCommission(9, true));
+        $this->assertEquals($normal * 10, $salva->sumCoverholderCommission(10, false));
+        $this->assertEquals($normal * 9 + $last, $salva->sumCoverholderCommission(10, true));
+        $this->assertEquals($normal * 11, $salva->sumCoverholderCommission(11, false));
+        $this->assertEquals($normal * 10 + $last, $salva->sumCoverholderCommission(11, true));
+        $this->assertEquals($yearly, $salva->sumCoverholderCommission(12, false));
+        $this->assertEquals($yearly, $salva->sumCoverholderCommission(12, true));
+        $this->assertEquals($normal * 13, $salva->sumCoverholderCommission(13, false));
+        $this->assertEquals($normal * 12 + $last, $salva->sumCoverholderCommission(13, true));
     }
 }

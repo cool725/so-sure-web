@@ -744,7 +744,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
 
         $user = new User();
         $user->setEmail(static::generateEmail('testInitWithPremiumNonPicSure', $this));
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setPremium($premium);
         $policy->init($user, $terms);
         $this->assertTrue(true);
@@ -761,7 +761,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
 
         $user = new User();
         $user->setEmail(static::generateEmail('testInitWithPremiumAllowed', $this));
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setPremium($premium);
         $policy->init($user, $terms);
         $this->assertTrue(true);
@@ -781,7 +781,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
 
         $user = new User();
         $user->setEmail(static::generateEmail('testInitWithPremiumException', $this));
-        $policy = new PhonePolicy();
+        $policy = new SalvaPhonePolicy();
         $policy->setPremium($premium);
         $policy->init($user, $terms);
     }
@@ -5482,7 +5482,6 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $payment = self::addPayment(
             $policy,
             $policy->getPremium()->getMonthlyPremiumPrice(),
-            Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2016-02-28 15:00'),
             JudoPayment::RESULT_DECLINED

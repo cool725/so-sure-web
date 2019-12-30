@@ -2,14 +2,16 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Payment\Payment;
+use AppBundle\Classes\Salva;
+use AppBundle\Exception\CommissionException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
-use AppBundle\Classes\Salva;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\SalvaPhonePolicyRepository")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class SalvaPhonePolicy extends PhonePolicy
@@ -38,10 +40,10 @@ class SalvaPhonePolicy extends PhonePolicy
     // Policy needs to be replaced (cancelled/created) at salva - will replacement-create to active after acceptance
     const SALVA_STATUS_PENDING_REPLACEMENT_CANCEL = 'replacement-cancel';
 
-        // Policy needs to be replaced (cancelled/created) at salva - will change to active after acceptance
+    // Policy needs to be replaced (cancelled/created) at salva - will change to active after acceptance
     const SALVA_STATUS_PENDING_REPLACEMENT_CREATE = 'replacement-create';
 
-        // Policy needs to be updated (direct update) at salva - will change to active after acceptance
+    // Policy needs to be updated (direct update) at salva - will change to active after acceptance
     const SALVA_STATUS_PENDING_UPDATE = 'pending-update';
 
     const RESULT_TYPE_CREATE = 'create';
@@ -337,6 +339,155 @@ class SalvaPhonePolicy extends PhonePolicy
         $this->setSalvaStatus(self::SALVA_STATUS_WAIT_CANCELLED);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getUnderwriterTimeZone()
+    {
+        return new \DateTimeZone(Salva::SALVA_TIMEZONE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUnderwriterName()
+    {
+        return Salva::NAME;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setCommission($payment, $allowFraction = false, \DateTime $date = null)
+    {
+        $salva = new Salva();
+        $amount = $payment->getAmount();
+        // Only set broker fees if we know the amount
+        if ($this->areEqualToFourDp($amount, $this->getPremium()->getYearlyPremiumPrice())) {
+            $payment->setCommission(Salva::YEARLY_COVERHOLDER_COMMISSION, Salva::YEARLY_BROKER_COMMISSION);
+        } elseif ($amount >= 0 && ($this->getPremium()->isEvenlyDivisible($amount) ||
+            $this->getPremium()->isEvenlyDivisible($amount, true))
+        ) {
+            $comparison = $payment->hasSuccess() ? 0 : $amount;
+            $includeFinal = $this->areEqualToTwoDp($comparison, $this->getOutstandingPremium());
+            $numPayments = $this->getPremium()->getNumberOfMonthlyPayments($amount);
+            $payment->setCommission(
+                $salva->sumCoverholderCommission($numPayments, $includeFinal),
+                $numPayments * Salva::MONTHLY_BROKER_COMMISSION
+            );
+        } elseif ($allowFraction && $amount >= 0) {
+            $payment->setCommission(
+                $this->getProratedCoverholderCommissionPayment($payment->getDate()),
+                $this->getProratedBrokerCommissionPayment($payment->getDate())
+            );
+        } elseif ($amount < 0) {
+            if ($date === null) {
+                $date = new \DateTime();
+            }
+            $brokerCommission = $this->getBrokerCommissionPaid();
+            $coverholderCommission = $this->getCoverholderCommissionPaid();
+            $dueBrokerCommission = $this->getProratedBrokerCommission($date);
+            $dueCoverholderCommission = $this->getProratedCoverholderCommission($date);
+            $payment->setCommission(
+                $dueCoverholderCommission - $coverholderCommission,
+                $dueBrokerCommission - $brokerCommission
+            );
+        } else {
+            throw new CommissionException(sprintf(
+                'Failed to set correct commission for %f (policy %s)',
+                $amount,
+                $this->getId()
+            ));
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getYearlyTotalCommission(): float
+    {
+        return Salva::YEARLY_TOTAL_COMMISSION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getYearlyCoverholderCommission(): float
+    {
+        return Salva::YEARLY_COVERHOLDER_COMMISSION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getYearlyBrokerCommission(): float
+    {
+        return Salva::YEARLY_BROKER_COMMISSION;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExpectedCommission(\DateTime $date = null)
+    {
+        $salva = new Salva();
+        $premium = $this->getPremium();
+
+        $expectedCommission = null;
+        $totalPayments = $this->getTotalSuccessfulStandardPayments(false, $date);
+        // TODO: do we need to see if cancelled and if so use policy end date?
+        $expectedPayments = $this->getTotalExpectedPaidToDate($date);
+        $isMoneyOwed = !$this->areEqualToTwoDp($totalPayments, $expectedPayments) && $totalPayments < $expectedPayments;
+
+        $numPayments = $premium->getNumberOfMonthlyPayments($totalPayments);
+        if ($numPayments > 12 || $numPayments < 0) {
+            throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
+        }
+        $expectedMonthlyCommission = $salva->sumCoverholderCommission($numPayments, $numPayments == 12) +
+            Salva::MONTHLY_BROKER_COMMISSION * $numPayments;
+        $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
+
+        // active/unpaid should be on a cash received based
+        // also if a policy has been cancelled and there is no refund allowed, then should be based on cash recevied
+        // also if a policy has been cancelled and there is money owed
+        if ($this->isCooloffCancelled()) {
+            return 0;
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+            self::STATUS_PICSURE_REQUIRED
+        ])) {
+            $expectedCommission = $expectedMonthlyCommission;
+        } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
+            // if there's a refund, the number of payments won't be equal and so we need to calculate based on received
+            // funds, rather than monthly
+            if ($numPayments) {
+                $expectedCommission = $expectedMonthlyCommission;
+            } else {
+                $expectedCommission = $commissionReceived;
+            }
+        } elseif (in_array($this->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM]) && $numPayments == 11) {
+            // we've had a historical issue where if a policy has had 11 payments, and the cancellation date is at the
+            // same day as the expiration date, we dont' quite cancel in time.
+            $expectedCommission = $expectedMonthlyCommission;
+        } else {
+            if (!$date) {
+                $date = \DateTime::createFromFormat('U', time());
+            }
+            // policy is not active (above if statement)
+            // so at most we should only be calculating to the end of the policy
+            if ($date > $this->getEnd()) {
+                $date = $this->getEnd();
+            }
+            $expectedCommission = $this->getProratedCommission($date);
+        }
+        return $expectedCommission;
+    }
+
+
     public function hasSalvaPreviousVersionPastMidnight($version = null)
     {
         if (!$this->isPolicy() || !$this->getSalvaStartDate($version)) {
@@ -378,6 +529,7 @@ class SalvaPhonePolicy extends PhonePolicy
 
         $startDate = $this->getSalvaStartDate($version);
         $startDate = $this->startOfDay($startDate);
+
         $endDate = null;
         if ($version) {
             // if we're versioned, the previous period was already billed for the start date
@@ -387,7 +539,6 @@ class SalvaPhonePolicy extends PhonePolicy
             }
 
             $endDate = $this->getSalvaTerminationDate($version);
-            //print_r($endDate);
         } elseif ($this->getStatus() == SalvaPhonePolicy::STATUS_CANCELLED) {
             if ($this->isRefundAllowed()) {
                 $endDate = clone $this->getEnd();
@@ -461,7 +612,6 @@ class SalvaPhonePolicy extends PhonePolicy
             ));
             */
         }
-
         return $days;
     }
 
@@ -515,6 +665,7 @@ class SalvaPhonePolicy extends PhonePolicy
             // previously sent
             return $this->toTwoDp(0 - $previousGwp);
         }
+
 
         return $this->toTwoDp($totalGwp);
     }

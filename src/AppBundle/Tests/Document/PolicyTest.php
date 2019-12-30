@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
@@ -36,7 +37,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $nonRefundAmount = rand(0, 100) / 90;
         $refundAmount = rand(0, 100) / 90;
         $date = new \DateTime();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         for ($i = 0; $i < $nNonRefunds; $i++) {
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
@@ -74,7 +75,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $nonRefundAmount = rand(0, 100) / 90;
         $refundAmount = rand(-100, -1) / 90;
         $date = new \DateTime();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         for ($i = 0; $i < $nNonRefunds; $i++) {
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
@@ -100,7 +101,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLastRevertedScheduledPaymentNormal()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(5.3);
         $premium->setIpt(1.2);
@@ -142,7 +143,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLastRevertedScheduledPaymentEmpty()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $premium = new PhonePremium();
         $premium->setGwp(5.3);
         $premium->setIpt(1.2);
@@ -174,7 +175,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
     {
         $user = new User();
         $premium = new PhonePremium();
-        $a = new PhonePolicy();
+        $a = new HelvetiaPhonePolicy();
         $a->setId("1");
         $a->setPolicyNumber("Mob/2016/1");
         $a->setPremium($premium);
@@ -182,7 +183,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $a->setEnd(new \DateTime('2017-12-30'));
         $a->setStatus(Policy::STATUS_CANCELLED);
         $a->setCancelledReason(Policy::CANCELLED_UNPAID);
-        $b = new PhonePolicy();
+        $b = new HelvetiaPhonePolicy();
         $b->setPolicyNumber("Mob/2016/2");
         $b->setId("2");
         $b->setPremium($premium);
@@ -190,13 +191,13 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $b->setEnd(new \DateTime('2018-05-02 14:05'));
         $b->setStatus(Policy::STATUS_CANCELLED);
         $b->setCancelledReason(Policy::CANCELLED_UPGRADE);
-        $c = new PhonePolicy();
+        $c = new HelvetiaPhonePolicy();
         $c->setId("3");
         $c->setPolicyNumber("Mob/2016/3");
         $c->setPremium($premium);
         $c->setStart(new \DateTime('2018-05-02 20:21'));
         $c->setStatus(Policy::STATUS_ACTIVE);
-        $d = new PhonePolicy();
+        $d = new HelvetiaPhonePolicy();
         $d->setId("4");
         $d->setPolicyNumber("Mob/2016/4");
         $d->setPremium($premium);
@@ -204,7 +205,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $d->setEnd(new \DateTime('2018-09-09 12:30'));
         $d->setStatus(Policy::STATUS_CANCELLED);
         $d->setCancelledReason(Policy::CANCELLED_UPGRADE);
-        $e = new PhonePolicy();
+        $e = new HelvetiaPhonePolicy();
         $e->setId("5");
         $e->setPolicyNumber("Mob/2016/5");
         $e->setPremium($premium);
@@ -234,7 +235,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $premium->setGwp(12.34);
         $premium->setIpt(0.66);
         $date = new \DateTime();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPremium($premium);
         $policy->setStart(clone $date);
         $policy->setEnd((clone $date)->add(new \DateInterval("P1Y")));
@@ -273,7 +274,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $premium->setGwp(2.34);
         $premium->setIpt(0.66);
         $date = new \DateTime();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPremium($premium);
         $policy->setStart(clone $date);
         $policy->setEnd((clone $date)->add(new \DateInterval("P1Y")));
@@ -297,7 +298,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
     public function testGetNonRewardConnections()
     {
         //Create Policy
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user = new User();
         $policy->setUser($user);
 

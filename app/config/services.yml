@@ -132,8 +132,10 @@ services:
             - "@logger"
             - "@app.policy"
             - "@app.mailer"
-            - "%checkout_apisecret%"
-            - "%checkout_apipublic%"
+            - "%checkout_salva_apisecret%"
+            - "%checkout_salva_apipublic%"
+            - "%checkout_helvetia_apisecret%"
+            - "%checkout_helvetia_apipublic%"
             - "%kernel.environment%"
             - "@statsd"
             - "@event_dispatcher"
@@ -531,6 +533,8 @@ services:
         class: AppBundle\Service\PolicyTwigExtension
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
+            - "%checkout_salva_apipublic%"
+            - "%checkout_helvetia_apipublic%"
         public: false
         tags:
             - { name: twig.extension }
@@ -551,6 +555,17 @@ services:
     AppBundle\Service\ExcelService:
         arguments:
             - "@logger"
+
+    app.helvetia:
+        alias: AppBundle\Service\HelvetiaExportService
+        public: true
+
+    AppBundle\Service\HelvetiaExportService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@aws.s3"
+            - "%kernel.environment%"
 
     app.salva:
         alias: AppBundle\Service\SalvaExportService
@@ -1259,8 +1274,8 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewalEvent }
 
-    app.listener.salva:
-        class:   AppBundle\Listener\SalvaListener
+    app.listener.underwriter:
+        class:   AppBundle\Listener\UnderwriterListener
         arguments:
             - "@app.salva"
         tags:

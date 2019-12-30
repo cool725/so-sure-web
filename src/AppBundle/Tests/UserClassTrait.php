@@ -146,7 +146,7 @@ trait UserClassTrait
             $policy->setPhone($phone, $date);
             /** @var PhonePrice */
             $price = $phone->getOldestCurrentPhonePrice();
-            $policy->setPremium($price->createPremium());
+            $policy->setPremium($price->createPremium(null, $date));
             if (!$imei) {
                 $policy->setImei(static::generateRandomImei());
             }
@@ -345,7 +345,7 @@ trait UserClassTrait
 
         if ($phone) {
             $policy->setPhone($phone, $date);
-            $policy->setPremium($phone->getOldestCurrentPhonePrice()->createPremium());
+            $policy->setPremium($phone->getOldestCurrentPhonePrice()->createPremium(null, $date));
         }
 
         if ($addPayment) {
@@ -438,11 +438,9 @@ trait UserClassTrait
         if ($monthly) {
             $policy->setPremiumInstallments(12);
             $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
-            $commission = Salva::MONTHLY_TOTAL_COMMISSION;
         } else {
             $policy->setPremiumInstallments(1);
             $premium = $policy->getPremium()->getYearlyPremiumPrice(null, $date);
-            $commission = Salva::YEARLY_TOTAL_COMMISSION;
         }
         if ($adjustment) {
             $premium = $premium - $adjustment;
@@ -456,7 +454,7 @@ trait UserClassTrait
         } else {
             $receiptId = random_int(1, 999999);
         }
-        self::addPayment($policy, $premium, $commission, $receiptId, $date);
+        self::addPayment($policy, $premium, $receiptId, $date);
     }
 
     public static function addBacsPayPayment($policy, $date = null, $monthly = true, $manual = true)
@@ -489,7 +487,6 @@ trait UserClassTrait
     public static function addPayment(
         Policy $policy,
         $amount,
-        $commission,
         $receiptId = null,
         $date = null,
         $result = JudoPayment::RESULT_SUCCESS
@@ -499,7 +496,7 @@ trait UserClassTrait
         }
         $payment = new JudoPayment();
         $payment->setAmount($amount);
-        $payment->setTotalCommission($commission);
+        $policy->setCommission($payment);
         $payment->setResult($result);
         $payment->setReceipt($receiptId);
         if ($date) {
@@ -513,7 +510,6 @@ trait UserClassTrait
     public static function addCheckoutPayment(
         Policy $policy,
         $amount,
-        $commission,
         $receiptId = null,
         $date = null,
         $result = CheckoutPayment::RESULT_CAPTURED
@@ -523,7 +519,7 @@ trait UserClassTrait
         }
         $payment = new CheckoutPayment();
         $payment->setAmount($amount);
-        $payment->setTotalCommission($commission);
+        $policy->setCommission($payment);
         $payment->setResult($result);
         $payment->setReceipt($receiptId);
         if ($date) {

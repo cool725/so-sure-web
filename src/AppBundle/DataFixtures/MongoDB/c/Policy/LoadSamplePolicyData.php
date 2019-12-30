@@ -21,6 +21,7 @@ use AppBundle\Service\RouterService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
@@ -646,7 +647,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      * @param integer|null  $paidMonths
      * @param string        $picSure
      * @param boolean       $isPaymentMethodBacs
-     * @return SalvaPhonePolicy
+     * @return PhonePolicy
      * @throws \AppBundle\Exception\InvalidPremiumException
      */
     private function newPolicy(
@@ -693,7 +694,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $days = sprintf("P%dD", $days);
         }
         $startDate->sub(new \DateInterval($days));
-        $policy = new SalvaPhonePolicy();
+        $policy = (rand(0, 1)) ? new SalvaPhonePolicy() : new HelvetiaPhonePolicy();
         $policy->setPaymentMethod(
             $this->getPaymentMethod($policy, ($isPaymentMethodBacs !== null) ? $isPaymentMethodBacs : (rand(0, 1) == 0))
         );
@@ -843,7 +844,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 if (random_int(0, 3) == 0) {
                     $tDate = clone $paymentDate;
                     $tDate->add(new \DateInterval('P1D'));
-                    $policy->incrementSalvaPolicyNumber($tDate);
+                    if ($policy instanceof SalvaPhonePolicy) {
+                        $policy->incrementSalvaPolicyNumber($tDate);
+                    }
                 }
             }
         }

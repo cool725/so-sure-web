@@ -5,6 +5,10 @@ namespace AppBundle\Tests;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Premium;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
@@ -13,6 +17,8 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\LogEntry;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\Helvetia;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
@@ -73,12 +79,32 @@ class Create
      */
     public static function policy($user, $start, $status, $installments)
     {
-        $policy = new PhonePolicy();
-        $policy->setUser($user);
         $startDate = is_string($start) ? new \DateTime($start) : $start;
+        if ($startDate < Salva::getSalvaBinderEndDate()) {
+            return self::salvaPhonePolicy($user, $startDate, $status, $installments);
+        }
+        return self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
+    }
+
+    /**
+     * Creates a salva phone policy.
+     * @param User             $user         is the user who owns the policy.
+     * @param \DateTime|string $start        is the start date of the policy.
+     * @param string           $status       is the status of the policy.
+     * @param int              $installments is the number of premium installments the policy is to pay.
+     * @return SalvaPhonePolicy the new phone policy.
+     */
+    public static function salvaPhonePolicy($user, $start, $status, $installments, $phone = null)
+    {
+        $startDate = is_string($start) ? new \DateTime($start) : $start;
+        $policy = new SalvaPhonePolicy();
+        $policy->setUser($user);
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $policy->setStaticEnd($policy->getEnd());
+        if ($phone) {
+            $policy->setPhone($phone);
+        }
         $premium = new PhonePremium();
         $premium->setGwp(rand(20, 100) / 8);
         $policy->setPremium($premium);
@@ -89,27 +115,51 @@ class Create
     }
 
     /**
-     * Creates a policy and sets a phone on it.
-     * @param User             $user         is the user that the policy will have.
-     * @param \DateTime|string $start        is the date at which the policy is to start.
-     * @param string           $status       is the status for the policy to have.
-     * @param int              $installments is the premium installments the policy is to have.
-     * @param Phone            $phone        is the phone to give the policy.
-     * @return PhonePolicy the created policy.
+     * Creates a helvetia phone policy.
+     * @param User             $user         is the user who owns the policy.
+     * @param \DateTime|string $start        is the start date of the policy.
+     * @param string           $status       is the status of the policy.
+     * @param int              $installments is the number of premium installments the policy is to pay.
+     * @return HelvetiaPhonePolicy the new phone policy.
      */
-    public static function phonePolicy($user, $start, $status, $installments, $phone)
+    public static function helvetiaPhonePolicy($user, $start, $status, $installments, $phone = null)
     {
-        $policy = self::policy($user, $start, $status, $installments);
-        $policy->setPhone($phone);
+        $startDate = is_string($start) ? new \DateTime($start) : $start;
+        $policy = new HelvetiaPhonePolicy();
+        $policy->setUser($user);
+        $policy->setStart($startDate);
+        $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
+        $policy->setStaticEnd($policy->getEnd());
+        if ($phone) {
+            $policy->setPhone($phone);
+        }
+        $premium = new PhonePremium();
+        $premium->setGwp(rand(20, 100) / 8);
+        $policy->setPremium($premium);
+        $policy->setStatus($status);
+        $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
+        $policy->setPremiumInstallments($installments);
         return $policy;
     }
 
     /**
-     * Creates a phone price with random gwp.
-     * @param \DateTime|string $validFrom is the date from which the price is valid as either a date object or string.
-     * @param string           $stream    is the stream that this price is in.
-     * @return PhonePrice the new phone price.
+     * Create a policy and give it a bacs payment method.
+     * @param User             $user         is the user that the policy belongs to.
+     * @param \DateTime|string $start        is the start date either as a date string or as a date.
+     * @param string           $status       is the status that the policy should be given.
+     * @param int              $installments is the number of premium installments the policy is meant to pay.
+     * @return Policy the policy.
      */
+    public static function bacsPolicy($user, $start, $status, $installments)
+    {
+        $policy = Create::policy($user, $start, $status, $installments);
+        $bankAccount = new BankAccount();
+        $paymentMethod = new BacsPaymentMethod();
+        $paymentMethod->setBankAccount($bankAccount);
+        $policy->setPaymentMethod($paymentMethod);
+        return $policy;
+    }
+
     public static function phonePrice($validFrom, $stream)
     {
         $date = is_string($validFrom) ? new \DateTime($validFrom) : $validFrom;
@@ -154,7 +204,7 @@ class Create
         $payment->setDate($properDate);
         $policy->addPayment($payment);
         if ($success) {
-            $payment->setCommission(false, $properDate);
+            $policy->setCommission($payment, false, $properDate);
         }
         return $payment;
     }

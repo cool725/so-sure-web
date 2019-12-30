@@ -817,7 +817,10 @@ class SalvaExportServiceTest extends WebTestCase
             $refundCommissionAmount = $policy->getRefundCommissionAmount();
             $refund = new JudoPayment();
             $refund->setAmount(0 - $refundAmount);
-            $refund->setRefundTotalCommission($refundCommissionAmount);
+            $refund->setCommission(
+                $policy->getProrataCoverholderCommissionRefund(),
+                $policy->getBrokerCoverholderCommissionRefund()
+            );
             $refund->setReceipt(sprintf('R-%s', rand(1, 999999)));
             $refund->setResult(JudoPayment::RESULT_SUCCESS);
             $refund->setDate($date);

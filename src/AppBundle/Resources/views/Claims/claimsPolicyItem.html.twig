@@ -138,6 +138,10 @@
                                     <td>Policy Dates</td>
                                     <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
                                 </tr>
+                                <tr>
+                                    <td>Underwriter</td>
+                                    <td>{{ policy.underwriterName }}</td>
+                                </tr>
                                 {% endif %}
                             </table>
                         </div>
@@ -426,7 +430,7 @@
                                     <tr>
                                         <td>Policy Commission</td>
                                         <td>
-                                            Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
+                                            Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
                                             {% if policy.isPolicy and policy.start %}
                                                 <br>
                                                 {% if policy.end < now %}
@@ -974,29 +978,31 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
             {% if is_granted('ROLE_EMPLOYEE') %}
-            <h3>Salva History</h3>
-            <table class="table table-striped">
-                <tr>
-                    <td>Salva Policy Numbers</td>
-                    <td>
-                        {% for key, value in policy.salvaPolicyNumbers %}
-                            <ul>
-                                {{ key }} - {{ value }}
-                            </ul>
-                        {% endfor %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Salva Policy Results</td>
-                    <td>
-                        {% for key, value in policy.salvaPolicyResultsUnserialized %}
-                            <ul>
-                                {{ key }} - {{ value|json_encode }}
-                            </ul>
-                        {% endfor %}
-                    </td>
-                </tr>
-            </table>
+                {% if policy.underwriterName == 'Salva' %}
+                    <h3>Salva History</h3>
+                    <table class="table table-striped">
+                        <tr>
+                            <td>Salva Policy Numbers</td>
+                            <td>
+                                {% for key, value in policy.salvaPolicyNumbers %}
+                                    <ul>
+                                        {{ key }} - {{ value }}
+                                    </ul>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Salva Policy Results</td>
+                            <td>
+                                {% for key, value in policy.salvaPolicyResultsUnserialized %}
+                                    <ul>
+                                        {{ key }} - {{ value|json_encode }}
+                                    </ul>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </table>
+                {% endif %}
             {% endif %}
             <h3>User History</h3>
             <table class="table table-striped">
@@ -1459,37 +1465,39 @@
                     </td>
                 </tr>
                 {% if is_granted('ROLE_ADMIN') %}
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Trigger Salva Policy Update</td>
-                    <td>
-                        {{ form_start(salva_update_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(salva_update_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to trigger an update with salva?'}}) }}
-                        {{ form_end(salva_update_form) }}
-                        <br>
-                        If the policy was manually adjusted, notify Salva of the new price.
-                    </td>
-                </tr>
+                    {% if policy.underwriterName == 'Salva' %}
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Trigger Salva Policy Update</td>
+                            <td>
+                                {{ form_start(salva_update_form, {'attr': {'class': 'form-inline'}}) }}
+                                {{ form_widget(salva_update_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-danger confirm-submit', 'data-confirm-msg': 'Are you sure you want to trigger an update with salva?'}}) }}
+                                {{ form_end(salva_update_form) }}
+                                <br>
+                                If the policy was manually adjusted, notify Salva of the new price.
+                            </td>
+                        </tr>
 
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Requeue Salva Policy</td>
-                    <td>
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaRequeueForm">
-                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            Requeue
-                        </button>
-                    </td>
-                </tr>
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Requeue Salva Policy</td>
+                            <td>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaRequeueForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Requeue
+                                </button>
+                            </td>
+                        </tr>
 
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Salva Status</td>
-                    <td>
-                        {{ policy.salvaStatus }}
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaStatusForm">
-                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            Change Status
-                        </button>
-                    </td>
-                </tr>
+                        <tr>
+                            <td><i class="fa fa-lock" title="Admin only"></i> Salva Status</td>
+                            <td>
+                                {{ policy.salvaStatus }}
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#salvaStatusForm">
+                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                    Change Status
+                                </button>
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endif %}
             </table>
 
@@ -2002,7 +2010,7 @@
                                         {% endif %}
 
                                         <hr>
-                                        Policy Commission: Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
+                                        Policy Commission: Received £{{ policy.getTotalCommissionPaid() | number_format(2, '.', ',') }} of £{{ policy.yearlyTotalCommission| number_format(2, '.', ',') }} (coverholder + broker)
                                         {% if policy.isPolicy and policy.start %}
                                             <br>
                                             {% if policy.end < now %}
@@ -2058,8 +2066,10 @@
 
     {% endif %}
     {% if is_granted('ROLE_ADMIN') %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+        {% if policy.underwriterName == 'Salva' %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaRequeueForm', 'policy': policy, 'id': 'salvaRequeueForm'} %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
+        {% endif %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:createScheduledPaymentForm', 'policy': policy, 'id': 'createScheduledPaymentForm'} %}
         {% if policy.isPolicy %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}

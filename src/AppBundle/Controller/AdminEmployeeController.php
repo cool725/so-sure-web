@@ -1467,7 +1467,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $price = $policy->getPhone()->getCurrentYearlyPhonePrice();
             $bacsPayment->setAmount($price->getYearlyPremiumPrice());
         }
-        $bacsPayment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        $bacsPayment->setCommission(
+            $policy->getYearlyCoverholderCommission(),
+            $policy->getYearlyBrokerCommission()
+        );
         if ($policy->getPolicyOrUserBacsBankAccount()) {
             $bacsPayment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
         }
@@ -1545,7 +1548,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $bacsRefund->setSource(Payment::SOURCE_ADMIN);
         $bacsRefund->setPolicy($policy);
         $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
-        $bacsRefund->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $bacsRefund->setCommission(
+            $policy->getYearlyCoverholderCommission(),
+            $policy->getYearlyBrokerCommission()
+        );
         $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
         if ($policy->getPolicyOrUserBacsBankAccount()) {
             $bacsRefund->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());

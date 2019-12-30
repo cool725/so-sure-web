@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
@@ -28,7 +29,7 @@ class PhonePolicyTest extends \PHPUnit\Framework\TestCase
         $phone = new Phone();
         $phone->addPhonePrice($this->createPhonePrice(666, new \DateTime("0001-05-19")));
         $phone->setHighlight(true);
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPhone($phone);
         /** @var PhonePrice */
         $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
@@ -62,7 +63,7 @@ class PhonePolicyTest extends \PHPUnit\Framework\TestCase
         $phone = new Phone();
         $phone->setHighlight(false);
         $phone->addPhonePrice($this->createPhonePrice(666, new \DateTime("0001-05-19")));
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setPhone($phone);
         /** @var PhonePrice */
         $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);

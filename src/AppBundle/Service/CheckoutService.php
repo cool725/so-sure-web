@@ -1,8 +1,11 @@
 <?php
+
 namespace AppBundle\Service;
 
 use AppBundle\Classes\NoOp;
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\Helvetia;
 use AppBundle\Document\Charge;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\CheckoutFile;
@@ -31,10 +34,9 @@ use com\checkout\ApiServices\Reporting\RequestModels\TransactionFilter;
 use com\checkout\ApiServices\SharedModels\Address;
 use com\checkout\ApiServices\SharedModels\Transaction;
 use com\checkout\ApiServices\Tokens\RequestModels\PaymentTokenCreate;
+use com\checkout\ApiServices\Tokens\ResponseModels\CardToken;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
-
-use AppBundle\Classes\Salva;
 
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Phone;
@@ -57,6 +59,9 @@ use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\SameDayPaymentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Handles payments through checkout.com.
+ */
 class CheckoutService
 {
     use CurrencyTrait;
@@ -106,38 +111,47 @@ class CheckoutService
     /** @var PriceService */
     protected $priceService;
 
-    /** @var ApiClient */
-    protected $client;
+    /** @var string */
+    protected $salvaApiSecret;
 
-    /** @var CheckoutApi */
-    protected $api;
+    /** @var string */
+    protected $salvaApiPublic;
 
-    public function setDispatcher($dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
+    /** @var string */
+    protected $helvetiaApiSecret;
+
+    /** @var string */
+    protected $helvetiaApiPublic;
+
+    /** @var boolean */
+    protected $production;
 
     /**
-     * @param DocumentManager          $dm
-     * @param LoggerInterface          $logger
-     * @param PolicyService            $policyService
-     * @param MailerService            $mailer
-     * @param string                   $apiSecret
-     * @param string                   $apiPublic
-     * @param string                   $environment
-     * @param \Domnikl\Statsd\Client   $statsd
-     * @param EventDispatcherInterface $dispatcher
-     * @param SmsService               $sms
-     * @param FeatureService           $featureService
-     * @param PriceService             $priceService
+     * Injects the service's dependencies.
+     * @param DocumentManager          $dm                is used for database access.
+     * @param LoggerInterface          $logger            is used for logging.
+     * @param PolicyService            $policyService     is used to update policies in response to payment.
+     * @param MailerService            $mailer            is used to email users in response to payment status.
+     * @param string                   $salvaApiSecret    is the private key for the old checkout channel.
+     * @param string                   $salvaApiPublic    is the public key for the old checkout channel.
+     * @param string                   $helvetiaApiSecret is the private key for the new checkout channel.
+     * @param string                   $helvetiaApiPublic is the public key for the new checkout channel.
+     * @param string                   $environment       is the environment that the service is in.
+     * @param \Domnikl\Statsd\Client   $statsd            is used to record stats.
+     * @param EventDispatcherInterface $dispatcher        is used to dispatch payment events events.
+     * @param SmsService               $sms               is used to sms users in response to payment status.
+     * @param FeatureService           $featureService    is used to check if features are enabled.
+     * @param PriceService             $priceService      is used to verify paid sums.
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         PolicyService $policyService,
         MailerService $mailer,
-        $apiSecret,
-        $apiPublic,
+        $salvaApiSecret,
+        $salvaApiPublic,
+        $helvetiaApiSecret,
+        $helvetiaApiPublic,
         $environment,
         \Domnikl\Statsd\Client $statsd,
         EventDispatcherInterface $dispatcher,
@@ -155,46 +169,103 @@ class CheckoutService
         $this->environment = $environment;
         $this->featureService = $featureService;
         $this->priceService = $priceService;
-
-        $isProd = $environment == 'prod';
-        $this->client = new ApiClient($apiSecret, $isProd ? 'live' : 'sandbox', !$isProd);
-        $this->api = new CheckoutApi($apiSecret, -1, $apiPublic);
+        $this->salvaApiSecret = $salvaApiSecret;
+        $this->salvaApiPublic = $salvaApiPublic;
+        $this->helvetiaApiSecret = $helvetiaApiSecret;
+        $this->helvetiaApiPublic = $helvetiaApiPublic;
+        $this->production = $environment === 'prod';
     }
 
     /**
-     * @param string $chargeId
-     * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge
+     * Sets the service's event dispatcher.
+     * @param EventDispatcherInterface $dispatcher is the dispatcher to set it to.
      */
-    public function getTransaction($chargeId)
+    public function setDispatcher($dispatcher)
     {
-        $charge = $this->client->chargeService();
-        /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
-        $details = $charge->getCharge($chargeId);
-
-        return $details;
+        $this->dispatcher = $dispatcher;
     }
 
-    public function getTransactionWebType($chargeId)
+    /**
+     * Gives the checkout client to the channel that should be used for payments regarding named underwriter.
+     * @param string $underwriter is the name of the underwriter that we are getting the checkout client for.
+     * @return ApiClient the client for the named underwriter. If none can be found then an illegal argument exception
+     *                   will be thrown.
+     */
+    public function getClientForUnderwriter($underwriter)
     {
-        try {
-            $data = $this->getTransaction($chargeId);
-            if ($data->getMetadata() && isset($data->getMetadata()['web_type'])) {
-                return $data->getMetadata()['web_type'];
-            }
-        } catch (\Exception $e) {
-            $this->logger->warning(
-                sprintf('Unable to find transaction charge %s', $chargeId),
-                ['exception' => $e]
-            );
+        $apiSecret = null;
+        if ($underwriter === Salva::NAME) {
+            $apiSecret = $this->salvaApiSecret;
+        } elseif ($underwriter === Helvetia::NAME) {
+            $apiSecret = $this->helvetiaApiSecret;
         }
+        if ($apiSecret) {
+            return new ApiClient($apiSecret, $this->production ? 'live' : 'sandbox', !$this->production);
+        }
+        throw new \InvalidArgumentException("{$underwriter} is not the name of a valid underwriter");
+    }
 
-        return null;
+    /**
+     * Gives the checkout api that should be used for payments regarding named underwriter.
+     * @param string $underwriter is the name of the underwriter that we are getting the checkout api for.
+     * @return CheckoutApi the correct api if there is one. An illegal argument exception will be thrown if there is
+     *                     not appropriate api.
+     */
+    public function getApiForUnderwriter($underwriter)
+    {
+        $apiSecret = null;
+        $apiPublic = null;
+        if ($underwriter === Salva::NAME) {
+            $apiSecret = $this->salvaApiSecret;
+            $apiPublic = $this->salvaApiPublic;
+        } elseif ($underwriter === Helvetia::NAME) {
+            $apiSecret = $this->helvetiaApiSecret;
+            $apiPublic = $this->helvetiaApiPublic;
+        }
+        if ($apiSecret && $apiPublic) {
+            return new CheckoutApi($apiSecret, -1, $apiPublic);
+        }
+        throw new \InvalidArgumentException("{$underwriter} is not the name of a valid underwriter");
+    }
+    /**
+     * Gives the checkout client that should be used for payments regarding a given policy. If the policy has no
+     * appropriate client an exception will be thrown but that shouldn't be possible.
+     * @param Policy $policy is the policy that we are going to work on with the client.
+     * @return ApiClient the appropriate client.
+     */
+    public function getClientForPolicy(Policy $policy)
+    {
+        return $this->getClientForUnderwriter($policy->getUnderwriterName());
+    }
+
+    /**
+     * Gives the checkout api that should be used for payments regarding a given policy. If the policy has no
+     * appropriate api an exception will be thrown but that shouldn't be possible.
+     * @param Policy $policy is the policy that we are going to work on with the API.
+     * @return CheckoutApi the appropriate api.
+     */
+    public function getApiForPolicy(Policy $policy)
+    {
+        return $this->getApiForUnderwriter($policy->getUnderwriterName());
+    }
+
+    /**
+     * Gets the details of a transaction from checkout.
+     * @param ApiClient $client   the client to use to get this transaction (which is the client that the transaction
+     *                            was made with).
+     * @param string    $chargeId the id of the charge to get.
+     * @return \com\checkout\ApiServices\Charges\ResponseModels\Charge
+     */
+    public function getTransaction($client, $chargeId)
+    {
+        $charge = $client->chargeService();
+        /** @var \com\checkout\ApiServices\Charges\ResponseModels\Charge $details */
+        $details = $charge->getCharge($chargeId);
+        return $details;
     }
 
     public function getTransactions($pageSize, $logMissing = true)
     {
-        NoOp::ignore([$pageSize]);
-
         $policies = [];
         $repo = $this->dm->getRepository(CheckoutPayment::class);
 
@@ -202,7 +273,8 @@ class CheckoutService
         $filter->setPageSize($pageSize);
         //$filter->setSearch()
 
-        $transactions = $this->client->reportingService()->queryTransaction($filter);
+        $client = $this->getClientForUnderwriter(Helvetia::NAME);
+        $transactions = $client->reportingService()->queryTransaction($filter);
         $data = [
             'validated' => 0,
             'missing' => [],
@@ -215,7 +287,7 @@ class CheckoutService
             /** @var Transaction $transaction */
             $policyId = null;
             $result = $transaction->getStatus();
-            $details = $this->getTransaction($transaction->getId());
+            $details = $this->getTransaction($client, $transaction->getId());
             if ($result == CheckoutPayment::RESULT_CAPTURED &&
                 $details->getMetadata() && isset($details->getMetadata()['policy_id'])) {
                 // Non-token payments (eg. user) may be tried several times in a row
@@ -590,7 +662,8 @@ class CheckoutService
             $charge->setMetadata(['policy_id' => $policyId]);
             $charge->setBaseCardCreate($cardCreate);
 
-            $service = $this->client->chargeService();
+            $client = $this->getClientForPolicy($policy);
+            $service = $client->chargeService();
             $details = $service->chargeWithCard($charge);
             if ($details->getStatus() != CheckoutPayment::RESULT_AUTHORIZED) {
                 /**
@@ -619,7 +692,7 @@ class CheckoutService
                 $this->dm->flush();
             }
 
-            $service = $this->client->chargeService();
+            $service = $client->chargeService();
             $details = $service->CaptureCardCharge($capture);
         } catch (\Exception $e) {
             $this->logger->error(
@@ -629,29 +702,6 @@ class CheckoutService
         }
 
         return $details;
-    }
-
-    public function createCardToken($cardNumber, $expiryDate, $cv2)
-    {
-        $token = null;
-        try {
-            $exp = explode('/', $expiryDate);
-
-            $cardNumber = str_replace(' ', '', $cardNumber);
-
-            $card = new \Checkout\Models\Tokens\Card($cardNumber, $exp[0], $exp[1]);
-            //NoOp::ignore([$cv2]);
-            $card->cvv = $cv2;
-            $service = $this->api->tokens();
-            $token = $service->request($card);
-        } catch (\Exception $e) {
-            $this->logger->error(
-                sprintf('Failed creating card token. Msg: %s', $e->getMessage()),
-                ['exception' => $e]
-            );
-        }
-
-        return $token;
     }
 
     public function tokenMigration($filename)
@@ -705,10 +755,14 @@ class CheckoutService
         return ['migrated' => $migrated, 'skipped' => $skipped];
     }
 
-    public function getCharge($chargeId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
-    {
-        $service = $this->client->chargeService();
-
+    public function getCharge(
+        $client,
+        $chargeId,
+        $enforceFullAmount = true,
+        $enforceDate = true,
+        \DateTime $date = null
+    ) {
+        $service = $client->chargeService();
         try {
             /**  @var \com\checkout\ApiServices\Charges\ResponseModels\ChargeHistory  $transactionDetails **/
             $transactionDetails = $service->getChargeHistory($chargeId);
@@ -721,7 +775,6 @@ class CheckoutService
 
             throw $e;
         }
-
         $hasRefund = false;
         $refundedAmount = 0;
         $amount = 0;
@@ -734,8 +787,6 @@ class CheckoutService
                 $amount += $charge->getValue();
             }
         }
-
-
         if ($hasRefund) {
             $msg = sprintf(
                 'Checkout receipt %s has a refund applied (refunded %s of %s).',
@@ -751,8 +802,6 @@ class CheckoutService
                 $this->logger->warning($msg);
             }
         }
-
-
         /**  @var \com\checkout\ApiServices\Charges\ResponseModels\Charge  $transactionDetails **/
         $transactionDetails = $service->verifyCharge($chargeId);
         $created = \DateTime::createFromFormat(\DateTime::ATOM, $transactionDetails->getCreated());
@@ -776,7 +825,6 @@ class CheckoutService
                 $this->logger->warning($msg);
             }
         }
-
         return $transactionDetails;
     }
 
@@ -790,6 +838,7 @@ class CheckoutService
         $token,
         $amount = null
     ) {
+        $client = $this->getClientForPolicy($policy);
         $user = $policy->getUser();
         $details = null;
         $payment = null;
@@ -801,7 +850,7 @@ class CheckoutService
         }
 
         try {
-            $service = $this->client->chargeService();
+            $service = $client->chargeService();
 
             $user = $policy->getUser();
 
@@ -914,8 +963,8 @@ class CheckoutService
                 $paymentMethod->setPreviousChargeId('none');
                 $this->dm->flush();
             }
-
-            $service = $this->client->chargeService();
+            $client = $this->getClientForPolicy($policy);
+            $service = $client->chargeService();
 
             $charge = new CardTokenChargeCreate();
             $charge->setEmail($user->getEmail());
@@ -1101,7 +1150,7 @@ class CheckoutService
      */
     public function validateCharge(Policy $policy, $chargeId, $source, \DateTime $date = null)
     {
-        $transactionDetails = $this->getCharge($chargeId);
+        $transactionDetails = $this->getCharge($this->getClientForPolicy($policy), $chargeId);
         $repo = $this->dm->getRepository(CheckoutPayment::class);
         $exists = $repo->findOneBy(['receipt' => $transactionDetails->getId()]);
         if ($exists) {
@@ -1533,9 +1582,11 @@ class CheckoutService
             ));
         }
 
+
         $user = $policy->getUser();
 
-        $chargeService = $this->client->chargeService();
+        $client = $this->getClientForPolicy($policy);
+        $chargeService = $client->chargeService();
         $chargeCreate = new CardIdChargeCreate();
         if ($paymentMethod->hasPreviousChargeId()) {
             $chargeCreate->setPreviousChargeId($paymentMethod->getPreviousChargeId());
@@ -1704,7 +1755,7 @@ class CheckoutService
     public function setCommission($payment, $allowFraction = false)
     {
         try {
-            $payment->setCommission($allowFraction);
+            $payment->getPolicy()->setCommission($payment, $allowFraction);
         } catch (CommissionException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -1713,31 +1764,27 @@ class CheckoutService
     }
 
     /**
-     * Refund a payment
-     *
+     * Refund a payment.
      * @param CheckoutPayment $payment
-     * @param float           $amount         Amount to refund (or null for entire initial amount)
-     * @param float           $totalCommision Total commission amount to refund (or null for entire amount from payment)
-     * @param string          $notes
-     * @param string          $source
-     *
-     * @return CheckoutPayment
+     * @param float           $amount                Amount to refund (or null for entire initial amount)
+     * @param float           $coverholderCommission total commission amount to refund or null to refund it all.
+     * @param float           $brokerCommission      is the amount of broker commission to refund or null for all of it.
+     * @param string          $notes                 the notes to put on the refund.
+     * @param string          $source                is the source to say on the payment.
+     * @return CheckoutPayment the new refund.
      */
     public function refund(
         CheckoutPayment $payment,
         $amount = null,
-        $totalCommision = null,
+        $coverholderCommission = null,
+        $brokerCommission = null,
         $notes = null,
         $source = null
     ) {
-        if (!$amount) {
-            $amount = $payment->getAmount();
-        }
-        if (!$totalCommision) {
-            $totalCommision = $payment->getTotalCommission();
-        }
+        $amount = $amount ?: $payment->getAmount();
+        $coverholderCommission = $coverholderCommission ?: $payment->getCoverholderCommission();
+        $brokerCommission = $brokerCommission ?: $payment->getBrokerCommission();
         $policy = $payment->getPolicy();
-
         // Refund is a negative payment
         $refund = new CheckoutPayment();
         $refund->setAmount(0 - $amount);
@@ -1750,7 +1797,8 @@ class CheckoutService
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
-        $chargeService = $this->client->chargeService();
+        $client = $this->getClientForPolicy($policy);
+        $chargeService = $client->chargeService();
         $chargeRefund = new ChargeRefund();
         $chargeRefund->setChargeId($payment->getReceipt());
         $chargeRefund->setValue($this->convertToPennies($amount));
@@ -1784,9 +1832,10 @@ class CheckoutService
         $refundAmount = $this->convertFromPennies($refundDetails->getValue());
         $refund->setAmount(0 - $refundAmount);
         //$refund->setReference($refundModelDetails["yourPaymentReference"]);
-
-        $refund->setRefundTotalCommission($totalCommision);
-
+        $refund->setCommission(
+            0 - $coverholderCommission,
+            0 - $brokerCommission
+        );
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         return $refund;
@@ -1962,5 +2011,33 @@ class CheckoutService
         $this->statsd->endTiming("judopay.existing");
 
         return true;
+    }
+
+    /**
+     * Creates a card token on checkout.
+     * @param Policy $policy     is the policy that the card belongs on.
+     * @param string $cardNumber is the number on the card the token is being created for.
+     * @param string $expiryDate is the expiry date written on the card.
+     * @param string $cv2        is the cv2 number on the card.
+     * @return \Checkout\Models\Tokens\Card the token which checkout sends back.
+     */
+    public function createCardToken($policy, $cardNumber, $expiryDate, $cv2)
+    {
+        $token = null;
+        try {
+            $exp = explode('/', $expiryDate);
+            $cardNumber = str_replace(' ', '', $cardNumber);
+            $card = new \Checkout\Models\Tokens\Card($cardNumber, $exp[0], $exp[1]);
+            $card->cvv = $cv2;
+            $api = $this->getApiForPolicy($policy);
+            $service = $api->tokens();
+            $token = $service->request($card);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed creating card token. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+        }
+        return $token;
     }
 }

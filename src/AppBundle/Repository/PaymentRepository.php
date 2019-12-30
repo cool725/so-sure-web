@@ -4,15 +4,23 @@ namespace AppBundle\Repository;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\BacsPayment;
-use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class PaymentRepository extends DocumentRepository
 {
     use DateTrait;
 
-    public function getAllPaymentsForExport(\DateTime $date, $extraMonth = false)
+    /**
+     * Gives you all the payments for underwriter export.
+     * @param \DateTime   $date        is the date which tells what month we are getting payments in.
+     * @param boolean     $extraMonth  tells whether to expand the query to multiple months.
+     * @param string|null $underwriter is the underwriter to restrict the query to, or null for all of them.
+     * @return Cursor over all the payments for the export.
+     */
+    public function getAllPaymentsForExport(\DateTime $date, $extraMonth = false, $underwriter = null)
     {
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
@@ -20,7 +28,6 @@ class PaymentRepository extends DocumentRepository
             $startMonth = $this->startOfMonth($date->sub(new \DateInterval('P1D')));
             $nextMonth = $this->endOfMonth($nextMonth);
         }
-
         $qb = $this->createQueryBuilder()
             ->field('success')->equals(true)
             ->field('date')->gte($startMonth)
@@ -36,15 +43,15 @@ class PaymentRepository extends DocumentRepository
                 'sosurePotReward',
                 'policyDiscount',
                 'debtCollection',
-                'policyDiscountRefund',
-            ])
+                'policyDiscountRefund'
+            ]);
+        if ($underwriter) {
+            $qb->field('policy.policy_type')->equals($underwriter);
+        }
+        return $qb
             ->sort('date')
             ->sort('id')
-            ->getQuery();
-
-        //print_r($qb->getQuery());
-
-        return $qb->execute();
+            ->getQuery()->execute();
     }
 
     public function getAllPaymentsForReport(\DateTime $date, $judoOnly = false, $checkoutOnly = false)

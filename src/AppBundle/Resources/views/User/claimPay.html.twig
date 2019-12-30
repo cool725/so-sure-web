@@ -32,7 +32,7 @@
                     <div class="h4 mb-3"><span class="sub">Paid to date:</span> &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</div>
                     <div class="h4 mb-5"><span class="sub">Amount left to pay:</span> &pound;{{ remainderTotal }}</div>
                     <form class="payment-form" method="POST"
-                          data-public-key="{{ checkout_public_key }}"
+                          data-public-key="{{ checkoutApiKey(policy) }}"
                           data-customer-email="{{ app.user.email }}"
                           data-value="{{ convert_to_pennies(amount) }}"
                           data-url="{{ url('purchase_checkout_claim', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"

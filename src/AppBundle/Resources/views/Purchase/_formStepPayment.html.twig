@@ -64,7 +64,7 @@
 <div class="mb-4">
     <form class="payment-form"
           method="POST"
-          data-public-key="{{ checkout_public_key }}"
+          data-public-key="{{ checkoutApiKey(policy) }}"
           data-customer-email="{{ app.user.email }}"
           data-value="{{ convert_to_pennies(purchase_form.amount.vars.value) }}"
           data-currency="GBP"

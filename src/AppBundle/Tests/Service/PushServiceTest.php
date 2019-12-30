@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Service\PushService;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 
 /**
  * @group functional-nonet
@@ -68,7 +69,7 @@ class PushServiceTest extends WebTestCase
 
     public function testPseudoMessagePicsurePolicy()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setId(rand(1, 999999));
         $data = self::$push->getCustomData(PushService::PSEUDO_MESSAGE_PICSURE, null, $policy);
         $this->assertEquals(['ss' => [

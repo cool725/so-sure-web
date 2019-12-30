@@ -7,6 +7,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
@@ -231,7 +232,7 @@ class PolicyRepository extends BaseDocumentRepository
         $lastWeek->sub(new \DateInterval('P1W'));
         $sixtyDays = \DateTime::createFromFormat('U', time());
         $sixtyDays->sub(new \DateInterval('P60D'));
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
 
         $qb = $this->createQueryBuilder();
         $qb->addAnd($qb->expr()->field('status')->in([

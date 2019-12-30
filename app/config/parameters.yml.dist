@@ -78,8 +78,6 @@ parameters:
     judopay_websecret:
     judopay_id:
 
-    checkout_apisecret:
-    checkout_apipublic:
     checkout_salva_apisecret:
     checkout_salva_apipublic:
     checkout_helvetia_apisecret:

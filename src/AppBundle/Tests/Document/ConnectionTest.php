@@ -6,6 +6,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\PolicyTerms;
@@ -48,7 +49,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
     public function testConnectionSelf()
     {
         $userA = new User();
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $policyA->setId(1);
         $policyA->setUser($userA);
 
@@ -64,11 +65,11 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
     public function testConnectionPrevious()
     {
         $userA = new User();
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $policyA->setId(1);
         $policyA->setUser($userA);
 
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $policyB->setId(2);
         $policyB->setUser($userA);
         $policyB->link($policyA);
@@ -85,11 +86,11 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
     public function testConnectionNext()
     {
         $userA = new User();
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $policyA->setId(1);
         $policyA->setUser($userA);
 
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $policyB->setId(2);
         $policyB->setUser($userA);
 
@@ -104,17 +105,17 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
     public function testInversedConnection()
     {
         $userA = new User();
-        $policyA = new PhonePolicy();
+        $policyA = new HelvetiaPhonePolicy();
         $policyA->setId(1);
         $policyA->setUser($userA);
 
         $userB = new User();
-        $policyB = new PhonePolicy();
+        $policyB = new HelvetiaPhonePolicy();
         $policyB->setId(2);
         $policyB->setUser($userB);
 
         $userC = new User();
-        $policyC = new PhonePolicy();
+        $policyC = new HelvetiaPhonePolicy();
         $policyC->setId(3);
         $policyC->setUser($userC);
 
@@ -226,7 +227,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
     public function testConnectionProrateSourcePolicy()
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $connection = new StandardConnection();
         $connection->setSourcePolicy($policy);

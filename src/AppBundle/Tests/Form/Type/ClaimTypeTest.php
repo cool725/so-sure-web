@@ -6,6 +6,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
@@ -55,7 +56,7 @@ class ClaimTypeTest extends FormTypeTest
     public function testClaimTypePrePicsure()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $terms = new PolicyTerms();
@@ -99,7 +100,7 @@ class ClaimTypeTest extends FormTypeTest
     public function testClaimTypeApprovedPicsure()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
@@ -145,7 +146,7 @@ class ClaimTypeTest extends FormTypeTest
     public function testClaimTypeRejectedPicsure()
     {
         $user = new User();
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);

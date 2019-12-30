@@ -25,6 +25,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\User;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
 
 use AppBundle\Service\PushService;
@@ -103,7 +104,7 @@ class PushListenerTest extends WebTestCase
             static::generateEmail('testPushListener', $this),
             'bar'
         );
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 

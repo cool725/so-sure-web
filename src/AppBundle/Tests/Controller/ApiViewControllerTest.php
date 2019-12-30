@@ -8,6 +8,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
@@ -71,7 +72,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
 
         $latestTerms = $this->getLatestPolicyTerms($this->getDocumentManager());
 
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         if ($promo) {
             $policy->setPromoCode('launch');
         }

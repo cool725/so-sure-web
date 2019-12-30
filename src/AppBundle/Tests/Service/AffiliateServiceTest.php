@@ -21,6 +21,7 @@ use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -651,7 +652,7 @@ class AffiliateServiceTest extends WebTestCase
      */
     private static function createTestPolicy($user, $date)
     {
-        $policy = new PhonePolicy();
+        $policy = new HelvetiaPhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setUser($user);
         $policy->setStart(clone $date);
@@ -674,7 +675,7 @@ class AffiliateServiceTest extends WebTestCase
             return null;
         }
         $policy->setStatus(Policy::STATUS_RENEWAL);
-        $renewal = new PhonePolicy();
+        $renewal = new HelvetiaPhonePolicy();
         $renewal->setUser($user);
         $renewal->setStart(clone $date);
         $renewal->setStatus(Policy::STATUS_ACTIVE);
