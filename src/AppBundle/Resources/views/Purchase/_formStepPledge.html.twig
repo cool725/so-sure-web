@@ -22,9 +22,9 @@
     <div class="form-group">
         <small class="form-text text-center">
             {% if validation_required is not null %}
-                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14_R.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
+                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
             {% else %}
-                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
+                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
             {% endif %}
         </small>
     </div>

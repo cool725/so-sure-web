@@ -58,6 +58,12 @@ class PolicyTerms extends PolicyDocument
     // Version 14 for Aggregators
     const VERSION_14_R = 'Version 14 November 2019 Aggregator';
 
+    // Immediate Cancellation
+    const VERSION_15 = 'Version 1 January 2020';
+
+    // Version 15 for Aggregators
+    const VERSION_15_R = 'Version 1 January 2020 Aggregator';
+
     // ensure that lastest version is last in the array
     public static $allVersions = [
         self::VERSION_0 => '1',
@@ -75,7 +81,9 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_12 => '12',
         self::VERSION_13 => '13',
         self::VERSION_14_R => '14_R',
-        self::VERSION_14 => '14'
+        self::VERSION_14 => '14',
+        self::VERSION_15_R => '15_R',
+        self::VERSION_15 => '15'
     ];
 
     public static function getLowExcess()
@@ -136,6 +144,7 @@ class PolicyTerms extends PolicyDocument
         // If terms version with _R appended
         return in_array($this->getVersion(), [
             self::VERSION_14_R,
+            self::VERSION_15_R
         ]);
     }
 
