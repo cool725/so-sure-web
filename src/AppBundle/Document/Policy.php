@@ -4655,7 +4655,11 @@ abstract class Policy
             throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $this->getId()));
         }
 
-        $newPolicy = new static();
+        if($this instanceof SalvaPhonePolicy) {
+            $newPolicy = new HelvetiaPhonePolicy();
+        } else {
+            $newPolicy = new static();
+        }
         $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd(), $terms);
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
