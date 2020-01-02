@@ -65,7 +65,6 @@
                     </form>
                     {% endif %}
                 {% else %}
-                    <p>{{ checkoutApiKey(policy) }}</p>
                     <form class="payment-form" method="POST"
                           data-public-key="{{ checkoutApiKey(policy) }}"
                           data-customer-email="{{ app.user.email }}"
