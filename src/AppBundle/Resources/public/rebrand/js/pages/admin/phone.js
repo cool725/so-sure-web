@@ -156,7 +156,8 @@ $(function(){
 
             modal.find('.modal-title').text(phone.make + ' ' + phone.model + ' ' + phone.memory + 'GB');
             modal.find('#phone_gwp').val(phone.gwp);
-            modal.find('#phone_salva').html('£' + salva_standard + ' / £' + salva_min);
+            modal.find('#min_premium').html('<span class="sub">Minimum premium available:</span> £' + salva_min);
+            modal.find('#standard_premium').html('<span class="sub">Standard premium:</span> £' + salva_standard);
             modal.find('#phone_desired_premium').val('');
 
             // Add excess to fields as defaults overwrite

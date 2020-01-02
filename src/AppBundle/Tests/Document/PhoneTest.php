@@ -283,14 +283,18 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(12.49, $phone1500->getSalvaBinderMonthlyPremium($binder2018));
     }
 
-    /**
-     * @expectedException \Exception
-     */
-    public function testPostBinder()
+    public function testBinder2020()
     {
-        $phone = new Phone();
-        $phone->init('Apple', 'PostBinder', 9, static::$policyTerms, 32, ['post-binder'], 1000);
-        $phone->getSalvaBinderMonthlyPremium(Salva::getSalvaBinderEndDate());
+        $phone1000 = new Phone();
+        $phone1000->init('Apple', '1000Binder', 9, static::$policyTerms, 32, ['1000-binder'], 1000);
+        $phone1250 = new Phone();
+        $phone1250->init('Apple', '1250Binder', 9, static::$policyTerms, 32, ['1250-binder'], 1250);
+        $phone1500 = new Phone();
+        $phone1500->init('Apple', '1500Binder', 9, static::$policyTerms, 32, ['1500-binder'], 1500);
+        $binder2020 = new \DateTime('2019-12-31 00:00:00', SoSure::getSoSureTimezone());
+        $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium($binder2020));
+        $this->assertEquals(11.49, $phone1250->getSalvaBinderMonthlyPremium($binder2020));
+        $this->assertEquals(12.49, $phone1500->getSalvaBinderMonthlyPremium($binder2020));
     }
 
     /**

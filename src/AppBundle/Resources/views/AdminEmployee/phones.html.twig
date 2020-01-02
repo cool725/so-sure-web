@@ -592,6 +592,10 @@
                                             <small class="form-text">This field does not save and will only calculate the GWP field if calculate is clicked</small>
                                         </div>
                                         <div class="form-group">
+                                            <div class="h6"><span id="min_premium"></span></div>
+                                            <div class="h6"><span id="standard_premium"></span></div>
+                                        </div>
+                                        <div class="form-group">
                                             <label>GWP</label>
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
@@ -617,23 +621,20 @@
                                                      class="form-control">
                                             </div>
                                         </div>
-                                        <div class="h6">Salva Std/Min: <span id="phone_salva"></span></div>
                                         <div class="form-group">
-                                            <label>Price Stream</label>
+                                            <label>Set Montly/Yearly type</label>
                                             <div class="input-group">
                                                 <select type="select"
                                                      id="phone_stream"
                                                      name="stream"
                                                      class="form-control">
-                                                    <option value="all">ALL</option>
                                                     <option value="monthly">Monthly</option>
                                                     <option value="yearly">Yearly</option>
+                                                    <option value="all">All</option>
                                                 </select>
                                             </div>
                                             <small class="form-text">
-                                                Determines whether this price is exclusively for monthly premiums,
-                                                yearly premiums, or is applied to both (in which case the ALL option is
-                                                chosen), which is the default behaviour.
+                                                Determines whether this price is exclusively for monthly premiums, yearly premiums, or set to all if no discount.
                                             </small>
                                         </div>
                                     </div>

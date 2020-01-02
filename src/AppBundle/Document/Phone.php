@@ -909,36 +909,58 @@ class Phone
     {
         $binder2016 = new \DateTime('2016-09-01 00:00:00', SoSure::getSoSureTimezone());
         $binder2018 = new \DateTime('2018-01-01 00:00:00', SoSure::getSoSureTimezone());
+        $binder2020 = new \DateTime('2019-12-31 00:00:00', SoSure::getSoSureTimezone());
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
-        if ($date >= Salva::getSalvaBinderEndDate()) {
-            throw new \Exception('No binder available');
-        }
         $price = $this->getCurrentRetailPrice($date);
-        if ($price <= 150) {
-            return 3.99 + 1.5; // 5.49
-        } elseif ($price <= 250) {
-            return 4.99 + 1.5; // 6.49
-        } elseif ($price <= 400) {
-            return 5.49 + 1.5; // 6.99
-        } elseif ($price <= 500) {
-            return 5.99 + 1.5; // 7.49
-        } elseif ($price <= 600) {
-            return 6.99 + 1.5; // 8.49
-        } elseif ($price <= 750) {
-            return 7.99 + 1.5; // 9.49
-        } elseif ($price <= 1000) {
-            return 8.99 + 1.5; // 10.49
-        }
-        if ($date >= $binder2018) {
-            if ($price <= 1250) {
+        if ($date >= Salva::getSalvaBinderEndDate()) {
+            // Need to set our ranges here for Helvetia
+            if ($price <= 150) {
+                return 3.99 + 1.5; // 5.49
+            } elseif ($price <= 250) {
+                return 4.99 + 1.5; // 6.49
+            } elseif ($price <= 400) {
+                return 5.49 + 1.5; // 6.99
+            } elseif ($price <= 500) {
+                return 5.99 + 1.5; // 7.49
+            } elseif ($price <= 600) {
+                return 6.99 + 1.5; // 8.49
+            } elseif ($price <= 750) {
+                return 7.99 + 1.5; // 9.49
+            } elseif ($price <= 1000) {
+                return 8.99 + 1.5; // 10.49
+            } elseif ($price <= 1250) {
                 return 9.99 + 1.5; // 11.49
             } elseif ($price <= 1500) {
                 return 10.99 + 1.5; // 12.49
             }
+            return null;
+        } else {
+            if ($price <= 150) {
+                return 3.99 + 1.5; // 5.49
+            } elseif ($price <= 250) {
+                return 4.99 + 1.5; // 6.49
+            } elseif ($price <= 400) {
+                return 5.49 + 1.5; // 6.99
+            } elseif ($price <= 500) {
+                return 5.99 + 1.5; // 7.49
+            } elseif ($price <= 600) {
+                return 6.99 + 1.5; // 8.49
+            } elseif ($price <= 750) {
+                return 7.99 + 1.5; // 9.49
+            } elseif ($price <= 1000) {
+                return 8.99 + 1.5; // 10.49
+            }
+            if ($date >= $binder2018) {
+                if ($price <= 1250) {
+                    return 9.99 + 1.5; // 11.49
+                } elseif ($price <= 1500) {
+                    return 10.99 + 1.5; // 12.49
+                }
+            }
+            return null;
         }
-        return null;
     }
 
     /**
