@@ -8,7 +8,7 @@
     background-color: $dodger-blue;
     background-repeat: no-repeat;
     background-size: cover;
-    @include blue-gradient;
+    @include blue-gradient-45;
     opacity: 0;
     visibility: hidden;
     transition: opacity .35s, visibility .35s, height .35s;

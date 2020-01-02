@@ -6,6 +6,7 @@
     top: 0; left: 0;
     padding-top: 6rem;
     background-color: $dodger-blue;
+    @include blue-gradient-45;
     opacity: 0;
     visibility: hidden;
     transition: opacity .35s, visibility .35s, height .35s;
