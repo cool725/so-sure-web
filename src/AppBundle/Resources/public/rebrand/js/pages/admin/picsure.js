@@ -9,6 +9,13 @@
 // e.g. require('../components/banner.js');
 require('@fancyapps/fancybox');
 
+// Lazy load images
+require('intersection-observer');
+import lozad from 'lozad';
+
+const observer = lozad(); // lazy loads elements with default selector as '.lozad'
+observer.observe();
+
 $(function(){
 
     $('#invalid_modal').on('show.bs.modal', function (event) {

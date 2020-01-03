@@ -36,10 +36,11 @@
                     <table class="table table-striped">
                         <thead class="thead-light">
                             <tr>
-                                <th width="30%">User</th>
+                                <th width="20%">User</th>
+                                <th width="20%">Phone</th>
                                 <th width="10%">Status</th>
                                 <th width="30%">Submitted</th>
-                                <th width="30%">Actions</th>
+                                <th width="20%">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,9 +48,10 @@
                                 {# TODO: Set table row colour based of ML score eventually #}
                                 <tr>
                                     {# Policy #}
-                                    <td width="30%"><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
+                                    <td><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></td>
                                     {# Fraud Check #}
-                                    <td width="10%">
+                                    <td>{{ policy.phone }}</td>
+                                    <td>
                                         {% if policy.picSureCircumvention is null %}
                                             <i class="fal fa-clock fa-lg" title="Pre anti-fraud check" data-toggle="tooltip" data-placement="top"></i>
                                         {% elseif policy.picSureCircumvention == true %}
@@ -59,7 +61,7 @@
                                         {% endif %}
                                     </td>
                                     {# Submitted image(s) #}
-                                    <td width="30%">
+                                    <td>
                                         {% for file in policy.getPolicyPicSureFiles %}
                                             <a href="{{ path('admin_picsure_image', {'file': file.key }) }}"
                                                class="no-style"
@@ -83,11 +85,11 @@
                                                     {% endif %}
                                                 {% endif %}
                                                ">
-                                                <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" width="40px" height="40px" class="mb-1">
+                                                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ path('admin_picsure_image', {'file': file.key }) }}" width="40px" height="40px" class="mb-1 lozad">
                                             </a>
                                         {% endfor %}
                                     </td>
-                                    <td width="30%">
+                                    <td>
                                         {% if policy.picSureStatus == 'manual' %}
                                             <a href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"
                                                class="btn btn-success btn-sm mb-1 mr-md-2"
