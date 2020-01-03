@@ -4,9 +4,10 @@
 {% set body_class = 'landing' %}
 {% set robots_noindex = true %}
 
-{% block title %}so-sure - Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %}{% endblock %}
+{% block title %}Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %} | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
+    <link rel="canonical" href="{{ path(app.request.attributes.get('_route')) }}" />
 {% endblock %}
 
 {% block cssPage %}

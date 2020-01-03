@@ -3,8 +3,10 @@
 {# Set vars #}
 {% set body_class = 'make-a-claim' %}
 
-{% block title %}so-sure - Claim Login{% endblock %}
-{% block meta %}{% endblock %}
+{% block title %}Claim Login | so-sure{% endblock %}
+{% block meta %}
+    <link rel="canonical" href="{{ path('claim_login') }}" />
+{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/make-a-claim.css') }}">

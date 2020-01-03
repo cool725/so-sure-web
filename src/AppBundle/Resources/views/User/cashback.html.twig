@@ -1,44 +1,10 @@
-{# {% extends 'AppBundle:User:baseRenewPolicy.html.twig' %} #}
-
-{# {% block titleArea %}
-    <h1><span class="title-top">Request cashback</span></h1>
-{% endblock %}
-
-{% block content %}
-    <p class="lead text-center">Please use this form to request cashback. <br> Note that it will take 28-45 days from the end of your policy before the bacs transfer will be sent.</p>
-{% endblock %}
-
-{% block actions %}
-    <div class="checkout--step">
-        <div class="container">
-            {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback', 'autocomplete': 'off'}}) }}
-                <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(cashback_form.accountName) }}</div>
-                </div>
-                <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code', 'class': 'form-control'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(cashback_form.sortCode) }}</div>
-                </div>
-                <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number', 'class': 'form-control'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
-                </div>
-                <div class="form-group">
-                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                </div>
-            {{ form_end(cashback_form) }}
-        </div>
-    </div>
-{% endblock %} #}
-
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
 {% set body_class = 'user' %}
 {% set user_mode = true %}
 
-{% block title %}so-sure -  Request cashback{% endblock %}
+{% block title %}Request cashback | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
