@@ -6385,9 +6385,9 @@ abstract class Policy
         $type = 'phone';
 
         if ($this instanceof SalvaPhonePolicy) {
-            $type = 'salva-phone';
+            $type = self::TYPE_SALVA_PHONE;
         } elseif ($this instanceof SalvaPhonePolicy) {
-            $type = 'helvetia-phone';
+            $type = self::TYPE_HELVETIA_PHONE;
         }
 
         $data = [
