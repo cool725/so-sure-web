@@ -3,7 +3,13 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Policy;
+use AppBundle\Document\User;
+use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\HelvetiaPhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\ImeiTrait;
 use AppBundle\Classes\Helvetia;
 use AppBundle\Classes\SoSure;
 use AppBundle\Tests\Create;
@@ -49,5 +55,26 @@ class HelvetiaPhonePolicyTest extends TestCase
             $payment->getCoverholderCommission()
         );
         $this->assertEquals($payment->getAmount() * 0.2, $payment->getTotalCommission());
+    }
+
+    /**
+     * Testing that Salva policies renew as Helvetia policies
+     */
+    public function testSalvaRenewals()
+    {
+        $user = new User();
+        $user->setLocked(false);
+        $user->setEnabled(true);
+        $phone = new Phone();
+        $price = Create::phonePrice('2019-02-02', PhonePrice::STREAM_MONTHLY);
+        $phone->addPhonePrice($price);
+        $policy = Create::salvaPhonePolicy($user, '2019-01-15', Policy::STATUS_ACTIVE, 12);
+        $policy->setImei(ImeiTrait::generateRandomImei());
+        $policy->setPhone($phone);
+        $user->addPolicy($policy);
+        $terms = new policyTerms();
+        $newPolicy = $policy->createPendingRenewal($terms, new \DateTime('2020-02-01'));
+        $this->assertTrue($newPolicy instanceof HelvetiaPhonePolicy);
+        $this->assertFalse($newPolicy instanceof SalvaPhonePolicy);
     }
 }
