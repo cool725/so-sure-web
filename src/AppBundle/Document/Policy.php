@@ -6390,7 +6390,7 @@ abstract class Policy
 
         if ($this instanceof SalvaPhonePolicy) {
             $type = self::TYPE_SALVA_PHONE;
-        } elseif ($this instanceof SalvaPhonePolicy) {
+        } elseif ($this instanceof HelvetiaPhonePolicy) {
             $type = self::TYPE_HELVETIA_PHONE;
         }
 
