@@ -6386,11 +6386,18 @@ abstract class Policy
             }
         }
 
+        $type = 'phone';
+
+        if ($this instanceof SalvaPhonePolicy) {
+            $type = self::TYPE_SALVA_PHONE;
+        } elseif ($this instanceof SalvaPhonePolicy) {
+            $type = self::TYPE_HELVETIA_PHONE;
+        }
+
         $data = [
             'id' => $this->getId(),
             'status' => $this->getApiStatus(),
-            //TODO - change this to fetch the actual policy_type
-            'type' => 'helvetia-phone',
+            'type' => $type,
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,
             'policy_number' => $this->getPolicyNumber(),
