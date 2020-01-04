@@ -533,6 +533,13 @@ class UserController extends BaseController
             $fbFriends = $this->getFacebookFriends($request, $policy);
         }
 
+        // @codingStandardsIgnoreStart
+        $this->addFlash(
+            'error',
+            "We're busy working on an ongoing issue with the app, we aim to have it back up and running as soon as possible!"
+        );
+        // @codingStandardsIgnoreEnd
+
         return array(
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
