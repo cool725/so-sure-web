@@ -30,22 +30,24 @@
 {% endblock %}
 
 {% block gtm_data %}
-    ,
-    'event': 'checkout',
-    'ecommerce': {
-        'checkout': {
-            'actionField': {'step': 'Personal Details'},
-            'products': [{
-                'id': '{{ phone.id }}',
-                'name': '{{ phone.make }} {{ phone.model }}',
-                'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
-                'brand': '{{ phone.make }}',
-                'category': '{{ phone.make }}',
-                'variant': '{{ phone.memory }}GB',
-                'quantity': 1
-            }]
+    {% if phone %}
+        ,
+        'event': 'checkout',
+        'ecommerce': {
+            'checkout': {
+                'actionField': {'step': 'Personal Details'},
+                'products': [{
+                    'id': '{{ phone.id }}',
+                    'name': '{{ phone.make }} {{ phone.model }}',
+                    'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
+                    'brand': '{{ phone.make }}',
+                    'category': '{{ phone.make }}',
+                    'variant': '{{ phone.memory }}GB',
+                    'quantity': 1
+                }]
+            }
         }
-    }
+    {% endif %}
 {% endblock %}
 
 {% block body %}
