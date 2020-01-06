@@ -104,12 +104,12 @@ class SearchController extends BaseController
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory()
-                        ]);
+                        ], 301);
                     } else {
                         return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel()
-                        ]);
+                        ], 301);
                     }
                 }
             }
@@ -173,12 +173,12 @@ class SearchController extends BaseController
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory()
-                        ]);
+                        ], 301);
                     } else {
                         return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel()
-                        ]);
+                        ], 301);
                     }
                 }
             }
@@ -242,12 +242,12 @@ class SearchController extends BaseController
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
-                        ]);
+                        ], 301);
                     } else {
                         return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
-                        ]);
+                        ], 301);
                     }
                 }
             }
@@ -311,12 +311,12 @@ class SearchController extends BaseController
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
                             'memory' => $phone->getMemory(),
-                        ]);
+                        ], 301);
                     } else {
                         return $this->redirectToRoute('phone_insurance_make_model', [
                             'make' => $phone->getMake(),
                             'model' => $phone->getEncodedModel(),
-                        ]);
+                        ], 301);
                     }
                 }
             }
