@@ -494,7 +494,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             }
 
             // Should allow a little bit of variance to account for rounding.
-            $allowedVariance = 0.01;
+            $allowedVariance = 0.005;
             // allow up to 1 month difference for non-active policies
             if (!$policy->isActive()) {
                 $allowedVariance = Salva::MONTHLY_TOTAL_COMMISSION - 0.01;
