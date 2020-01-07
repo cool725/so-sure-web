@@ -7,7 +7,7 @@
 {% block title %}Contact Us | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="If you need to get in touch with us for any reason, our friendly customer service team are on hand to help you. Start a live chat or email So Sure here!"/>
-    <link rel="canonical" href="{{ path('about_how_to_contact_so_sure') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

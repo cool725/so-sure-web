@@ -5,7 +5,7 @@
 
 {% block title %}Claim Login | so-sure{% endblock %}
 {% block meta %}
-    <link rel="canonical" href="{{ path('claim_login') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

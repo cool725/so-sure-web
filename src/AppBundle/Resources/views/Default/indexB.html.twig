@@ -6,7 +6,7 @@
 {% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
 {% block meta %}
     <meta name="description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure."/>
-    <link rel="canonical" href="{{ path('homepage') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block schema %}

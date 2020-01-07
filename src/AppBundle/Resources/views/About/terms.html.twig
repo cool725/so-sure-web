@@ -6,7 +6,7 @@
 {% block title %}Terms &amp; Conditions | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="Our most up-to-date terms and conditions outlines their impact on terms of use, availability, copyright notice, intellectual property rights and more."/>
-    <link rel="canonical" href="{{ path('terms') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

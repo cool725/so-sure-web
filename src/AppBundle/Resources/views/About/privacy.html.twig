@@ -6,7 +6,7 @@
 {% block title %}Privacy Policy | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="Our privacy notice will inform you how So Sure protects your personal data as well as how the law affects privacy rights. Find our privacy policy here."/>
-    <link rel="canonical" href="{{ path('privacy') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
