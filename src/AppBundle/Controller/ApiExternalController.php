@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\Opt\EmailOptOut;
 
 use AppBundle\Classes\ApiErrorCode;
@@ -321,6 +322,17 @@ class ApiExternalController extends BaseController
 
         $alphaValidator = new AlphanumericValidator();
         $alphaSpaceValidator = new AlphanumericSpaceDotValidator();
+
+        $leadRepo = $dm->getRepository(Lead::class);
+        $existingLead = $leadRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+
+        if (!$existingLead) {
+            $lead = new Lead();
+            $lead->setSource('aggregator');
+            $lead->setEmail($email);
+
+            $dm->persist($lead);
+        }
 
         $user = new User();
         $user->setEnabled(true);
