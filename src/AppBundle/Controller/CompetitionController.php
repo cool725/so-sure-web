@@ -51,7 +51,7 @@ class CompetitionController extends BaseController
                         $leadRepo = $dm->getRepository(Lead::class);
                         if ($ip) {
                             $existingIps = $leadRepo->findBy(['ip' => $ip]);
-                            if ($existingIps && count($existingIps) > 2) {
+                            if ($existingIps && count($existingIps) > 15) {
                                 // @codingStandardsIgnoreStart
                                 $err = 'It looks like you\'ve already entered the draw, not to worry you can share to get more entries 🤗';
                                 // @codingStandardsIgnoreEnd

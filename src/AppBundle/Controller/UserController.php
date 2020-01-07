@@ -535,8 +535,8 @@ class UserController extends BaseController
 
         // @codingStandardsIgnoreStart
         $this->addFlash(
-            'error',
-            "We're busy working on an ongoing issue with the app, we aim to have it back up and running as soon as possible!"
+            'success',
+            "🥳 The app is back up and running you can now validate your device!"
         );
         // @codingStandardsIgnoreEnd
 
