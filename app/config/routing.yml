@@ -877,4 +877,3 @@ redirect_faq_faq:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /faq
         permanent: true
-
