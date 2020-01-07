@@ -365,6 +365,20 @@ redirect_change_password:
         route: user_home
         permanent: true
 
+redirect_blog_tag_blockchain:
+    path: /blog/tag/blockchain/
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_tag_mobile_world_congress:
+    path: /blog/tag/mobile-world-congress/
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
 # https://symfony.com/doc/3.4/routing/redirect_trailing_slash.html with a 301
 remove_trailing_slash:
     path: /{url}
@@ -866,6 +880,62 @@ redirect_blog_tag_insurance:
 
 redirect_blog_2016_06_07:
     path: /blog/2016/06/06/5-ways-careful-wins-every-time.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_03_31:
+    path: /blog/2016/03/31/5-key-industries-that-are-facing-disruption.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_05_06:
+    path: /blog/2016/05/06/7-exciting-fintech-products-that-youll-soon-be-using-everyday.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_08_10:
+    path: /blog/2016/08/10/what-will-a-cashless-society-change-about-the-way-that-we-live.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_04_20:
+    path: /blog/2016/04/20/why-do-millennials-love-fintech.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_05_04:
+    path: /blog/2016/05/04/10-amazing-things-you-didnt-know-that-you-could-insure.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_07_07_10:
+    path: /blog/2016/07/07/10-awesome-ways-to-repurpose-your-old-smartphone.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_09_14:
+    path: /blog/2016/09/14/hello-world-welcome-to-social-insurance.html
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /blog/
+        permanent: true
+
+redirect_blog_2016_10_18:
+    path: /blog/2016/10/18/8-ways-that-you-can-spend-your-reward-pot-bonus.html
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /blog/
