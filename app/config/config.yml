@@ -763,6 +763,8 @@ nelmio_security:
                 - https://pro.fontawesome.com
                 - https://fonts.gstatic.com
                 - https://fonts.smct.co
+                - http://fonts.gstatic.com
+                - https://fonts.gstatic.com
                 - 'data:'
             child-src:
                 - 'self'
