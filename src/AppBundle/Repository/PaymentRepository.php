@@ -79,10 +79,11 @@ class PaymentRepository extends DocumentRepository
      * @param \DateTime         $date        is a date within the month in which we are looking for payments.
      * @param string|array|null $type        is the type of payment to look for or null for any, and an array for a set
      *                                       of types that it can be in.
-     * @param string|null       $policyType  is the type of the policy upon which we are looking for payments.
+     * @param array|null        $policyTypes is the types of the policy upon which we are looking for payments. If it
+     *                                       is null then it does not concern itself about policy types.
      * @return array containing all of these payments.
      */
-    public function getAllPayments(\DateTime $date, $type = null, $policyType = null)
+    public function getAllPayments(\DateTime $date, $type = null, $policyTypes = null)
     {
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
@@ -97,8 +98,8 @@ class PaymentRepository extends DocumentRepository
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
             ->field('type')->in($type);
-        if ($underwriter) {
-            $qb->field('policy.policy_type')->equals($underwriter);
+        if ($policyTypes !== null) {
+            $qb->field('policy.policy_type')->in($policyTypes);
         }
         return $qb->getQuery()->execute();
     }

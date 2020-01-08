@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\Helvetia;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\AffiliateCompany;
 use AppBundle\Document\ArrayToApiArrayTrait;
@@ -770,57 +771,56 @@ class AdminController extends BaseController
      */
     public function adminAccountsHelvetiaAction(Request $request, $year = null, $month = null)
     {
-        return [
-            'paidCards' => 1,
-            'paidBacs' => 2,
-            'paidSoSure' => 3,
-            'premiumReceived' => 4
-            'refundedCards' => 5,
-            'chargebackCards' => 6,
-            'refundBacs' => 7,
-            'chargebackBacs' => 8,
-            'totalChargeback' => 8,
-            'refundedSoSure' => 9,
-            'premiumRefunded' => 10,
-            'debtCollection' => 11,
-            'netPremium' => 12,
-            'helvetiaRewardPotIncurredCashBack' => 13,
-            'helvetiaRewardPotRefundCashBack' => 14,
-            'helvetiaNetRewardPotCashBack' => 15,
-            'helvetiaRewardPotIncurredRenewalDiscount' => 16,
-            'helvetiaRewardPotRefundRenewalDiscount' => 17,
-            'helvetiaNetRewardPotRenewalDiscount' => 18,
-            'helvetiaRewardPotIncurred' => 19,
-            'helvetiaRewardPotRefund' => 20,
-            'helvetiaNetRewardPot' => 21,
-            'soSureRewardPotIncurredCashBack' => 22,
-            'soSureRewardPotRefundCashBack' => 23,
-            'soSureNetRewardPotCashBack' => 24,
-            'soSureRewardPotIncurredRenewalDiscount' => 25,
-            'soSureRewardPotRefundRenewalDiscount' => 26,
-            'soSureNetRewardPotRenewalDiscount' => 27,
-            'soSureRewardPotIncurred' => 28,
-            'soSureRewardPotRefund' => 29,
-            'soSureNetRewardPot' => 30,
-            'customerLumpSumCashBack' => 31,
-            'netCustomerRewardPot' => 32,
-            'customerRenewalDiscountCancellationRefund' => 33,
-            'netRenewalDiscountRefund' => 34,
-            'helvetiaPremium' => 35,
-            'netHelvetiaPremium' => 36
-            'soSurePremium' => 37,
-            'netSoSurePremium' => 38
-            'brokerPremium' => 39,
-            'netBrokerPremium' => 40,
-            'csvTotal' => 41,
-            'expectedDistributionTotal' => 42,
-            'nCardPayments' => 43,
-            'nBacsPayments' => 44,
-            'nSoSurePayments' => 45,
-            'nCardRefunds' => 46,
-            'nBacsRefunds' => 47,
-            'nSoSureRefunds' => 48
+        $now = new \DateTime();
+        $year = $year ?: $now->format('Y');
+        $month = $month ?: $now->format('m');
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        $helvetiaForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_form')
+            ->add('export', SubmitType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('salva_form')) {
+                $helvetiaForm->handleRequest($request);
+                if ($helvetiaForm->isValid()) {
+                    /** @var SalvaExportService $salva */
+                    $salva = $this->get('app.salva');
+                    $salva->exportPayments(true);
+                    $this->addFlash(
+                        'success',
+                        'Re-exported Salva Payments File to S3'
+                    );
+                    return new RedirectResponse($this->generateUrl('admin_accounts_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            }
+        }
+        $dm = $this->getManager();
+        /** @var S3FileRepository $s3FileRepo */
+        $s3FileRepo = $dm->getRepository(S3File::class);
+        /** @var ReportingService $reportingService */
+        $reportingService = $this->get('app.reporting');
+        $data = [
+            'year' => $year,
+            'month' => $month,
+            'paymentTotals' => $reportingService->getAllPaymentTotals(
+                $date,
+                Helvetia::POLICY_TYPES,
+                !$this->isProduction()
+            ),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
+            'print' => false,
         ];
+        $data = array_merge($data, [
+            'files' => $s3FileRepo->getAllFiles($date),
+            'salvaForm' => $helvetiaForm->createView(),
+        ]);
+        return $data;
     }
 
     /**

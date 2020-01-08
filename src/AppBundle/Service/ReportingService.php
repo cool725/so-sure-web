@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\Helvetia;
+use AppBundle\Classes\Salva;
+use AppBundle\Document\File\HelvetiaPaymentFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
@@ -916,7 +919,7 @@ class ReportingService
     /**
      * Gives you the payment totals for all the different kinds of payments that there are.
      * @param \DateTime $date         is the date within the month for which we are getting all these payments.
-     * @param string    $underwriter  is the name of the underwriter that the payments must belong with.
+     * @param string    $underwriter  is the name of the underwriter that this is getting all payments totals for.
      * @param boolean   $allowInvalid is whether or not to allow payments belonging to invalid policies among the
      *                                results.
      * @param boolean   $useCache     whether to return cached results if they are available. If results are generated
@@ -929,24 +932,27 @@ class ReportingService
         if ($useCache === true && $this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
-        $payments = $this->getPayments($date);
-        $potRewardPayments = $this->getPayments($date, 'potReward');
-        $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
-        $potRewardPaymentsDiscount = $this->getPayments($date, 'potReward', false);
-        $soSurePotRewardPayments = $this->getPayments($date, 'sosurePotReward');
-        $soSurePotRewardPaymentsCashback = $this->getPayments($date, 'sosurePotReward', true);
-        $soSurePotRewardPaymentsDiscount = $this->getPayments($date, 'sosurePotReward', false);
-        $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
-        $policyDiscountRefundPayments = $this->getPayments($date, 'policyDiscountRefund');
-        $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
-        $underwriterPaymentFile = null;
+        $underwriterPaymentFile;
+        $policyTypes;
         if ($underwriter == Salva::NAME) {
             $underwriterPaymentFile = $this->getSalvaPaymentFile($date);
+            $policyTypes = Salva::POLICY_TYPES;
         } elseif ($underwriter = Helvetia::NAME) {
             $underwriterPaymentFile = $this->getHelvetiaPaymentFile($date);
+            $policyTypes = Helvetia::POLICY_TYPES;
         } else {
             throw new \InvalidArgumentException("{$underwriter} is not a proper kind of underwriter");
         }
+        $payments = $this->getPayments($date, $policyTypes);
+        $potRewardPayments = $this->getPayments($date, $policyTypes, 'potReward');
+        $potRewardPaymentsCashback = $this->getPayments($date, $policyTypes, 'potReward', true);
+        $potRewardPaymentsDiscount = $this->getPayments($date, $policyTypes, 'potReward', false);
+        $soSurePotRewardPayments = $this->getPayments($date, $policyTypes, 'sosurePotReward');
+        $soSurePotRewardPaymentsCashback = $this->getPayments($date, $policyTypes, 'sosurePotReward', true);
+        $soSurePotRewardPaymentsDiscount = $this->getPayments($date, $policyTypes, 'sosurePotReward', false);
+        $policyDiscountPayments = $this->getPayments($date, $policyTypes, 'policyDiscount');
+        $policyDiscountRefundPayments = $this->getPayments($date, $policyTypes, 'policyDiscountRefund');
+        $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
         $data = [
             'all' => Payment::sumPayments($payments, !$allowInvalid),
             'judo' => Payment::sumPayments($payments, !$allowInvalid, JudoPayment::class),
@@ -1245,11 +1251,20 @@ class ReportingService
         return $cashback;
     }
 
-    private function getPayments(\DateTime $date, $type = null, $cashback = null)
+    /**
+     * Gets all the successful payments in the given month for the given underwriter and optionally on the given type
+     * and on a policy with or without cashback.
+     * @param \DateTime    $date        is a date within the month that we are looking at payments for.
+     * @param array        $policyTypes is a list of the types of policy we are looking for payments at.
+     * @param string|null  $type        is the type of payment we are looking for.
+     * @param boolean|null $cashback    is whether the payment's policies have cashback or not, or null for no worries.
+     * @return array containing the found payments.
+     */
+    private function getPayments(\DateTime $date, $policyTypes, $type = null, $cashback = null)
     {
         /** @var PaymentRepository $paymentRepo */
         $paymentRepo = $this->dm->getRepository(Payment::class);
-        $payments = $paymentRepo->getAllPayments($date, $type);
+        $payments = $paymentRepo->getAllPayments($date, $type, $policyTypes);
         if ($cashback !== null) {
             $allPayments = [];
             foreach ($payments as $payment) {
@@ -1257,11 +1272,27 @@ class ReportingService
                     $allPayments[] = $payment;
                 }
             }
-
             return $allPayments;
         }
-
         return $payments;
+    }
+
+    /**
+     * Gives you a helvetia payment file for the given month.
+     * @param \DateTime $date is a date within the month that we are looking for a payment file in.
+     * @return HelvetiaPaymentFile|null the payment file if it was found or null if not.
+     */
+    private function getHelvetiaPaymentFile(\DateTime $date)
+    {
+        // TODO: this just returns the first thing it finds which seems stupid.
+        $repo = $this->dm->getRepository(HelvetiaPaymentFile::class);
+        $files = $repo->getAllFiles($date, 'helvetiaPayment');
+        if ($files && count($files) > 0) {
+            foreach ($files as $file) {
+                return $file;
+            }
+        }
+        return null;
     }
 
     private function getSalvaPaymentFile(\DateTime $date)
