@@ -764,9 +764,69 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/accounts/print/{year}/{month}", name="admin_accounts_print")
+     * @Route("accounts-salva", name="admin_accounts_helvetia")
+     * @Route("/accounts/{year}/{month}", name="admin_accounts_helvetia_date")
+     * @Template
      */
-    public function adminAccountsPrintAction($year, $month)
+    public function adminAccountsHelvetiaAction(Request $request, $year = null, $month = null)
+    {
+        return [
+            'paidCards' => 1,
+            'paidBacs' => 2,
+            'paidSoSure' => 3,
+            'premiumReceived' => 4
+            'refundedCards' => 5,
+            'chargebackCards' => 6,
+            'refundBacs' => 7,
+            'chargebackBacs' => 8,
+            'totalChargeback' => 8,
+            'refundedSoSure' => 9,
+            'premiumRefunded' => 10,
+            'debtCollection' => 11,
+            'netPremium' => 12,
+            'helvetiaRewardPotIncurredCashBack' => 13,
+            'helvetiaRewardPotRefundCashBack' => 14,
+            'helvetiaNetRewardPotCashBack' => 15,
+            'helvetiaRewardPotIncurredRenewalDiscount' => 16,
+            'helvetiaRewardPotRefundRenewalDiscount' => 17,
+            'helvetiaNetRewardPotRenewalDiscount' => 18,
+            'helvetiaRewardPotIncurred' => 19,
+            'helvetiaRewardPotRefund' => 20,
+            'helvetiaNetRewardPot' => 21,
+            'soSureRewardPotIncurredCashBack' => 22,
+            'soSureRewardPotRefundCashBack' => 23,
+            'soSureNetRewardPotCashBack' => 24,
+            'soSureRewardPotIncurredRenewalDiscount' => 25,
+            'soSureRewardPotRefundRenewalDiscount' => 26,
+            'soSureNetRewardPotRenewalDiscount' => 27,
+            'soSureRewardPotIncurred' => 28,
+            'soSureRewardPotRefund' => 29,
+            'soSureNetRewardPot' => 30,
+            'customerLumpSumCashBack' => 31,
+            'netCustomerRewardPot' => 32,
+            'customerRenewalDiscountCancellationRefund' => 33,
+            'netRenewalDiscountRefund' => 34,
+            'helvetiaPremium' => 35,
+            'netHelvetiaPremium' => 36
+            'soSurePremium' => 37,
+            'netSoSurePremium' => 38
+            'brokerPremium' => 39,
+            'netBrokerPremium' => 40,
+            'csvTotal' => 41,
+            'expectedDistributionTotal' => 42,
+            'nCardPayments' => 43,
+            'nBacsPayments' => 44,
+            'nSoSurePayments' => 45,
+            'nCardRefunds' => 46,
+            'nBacsRefunds' => 47,
+            'nSoSureRefunds' => 48
+        ];
+    }
+
+    /**
+     * @Route("/accounts/print/{year}/{month}", name="admin_accounts_salva_print")
+     */
+    public function adminAccountsSalvaPrintAction($year, $month)
     {
         // default 30s for prod is no longer enough
         set_time_limit(600);
@@ -779,7 +839,6 @@ class AdminController extends BaseController
         $snappyPdf->setOption('page-size', 'A4');
         /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
-
 
         $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
             'year' => $year,
@@ -804,11 +863,11 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/accounts", name="admin_accounts")
-     * @Route("/accounts/{year}/{month}", name="admin_accounts_date")
+     * @Route("/accounts", name="admin_accounts_salva")
+     * @Route("/accounts/{year}/{month}", name="admin_accounts_salva_date")
      * @Template
      */
-    public function adminAccountsAction(Request $request, $year = null, $month = null)
+    public function adminAccountsSalvaAction(Request $request, $year = null, $month = null)
     {
         // default 30s for prod is no longer enough
         set_time_limit(600);

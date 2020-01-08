@@ -74,7 +74,15 @@ class PaymentRepository extends DocumentRepository
             ->execute();
     }
 
-    public function getAllPayments(\DateTime $date, $type = null)
+    /**
+     * Gives you all successful payments in a given month and optionally of a given type and with a given underwriter.
+     * @param \DateTime         $date        is a date within the month in which we are looking for payments.
+     * @param string|array|null $type        is the type of payment to look for or null for any, and an array for a set
+     *                                       of types that it can be in.
+     * @param string|null       $policyType  is the type of the policy upon which we are looking for payments.
+     * @return array containing all of these payments.
+     */
+    public function getAllPayments(\DateTime $date, $type = null, $policyType = null)
     {
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
@@ -83,15 +91,16 @@ class PaymentRepository extends DocumentRepository
         } elseif (is_string($type)) {
             $type = [$type];
         }
-
-        return $this->createQueryBuilder()
+        $qb = $this->createQueryBuilder()
             ->field('success')->equals(true)
             ->field('policy')->notEqual(null)
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
-            ->field('type')->in($type)
-            ->getQuery()
-            ->execute();
+            ->field('type')->in($type);
+        if ($underwriter) {
+            $qb->field('policy.policy_type')->equals($underwriter);
+        }
+        return $qb->getQuery()->execute();
     }
 
     public function getAllPendingCredits()

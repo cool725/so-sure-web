@@ -50,7 +50,7 @@ use DateTimeZone;
 class ReportingService
 {
     const REPORT_KEY_FORMAT = 'Report:%s:%s:%s';
-    const REPORT_CACHE_TIME = 3600;
+    const REPORT_CACHE_TIME = 32400;
     const REPORT_PERIODS = [
         'last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
         'current month to date' => ['start' => 'first day of this month', 'end' => 'now'],
@@ -913,18 +913,22 @@ class ReportingService
         return $rewardPotLiability;
     }
 
-    public function getAllPaymentTotals($isProd, \DateTime $date, $useCache = true)
+    /**
+     * Gives you the payment totals for all the different kinds of payments that there are.
+     * @param \DateTime $date         is the date within the month for which we are getting all these payments.
+     * @param string    $underwriter  is the name of the underwriter that the payments must belong with.
+     * @param boolean   $allowInvalid is whether or not to allow payments belonging to invalid policies among the
+     *                                results.
+     * @param boolean   $useCache     whether to return cached results if they are available. If results are generated
+     *                                then they will be cached regardless.
+     * @return array containing all of the results.
+     */
+    public function getAllPaymentTotals(\DateTime $date, $underwriter, $allowInvalid, $useCache = true)
     {
-        $redisKey = sprintf(
-            self::REPORT_KEY_FORMAT,
-            'allPaymentsTotal',
-            $isProd ? 'prod' : 'non-prod',
-            $date->format('Y-m-d')
-        );
+        $redisKey = sprintf(self::REPORT_KEY_FORMAT, 'allPayments', 'totals', $date->format('Y-m-d'));
         if ($useCache === true && $this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
-
         $payments = $this->getPayments($date);
         $potRewardPayments = $this->getPayments($date, 'potReward');
         $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
@@ -935,29 +939,70 @@ class ReportingService
         $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
         $policyDiscountRefundPayments = $this->getPayments($date, 'policyDiscountRefund');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
-
-        // @codingStandardsIgnoreStart
+        $underwriterPaymentFile = null;
+        if ($underwriter == Salva::NAME) {
+            $underwriterPaymentFile = $this->getSalvaPaymentFile($date);
+        } elseif ($underwriter = Helvetia::NAME) {
+            $underwriterPaymentFile = $this->getHelvetiaPaymentFile($date);
+        } else {
+            throw new \InvalidArgumentException("{$underwriter} is not a proper kind of underwriter");
+        }
         $data = [
-            'all' => Payment::sumPayments($payments, $isProd),
-            'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
-            'checkout' => Payment::sumPayments($payments, $isProd, CheckoutPayment::class),
-            'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
-            'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
-            'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
-            'bacsIndemnity' => Payment::sumPayments($payments, $isProd, BacsIndemnityPayment::class),
-            'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
-            'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
-            'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, $isProd, PotRewardPayment::class),
-            'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, $isProd, SoSurePotRewardPayment::class),
-            'sosurePotRewardCashback' => Payment::sumPayments($soSurePotRewardPaymentsCashback, $isProd, SoSurePotRewardPayment::class),
-            'sosurePotRewardDiscount' => Payment::sumPayments($soSurePotRewardPaymentsDiscount, $isProd, SoSurePotRewardPayment::class),
-            'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
-            'policyDiscountRefunds' => Payment::sumPayments($policyDiscountRefundPayments, $isProd, PolicyDiscountRefundPayment::class),
+            'all' => Payment::sumPayments($payments, !$allowInvalid),
+            'judo' => Payment::sumPayments($payments, !$allowInvalid, JudoPayment::class),
+            'checkout' => Payment::sumPayments($payments, !$allowInvalid, CheckoutPayment::class),
+            'sosure' => Payment::sumPayments($payments, !$allowInvalid, SoSurePayment::class),
+            'chargebacks' => Payment::sumPayments($payments, !$allowInvalid, ChargebackPayment::class),
+            'bacs' => Payment::sumPayments($payments, !$allowInvalid, BacsPayment::class),
+            'bacsIndemnity' => Payment::sumPayments(
+                $payments,
+                !$allowInvalid,
+                BacsIndemnityPayment::class
+            ),
+            'potReward' => Payment::sumPayments(
+                $potRewardPayments,
+                !$allowInvalid,
+                PotRewardPayment::class
+            ),
+            'potRewardCashback' => Payment::sumPayments(
+                $potRewardPaymentsCashback,
+                !$allowInvalid,
+                PotRewardPayment::class
+            ),
+            'potRewardDiscount' => Payment::sumPayments(
+                $potRewardPaymentsDiscount,
+                !$allowInvalid,
+                PotRewardPayment::class
+            ),
+            'sosurePotReward' => Payment::sumPayments(
+                $soSurePotRewardPayments,
+                !$allowInvalid,
+                SoSurePotRewardPayment::class
+            ),
+            'sosurePotRewardCashback' => Payment::sumPayments(
+                $soSurePotRewardPaymentsCashback,
+                $allowInvalid,
+                SoSurePotRewardPayment::class
+            ),
+            'sosurePotRewardDiscount' => Payment::sumPayments(
+                $soSurePotRewardPaymentsDiscount,
+                $allowInvalid,
+                SoSurePotRewardPayment::class
+            ),
+            'policyDiscounts' => Payment::sumPayments(
+                $policyDiscountPayments,
+                $allowInvalid,
+                PolicyDiscountPayment::class
+            ),
+            'policyDiscountRefunds' => Payment::sumPayments(
+                $policyDiscountRefundPayments,
+                $allowInvalid,
+                PolicyDiscountRefundPayment::class
+            ),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
-            'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
+            'underwriterPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
-        // @codingStandardsIgnoreEnd
         $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
 
         return $data;
