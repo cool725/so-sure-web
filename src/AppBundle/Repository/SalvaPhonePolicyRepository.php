@@ -46,7 +46,7 @@ class SalvaPhonePolicyRepository extends PhonePolicyRepository
         } else {
             $qb->field('policyNumber')->notEqual(null);
         }
-        return $qb->getQuery()->execute();
+        return $qb->getQuery()->execute()->toArray();
     }
 
     /**
