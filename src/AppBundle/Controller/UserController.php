@@ -534,10 +534,10 @@ class UserController extends BaseController
         }
 
         // @codingStandardsIgnoreStart
-        $this->addFlash(
-            'success',
-            "🥳 The app is back up and running you can now validate your device!"
-        );
+        // $this->addFlash(
+        //     'success',
+        //     "🥳 The app is back up and running you can now validate your device!"
+        // );
         // @codingStandardsIgnoreEnd
 
         return array(
