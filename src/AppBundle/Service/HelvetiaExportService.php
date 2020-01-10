@@ -321,6 +321,7 @@ class HelvetiaExportService
         $file->addMetaData('total', $total);
         $file->addMetaData('numPayments', $n);
         $file->setDailyTransaction($daily);
+        $file->setFileName($filename);
         $this->dm->persist($file);
         $this->dm->flush();
     }

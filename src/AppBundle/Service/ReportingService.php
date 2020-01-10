@@ -884,26 +884,37 @@ class ReportingService
         return $data;
     }
 
-    public function getActivePoliciesCount($date)
+    public function getActivePoliciesCount($date, $underwriter)
     {
-        /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        /** @var SalvaPhonePolicyRepository $salvaPhonePolicyRepo */
-        $salvaPhonePolicyRepo = $this->dm->getRepository(SalvaPhonePolicy::class);
-        /** @var HelvetiaPhonePolicyRepository $helvetiaPhonePolicyRepo */
-        $helvetiaPhonePolicyRepo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
-        var_dump($phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date));
-        var_dump($salvaPhonePolicyRepo->countAllActivePoliciesToEndOfMonth($date));
-        var_dump($helvetiaPhonePolicyRepo->countAllActivePoliciesToEndOfMonth($date));
-        die("bing bing wahho");
+        $phonePolicyRepo;
+        if ($underwriter == Salva::NAME) {
+            /** @var PhonePolicyRepository $phonePolicyRepo */
+            $phonePolicyRepo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        } elseif ($underwriter == Helvetia::NAME) {
+            /** @var PhonePolicyRepository $phonePolicyRepo */
+            $phonePolicyRepo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
+        } else {
+            throw new \InvalidArgumentException(sprintf(
+                '%s is not a valid underwriter',
+                $underwriter
+            ));
+        }
         return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
     }
 
-    public function getActivePoliciesWithPolicyDiscountCount($date)
+    public function getActivePoliciesWithPolicyDiscountCount($date, $underwriter, $promoOnly = false)
     {
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-
+        $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
+        $rewardPotLiability = 0;
+        foreach ($policies as $policy) {
+            if ($promoOnly) {
+                $rewardPotLiability += $policy->getPromoPotValue();
+            } else {
+                $rewardPotLiability += $policy->getPotValue();
+            }
+        }
         return $phonePolicyRepo->countAllActivePoliciesWithPolicyDiscountToEndOfMonth($date);
     }
 

@@ -83,7 +83,7 @@ class PhonePolicyRepository extends PolicyRepository
         }
         $qb = $this->createQueryBuilder()
             ->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID, Policy::STATUS_PICSURE_REQUIRED])
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         if ($installments) {
             $qb->field('premiumInstallments')->equals($installments);
         }
@@ -113,7 +113,7 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_PICSURE_REQUIRED
             ])
         );
-        $qb->addAnd($qb->expr()->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX)));
+        $qb->addAnd($qb->expr()->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX)));
         $qb->addAnd($qb->expr()->field('potValue')->gt(0));
         $qb->addAnd($qb->expr()->field('end')->gt($date));
         $qb->addAnd(
@@ -131,7 +131,7 @@ class PhonePolicyRepository extends PolicyRepository
         if (!$endDate) {
             $endDate = \DateTime::createFromFormat('U', time());
         }
-        $qb = $this->createQueryBuilder()->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+        $qb = $this->createQueryBuilder()->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
@@ -172,7 +172,7 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_UNPAID,
                 Policy::STATUS_PICSURE_REQUIRED
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
 
         $qb->field('start')->lt($endDate);
         if ($startDate) {
@@ -210,7 +210,7 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
 
         $qb->field('start')->lt($endDate);
         if ($startDate) {
@@ -239,7 +239,7 @@ class PhonePolicyRepository extends PolicyRepository
         }
 
         $qb = $this->createQueryBuilder()
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
 
         $qb->field('leadSource')->equals($leadSource);
         $qb->field('start')->lt($endDate);
@@ -261,7 +261,7 @@ class PhonePolicyRepository extends PolicyRepository
         }
 
         $qb = $this->createQueryBuilder()
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         $qb->field('statusUpdated')->lt($endDate);
         if ($startDate) {
             $qb->field('statusUpdated')->gte($startDate);
@@ -312,7 +312,7 @@ class PhonePolicyRepository extends PolicyRepository
         }
 
         $qb = $this->createQueryBuilder()
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
 /*
         $qb->field('status')->in([
             Policy::STATUS_CANCELLED,
@@ -359,7 +359,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function getPotValues()
     {
         return $this->getDocumentManager()->getDocumentCollection($this->getClassName())->createAggregationBuilder()
-                ->match()->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX))
+                ->match()->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
                 ->group()
                     ->field('_id')->expression(0)
                     ->field('potValue')
@@ -374,7 +374,7 @@ class PhonePolicyRepository extends PolicyRepository
     {
         $qb = $this->createQueryBuilder()
             ->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID, Policy::STATUS_PICSURE_REQUIRED])
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         return $qb->getQuery()->execute();
     }
 
@@ -384,7 +384,7 @@ class PhonePolicyRepository extends PolicyRepository
             ->field('status')->in([
                 Policy::STATUS_UNPAID
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         return $qb->getQuery()->execute();
     }
 
@@ -395,7 +395,7 @@ class PhonePolicyRepository extends PolicyRepository
     public function findAllPolicies()
     {
         return $this->createQueryBuilder()
-            ->field('policyNumber')->equals(VALID_REGEX)
+            ->field('policyNumber')->equals(self::VALID_REGEX)
             ->getQuery()->execute();
     }
 
@@ -417,7 +417,7 @@ class PhonePolicyRepository extends PolicyRepository
         $qb = $this->createQueryBuilder()
             ->field('picSureStatus')->equals($picSureStatus)
             ->field('policyTerms.$id')->in($picsureTermsIds)
-            ->field('policyNumber')->equals(new \MongoRegex(VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         if ($activeUnpaidOnly) {
             $qb = $qb->field('status')->equals([
                 Policy::STATUS_ACTIVE,
@@ -440,7 +440,7 @@ class PhonePolicyRepository extends PolicyRepository
      */
     public function findEndingByStatus($status = null, \DateTime $start = null, \DateTime $end = null)
     {
-        $qb = $this->createQueryBuilder()->field("policyNumber")->equals(new \MongoRegex(VALID_REGEX));
+        $qb = $this->createQueryBuilder()->field("policyNumber")->equals(new \MongoRegex(self::VALID_REGEX));
         if (is_array($status)) {
             $qb->field("status")->in($status);
         } elseif ($status) {

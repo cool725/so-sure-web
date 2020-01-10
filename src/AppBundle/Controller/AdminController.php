@@ -841,8 +841,8 @@ class AdminController extends BaseController
                 Helvetia::POLICY_TYPES,
                 !$this->isProduction()
             ),
-            'activePolicies' => $reportingService->getActivePoliciesCount($date),
-            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date, Helvetia::NAME),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date, Helvetia::NAME),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
             'print' => false,
