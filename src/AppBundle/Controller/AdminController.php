@@ -765,8 +765,41 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("accounts-salva", name="admin_accounts_helvetia")
-     * @Route("/accounts/{year}/{month}", name="admin_accounts_helvetia_date")
+     * @Route("/accounts-helvetia/print/{year}/{month}", name="admin_accounts_helvetia_print")
+     */
+    public function adminAccountsHelvetiaPrintAction($year, $month)
+    {
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        $templating = $this->get('templating');
+        $snappyPdf = $this->get('knp_snappy.pdf');
+        $snappyPdf->setOption('orientation', 'Portrait');
+        $snappyPdf->setOption('page-size', 'A4');
+        /** @var ReportingService $reportingService */
+        $reportingService = $this->get('app.reporting');
+        $html = $templating->render('AppBundle:Pdf:adminAccountsHelvetia.html.twig', [
+            'year' => $year,
+            'month' => $month,
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Helvetia::NAME, !$this->isProduction()),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
+            'stats' => $reportingService->getStats($date),
+            'print' => true
+        ]);
+        return new Response(
+            $snappyPdf->getOutputFromHtml($html),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => sprintf('attachment; filename="so-sure-%d-%d.pdf"', $year, $month)
+            ]
+        );
+    }
+
+    /**
+     * @Route("/accounts-helvetia", name="admin_accounts_helvetia")
+     * @Route("/accounts-helvetia/{year}/{month}", name="admin_accounts_helvetia_date")
      * @Template
      */
     public function adminAccountsHelvetiaAction(Request $request, $year = null, $month = null)
@@ -776,20 +809,18 @@ class AdminController extends BaseController
         $month = $month ?: $now->format('m');
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
         $helvetiaForm = $this->get('form.factory')
-            ->createNamedBuilder('salva_form')
+            ->createNamedBuilder('helvetia_form')
             ->add('export', SubmitType::class)
             ->getForm();
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('salva_form')) {
+            die("Brexit");
+            if ($request->request->has('helvetia_form')) {
                 $helvetiaForm->handleRequest($request);
                 if ($helvetiaForm->isValid()) {
-                    /** @var SalvaExportService $salva */
-                    $salva = $this->get('app.salva');
-                    $salva->exportPayments(true);
-                    $this->addFlash(
-                        'success',
-                        'Re-exported Salva Payments File to S3'
-                    );
+                    /** @var HelvetiaExportService $salva */
+                    $helvetia = $this->get('app.helvetia');
+                    $helvetia->exportPayments(true);
+                    $this->addFlash('success', 'Re-exported Helvetia Payments File to S3');
                     return new RedirectResponse($this->generateUrl('admin_accounts_date', [
                         'year' => $year,
                         'month' => $month
@@ -802,7 +833,7 @@ class AdminController extends BaseController
         $s3FileRepo = $dm->getRepository(S3File::class);
         /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
-        $data = [
+        return [
             'year' => $year,
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals(
@@ -815,12 +846,9 @@ class AdminController extends BaseController
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
             'print' => false,
-        ];
-        $data = array_merge($data, [
             'files' => $s3FileRepo->getAllFiles($date),
-            'salvaForm' => $helvetiaForm->createView(),
-        ]);
-        return $data;
+            'helvetiaForm' => $helvetiaForm->createView()
+        ];
     }
 
     /**
@@ -840,10 +868,10 @@ class AdminController extends BaseController
         /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
 
-        $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
+        $html = $templating->render('AppBundle:Pdf:adminAccountsSalva.html.twig', [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME, !$this->isProduction()),
             'activePolicies' => $reportingService->getActivePoliciesCount($date),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
@@ -914,7 +942,7 @@ class AdminController extends BaseController
         $data = [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME, !$this->isProduction()),
             'activePolicies' => $reportingService->getActivePoliciesCount($date),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),

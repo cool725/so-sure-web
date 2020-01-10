@@ -25,6 +25,7 @@ use Psr\Log\LoggerInterface;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Invitation\Invitation;
@@ -887,7 +888,14 @@ class ReportingService
     {
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-
+        /** @var SalvaPhonePolicyRepository $salvaPhonePolicyRepo */
+        $salvaPhonePolicyRepo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        /** @var HelvetiaPhonePolicyRepository $helvetiaPhonePolicyRepo */
+        $helvetiaPhonePolicyRepo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
+        var_dump($phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date));
+        var_dump($salvaPhonePolicyRepo->countAllActivePoliciesToEndOfMonth($date));
+        var_dump($helvetiaPhonePolicyRepo->countAllActivePoliciesToEndOfMonth($date));
+        die("bing bing wahho");
         return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
     }
 

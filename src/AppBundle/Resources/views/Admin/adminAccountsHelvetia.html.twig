@@ -1,20 +1,87 @@
-<html>
-    <head>
-        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
-        <style>
-            body: { width: 100%; }
-            table { width: 100%; border-collapse: separate; border-spacing:1em; }
-            td:first { width: 60%; }
-            .table-striped > tbody > tr:nth-child(2n+1) {
-                background-color: #f9f9f9;
-            }
-        </style>
-    </head>
-    <body>
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+{# {% form_theme promotionForm with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
-        <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
+{# Set vars #}
+{% set body_class = 'admin-accounts' %}
 
-{% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
+{% block title %}Accounts {{ month }} / {{ year }}{% endblock %}
+{% block meta %}{% endblock %}
 
-    </body>
-</html>
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Accounts {{ month }} / {{ year }}</h1>
+            </div>
+            {# TODO: Controls area #}
+            <div class="card card-page-filter mb-5">
+                <div class="card-body">
+                    <form id="month_form"
+                          class="form-inline"
+                          method="GET"
+                          autocomplete="off">
+                        <div class="form-group">
+                            <label class="mr-md-2">Choose date:</label>
+                            <div class="input-group date mr-md-2"
+                                 id="date_time_picker"
+                                 data-target-input="nearest"
+                                 data-url="{{ path('admin_accounts_helvetia') }}">
+                                <input type="text"
+                                       class="form-control datetimepicker-input"
+                                       data-target="#date_time_picker"
+                                       value="{{month}}-{{year}}" />
+                                <div class="input-group-append"
+                                     data-target="#date_time_picker"
+                                     data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fal fa-calendar fa-fw"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success mr-md-2">
+                                <i class="fa fa-arrow-right fa-fw"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <a class="btn btn-info mr-md-2" target="_blank" href="{{ path('admin_accounts_helvetia_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
+                                <i class="fa fa-print fa-fw"></i>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% include 'AppBundle:Admin:adminAccountsHelvetiaData.html.twig' %}
+
+            <h3>Helvetia Files</h3>
+            <ul>
+                {% for file in files %}
+                    {% if file.fileType == 'HelvetiaPaymentFile' or file.fileType == 'HelvetiaPolicyFile' %}
+                        <li>
+                            {{ file.filename }} ~ {{ file.created|date }}</h5>
+                            <ul>
+                                {% for key, value in file.metadata %}
+                                    <li>{{ key }}: {{ value }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/accounts.js') }}"></script>
+    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
+{% endblock %}

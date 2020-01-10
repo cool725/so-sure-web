@@ -1,3 +1,5 @@
+
+{# TODO: Content area #}
 {% set indent_width = "5%" %}
 {% set text_width = "70%" %}
 {% set double_text_width = "65%" %}
@@ -14,27 +16,27 @@
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Paid in (cards)</td>
-                <td>£{{ paidCards|number_format(2, '.', ',') }}</td>
+                <td>£{{ paymentTotals.checkout.received|number_format(2, '.', ',') }}</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Paid in (bacs)</td>
-                <td>£{{ paidBacs|number_format(2, '.', ',') }}</td>
+                <td>£{{ paymentTotals.bacs.received|number_format(2, '.', ',') }}</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Paid in (so-sure)</td>
-                <td>£{{ paidSoSure|number_format(2, '.', ',') }}</td>
+                <td>£{{ paymentTotals.sosure.received|number_format(2, '.', ',') }}</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}"><strong>Premium received in month</strong></td>
-                {% set receivedTotal = paidCards + bacsPaid + paidSoSure %}
+                {% set receivedTotal = paymentTotals.checkout.received + paymentTotals.bacs.received + paymentTotals.sosure.received %}
                 {% set expectedReceived = paymentTotals.all.received - paymentTotals.chargebacks.received %}
                 {% if equal_to_two_dp(receivedTotal, expectedReceived) %}
-                    <td><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
+                <td><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
                 {% else %}
-                    <td class="table-danger" title="Expect total received £{{ expectedReceived|number_format(2, '.', ',') }}"><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
+                <td class="table-danger" title="Expect total received £{{ expectedReceived|number_format(2, '.', ',') }}"><strong>£{{ receivedTotal|number_format(2, '.', ',') }}</strong></td>
                 {% endif %}
             </tr>
         </tbody>
@@ -47,7 +49,7 @@
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Refunded (cards)</td>
-                <td>(£{{ (0 - (paymentTotals.judo.refunded + paymentTotals.checkout.refunded))|number_format(2, '.', ',') }})</td>
+                <td>(£{{ (0 - paymentTotals.checkout.refunded)|number_format(2, '.', ',') }})</td>
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
@@ -72,7 +74,7 @@
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}"><strong>Premium refunds in month</strong></td>
-                {% set refundedTotal = paymentTotals.judo.refunded + paymentTotals.checkout.refunded + paymentTotals.chargebacks.total + paymentTotals.bacsIndemnity.refunded + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
+                {% set refundedTotal = paymentTotals.checkout.refunded + paymentTotals.chargebacks.total + paymentTotals.bacsIndemnity.refunded + paymentTotals.bacs.refunded + paymentTotals.sosure.refunded %}
                 {% set expectedRefunded = paymentTotals.all.refunded + paymentTotals.chargebacks.received %}
                 {% if equal_to_two_dp(refundedTotal, expectedRefunded) %}
                 <td><strong>(£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }})</strong></td>
@@ -324,7 +326,7 @@
         <tbody>
             <tr>
                 <td width="{{ indent_width }}"></td>
-                <td width="{{ text_width }}">Salva</td>
+                <td width="{{ text_width }}">Helvetia</td>
                 <td>£{{ paymentTotals.all.totalUnderwriter|number_format(2, '.', ',') }} ( {{ paymentTotals.all.totalUnderwriterPercent |number_format(1, '.', ',')}}% )</td>
             </tr>
             <tr>
@@ -342,8 +344,8 @@
                 <td width="{{ text_width }}"><strong>Total premium distributions</strong></td>
                 {% set reportTotal = paymentTotals.all.totalUnderwriter + paymentTotals.all.totalCommission %}
                 {% set paymentsTotal = 0 %}
-                {% if paymentTotals.salvaPaymentFile.metadata['total'] is defined %}
-                    {% set paymentsTotal = paymentTotals.salvaPaymentFile.metadata['total'] %}
+                {% if paymentTotals.helvetiaPaymentFile.metadata['total'] is defined %}
+                    {% set paymentsTotal = paymentTotals.helvetiaPaymentFile.metadata['total'] %}
                 {% endif %}
                 {%  set expectedTotal = paymentsTotal - paymentTotals.policyDiscountRefunds.total - paymentTotals.potRewardCashback.total - paymentTotals.sosurePotRewardCashback.total %}
 
@@ -362,7 +364,7 @@
     <table class="table table-striped">
         <thead class="table-info">
             <tr>
-                <th colspan="3">Salva Transfer</th>
+                <th colspan="3">Helvetia Transfer</th>
             </tr>
         </thead>
         <tbody>
@@ -388,7 +390,7 @@
             </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
-                <td width="{{ text_width }}"><strong>Net transfer to Salva</strong></td>
+                <td width="{{ text_width }}"><strong>Net transfer to Helvetia</strong></td>
                 <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.potRewardCashback.total + (0 - paymentTotals.sosurePotRewardDiscount.total) + paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</strong></td>
             </tr>
         </tbody>
@@ -491,11 +493,6 @@
         <tbody>
             <tr>
                 <td width="{{ indent_width }}"></td>
-                <td width="{{ text_width }}">Judo</td>
-                <td>{{ paymentTotals.judo.numReceived }}</td>
-            </tr>
-            <tr>
-                <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Checkout</td>
                 <td>{{ paymentTotals.checkout.numReceived }}</td>
             </tr>
@@ -516,11 +513,6 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td width="{{ indent_width }}"></td>
-                <td width="{{ text_width }}">Judo</td>
-                <td>{{ paymentTotals.judo.numRefunded }}</td>
-            </tr>
             <tr>
                 <td width="{{ indent_width }}"></td>
                 <td width="{{ text_width }}">Checkout</td>
@@ -578,8 +570,8 @@
                 <td>Reward Pot Liability <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
                 <td>
                     £{{ (rewardPotLiability - rewardPromoPotLiability)|number_format(2, '.', ',') }}
-                    {% if not print and stats['accounts-reward-pot-liability-salva'] is defined %}
-                        [£{{ stats['accounts-reward-pot-liability-salva'] }} cached]
+                    {% if not print and stats['accounts-reward-pot-liability-helvetia'] is defined %}
+                        [£{{ stats['accounts-reward-pot-liability-helvetia'] }} cached]
                     {% endif %}
                 </td>
             </tr>
