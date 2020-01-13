@@ -4001,7 +4001,7 @@ abstract class Policy
 
     public function shouldCancelPolicy($prefix = null, $date = null)
     {
-        if (!$this->isValidPolicy($prefix) || !$this->isActive()) {
+        if (!$this->isValidPolicy() || !$this->isActive()) {
             return false;
         }
 
@@ -4032,7 +4032,7 @@ abstract class Policy
 
     public function shouldExpirePolicy($prefix = null, $date = null)
     {
-        if (!$this->isValidPolicy($prefix) || !$this->isActive()) {
+        if (!$this->isValidPolicy() || !$this->isActive()) {
             return false;
         }
 
@@ -4307,20 +4307,23 @@ abstract class Policy
             // any emails with @so-sure.com will generate an invalid policy
             $prefix = self::PREFIX_INVALID;
         }
-
         return $prefix;
     }
 
-    public function hasPolicyPrefix($prefix = null)
+    /**
+     * Tells you if the policy has a given policy number prefix.
+     * @param string|null $prefix is the prefix you are looking for.
+     * @return boolean true if the policy has this prefix and false if not.
+     */
+    public function hasPolicyPrefix($prefix)
     {
-        if (!$prefix) {
-            $prefix = $this->getPolicyNumberPrefix();
-        }
-
-        // TODO: Should this be up to / ?
         return mb_strpos($this->getPolicyNumber(), $prefix) === 0;
     }
 
+    /**
+     * Tells you if this policy has the invalid policy prefix.
+     * @return boolean true if the prefix says it is invalid and false if not.
+     */
     public function isPrefixInvalidPolicy()
     {
         return $this->hasPolicyPrefix(self::PREFIX_INVALID);
@@ -4328,15 +4331,14 @@ abstract class Policy
 
     /**
      * Tells you if a given policy is valid.
-     * @param string|null $prefix is an optional prefix to consider as valid, otherwise use the hardcoded prefix for the
-     *                            given policy type.
+     * @return boolean true if it is valid and false if not.
      */
-    public function isValidPolicy($prefix = null)
+    public function isValidPolicy()
     {
         if (!$this->isPolicy()) {
             return false;
         }
-        return $this->hasPolicyPrefix($prefix);
+        return !$this->isPrefixInvalidPolicy();
     }
 
     public function isBillablePolicy()
@@ -6336,17 +6338,19 @@ abstract class Policy
         return $isConnected;
     }
 
-    public function useForAttribution($prefix = null)
+    /**
+     * Tells you whether this policy should be used for attribution.
+     * @return boolean true if it should be used for the user's attribution, and false otherwise.
+     */
+    public function useForAttribution()
     {
         if (!$this->isPolicy()) {
-            return null;
+            return false;
         }
-
-        $attributionPolicy = $this->getUser()->getAttributionPolicy($prefix);
+        $attributionPolicy = $this->getUser()->getAttributionPolicy();
         if (!$attributionPolicy) {
-            return null;
+            return false;
         }
-
         return $this->getId() == $attributionPolicy->getId();
     }
 
@@ -6458,7 +6462,7 @@ abstract class Policy
     {
         $total = 0;
         foreach ($policies as $policy) {
-            if ($policy->isValidPolicy($prefix)) {
+            if ($policy->isValidPolicy()) {
                 $includePolicy = true;
                 if ($activeUnpaidOnly && !$policy->isActive()) {
                     $includePolicy = false;
@@ -6468,7 +6472,6 @@ abstract class Policy
                 }
             }
         }
-
         return $total;
     }
 }

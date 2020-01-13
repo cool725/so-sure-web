@@ -147,7 +147,7 @@ class PaymentService
             if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
-            if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
+            if (!$scheduledPayment->getPolicy()->isValidPolicy()) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {

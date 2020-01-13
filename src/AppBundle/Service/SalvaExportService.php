@@ -772,7 +772,7 @@ class SalvaExportService
                 if (!$policy) {
                     throw new \Exception(sprintf('Unable to find policyId: %s', $data['policyId']));
                 }
-                if (!$policy->isValidPolicy($prefix)) {
+                if (!$policy->isValidPolicy()) {
                     throw new \Exception(sprintf('Invalid policy - policyId: %s', $data['policyId']));
                 }
 

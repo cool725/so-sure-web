@@ -3239,7 +3239,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
             12
         );
         $this->assertEquals(0, $monthlyPolicy->getOutstandingPremiumToDate($date));
-        $this->assertTrue($monthlyPolicy->isValidPolicy(null));
+        $this->assertTrue($monthlyPolicy->isValidPolicy());
 
         // billing date is +1 hour, and needs to be slight after
         $date->add(new \DateInterval('PT2H'));
@@ -3264,7 +3264,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
             10
         );
         $this->assertEquals(0, $monthlyPolicy->getOutstandingPremiumToDate($date));
-        $this->assertTrue($monthlyPolicy->isValidPolicy(null));
+        $this->assertTrue($monthlyPolicy->isValidPolicy());
         $this->assertTrue($monthlyPolicy->getPremium()->hasAnnualDiscount());
         $this->assertNotEquals(
             $monthlyPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
@@ -3292,7 +3292,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
             Salva::MONTHLY_TOTAL_COMMISSION,
             12
         );
-        $this->assertTrue($monthlyPolicy->isValidPolicy(null));
+        $this->assertTrue($monthlyPolicy->isValidPolicy());
 
         // billing date is +1 hour, and needs to be slight after
         $date->add(new \DateInterval('PT2H'));

@@ -1116,7 +1116,7 @@ class PurchaseController extends BaseController
                     JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
                 );
             } catch (ProcessedException $e) {
-                if (!$policy->isValidPolicy($policy->getPolicyPrefix($this->getParameter('kernel.environment')))) {
+                if (!$policy->isValidPolicy()) {
                     throw $e;
                 }
                 $this->get('logger')->warning(
