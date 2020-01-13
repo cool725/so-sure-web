@@ -780,10 +780,13 @@ class AdminController extends BaseController
             'year' => $year,
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals($date, Helvetia::NAME, !$this->isProduction()),
-            'activePolicies' => $reportingService->getActivePoliciesCount($date),
-            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
-            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
-            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date, Helvetia::NAME),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount(
+                $date,
+                Helvetia::NAME
+            ),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date, Helvetia::NAME),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true, Helvetia::NAME),
             'stats' => $reportingService->getStats($date),
             'print' => true
         ]);
@@ -843,8 +846,8 @@ class AdminController extends BaseController
             ),
             'activePolicies' => $reportingService->getActivePoliciesCount($date, Helvetia::NAME),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date, Helvetia::NAME),
-            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
-            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date, Helvetia::NAME),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true, Helvetia::NAME),
             'print' => false,
             'files' => $s3FileRepo->getAllFiles($date),
             'helvetiaForm' => $helvetiaForm->createView()
@@ -872,11 +875,10 @@ class AdminController extends BaseController
             'year' => $year,
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME, !$this->isProduction()),
-            'activePolicies' => $reportingService->getActivePoliciesCount($date),
-            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
-            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
-            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
-            'stats' => $reportingService->getStats($date),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date, Salva::NAME),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date, Salva::NAME),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date, Salva::NAME),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true, Salva::NAME),
             'print' => true,
         ]);
 
@@ -943,11 +945,10 @@ class AdminController extends BaseController
             'year' => $year,
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME, !$this->isProduction()),
-            'activePolicies' => $reportingService->getActivePoliciesCount($date),
-            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
-            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
-            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
-            'stats' => $reportingService->getStats($date),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date, Salva::NAME),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date, Salva::NAME),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date, Salva::NAME),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true, Salva::NAME),
             'print' => false,
         ];
         //throw new \Exception(print_r($data, true));

@@ -125,7 +125,6 @@ class AdminReportsCommand extends ContainerAwareCommand
             list($start, $end) = ReportingService::getLastPeriod($period);
             $this->reporting->report($start, $end, false, false);
         }
-        $this->reporting->getCumulativePolicies(new \DateTime(SoSure::POLICY_START), new \DateTime(), false);
     }
 
     /**

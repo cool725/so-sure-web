@@ -886,26 +886,15 @@ class ReportingService
 
     public function getActivePoliciesCount($date, $underwriter)
     {
-        $phonePolicyRepo;
-        if ($underwriter == Salva::NAME) {
-            /** @var PhonePolicyRepository $phonePolicyRepo */
-            $phonePolicyRepo = $this->dm->getRepository(SalvaPhonePolicy::class);
-        } elseif ($underwriter == Helvetia::NAME) {
-            /** @var PhonePolicyRepository $phonePolicyRepo */
-            $phonePolicyRepo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
-        } else {
-            throw new \InvalidArgumentException(sprintf(
-                '%s is not a valid underwriter',
-                $underwriter
-            ));
-        }
+        /** @var PhonePolicyRepository $phonePolicyRepo */
+        $phonePolicyRepo = $this->underwriterRepo($underwriter);
         return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
     }
 
     public function getActivePoliciesWithPolicyDiscountCount($date, $underwriter, $promoOnly = false)
     {
         /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $phonePolicyRepo = $this->underwriterRepo($underwriter);
         $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
         $rewardPotLiability = 0;
         foreach ($policies as $policy) {
@@ -918,10 +907,10 @@ class ReportingService
         return $phonePolicyRepo->countAllActivePoliciesWithPolicyDiscountToEndOfMonth($date);
     }
 
-    public function getRewardPotLiability($date, $promoOnly = false)
+    public function getRewardPotLiability($date, $underwriter, $promoOnly = false)
     {
         /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $phonePolicyRepo = $this->underwriterRepo($underwriter);
         $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
         $rewardPotLiability = 0;
         foreach ($policies as $policy) {
@@ -1373,57 +1362,6 @@ class ReportingService
     }
 
     /**
-     * Creates a report in the cumulative style used by dylan, and monthly values calculated in the way that we use
-     * side by side over a series of months.
-     * @param \DateTime $start    is the starting month.
-     * @param \DateTime $end      is the ending month.
-     * @param boolean   $useCache says whether we should try to load from the cache or just skip that.
-     * @return array containing the full report.
-     */
-    public function getCumulativePolicies($start, $end, $useCache = true)
-    {
-        $start = $this->startOfMonth($start);
-        $end = $this->startOfDay($end);
-        $key = sprintf(self::REPORT_KEY_FORMAT, $start->format('Y-m-d.hi'), $end->format('Y-m-d.hi'), "cumulative");
-        if ($useCache === true && $this->redis->exists($key)) {
-            return unserialize($this->redis->get($key));
-        }
-        /** @var PhonePolicyRepository $policyRepo */
-        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $report = [];
-        $runningTotal = $this->totalAtPoint($start);
-        while ($start < $end) {
-            $endOfMonth = $this->endOfMonth($start);
-            if ($endOfMonth > $end) {
-                $endOfMonth = $end;
-            }
-            $month = [];
-            $month["open"] = $runningTotal;
-            $month["new"] = $policyRepo->countAllStartedPolicies(null, $start, $endOfMonth);
-            $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
-            $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
-            $runningTotal += $month["new"];
-            $runningTotal -= $month["expired"];
-            $runningTotal -= $month["cancelled"];
-            $month["close"] = $runningTotal;
-            $month["upgrade"] = $policyRepo->countAllEndingPolicies(
-                Policy::CANCELLED_UPGRADE,
-                $start,
-                $endOfMonth,
-                false
-            );
-            $month["newAdjusted"] = $month["new"] - $month["upgrade"];
-            $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
-            $month["queryOpen"] = $this->totalAtPoint($start);
-            $month["queryClose"] = $this->totalAtPoint($endOfMonth);
-            $report[$start->format("F Y")] = $month;
-            $start = $endOfMonth;
-        }
-        $this->redis->setex($key, self::REPORT_CACHE_TIME, serialize($report));
-        return $report;
-    }
-
-    /**
      * Gives a list of time periods to report on.
      * @return array which associates a name for each period to another array containing string representations of the
      *               start and end of that period.
@@ -1469,17 +1407,31 @@ class ReportingService
     }
 
     /**
-     * Gives you the total number of policies that are going.
-     * @param \DateTime $date is the date to look at.
-     * @return int the number of policies.
+     * Gives you the correct policy repo for the given underwriter.
+     * @param string|null $underwriter is the name of the underwriter to go for. If it is null you get a general phone
+     *                                 policy repo.
+     * @return PhonePolicyRepository for the underwriter you gave.
+     * @throws \InvalidArgumentException if you don't pass either helvetia or salva.
      */
-    private function totalAtPoint(\DateTime $date)
+    private function underwriterRepo($underwriter)
     {
-        /** @var PhonePolicyRepository $policyRepo */
-        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
-        return $policyRepo->countAllNewPolicies($date) - (
-            $policyRepo->countEndingByStatus(Policy::$expirationStatuses, null, $date) +
-            $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
-        );
+        $phonePolicyRepo = null;
+        if ($underwriter == Salva::NAME) {
+            /** @var PhonePolicyRepository $phonePolicyRepo */
+            $phonePolicyRepo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        } elseif ($underwriter == Helvetia::NAME) {
+            /** @var PhonePolicyRepository $phonePolicyRepo */
+            $phonePolicyRepo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
+        } elseif ($underwriter === null) {
+            /** @var PhonePolicyRepository $phonePolicyRepo */
+            $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        }
+        if ($phonePolicyRepo) {
+            return $phonePolicyRepo;
+        }
+        throw new \InvalidArgumentException(sprintf(
+            '"%s" is not a valid underwriter name',
+            $underwriter
+        ));
     }
 }

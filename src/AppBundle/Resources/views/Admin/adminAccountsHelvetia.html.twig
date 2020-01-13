@@ -59,21 +59,27 @@
 
             {% include 'AppBundle:Admin:adminAccountsHelvetiaData.html.twig' %}
 
-            <h3>Helvetia Files</h3>
-            <ul>
-                {% for file in files %}
-                    {% if file.fileType == 'HelvetiaPaymentFile' or file.fileType == 'HelvetiaPolicyFile' %}
-                        <li>
-                            {{ file.filename }} ~ {{ file.created|date }}</h5>
-                            <ul>
+            <h4>Files</h4>
+            <div class="table-responsive-sm mb-5">
+                    <table class="table table-striped">
+                    {% for file in files %}
+                        {% if file.fileType == 'HelvetiaPaymentFile' or file.fileType == 'HelvetiaPolicyFile' %}
+                            <thead class="thead-light">
+                                <tr><th colspan="3">{{ file.filename }} ~ {{ file.created| date }}</th></tr>
+                            </thead>
+                            <tbody>
                                 {% for key, value in file.metadata %}
-                                    <li>{{ key }}: {{ value }}</li>
+                                    <tr>
+                                        <td width="5%"></td>
+                                        <td width="70%">{{ key }}</td>
+                                        <td>{{ value }}</td>
+                                    </tr>
                                 {% endfor %}
-                            </ul>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+                            </tbody>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
         </div>
     </section>
 

@@ -549,9 +549,6 @@
                 <td>Average Payment Amount</td>
                 <td>
                     {% if paymentTotals.all.avgPayment %}£{{ paymentTotals.all.avgPayment|number_format(2, '.', ',')  }}{% else %}n/a{% endif %}
-                    {% if not print and stats['accounts-avg-payments'] is defined %}
-                        [£{{ stats['accounts-avg-payments'] }} cached]
-                    {% endif %}
                 </td>
             </tr>
             <tr>
@@ -559,9 +556,6 @@
                 <td>Number of Active Policies (as of end {{ month }} / {{ year }})</td>
                 <td>
                     {{ activePolicies }}
-                    {% if not print and stats['accounts-active-policies'] is defined %}
-                        [{{ stats['accounts-active-policies'] }} cached]
-                    {% endif %}
                 </td>
             </tr>
             <tr>
@@ -569,9 +563,6 @@
                 <td>Number of Active Policies w/Reward Pot Discount (as of end {{ month }} / {{ year }})</td>
                 <td>
                     {{ activePoliciesWithDiscount }}
-                    {% if not print and stats['accounts-active-policies-with-discounts'] is defined %}
-                        [{{ stats['accounts-active-policies-with-discounts'] }} cached]
-                    {% endif %}
                 </td>
             </tr>
             <tr>
@@ -579,9 +570,6 @@
                 <td>Reward Pot Liability <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
                 <td>
                     £{{ (rewardPotLiability - rewardPromoPotLiability)|number_format(2, '.', ',') }}
-                    {% if not print and stats['accounts-reward-pot-liability-salva'] is defined %}
-                        [£{{ stats['accounts-reward-pot-liability-salva'] }} cached]
-                    {% endif %}
                 </td>
             </tr>
             <tr>
@@ -589,9 +577,6 @@
                 <td>Reward Pot Liability for so-sure (marketing) <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
                 <td>
                     £{{ rewardPromoPotLiability|number_format(2, '.', ',') }}
-                    {% if not print and stats['accounts-reward-pot-liability-sosure'] is defined %}
-                        [£{{ stats['accounts-reward-pot-liability-sosure'] }} cached]
-                    {% endif %}
                 </td>
             </tr>
             <tr>
@@ -599,9 +584,6 @@
                 <td>Annual Run Rate Premium</td>
                 <td>
                     £{{ paymentTotals.totalRunRate|number_format(0, '.', ',') }}
-                    {% if not print and stats['accounts-annual-run-rate'] is defined %}
-                        [£{{ stats['accounts-annual-run-rate'] }} cached]
-                    {% endif %}
                 </td>
             </tr>
         </tbody>
