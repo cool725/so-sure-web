@@ -96,8 +96,8 @@ class BaseImeiService
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findDuplicateImei($imei);
 
+        /** @var Policy $policy */
         foreach ($policies as $policy) {
-            /** @var Policy $policy */
 
             // Partial policies can be ignored
             if (!$policy->isPolicy()) {

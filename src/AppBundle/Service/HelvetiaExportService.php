@@ -318,8 +318,8 @@ class HelvetiaExportService
         $file->setBucket(self::S3_BUCKET);
         $file->setKey($s3Key);
         $file->setDate($date);
-        $file->addMetaData('total', $total);
-        $file->addMetaData('numPayments', $n);
+        $file->addMetadata('total', $total);
+        $file->addMetadata('numPayments', $n);
         $file->setDailyTransaction($daily);
         $file->setFileName($filename);
         $this->dm->persist($file);
@@ -368,7 +368,7 @@ class HelvetiaExportService
      * @param string    $filename is the name to give the file on s3.
      * @param string    $type     determines the sub folder the file will be placed in.
      * @param \DateTime $date     is the date that the file is for.
-     * @return the s3 key of the file.
+     * @return string the s3 key of the file.
      */
     private function uploadS3($data, $filename, $type, $date)
     {

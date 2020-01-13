@@ -786,8 +786,7 @@ class AdminController extends BaseController
                 Helvetia::NAME
             ),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date, Helvetia::NAME),
-            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true, Helvetia::NAME),
-            'stats' => $reportingService->getStats($date),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, Helvetia::NAME, true),
             'print' => true
         ]);
         return new Response(
@@ -839,13 +838,12 @@ class AdminController extends BaseController
         return [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $reportingService->getAllPaymentTotals(
-                $date,
-                Helvetia::POLICY_TYPES,
-                !$this->isProduction()
-            ),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Helvetia::NAME, !$this->isProduction()),
             'activePolicies' => $reportingService->getActivePoliciesCount($date, Helvetia::NAME),
-            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date, Helvetia::NAME),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount(
+                $date,
+                Helvetia::NAME
+            ),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date, Helvetia::NAME),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true, Helvetia::NAME),
             'print' => false,

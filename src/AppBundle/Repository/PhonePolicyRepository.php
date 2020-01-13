@@ -4,6 +4,7 @@ namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Doctrine\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Cursor;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;

@@ -22,7 +22,7 @@ class AdminReportsCommand extends ContainerAwareCommand
     const SERVICE_NAME = 'sosure:admin:reports';
     protected static $defaultName = self::SERVICE_NAME;
 
-    /** @var KpiCachedi */
+    /** @var KpiCached */
     private $kpiReport;
     /** @var ReportingService */
     private $reporting;
@@ -144,15 +144,14 @@ class AdminReportsCommand extends ContainerAwareCommand
         $lastMonth = $this->startOfPreviousMonth($date);
         $twoMonths = $this->startOfPreviousMonth($lastMonth);
         $threeMonths = $this->startOfPreviousMonth($twoMonths);
-        $isProd = $this->environment == 'prod';
         $output->writeln(sprintf('Caching accounts for %s', $date->format(\DateTime::ATOM)));
-        $this->reporting->getAllPaymentTotals($date, $underwriter, !$isProd, false);
+        $this->reporting->getAllPaymentTotals($date, $underwriter, false);
         $output->writeln(sprintf('Caching accounts for %s', $lastMonth->format(\DateTime::ATOM)));
-        $this->reporting->getAllPaymentTotals($lastMonth, $underwriter, !$isProd, false);
+        $this->reporting->getAllPaymentTotals($lastMonth, $underwriter, false);
         $output->writeln(sprintf('Caching accounts for %s', $twoMonths->format(\DateTime::ATOM)));
-        $this->reporting->getAllPaymentTotals($twoMonths, $underwriter, !$isProd, false);
+        $this->reporting->getAllPaymentTotals($twoMonths, $underwriter, false);
         $output->writeln(sprintf('Caching accounts for %s', $threeMonths->format(\DateTime::ATOM)));
-        $this->reporting->getAllPaymentTotals($threeMonths, $underwriter, !$isProd, false);
+        $this->reporting->getAllPaymentTotals($threeMonths, $underwriter, false);
     }
 
     /**
