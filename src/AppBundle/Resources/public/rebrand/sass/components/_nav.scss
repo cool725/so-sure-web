@@ -9,7 +9,6 @@
 .navbar-so-sure {
     // TODO: When we switch to gradient hero adjust
     @include blue-gradient-45;
-    // background-color: $crayon-blue;
 
     .navbar-nav {
         transition: none;
@@ -32,19 +31,22 @@
             }
         }
 
-        .dropdown-menu {
-            position: absolute;
-            left: 50%;
-            margin-left: -10rem;
+        .nav-link-img {
+            padding: 0;
         }
 
-        .dropdown {
-            &:hover {
-                .dropdown-menu {
-                    display: block;
-                }
-            }
+        .dropdown-menu {
+            position: absolute;
+            left: auto; right: 0;
         }
+
+        // .dropdown-toggle.dropdown-hover {
+        //     &:hover {
+        //         .dropdown-menu {
+        //             display: block;
+        //         }
+        //     }
+        // }
     }
 }
 
@@ -53,6 +55,7 @@
 
         .nav-active {
             position: relative;
+            color: $deep-sky-blue-b !important;
 
             &:before {
                 width: 100%; height: 4px;

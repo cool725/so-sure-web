@@ -1,0 +1,76 @@
+<div id="menu" class="menu {{ menu_show }}">
+    <ul class="list-unstyled menu__links text-md-center">
+        {% if policy is defined and policy %}
+            <li>
+                <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="h5 d-flex align-items-center">
+                    <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2 show-in-nav" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
+                    Dashboard
+                </a>
+            </li>
+            {% if policy.displayRenewal %}
+                <li>
+                    <a href="{{ path('user_renew_policy', {'id': policy.id }) }}" class="h5">
+                        <i class="fal fa-star-exclamation fa-fw mr-2"></i> Renew
+                    </a>
+                </li>
+            {% endif %}
+{#             <li>
+                <a href="#" class="h5">
+                    <i class="fas fa-users fa-fw mr-2"></i> Invites
+                </a>
+            </li> #}
+            <li>
+                <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}" class="h5">
+                    <i class="fal fa-mobile-android fa-fw mr-2"></i> Claims
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('user_payment_details_policy', {'policyId': policy.id}) }}" class="h5">
+                    <i class="fal fa-credit-card fa-fw mr-2"></i> Payments
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('user_policy_list_policy', {'policyId': policy.id}) }}" class="h5">
+                    <i class="fal fa-file-certificate fa-fw mr-2"></i> Policies
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <a href="{{ path('user_home') }}" class="h5">
+                    <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2 d-flex align-items-center" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
+                    Dashboard
+                </a>
+            </li>
+{#             <li>
+                <a href="#" class="h5">
+                    <i class="fas fa-users fa-fw mr-2"></i> Invites
+                </a>
+            </li> #}
+            <li>
+                <a href="{{ path('user_claim') }}" class="h5">
+                    <i class="fal fa-mobile-android fa-fw mr-2"></i> Claims
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('user_payment_details') }}" class="h5">
+                    <i class="fal fa-credit-card fa-fw mr-2"></i> Payments
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('user_policy_list') }}" class="h5">
+                    <i class="fal fa-file-certificate fa-fw mr-2"></i> Policies
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{{ path('about_how_to_contact_so_sure') }}" class="h5">
+                Contact us
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('user_contact_details_policy') }}" class="h5">
+                Your account
+            </a>
+        </li>
+    </ul>
+</div>

@@ -4,7 +4,7 @@
     width: 100%; height: 0%;
     position: fixed;
     top: 0; left: 0;
-    padding-top: 6rem;
+    padding: 4rem 0;
     background-color: $dodger-blue;
     @include blue-gradient-45;
     opacity: 0;
@@ -17,7 +17,7 @@
     &__links {
         width: 100%;
         display: none;
-        flex: 3;
+        // flex: 3;
         margin: 0;
         overflow-y: scroll;
 
@@ -35,12 +35,22 @@
                     text-decoration: none;
                 }
             }
+
+            > ul li a {
+                padding-left: 3.5rem;
+
+                @include media-breakpoint-up(md) {
+                    padding-left: 2rem;
+                }
+            }
         }
 
         hr {
             border: none;
-            border-top: 2px solid $columbia-blue-e;
-            opacity: 0.5;
+            border-top: 1px solid $columbia-blue-e;
+            opacity: 0.25;
+            margin: 0;
+            padding: 0;
         }
 
         @include media-breakpoint-up(sm) {
