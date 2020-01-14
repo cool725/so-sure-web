@@ -98,7 +98,6 @@ class BaseImeiService
 
         /** @var Policy $policy */
         foreach ($policies as $policy) {
-
             // Partial policies can be ignored
             if (!$policy->isPolicy()) {
                 continue;

@@ -874,7 +874,10 @@ class AdminController extends BaseController
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME, !$this->isProduction()),
             'activePolicies' => $reportingService->getActivePoliciesCount($date, Salva::NAME),
-            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date, Salva::NAME),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount(
+                $date,
+                Salva::NAME
+            ),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date, Salva::NAME),
             'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true, Salva::NAME),
             'print' => true,

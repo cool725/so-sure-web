@@ -926,10 +926,10 @@ class ReportingService
 
     /**
      * Gives you the payment totals for all the different kinds of payments that there are.
-     * @param \DateTime $date         is the date within the month for which we are getting all these payments.
-     * @param string    $underwriter  is the name of the underwriter to get payment totals for.
-     * @param boolean   $useCache     whether to return cached results if they are available. If results are generated
-     *                                then they will be cached regardless.
+     * @param \DateTime $date        is the date within the month for which we are getting all these payments.
+     * @param string    $underwriter is the name of the underwriter to get payment totals for.
+     * @param boolean   $useCache    whether to return cached results if they are available. If results are generated
+     *                               then they will be cached regardless.
      * @return array containing all of the results.
      */
     public function getAllPaymentTotals(\DateTime $date, $underwriter, $useCache = true)
