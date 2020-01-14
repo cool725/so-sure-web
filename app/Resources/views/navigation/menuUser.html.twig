@@ -2,7 +2,7 @@
     <ul class="list-unstyled menu__links text-md-center">
         {% if policy is defined and policy %}
             <li>
-                <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="h5 d-flex align-items-center">
+                <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="h5 d-flex align-items-center justify-content-start justify-content-md-center">
                     <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2 show-in-nav" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
                     Dashboard
                 </a>
@@ -37,7 +37,7 @@
         {% else %}
             <li>
                 <a href="{{ path('user_home') }}" class="h5">
-                    <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2 d-flex align-items-center" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
+                    <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2 d-flex align-items-center justify-content-start justify-content-md-center" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
                     Dashboard
                 </a>
             </li>
