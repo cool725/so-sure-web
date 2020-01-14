@@ -1,14 +1,16 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 {% block fos_user_content %}
 
-    <h1 class="text-white text-center mb-4">Password reset request received</h1>
+    <h1 class="text-white h2 text-center mb-4">Password reset request received</h1>
 
     <div class="login__card">
         <div class="login__card__body">
-            <p>If you have an account, you should receive an email shortly with instructions on how to reset your password.</p>
-            <p>If you don't receive an email, please check your spam/junk/promotions folders as sometimes these type of emails will wind up there.</p>
-            <p>To protect your account, we only allow one reset request every {{ tokenLifetime }} hours.</p>
-            <a href="{{ path('about_how_to_contact_so_sure') }}" class="btn btn-outline-primary btn-block"><i class="fal fa-envelope fa-lg mr-2"></i> Contact us</a>
+            <p class="text-center">If you have an account, you should receive an email shortly with instructions on how to reset your password.</p>
+            <p class="text-center">If you don't receive an email, please check your spam/junk/promotions folders as sometimes these type of emails will wind up there.</p>
+            <p class="text-center mb-4">To protect your account, we only allow one reset request every {{ tokenLifetime }} hours.</p>
+            <div class="col-md-8 offset-md-2">
+                <a href="{{ path('about_how_to_contact_so_sure') }}" class="btn btn-outline-primary btn-block">Contact Us</a>
+            </div>
         </div>
     </div>
 

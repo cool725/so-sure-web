@@ -6,7 +6,7 @@
 
 {% block title %}Sitemap | so-sure{% endblock %}
 {% block meta %}
-    <link rel="canonical" href="{{ path('sitemap') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

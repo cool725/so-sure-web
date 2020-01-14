@@ -3,28 +3,34 @@
 
     {% if app.user is not null and app.user %}
 
-        <h4 class="text-columbia-blue-e text-center mb-1">You're logged in as:</h4>
-        <h1 class="text-white text-center mb-4">{{ app.user.name }}</h1>
+        <div class="text-columbia-blue-e h5 text-center mb-1">You're logged in as:</div>
+        <h1 class="text-white h2 text-center mb-4">{{ app.user.name }}</h1>
 
         <div class="login__card">
             <div class="login__card__body">
-                {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block">Admin</a>
-                {% elseif is_granted('ROLE_EMPLOYEE') %}
-                    <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block">Admin</a>
-                {% elseif is_granted('ROLE_CLAIMS') %}
-                    <a href="{{ path('claims_home') }}" class="btn btn-primary btn-block">Claims</a>
-                {% else %}
-                    <a href="{{ path('user_home') }}" class="btn btn-primary btn-block">Your Account</a>
-                {% endif %}
-                <a href="{{ path('fos_user_security_logout') }}" class="btn btn-outline-primary btn-block">Logout</a>
+                <div class="col-md-8 offset-md-2">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin_home') }}" class="btn btn-primary btn-no-shadow btn-block">Admin</a>
+                    {% elseif is_granted('ROLE_EMPLOYEE') %}
+                        <a href="{{ path('admin_home') }}" class="btn btn-primary btn-no-shadow btn-block">Admin</a>
+                    {% elseif is_granted('ROLE_CLAIMS') %}
+                        <a href="{{ path('claims_home') }}" class="btn btn-primary btn-no-shadow btn-block">Claims</a>
+                    {% else %}
+                        <a href="{{ path('user_home') }}" class="btn btn-primary btn-no-shadow btn-block">Your Account</a>
+                    {% endif %}
+
+                </div>
+                <div class="login__divider"><span class="h6 text-grey">or</span></div>
+                <div class="col-md-8 offset-md-2">
+                    <a href="{{ path('fos_user_security_logout') }}" class="btn btn-outline-primary btn-block">Logout</a>
+                </div>
             </div>
         </div>
 
     {% else %}
 
-        <h4 class="text-columbia-blue-e text-center mb-1">Login to your account</h4>
-        <h1 class="text-white text-center mb-4">Welcome Back 🎉</h1>
+        <div class="text-columbia-blue-e h5 text-center mb-1">Login to your account</div>
+        <h1 class="text-white h2 text-center mb-4">Welcome Back 🎉</h1>
 
         <div class="login__card">
             <div class="login__card__body">
@@ -46,7 +52,7 @@
                         <input type="hidden" name="state" value="{{ accountkit_state() }}">
                         <input type="hidden" name="fbAppEventsEnabled" value=true>
                         <input type="hidden" name="debug" value=false>
-                        <div class="form-group">
+                        <div class="form-group mb-4">
                             <label for="phone_number">Mobile Number</label>
                             <div class="input-group" id="phone-number-holder">
                                 <div class="input-group-prepend">
@@ -58,8 +64,8 @@
                                 <label class="error mt-1">Sorry, we were unable to log you in. You can try again, or <a href="{{ path('about_how_to_contact_so_sure') }}">contact us</a> for help.</label>
                             {% endif %}
                         </div>
-                        <div class="form-group">
-                            <button id="sms-login-btn" class="btn btn-block btn-icon btn-success">Get Login Code <i class="far fa-arrow-right fa-fw ml-2"></i></button>
+                        <div class="form-group  col-md-8 offset-md-2">
+                            <button id="sms-login-btn" class="btn btn-success btn-no-shadow btn-block">Send Login Code</button>
                         </div>
                     </form>
                     <form id="accountkit-form"
@@ -99,7 +105,7 @@
                                 </label>
                             {% endif %}
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-4">
                             <div class="row">
                                 <div class="col">
                                     <div class="custom-control custom-checkbox">
@@ -112,8 +118,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <button type="submit" id="_submit" name="_submit" class="btn btn-block btn-icon btn-success">Login via Email <i class="far fa-arrow-right fa-fw ml-2"></i></button>
+                        <div class="form-group col-md-8 offset-md-2">
+                            <button type="submit" id="_submit" name="_submit" class="btn btn-success btn-no-shadow btn-block">Login</button>
                         </div>
                     </form>
                 </div>
@@ -121,11 +127,11 @@
                 <div class="login__divider"><span class="h6 text-grey">or login with</span></div>
 
                 {# Login with #}
-                <div class="row">
-                    <div class="col">
+                {# <div class="row"> #}
+                    <div class="form-group col-md-8 offset-md-2">
                         <a href="#" id="swap-login" class="btn btn-outline-primary btn-block"><span>Email</span></a>
                     </div>
-                </div>
+                {# </div> #}
             </div>
         </div>
 

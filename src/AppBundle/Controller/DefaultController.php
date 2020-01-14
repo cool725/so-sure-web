@@ -900,7 +900,7 @@ class DefaultController extends BaseController
         ];
 
         if ($request->get('_route') == 'claim_login') {
-            return $this->render('AppBundle:Default:claimLogin.html.twig', $data);
+            return $this->redirectToRoute('claim', [], 301);
         }
         return $this->render('AppBundle:Default:claim.html.twig', $data);
     }

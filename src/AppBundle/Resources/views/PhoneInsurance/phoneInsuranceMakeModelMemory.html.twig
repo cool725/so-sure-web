@@ -46,7 +46,6 @@
 {% endif %}
 
 {% set canonical = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical })  %}
-{% set hide_quote_btn = true %}
 
 {% block title %}{{ make_desc }} {{ with_phone }}{{ add_phone }} Insurance For &pound;{{ prices['monthly'].monthlyPremiumPrice }} Monthly | so-sure{% endblock %}
 
