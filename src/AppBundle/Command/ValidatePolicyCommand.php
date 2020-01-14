@@ -559,7 +559,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $refundCommission,
                         $pendingBacsTotalCommission
                     );
-                } elseif ($refund === 0 && $refundCommission !== 0) {
+                } elseif ($refund === 0 && abs($refundCommission) >= 0.01) {
                     if ($refundCommission !== $pendingBacsTotalCommission) {
                         $lines[] = $this->failureRefundCommissionMessage(
                             $policy,
