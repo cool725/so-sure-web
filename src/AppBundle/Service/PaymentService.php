@@ -166,12 +166,11 @@ class PaymentService
 
     public function scheduledPayment(
         ScheduledPayment $scheduledPayment,
-        $prefix = null,
         \DateTime $date = null,
         $abortOnMultipleSameDayPayment = true
     ) {
         try {
-            $scheduledPayment->validateRunable($prefix, $date);
+            $scheduledPayment->validateRunable($date);
         } catch (ScheduledPaymentException $e) {
             /**
              * This should never be thrown as the only place that calls this that is not
@@ -207,7 +206,6 @@ class PaymentService
             try {
                 $payment = $this->checkout->scheduledPayment(
                     $scheduledPayment,
-                    $prefix,
                     $date,
                     $abortOnMultipleSameDayPayment
                 );

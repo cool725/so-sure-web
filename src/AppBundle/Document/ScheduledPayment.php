@@ -337,11 +337,11 @@ class ScheduledPayment
         return $this->getScheduled() <= $date;
     }
 
-    public function validateRunable($prefix = null, \DateTime $date = null)
+    public function validateRunable(\DateTime $date = null)
     {
         if (!$this->getPolicy()->isValidPolicy()) {
             throw new ScheduledPaymentException(sprintf(
-                'Scheduled payment %s policy is not valid. Invalid Prefix?',
+                'Scheduled payment %s policy is not valid.',
                 $this->getId()
             ));
         }

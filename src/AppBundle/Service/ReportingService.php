@@ -649,9 +649,9 @@ class ReportingService
 
     private function getTotalRunRate($newToDateDirectPolicies, $newToDateInvitationPolicies, $newToDateSCodePolicies)
     {
-        return Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, null, true);
+        return Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, true) +
+            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, true) +
+            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, true);
     }
 
     private function getExcludedPolicies($isKpi)

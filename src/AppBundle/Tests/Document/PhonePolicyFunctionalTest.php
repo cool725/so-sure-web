@@ -2424,7 +2424,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
         // Policy doesn't have a payment, so should be expired
-        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldCancelPolicy(new \DateTime("2016-01-01")));
     }
 
     public function testShouldCancelRenewalPolicyMissingPayment()
@@ -2468,10 +2468,10 @@ class PhonePolicyFunctionalTest extends WebTestCase
         );
 
         // Renewal doesn't have a payment, so should be expired after 30 days
-        $this->assertFalse($renewal->shouldCancelPolicy(null, new \DateTime("2017-01-01")));
-        $this->assertFalse($renewal->shouldCancelPolicy(null, new \DateTime("2017-01-30 23:59:00")));
-        $this->assertTrue($renewal->shouldCancelPolicy(null, new \DateTime("2017-01-31 00:01:00")));
-        $this->assertTrue($renewal->shouldCancelPolicy(null, new \DateTime("2017-03-01")));
+        $this->assertFalse($renewal->shouldCancelPolicy(new \DateTime("2017-01-01")));
+        $this->assertFalse($renewal->shouldCancelPolicy(new \DateTime("2017-01-30 23:59:00")));
+        $this->assertTrue($renewal->shouldCancelPolicy(new \DateTime("2017-01-31 00:01:00")));
+        $this->assertTrue($renewal->shouldCancelPolicy(new \DateTime("2017-03-01")));
     }
 
     public function testShouldCancelPolicy()
@@ -2495,8 +2495,8 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldCancelPolicy(new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldCancelPolicy(new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -2506,8 +2506,8 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
-        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-03-03")));
+        $this->assertFalse($policy->shouldCancelPolicy(new \DateTime("2016-01-01")));
+        $this->assertTrue($policy->shouldCancelPolicy(new \DateTime("2016-03-03")));
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -2517,8 +2517,8 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $payment->setReceipt(rand(1, 999999));
         $policy->addPayment($payment);
 
-        $this->assertFalse($policy->shouldCancelPolicy(null, new \DateTime("2016-02-09")));
-        $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-04-15")));
+        $this->assertFalse($policy->shouldCancelPolicy(new \DateTime("2016-02-09")));
+        $this->assertTrue($policy->shouldCancelPolicy(new \DateTime("2016-04-15")));
     }
 
     public function testCanCancelPolicy()

@@ -3999,7 +3999,7 @@ abstract class Policy
         return $this->getEnd()->diff($date)->days < 30;
     }
 
-    public function shouldCancelPolicy($prefix = null, $date = null)
+    public function shouldCancelPolicy($date = null)
     {
         if (!$this->isValidPolicy() || !$this->isActive()) {
             return false;
@@ -4030,7 +4030,7 @@ abstract class Policy
         return $date >= $this->getPolicyExpirationDate($date);
     }
 
-    public function shouldExpirePolicy($prefix = null, $date = null)
+    public function shouldExpirePolicy($date = null)
     {
         if (!$this->isValidPolicy() || !$this->isActive()) {
             return false;
@@ -6458,7 +6458,7 @@ abstract class Policy
         return $data;
     }
 
-    public static function sumYearlyPremiumPrice($policies, $prefix = null, $activeUnpaidOnly = false)
+    public static function sumYearlyPremiumPrice($policies, $activeUnpaidOnly = false)
     {
         $total = 0;
         foreach ($policies as $policy) {
