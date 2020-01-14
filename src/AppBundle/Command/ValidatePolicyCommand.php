@@ -80,12 +80,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             ->setName('sosure:policy:validate')
             ->setDescription('Validate policy payments')
             ->addOption(
-                'prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Policy prefix'
-            )
-            ->addOption(
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -181,7 +175,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $csvData = [];
         $policies = [];
         $date = $input->getOption('date');
-        $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
         $policyId = $input->getOption('policyId');
         $create = true === $input->getOption('create');
@@ -243,7 +236,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
                 $data = [
                     'warnClaim' => true,
-                    'prefix' => $prefix,
                     'validateDate' => $validateDate,
                     'adjustScheduledPayments' => $adjustScheduledPayments,
                     'validate-premiums' => $validatePremiums,
@@ -279,12 +271,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = '';
 
                 foreach ($policies as $policy) {
-                    if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
-                        continue;
-                    }
                     $data = [
                         'warnClaim' => false,
-                        'prefix' => $prefix,
                         'validateDate' => $validateDate,
                         'adjustScheduledPayments' => false,
                         'validate-premiums' => $validatePremiums,
@@ -313,7 +301,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = 'Pending Cancellations';
                 $lines[] = '-------------';
                 $lines[] = '';
-                $pending = $this->policyService->getPoliciesPendingCancellation(true, $prefix);
+                $pending = $this->policyService->getPoliciesPendingCancellation(true);
                 foreach ($pending as $policy) {
                     /** @var Policy $policy */
                     $lines[] = sprintf(
@@ -422,7 +410,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     );
                     $lines[] = $this->failurePaymentMessage(
                         $policy,
-                        $data['prefix'],
                         $data['validateDate']
                     );
                 }
@@ -439,7 +426,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = $this->failureIptRateMessage($policy);
             }
             if ($policy->hasCorrectPolicyStatus($data['validateDate']) === false) {
-                $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
+                $lines[] = $this->failureStatusMessage($policy, $data['validateDate']);
             }
             if ($policy->arePolicyScheduledPaymentsCorrect(
                 true,
@@ -514,7 +501,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance, true) === false) {
                 // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
                 if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
-                    $lines[] = $this->failureCommissionMessage($policy, $data['prefix'], $commissionDate);
+                    $lines[] = $this->failureCommissionMessage($policy, $commissionDate);
                 }
             }
 
@@ -632,7 +619,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function failureStatusMessage(Policy $policy, $prefix, $date)
+    private function failureStatusMessage(Policy $policy, $date)
     {
         $message = sprintf(
             'Unexpected status %s %s',
@@ -651,7 +638,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         return $message;
     }
 
-    private function failureCommissionMessage(Policy $policy, $prefix, $date)
+    private function failureCommissionMessage(Policy $policy, $date)
     {
         return sprintf(
             'Unexpected commission for policy %s (Paid: %0.2f Expected: %0.2f)',
@@ -671,7 +658,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         );
     }
 
-    private function failurePaymentMessage(Policy $policy, $prefix, $date)
+    private function failurePaymentMessage(Policy $policy, $date)
     {
         $totalPaid = $policy->getTotalSuccessfulPayments($date);
         $expectedPaid = $policy->getTotalExpectedPaidToDate($date);

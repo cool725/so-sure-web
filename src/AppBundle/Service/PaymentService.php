@@ -112,16 +112,14 @@ class PaymentService
     }
 
     public function getAllValidScheduledPaymentsForType(
-        $prefix,
         $type,
         \DateTime $scheduledDate = null,
         $validateBillable = true
     ) {
-        return $this->getAllValidScheduledPaymentsForTypes($prefix, [$type], $scheduledDate, $validateBillable);
+        return $this->getAllValidScheduledPaymentsForTypes([$type], $scheduledDate, $validateBillable);
     }
 
     public function getAllValidScheduledPaymentsForTypes(
-        $prefix,
         $types,
         \DateTime $scheduledDate = null,
         $validateBillable = true
