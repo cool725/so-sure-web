@@ -276,7 +276,7 @@ class FacebookService
         return $arr;
     }
 
-    public function monthlyLookalike(\DateTime $date, $prefix = null)
+    public function monthlyLookalike(\DateTime $date)
     {
         //$startMonth = new \DateTime('2018-01-01');
         $startMonth = $this->startOfMonth($date);
