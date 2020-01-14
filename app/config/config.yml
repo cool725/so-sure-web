@@ -766,6 +766,7 @@ nelmio_security:
                 - https://fonts.smct.co
                 - http://fonts.gstatic.com
                 - https://fonts.gstatic.com
+                - https://script.hotjar.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -1176,6 +1177,7 @@ nelmio_security:
                 - https://ssl.gstatic.com
                 - https://ep.smct.co
                 - https://*.smct.co
+                - https://script.hotjar.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
