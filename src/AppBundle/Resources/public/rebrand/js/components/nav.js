@@ -1,8 +1,8 @@
 // nav.js
 
-const bodyScrollLock = require('body-scroll-lock');
-const disableBodyScroll = bodyScrollLock.disableBodyScroll;
-const enableBodyScroll = bodyScrollLock.enableBodyScroll;
+// const bodyScrollLock = require('body-scroll-lock');
+// const disableBodyScroll = bodyScrollLock.disableBodyScroll;
+// const enableBodyScroll = bodyScrollLock.enableBodyScroll;
 
 import usrAgnt from '../common/setAgent.js';
 
@@ -31,11 +31,11 @@ $(function() {
         // Toggle the quote btn class
         btnSwap.toggleClass('hideme');
 
-        if (open) {
-            disableBodyScroll(menu);
-        } else {
-            enableBodyScroll(menu);
-        }
+        // if (open) {
+        //     disableBodyScroll(menu);
+        // } else {
+        //     enableBodyScroll(menu);
+        // }
     });
 
     // Add navbar background if page reloads not at the top

@@ -7,7 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
-    <link rel="canonical" href="{{ path('faq') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
@@ -656,7 +656,7 @@
                                         <li class="mb-2"><a href="#" class="open-intercom">Live chat</a> <mark>{{ support_hours }}</mark></li>
                                         <li class="mb-2">Live chat is not available on bank holidays.</li>
                                         <li class="mb-2">Emailing us at <a href="mailto:support@spam.so-sure.net" class="mailto append-email">support</a></li>
-                                        <li class="mb-2">If you have a claim you can call our claims team on <a href="tel:01133209722">0113 320 9722</a> <small>local rates apply</small></li>
+                                        <li class="mb-2">If you have a claim you can call our claims team on <a href="tel:{{ support_number }}">{{ support_number }}</a> <small>local rates apply</small></li>
                                     </ul>
                                 </div>
                             </div>

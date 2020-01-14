@@ -5,7 +5,7 @@
 
 {% block title %}Claim Login | so-sure{% endblock %}
 {% block meta %}
-    <link rel="canonical" href="{{ path('claim_login') }}" />
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
@@ -47,7 +47,7 @@
                         </div>
                         <h1 class="mb-4 text-white fit">Review your claim</h1>
                         <h4 class="text-columbia-blue-e">Enter your email and we'll send you a link</h4>
-                        <p class="mb-4 text-white">Prefer to speak to a human? Call our claims team on <a href="tel:01133209722" class="text-white text-nowrap"><u>0113 320 9722</u></a> (local rates apply).</p>
+                        <p class="mb-4 text-white">Prefer to speak to a human? Call our claims team on <a href="tel:{{ support_number }}" class="text-white text-nowrap"><u>{{ support_number }}</u></a> (local rates apply).</p>
                     </div>
                     <div class="hero__controls pb-3">
                         {{ form_start(claim_email_form, {

@@ -1,6 +1,6 @@
 {% extends 'base_rebrand.html.twig' %}
 {# Set vars #}
-{% set quote_mode = true %}
+{% set full_width = true %}
 {% set robots_noindex = true %}
 {% if phone %}
     {% set body_class = 'purchase' %}
@@ -24,7 +24,7 @@
         'event': 'checkout',
         'ecommerce': {
             'checkout': {
-                'actionField': {'step': 'Payment'},
+                'actionField': {'step': 4},
                 'products': [{
                     'id': '{{ phone.id }}',
                     'name': '{{ phone.make }} {{ phone.model }}',

@@ -1,119 +1,92 @@
-<div id="menu" class="menu d-flex flex-column {{ menu_show }}">
-    <ul class="list-unstyled align-self-stretch text-md-center menu__links">
+<div id="menu" class="menu {{ menu_show }}">
+    <ul class="list-unstyled menu__links text-md-center">
+        {% if app.user is not null and app.user %}
+            <li>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('admin_home') }}" class="h5">Admin</a>
+                {% elseif is_granted('ROLE_EMPLOYEE') %}
+                    <a href="{{ path('admin_home') }}" class="h5">Admin</a>
+                {% elseif is_granted('ROLE_CLAIMS') %}
+                    <a href="{{ path('claims_home') }}" class="h5">Claims</a>
+                {% else %}
+                    <a href="{{ path('user_home') }}" class="h5">
+                        <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
+                        Dashboard
+                    </a>
+                {% endif %}
+            </li>
+         {% endif %}
         <li>
-            <a href="{{ path('phone_insurance') }}" class="h5">
-                Phone insurance 📱
-            </a>
+            <a href="{{ path('phone_insurance') }}"
+               title="Mobile Phone Insurance"
+               class="h5">Phone insurance</a>
             <ul class="list-unstyled menu__links">
                 <li class="mb-2">
                     <a class="h5"
-                       href="{{ path('phone_insurance_make', {'make': 'apple'}) }}">
-                        <img src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_half-iphone-x-img.png" alt="so-sure - iPhone insurance" width="50px" class="mr-4 d-md-none">
-                        <span>
-                            iPhone
-                        </span>
-                    </a>
+                       title="iPhone Insurance"
+                       href="{{ path('phone_insurance_make', {'make': 'apple'}) }}"><span class="sub">iPhone</span></a>
                 </li>
                 <li class="mb-2">
                     <a class="h5"
-                       href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}">
-                        <img src="{{ cdn_url }}/images/rebrand/phones/samsung/so-sure_half-galaxy-s9-img.png" alt="so-sure - Samsung insurance" width="50px" class="mr-4 d-md-none">
-                        <span>
-                            Samsung
-                        </span>
-                    </a>
+                       title="Samsung Phone Insurance"
+                       href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}"><span class="sub">Samsung</span></a>
                 </li>
                 <li class="mb-2">
                     <a class="h5"
-                       href="{{ path('phone_insurance_make', {'make': 'lg'}) }}">
-                        <img src="{{ cdn_url }}/images/rebrand/phones/lg/so-sure_half-k30-img.png" alt="so-sure - LG insurance" width="50px" class="mr-4 d-md-none">
-                        <span>
-                            LG
-                        </span>
-                    </a>
+                       title="LG Phone Insurance"
+                       href="{{ path('phone_insurance_make', {'make': 'lg'}) }}"><span class="sub">LG</span></a>
                 </li>
                 <li class="mb-2">
                     <a class="h5"
-                       href="{{ path('phone_insurance_make', {'make': 'google'}) }}">
-                        <img src="{{ cdn_url }}/images/rebrand/phones/google/so-sure_half-pixel-3-img.png" alt="so-sure - Google Pixel insurance" width="50px" class="mr-4 d-md-none">
-                        <span>
-                            Google Pixel
-                        </span>
-                    </a>
+                       title="Google Pixel Insurance"
+                       href="{{ path('phone_insurance_make', {'make': 'google'}) }}"><span class="sub">Google Pixel</span></a>
                 </li>
                 <li class="mb-2">
                     <a class="h5"
-                       href="{{ path('phone_insurance_make', {'make': 'huawei'}) }}">
-                        <img src="{{ cdn_url }}/images/rebrand/phones/huawei/so-sure_half-mate-20-pro-img.png" alt="so-sure - Huawei insurance" width="50px" class="mr-4 d-md-none">
-                        <span>
-                            Huawei
-                        </span>
-                    </a>
+                       title="Huawei Phone Insurance"
+                       href="{{ path('phone_insurance_make', {'make': 'huawei'}) }}"><span class="sub">Huawei</span></a>
                 </li>
                 <li class="md-2">
                     <a class="h5"
-                       href="{{ path('phone_insurance_make', {'make': 'sony'}) }}">
-                        <img src="{{ cdn_url }}/images/rebrand/phones/sony/so-sure_half-xperia-10-plus-img.png" alt="so-sure - Sony insurance" width="50px" class="mr-4 d-md-none">
-                        <span>
-                            Sony
-                        </span>
-                    </a>
+                       title="Sony Phone Insurance"
+                       href="{{ path('phone_insurance_make', {'make': 'sony'}) }}"><span class="sub">Sony</span></a>
                 </li>
                 <li>
                     <a class="h5"
-                       href="{{ path('phone_insurance') }}#other_manufacturers">
-                       <img src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_half-phone.png" alt="so-sure - Phone insurance" width="50px" class="mr-4 d-md-none">
-                        <span>
-                            View all
-                        </span>
-                    </a>
+                       title="View all"
+                       href="{{ path('phone_insurance') }}#other_manufacturers"><span class="sub">View all</span></a>
                 </li>
             </ul>
         </li>
         <li>
             <a href="{{ path('social_insurance') }}" class="h5">
-                Social insurance 🤔
+                Social insurance
             </a>
         </li>
         <li>
             <a href="{{ path('comparison') }}" class="h5">
-                Compare cover 😎
+                Compare cover
             </a>
         </li>
         <li>
             <a href="{{ path('faq') }}" class="h5">
-                FAQs 🤓
+                FAQs
             </a>
         </li>
         <li>
             <a href="{{ path('about_how_to_contact_so_sure') }}" class="h5">
-                Contact us 💬
+                Contact us
             </a>
         </li>
         <li>
             <a href="{{ path('claim') }}" class="h5">
-                Make a Claim 😢
+                Make a Claim
             </a>
         </li>
         <li>
             <a href="{{ path('blog_index') }}" class="h5">
-                Blog 📚
+                Blog
             </a>
         </li>
     </ul>
-    <div class="px-5 py-4 text-md-center align-self-stretch menu__buttons">
-        {% if app.user is not null and app.user %}
-            {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block-xs">Admin</a>
-            {% elseif is_granted('ROLE_EMPLOYEE') %}
-                <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block-xs">Admin</a>
-            {% elseif is_granted('ROLE_CLAIMS') %}
-                <a href="{{ path('claims_home') }}" class="btn btn-primary btn-block-xs">Claims</a>
-            {% else %}
-                <a href="{{ path('user_home') }}" class="btn btn-primary btn-block-xs">Your account</a>
-            {% endif %}
-        {% else %}
-            <a href="#" class="btn btn-primary btn-blue-gradient btn-block-xs get-a-quote disabled">Get a Quote</a>
-        {% endif %}
-    </div>
 </div>
