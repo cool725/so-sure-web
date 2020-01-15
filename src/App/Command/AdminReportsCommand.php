@@ -57,10 +57,10 @@ class AdminReportsCommand extends ContainerAwareCommand
             ->addOption(
                 'date',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Use with pnl to cache historic reports. Format yyyy/mm'
             )
-            ->addOption('underwriter', null, InputOption::VALUE_OPTIONAL, sprintf(
+            ->addOption('underwriter', null, InputOption::VALUE_REQUIRED, sprintf(
                 'Use with accounts to select which underwriter\'s accounts to cache. \'%s\' or \'%s\'',
                 Salva::NAME,
                 Helvetia::NAME
