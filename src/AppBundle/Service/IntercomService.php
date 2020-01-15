@@ -518,7 +518,6 @@ class IntercomService
             return ['deleted' => true];
         }
 
-        $this->logger->info(sprintf('Test User Conversion'));
         $converted = false;
         if ($this->leadExists($user) && $user->hasActivePolicy()) {
             $this->logger->info(sprintf('Convert'));
@@ -625,6 +624,10 @@ class IntercomService
             $this->checkRateLimit();
             $resp = $this->client->users->create($data);
             $this->storeRateLimit();
+
+            if (property_exists($resp, 'deleted') && $resp->deleted) {
+                $this->logger->error(sprintf('IntercomId not matching for user: %s', $user->getEmail()));
+            }
 
             $user->setIntercomId($resp->id);
 
@@ -734,6 +737,7 @@ class IntercomService
             try {
                 $this->logger->info(sprintf('Intercom Convert'));
                 $resp = $this->client->leads->convertLead($data);
+                $user->setIntercomId($resp->id);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 if ($e->getCode() == 404) {
                     $this->logger->debug(sprintf(
@@ -773,18 +777,25 @@ class IntercomService
         return $lines;
     }
 
-    public function usersMaintenance()
+    public function usersMaintenance($dry = false)
     {
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
 
-        $emails = [];
+        $users = [];
         $output = [];
         $count = 0;
         $scroll = null;
         $now = \DateTime::createFromFormat('U', time());
+
+        if ($dry) {
+            $message = "Dry Maintenance Run";
+            $this->logger->info($message);
+            $output[] = $message;
+        }
+
         while ($count < self::MAX_SCROLL_RECORDS) {
             $output[] = sprintf('Checking Users - Scroll: %s / Count: %d', $scroll, $count);
             // print sprintf('Checking Users - %s', $scroll) . PHP_EOL;
@@ -812,6 +823,9 @@ class IntercomService
             }
 
             foreach ($resp->users as $user) {
+                if (mb_strpos($user->email, 'so-sure') !== false) {
+                    continue;
+                }
                 if (mb_strlen(trim($user->email)) > 0) {
                     $doNotContact = false;
                     foreach ($user->tags->tags as $tag) {
@@ -825,23 +839,32 @@ class IntercomService
                             $doNotContact = mb_stripos($tagName, self::TAG_DONT_CONTACT) !== false;
                         }
                     }
-                    if (!$doNotContact) {
-                        if (isset($emails[trim($user->email)]) && $emails[trim($user->email)] != $user->id) {
-                            $output[] = sprintf("Duplicate users for email %s", $user->email);
-                        }
-                        $emails[trim($user->email)] = $user->id;
+
+                    if (!mb_strpos(trim($user->email), 'so-sure.com')) {
+                        $users[trim($user->email)][] =
+                        [
+                            'id' => $user->id,
+                            'user_id' => $user->user_id,
+                            'premium' => property_exists($user->custom_attributes, 'Premium')?
+                            $user->custom_attributes->Premium:0
+                        ];
                     }
+
                     $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_MARKETING);
                     if ($user->unsubscribed_from_emails && !$optedOut) {
                         // Webhook callback from intercom issue
-                        $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_MARKETING);
+                        if (!$dry) {
+                            $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_MARKETING);
+                        }
                         $output[] = sprintf("Added optout for %s", $user->email);
                     } elseif (!$user->unsubscribed_from_emails && $optedOut) {
                         // sosure user listener -> queue -> intercom update issue
                         /** @var User $sosureUser */
                         $sosureUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->email)]);
                         if ($sosureUser) {
-                            $this->updateUser($sosureUser);
+                            if (!$dry) {
+                                $this->updateUser($sosureUser);
+                            }
                             $output[] = sprintf("Resync intercom user for %s", $user->email);
                         } else {
                             $output[] = sprintf("Unable to find so-sure user for %s", $user->email);
@@ -865,16 +888,112 @@ class IntercomService
                     // User w/o email, clear out after 8 weeks not seen
                     if (!$user->email && $age->days >= 56) {
                         $output[] = sprintf('Deleting user %s age: %d', $user->id, $age->days);
-                        $this->deleteUser($user->id);
+                        if (!$dry) {
+                            $this->deleteUser($user->id);
+                        }
                     }
                     // TODO: User cancelled, archive messages and clear out after 2 weeks not seen
                 }
                 $count++;
             }
-            $this->dm->flush();
+            if (!$dry) {
+                $this->dm->flush();
+            }
+        }
+
+        $oldleads = false;
+        $duplicates = false;
+        // For each intercom user per email ( Can be several if duplicates)
+        foreach ($users as $email => $intercomUsers) {
+            if (mb_strpos($email, 'so-sure') !== false) {
+                continue;
+            }
+            // Get the actual So-Sure user in the system
+            /** @var User $sosureUser */
+            $sosureUser = $userRepo->findOneBy((['emailCanonical' => mb_strtolower($email)]));
+            if ($sosureUser) {
+                $validIntercomUsers = false;
+                $invalidIntercomUsers = false;
+                // Separate Intercom Users per Valid and Invalid ( Based on the premium)
+                foreach ($intercomUsers as $key => $intercomUser) {
+                    if ($intercomUser['premium'] > 0) {
+                        $validIntercomUsers[] = $intercomUser;
+                    } else {
+                        $invalidIntercomUsers[] = $intercomUser;
+                    }
+                }
+                // For the intercom users with duplicates, and without
+                if (count($intercomUsers) > 1) {
+                    if (!$validIntercomUsers) {
+                        if ($sosureUser->hasActivePolicy()) {
+                            $message = sprintf("Multiple invalid Intercom users for valid user: %s", $email);
+                            $this->logger->warning($message);
+                            $output[] = $message;
+                        }
+                    } elseif (count($validIntercomUsers) > 1) {
+                        $matchingIntercomId = false;
+                        $matchingUserId = false;
+                        foreach ($validIntercomUsers as $key => $validIntercomUser) {
+                            if ($validIntercomUser['id'] == $sosureUser->getIntercomId()) {
+                                $matchingIntercomId[] = $key;
+                            }
+                            if ($validIntercomUser['user_id'] == $sosureUser->getId()) {
+                                $matchingUserId[] = $key;
+                            }
+                        }
+                        $message = sprintf("Duplicate Intercom user with premium: %s", $email);
+                        $this->logger->warning($message);
+                        $output[] = $message;
+                    } elseif (count($validIntercomUsers) == 1) {
+                        if ($invalidIntercomUsers) {
+                            foreach ($invalidIntercomUsers as $intercomUser) {
+                                $duplicates[] = ["id" => $intercomUser['id']];
+                                $message = sprintf("Duplicate to be tagged: %s", $email);
+                                $this->logger->warning($message);
+                                $output[] = $message;
+                            }
+                        }
+                    }
+                } elseif (count($intercomUsers) == 1) {
+                    if (!$validIntercomUsers) {
+                        if ($sosureUser->hasActivePolicy()) {
+                            if (!$dry) {
+                                if (!($intercomUsers[0]['id'] === $sosureUser->getIntercomId())) {
+                                    $sosureUser->setIntercomId($intercomUsers[0]['id']);
+                                    $this->dm->flush();
+                                }
+                                // Update the IntercomUser with the right data
+                                $this->queue($sosureUser);
+                            }
+                            $message = sprintf("Intercom user with invalid data updated for email: %s", $email);
+                            $this->logger->warning($message);
+                            $output[] = $message;
+                        } else {
+                            if (!$sosureUser->hasPolicy()) {
+                                $oldleads[] = ["id" => $intercomUsers[0]['id']];
+                                $message = sprintf("Old Lead: %s", $email);
+                                $this->logger->warning($message);
+                            }
+                        }
+                    }
+                } else {
+                    $message = sprintf("No intercom user in the array for email: %s", $email);
+                    $this->logger->warning($message);
+                    $output[] = $message;
+                }
+            } else {
+                $message = sprintf("No system user found for the intercom user: %s", $email);
+                $this->logger->warning($message);
+                $output[] = $message;
+            }
+        }
+        if ($oldleads && !$dry) {
+            $this->updateTag('M: old leads', $oldleads);
+        }
+        if ($duplicates && !$dry) {
+            $this->updateTag('M: duplicates', $duplicates);
         }
         $output[] = sprintf('Total Users Checked: %d', $count);
-
         return $output;
     }
 
@@ -1052,10 +1171,8 @@ class IntercomService
         try {
             $this->checkRateLimit();
             if ($useIntercomId) {
-                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUser($user->getIntercomId());
             } else {
-                // INTERCOM QUERY - DO NOT USE emailCanonical!
                 $resp = $this->client->users->getUsers(['email' => $user->getEmailCanonical()]);
             }
             $this->storeRateLimit();
