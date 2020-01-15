@@ -21,7 +21,7 @@ class SalvaPhonePolicyRepository extends PhonePolicyRepository
 {
     /**
      * Gives you all salva policies for export.
-     * @param \DateTime $date        is not used but is present for some reason.
+     * @param \DateTime $date is not used but is present for some reason.
      * @return Cursor to the set of found policies for export.
      */
     public function getAllPoliciesForExport(\DateTime $date)
@@ -45,7 +45,7 @@ class SalvaPhonePolicyRepository extends PhonePolicyRepository
 
     /**
      * Gives you all the expired policies for export.
-     * @param \DateTime $date        is not used but must be present for whatever reason.
+     * @param \DateTime $date is not used but must be present for whatever reason.
      * @return Cursor to the set of found policies for export.
      */
     public function getAllExpiredPoliciesForExport(\DateTime $date)
