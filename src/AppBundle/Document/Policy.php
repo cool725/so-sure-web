@@ -4338,7 +4338,7 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return false;
         }
-        return !$this->isPrefixInvalidPolicy();
+        return ($this->getPolicyNumber() && !$this->isPrefixInvalidPolicy());
     }
 
     public function isBillablePolicy()
