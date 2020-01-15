@@ -1,0 +1,28 @@
+<ul class="nav navbar-nav flex-row align-items-center d-none {{ menu_breakpoint }}">
+    <li class="nav-item dropdown">
+        <a href="#"
+           class="nav-link dropdown-toggle"
+           id="why_so_sure_nav"
+           role="button"
+           data-toggle="dropdown"
+           aria-haspopup="true"
+           aria-expanded="false">
+           {{ app.user.firstname|first }}. {{ app.user.lastname }}
+            <i class="far fa-sm text-columbia-blue-f fa-chevron-down ml-2"></i></a>
+        <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="why_so_sure_nav">
+            <a class="dropdown-item dropdown-item-nav mb-0"
+               href="{{ path('user_contact_details_policy') }}">
+               <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
+               Your account</a>
+            {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                <a class="dropdown-item dropdown-item-nav mb-0"
+                   href="{{ path('homepage', {'_impersonate': '_exit'}) }}">
+                   Exit User</a>
+            {% else %}
+                <a class="dropdown-item dropdown-item-nav mb-0"
+                   href="{{ path('fos_user_security_logout') }}">
+                    Log out</a>
+            {% endif %}
+        </div>
+    </li>
+</ul>

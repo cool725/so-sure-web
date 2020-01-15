@@ -17,7 +17,6 @@ class Feature
     const FEATURE_SALVA_POLICY_UPDATE = 'salva-policy-update';
 
     // TODO: Verify if still used
-    const FEATURE_QUOTE_LEAD = 'quote-lead';
     const FEATURE_STARLING = 'starling';
 
     // Active features
@@ -41,7 +40,6 @@ class Feature
 
     // All Features should be here
     public static $features = [
-        self::FEATURE_QUOTE_LEAD,
         self::FEATURE_RENEWAL,
         self::FEATURE_PICSURE,
         self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL,
@@ -67,7 +65,6 @@ class Feature
 
     // @codingStandardsIgnoreStart
     public static $descriptions = [
-        self::FEATURE_QUOTE_LEAD => 'Display a save this quote w/email to user on quote page - unused?',
         self::FEATURE_RENEWAL => 'Create renewal policies - too integrated to turn off',
         self::FEATURE_PICSURE => 'pic-sure funcationlaity - too integrated to turn off',
         self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL => 'Notify davies of errors',

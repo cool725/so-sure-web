@@ -17,12 +17,12 @@ $(function() {
         $(tab).tab('show')
     });
 
-    let secondaryNav = $('#secondary_nav'),
-        navPosition = $('#secondary_nav a.active').offset(),
-        currentPos = navPosition.left;
+    // let secondaryNav = $('#secondary_nav'),
+    //     navPosition = $('#secondary_nav a.active').offset(),
+    //     currentPos = navPosition.left;
 
-    $(window).on('load', function(event) {
-        secondaryNav.animate({scrollLeft: currentPos}, 1000);
-    });
+    // $(window).on('load', function(event) {
+    //     secondaryNav.animate({scrollLeft: currentPos}, 1000);
+    // });
 
 });

@@ -5,7 +5,8 @@
 
 {% block title %}Make a Claim | so-sure{% endblock %}
 {% block meta %}
-    <link rel="canonical" href="{{ path('claim') }}" />
+    <meta name="description" content="Is your phone lost, stolen or broken? Start your claim online with So Sure for a fast and pain-free cliams process. Learn more about each step here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

@@ -1,38 +1,51 @@
-<ul class="nav navbar-nav flex-row align-items-center">
-    {% if app.user is not null and app.user %}
-        <li class="nav-item d-none d-xl-block pr-xl-5">
-            {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
-            {% elseif is_granted('ROLE_EMPLOYEE') %}
-                <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
-            {% elseif is_granted('ROLE_CLAIMS') %}
-                <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
-            {% else %}
-                <a href="{{ path('user_home') }}" class="nav-link user-link">Your account</a>
-            {% endif %}
-        </li>
-    {% else %}
-        <li class="nav-item d-none-xxs pr-xl-5">
-            <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-white show-in-nav get-a-quote disabled btn-shadow">Get a Quote</a>
-        </li>
-    {% endif %}
-    <li class="nav-item d-none d-xl-block pr-xl-5">
-        {% if app.user is not null and app.user %}
-            {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
-            {% else %}
-                <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
-            {% endif %}
-        {% else %}
-            <a href="{{ path('fos_user_security_login') }}"
-               class="btn btn-outline-columbia-blue-f btn-sm">Customer login <i class="far fa-arrow-right fa-fw ml-2"></i></a>
+{% if app.user is not null and app.user %}
+    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-4">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
+        {% elseif is_granted('ROLE_EMPLOYEE') %}
+            <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
+        {% elseif is_granted('ROLE_CLAIMS') %}
+            <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
         {% endif %}
     </li>
-    <li class="nav-item d-xl-none">
-        <button id="nav_toggle" class="hamburger hamburger--spring-r hamburger--collapse show-in-nav" type="button">
-            <span class="hamburger-box">
-                <span class="hamburger-inner"></span>
-            </span>
-        </button>
+    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-4">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_policies') }}" class="nav-link user-link">Policies</a>
+        {% elseif is_granted('ROLE_EMPLOYEE') %}
+            <a href="{{ path('admin_policies') }}" class="nav-link user-link">Policies</a>
+        {% endif %}
     </li>
-</ul>
+    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-4">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_phones') }}" class="nav-link user-link">Phones</a>
+        {% elseif is_granted('ROLE_EMPLOYEE') %}
+            <a href="{{ path('admin_phones') }}" class="nav-link user-link">Phones</a>
+        {% endif %}
+    </li>
+    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-4">
+        {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+            <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email }}</u></a>
+        {% else %}
+            <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
+        {% endif %}
+    </li>
+{% endif %}
+{# Mobile Login - this shows inside the navigation only #}
+<li class="nav-item d-none-xxs {{ menu_show }} pr-xl-4">
+    {% if app.user is not null and app.user %}
+        {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+            <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}"
+               class="btn btn-outline-deep-sky-blue-d btn-sm show-in-nav btn-swap hideme"
+               title="{{ app.user.email }}"
+               ><i class="fas fa-user fa-fw"></i>
+                Exit User</a>
+        {% else %}
+            <a href="{{ path('fos_user_security_logout') }}"
+               class="btn btn-outline-deep-sky-blue-d btn-sm show-in-nav btn-swap hideme">
+               <i class="fas fa-user fa-fw"></i> Log out</i></a>
+        {% endif %}
+    {% else %}
+        <a href="{{ path('fos_user_security_login') }}"
+           class="btn btn-outline-deep-sky-blue-d btn-sm show-in-nav btn-swap hideme"><i class="fas fa-user fa-fw"></i> Customer login</a>
+    {% endif %}
+</li>

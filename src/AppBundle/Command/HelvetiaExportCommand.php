@@ -42,13 +42,13 @@ class HelvetiaExportCommand extends ContainerAwareCommand
                 'date',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'date of week for payments report. Format: Y-m-d',
+                'Month to export ( Any day in the month ). Format: Y-m-d',
                 null
             )
             ->addArgument(
                 'report',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-                'reports to generate (policies|claims|payments|renewals)'
+                'Type of report to generate (policies|claims|payments|renewals)'
             );
     }
 

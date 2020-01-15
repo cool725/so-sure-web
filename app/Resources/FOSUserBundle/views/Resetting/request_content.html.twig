@@ -1,6 +1,6 @@
 {# TODO: Add JS Validation #}
-<h1 class="text-white text-center mb-1">Reset Password</h1>
-<h4 class="text-columbia-blue-e text-center mb-4">Enter your email and we'll send you a reset link</h4>
+<h1 class="text-white h2 text-center mb-1">Reset Password</h1>
+<div class="text-columbia-blue-e h5 text-center mb-4">Enter your email and we'll send you a reset link</div>
 
 <div class="login__card">
     <div class="login__card__body">
@@ -9,18 +9,18 @@
               class="fos_user_resetting_request"
               autocomplete="off"
               data-client-validation="{{ form_client_validation }}">
-            <div class="form-group">
+            <div class="form-group mb-4">
                 <label for="username">Email Address</label>
                 <input type="email" id="username" name="username" required="required" class="reset form-control" placeholder="Enter Email Address"/>
                 {% if invalid_username is defined %}
                     <label class="error">Invalid email address</label>
                 {% endif %}
             </div>
-            <div class="form-group" >
-                <input type="submit" value="Send me a link!" class="btn btn-success btn-block" />
+            <div class="form-group col-md-8 offset-md-2">
+                <input type="submit" value="Send me a link!" class="btn btn-success btn-no-shadow btn-block" />
             </div>
-            <div class="form-group">
-                <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-primary btn-block"><i class="far fa-arrow-left"></i> back to login</a>
+            <div class="form-group col-md-8 offset-md-2">
+                <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-primary btn-block">Back to login</a>
             </div>
 
             <input type="hidden" name="token" value="{{ csrf_token('default') }}" />

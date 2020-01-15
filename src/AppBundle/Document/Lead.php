@@ -88,8 +88,10 @@ class Lead
     protected $phone;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us",
-     *                 "invitation", "scode", "affiliate", "invite-not-ready", "competition"}, strict=true)
+     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote",
+     *                 "purchase-flow", "contact-us",
+     *                 "invitation", "scode", "affiliate",
+     *                 "invite-not-ready", "competition", "aggregator"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
