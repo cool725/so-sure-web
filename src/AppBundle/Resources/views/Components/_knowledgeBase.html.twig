@@ -310,13 +310,13 @@
             id="knowledge_tabs"
             role="tablist">
             <li class="nav-item">
-                <a class="nav-link tab-link active track-data"
+                <a class="nav-link tab-link track-data"
                    id="cover_tab"
                    data-toggle="tab"
                    href="#cover"
                    role="tab"
                    aria-controls="home"
-                   aria-selected="true"
+                   aria-selected="false"
                    data-event="what-is-covered-tab-dt"
                    data-event-location="{{ app.request.uri }}"
                    data-event-once="">
@@ -370,13 +370,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link tab-link track-data"
+                <a class="nav-link tab-link active track-data"
                    id="cashback_tab"
                    data-toggle="tab"
                    href="#cashback"
                    role="tab"
                    aria-controls="cashback"
-                   aria-selected="false"
+                   aria-selected="true"
                    data-event="earn-cashback-tab-dt"
                    data-event-location="{{ app.request.uri }}"
                    data-event-once="">
@@ -391,7 +391,7 @@
             </li>
         </ul>
         <div class="tab-content" id="knowledge_tabs_content">
-            <div class="tab-pane fade show active"
+            <div class="tab-pane fade"
                id="cover"
                role="tabpanel"
                aria-labelledby="cover-tab">
@@ -584,7 +584,7 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade"
+            <div class="tab-pane fade show active"
                id="cashback"
                role="tabpanel"
                aria-labelledby="cashback_tab">

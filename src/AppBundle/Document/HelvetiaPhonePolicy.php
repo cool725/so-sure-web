@@ -65,10 +65,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
     {
         $premium = $this->getPremium();
         if (!$premium) {
-            throw new \InvalidArgumentException(sprintf(
-                'Commission cannot be calculated for Helvetia policy "%s" without premium',
-                $this->getId()
-            ));
+            return 0;
         }
         // 20% of premium price. Alex said after tax.
         return $premium->getYearlyPremiumPrice() * Helvetia::COMMISSION_PROPORTION;
@@ -79,7 +76,12 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getYearlyCoverholderCommission(): float
     {
-        return $this->getYearlyTotalCommission() - Helvetia::YEARLY_BROKER_COMMISSION;
+        $yearlyTotal = $this->getYearlyTotalCommission();
+        if ($yearlyTotal < Helvetia::YEARLY_BROKER_COMMISSION) {
+            return 0;
+        } else {
+            return $yearlyTotal - Helvetia::YEARLY_BROKER_COMMISSION;
+        }
     }
 
     /**
@@ -87,7 +89,12 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getYearlyBrokerCommission(): float
     {
-        return Helvetia::YEARLY_BROKER_COMMISSION;
+        $yearlyTotal = $this->getYearlyTotalCommission();
+        if ($yearlyTotal < Helvetia::YEARLY_BROKER_COMMISSION) {
+            return $yearlyTotal;
+        } else {
+            return Helvetia::YEARLY_BROKER_COMMISSION;
+        }
     }
 
     /**

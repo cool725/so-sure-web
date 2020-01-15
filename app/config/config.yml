@@ -103,6 +103,7 @@ twig:
         checkout_helvetia_public_key: "%checkout_helvetia_apipublic%"
         business_address: "Relay Building\n 114 Whitechapel High Street\n London\n E1 7PT\n UK"
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
+        support_number: "03450744839"
         broker_name: "Shepherd Compello Ltd"
 
 doctrine_mongodb:
@@ -763,6 +764,9 @@ nelmio_security:
                 - https://pro.fontawesome.com
                 - https://fonts.gstatic.com
                 - https://fonts.smct.co
+                - http://fonts.gstatic.com
+                - https://fonts.gstatic.com
+                - https://script.hotjar.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -1173,6 +1177,7 @@ nelmio_security:
                 - https://ssl.gstatic.com
                 - https://ep.smct.co
                 - https://*.smct.co
+                - https://script.hotjar.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

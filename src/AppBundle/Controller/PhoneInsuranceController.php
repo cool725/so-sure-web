@@ -223,6 +223,13 @@ class PhoneInsuranceController extends BaseController
             ]);
         }
 
+        // Check if caps in url and redirect back with make in lowercase - SEO
+        if (preg_match("/^[A-Z]/", $make)) {
+            return $this->redirectToRoute('phone_insurance_make', [
+                'make' => mb_strtolower($make)
+            ], 301);
+        }
+
         if (!$phone) {
             $this->get('logger')->info(sprintf(
                 'Failed to find make page for: %s',
