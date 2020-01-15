@@ -14,8 +14,6 @@ class PhonePolicyRepository extends PolicyRepository
 {
     use DateTrait;
 
-    const VALID_REGEX = '/^((?!INVALID).)*$/';
-
     /**
      * Finds all policies that have the given imei.
      * @return Cursor over the found imeis.

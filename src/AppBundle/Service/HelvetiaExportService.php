@@ -99,7 +99,7 @@ class HelvetiaExportService
         $paidPremium = 0;
         $paidBrokerFee = 0;
         /** @var HelvetiaPhonePolicy $policy */
-        foreach ($repo->getAllPoliciesForExport($this->environment) as $policy) {
+        foreach ($repo->getAllPoliciesForExport() as $policy) {
             $lines[] = CsvHelper::line(
                 $policy->getPolicyNumber(),
                 $policy->getStatus(),
@@ -250,7 +250,7 @@ class HelvetiaExportService
             'RenewalPolicyMonthlyPremiumIncDiscount'
         );
         /** @var HelvetiaPhonePolicy $policy */
-        foreach ($repo->getAllExpiredPoliciesForExport($this->environment) as $policy) {
+        foreach ($repo->getAllExpiredPoliciesForExport() as $policy) {
             if (!$this->greaterThanZero($policy->getPotValue())) {
                 continue;
             }
