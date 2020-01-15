@@ -45,6 +45,11 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:scheduled:payment')
             ->setDescription('Run any payments that are scheduled to run')
+            ->addArgument(
+                'prefix',
+                InputArgument::REQUIRED,
+                'Prefix'
+            )
             ->addOption(
                 'id',
                 null,

@@ -64,6 +64,11 @@ class BacsCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:bacs')
             ->setDescription('Run a bacs export')
+            ->addArgument(
+                'prefix',
+                InputArgument::REQUIRED,
+                'Prefix (does nothing)'
+            )
             ->addOption(
                 'debug',
                 null,

@@ -80,6 +80,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             ->setName('sosure:policy:validate')
             ->setDescription('Validate policy payments')
             ->addOption(
+                'prefix',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy prefix (does nothing)'
+            )
+            ->addOption(
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,

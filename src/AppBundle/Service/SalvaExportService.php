@@ -743,7 +743,7 @@ class SalvaExportService
         }
     }
 
-    public function process($max, $prefix = null)
+    public function process($max)
     {
         $count = 0;
         while ($count < $max) {

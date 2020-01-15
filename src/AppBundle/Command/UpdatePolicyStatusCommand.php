@@ -52,6 +52,12 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             ->setName('sosure:policy:update-status')
             ->setDescription('Transition policy statuses. Unpaid, Expired, Pending renewal, etc')
             ->addOption(
+                'prefix',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy prefix (does nothing)'
+            )
+            ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
