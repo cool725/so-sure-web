@@ -1635,7 +1635,6 @@ class UserController extends BaseController
             $data = [
                 'current' => 'claim-confirm',
                 'username' => $user->getName(),
-                'phone' => $phone,
                 'claim_type' => $fnol->getTypeString(),
                 'policy_date' => $policy->getStart(),
                 'claim_form' => $claimForm->createView(),
@@ -1670,7 +1669,6 @@ class UserController extends BaseController
             return $this->redirectToRoute("user_claim");
         }
         return [
-            'phone' => $policy->getPhone(),
             'amount' => $amount,
             'policy' => $policy,
             'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT
@@ -1788,7 +1786,7 @@ class UserController extends BaseController
 
         $data = [
             'claim' => $claim,
-            'phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',
+            'claim_phone' => $claim->getPhonePolicy() ? $claim->getPhonePolicy()->getPhone()->__toString() : 'Unknown',
             'time' => $this->getClaimResponseTime(),
             'claim_form' => $claimUpdateForm->createView(),
             'is_in_review' => $claim->getStatus() == Claim::STATUS_INREVIEW,
