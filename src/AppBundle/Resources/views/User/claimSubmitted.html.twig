@@ -31,10 +31,10 @@
                 </div>
                 <div class="col-lg-7 order-lg-1">
                     {% if is_in_review %}
-                        <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your {{ phone }} with IMEI {{ claim.policy.imei }} is being processed by our claims team.</p>
+                        <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your {{ claim_phone }} with IMEI {{ claim.policy.imei }} is being processed by our claims team.</p>
                         <p class="mb-4">If you need to upload more documents please use the form below.</p>
                     {% else %}
-                        <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your {{ phone }} with IMEI {{ claim.policy.imei }} has been sent to our claims team for processing.</p>
+                        <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your {{ claim_phone }} with IMEI {{ claim.policy.imei }} has been sent to our claims team for processing.</p>
                         <p class="mb-4">If we need to get in touch we will contact you with the details you provided:</p>
                         <ul class="mb-4">
                             <li class="mb-2">Phone number: <strong>{{ claim.phoneToReach }}</strong></li>
