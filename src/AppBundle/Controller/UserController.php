@@ -1635,7 +1635,6 @@ class UserController extends BaseController
             $data = [
                 'current' => 'claim-confirm',
                 'username' => $user->getName(),
-                'phone' => $phone,
                 'claim_type' => $fnol->getTypeString(),
                 'policy_date' => $policy->getStart(),
                 'claim_form' => $claimForm->createView(),
