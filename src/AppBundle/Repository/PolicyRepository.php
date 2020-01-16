@@ -226,7 +226,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function getWeeklyEmail($environment)
+    public function getWeeklyEmail()
     {
         $lastWeek = \DateTime::createFromFormat('U', time());
         $lastWeek->sub(new \DateInterval('P1W'));
