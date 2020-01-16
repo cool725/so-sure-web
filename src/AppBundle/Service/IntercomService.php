@@ -758,6 +758,8 @@ class IntercomService
             }
             $this->storeRateLimit();
 
+            $this->dm->flush();
+
             $this->logger->debug(sprintf(
                 'Intercom convert lead (userid %s) %s',
                 $user->getIntercomUserIdOrId(),
