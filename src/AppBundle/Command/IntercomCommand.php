@@ -155,6 +155,12 @@ class IntercomCommand extends ContainerAwareCommand
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'force: Force tag update, untag: Force to untag'
             )
+            ->addOption(
+                'dry',
+                null,
+                InputOption::VALUE_NONE,
+                'dry run ( User maintenance only )'
+            )
         ;
     }
 
@@ -177,6 +183,7 @@ class IntercomCommand extends ContainerAwareCommand
         $resetUserId = true === $input->getOption('reset-user-id');
         $resetIntercomId = true === $input->getOption('reset-intercom-id');
         $destroy = true === $input->getOption('destroy');
+        $dry = true === $input->getOption('dry');
         // Mass Scode update option
         $scode = true === $input->getOption('scode');
         // Tag management options
@@ -290,7 +297,7 @@ class IntercomCommand extends ContainerAwareCommand
             $output->writeln(implode(PHP_EOL, $this->intercom->leadsMaintenance()));
             $output->writeln(sprintf("Finished running lead maintenance"));
         } elseif ($userMaintenance) {
-            $output->writeln(implode(PHP_EOL, $this->intercom->usersMaintenance()));
+            $output->writeln(implode(PHP_EOL, $this->intercom->usersMaintenance($dry)));
             $output->writeln(sprintf("Finished running user maintenance"));
         } elseif ($pendingInvites) {
             $count = 0;
