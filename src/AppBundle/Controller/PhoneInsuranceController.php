@@ -597,6 +597,7 @@ class PhoneInsuranceController extends BaseController
         $decodedModel = Phone::decodeModel($model);
         $phone = null;
         $aggregator = '';
+        $requester = '';
 
         if ($id) {
             if ($request->query->get('aggregator')) {
@@ -614,6 +615,9 @@ class PhoneInsuranceController extends BaseController
                         ]);
                     }
                 }
+            } elseif ($request->query->get('requster')) {
+                // Placeholder for generic use with partners
+                $requester = '?requester=true';
             } else {
                 /** @var Phone $phone */
                 $phone = $repo->find($id);
@@ -647,7 +651,7 @@ class PhoneInsuranceController extends BaseController
                         ' ',
                         '+',
                         $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory()
-                    ).'GB'.$aggregator
+                    ).'GB'.$aggregator.$requester
             ]);
             return $response;
         }
@@ -669,7 +673,9 @@ class PhoneInsuranceController extends BaseController
         foreach ($phones as $phone) {
             // Loop through each phone and make an array for the response
             $aggregatorId = '';
+            $requester = 'requesterId';
             if ($request->query->get('aggregator')) {
+                $requester = 'aggregatorId';
                 // If aggregator set, look for aggregator ID (if applicable)
                 if ($request->query->get('aggregator') == 'GoCompare') {
                     $goCompare = new GoCompare();
@@ -682,13 +688,16 @@ class PhoneInsuranceController extends BaseController
                         }
                     }
                 }
+            } elseif ($request->query->get('requster')) {
+                // Placeholder for generic use with partners
+                $requester = 'requesterId';
             }
             $list[] = [
                 'id'            => $phone->getId(),
                 'make'          => $phone->getMake(),
                 'model'         => $phone->getModel(),
                 'memory'        => $phone->getMemory(),
-                'aggregatorId'  => $aggregatorId
+                $requester      => $aggregatorId
             ];
         }
         $response = new JsonResponse($list);
