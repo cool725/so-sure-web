@@ -378,4 +378,17 @@ class BlogController extends BaseController
         return $this->render($template, $data);
     }
     /** @codingStandardsIgnoreEnd */
+
+    /**
+     * @Route("/phone-insurance-guide", name="phone_insurance_guide", options={"sitemap" = true})
+     * @Template
+     */
+    public function phoneInsuranceGuideAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/phone-insurance-guide.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
