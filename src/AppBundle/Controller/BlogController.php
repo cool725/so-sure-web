@@ -391,4 +391,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/most-durable-phones", name="most_durable_phones", options={"sitemap" = true})
+     * @Template
+     */
+    public function mostDurablePhonesAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/most-durable-phones.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
