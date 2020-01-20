@@ -689,7 +689,7 @@ class PhoneInsuranceController extends BaseController
                     }
                 }
             } elseif ($request->query->get('requester')) {
-                // Placeholder for generic use with partners
+                // Placeholder for generic use with partners 
                 $requester = 'requesterId';
             }
             $list[] = [
