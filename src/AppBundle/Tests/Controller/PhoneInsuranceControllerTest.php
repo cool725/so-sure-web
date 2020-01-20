@@ -230,6 +230,26 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
     }
 
+    public function testQuoteMeRequester()
+    {
+        // this is just to make sure there are no errors with the new placeholder GET param
+        self::$client->request(
+            'GET',
+            '/quote-me/Apple+iPhone+XS+256GB?requester=CompanyName'
+        );
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertArrayHasKey('phoneId', $decoded);
+        $this->assertArrayHasKey('price', $decoded);
+        $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('yearlyPremium', (array) $decoded['price']);
+        $this->assertArrayHasKey('productOverrides', $decoded);
+        $this->assertArrayHasKey('excesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->excesses));
+        $this->assertArrayHasKey('picsureExcesses', (array) $decoded['productOverrides']);
+        $this->assertEquals(4, count($decoded['productOverrides']->picsureExcesses));
+        $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
+    }
+
     public function testQuoteMeError()
     {
         self::$client->request('GET', '/quote-me/Fake+Phone+256GB');
@@ -246,7 +266,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertArrayHasKey('id', (array) $decoded[0]);
         $this->assertArrayHasKey('make', (array) $decoded[0]);
         $this->assertArrayHasKey('model', (array) $decoded[0]);
-        $this->assertArrayHasKey('aggregatorId', (array) $decoded[0]);
+        $this->assertArrayHasKey('requesterId', (array) $decoded[0]);
     }
 
     public function testListPhonesWithAggregatorGoCompare()
@@ -268,5 +288,18 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
             }
         }
         $this->assertEquals(true, $found);
+    }
+
+    public function testListPhonesWithRequester()
+    {
+        self::$client->request('GET', '/list-phones?requester=CompanyName');
+        $decoded = (array) json_decode($this->getClientResponseContent());
+        $this->assertGreaterThan(0, count($decoded));
+        // Check first phone in list is valid
+        $this->assertArrayHasKey('id', (array) $decoded[0]);
+        $this->assertArrayHasKey('make', (array) $decoded[0]);
+        $this->assertArrayHasKey('model', (array) $decoded[0]);
+        $this->assertArrayHasKey('memory', (array) $decoded[0]);
+        $this->assertArrayHasKey('requesterId', (array) $decoded[0]);
     }
 }
