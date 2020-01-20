@@ -83,7 +83,8 @@ class PaymentRepository extends DocumentRepository
      *                                   no maximum.
      * @return Cursor over the found payments.
      */
-    public function getAllPaymentsForPolicyType($policyType, $start = null, $end = null) {
+    public function getAllPaymentsForPolicyType($policyType, $start = null, $end = null)
+    {
         $qb = $this->createQueryBuilder()->field('policy.policy_type')->equals($policyType);
         if ($start) {
             $qb->field('date')->gte($start);
