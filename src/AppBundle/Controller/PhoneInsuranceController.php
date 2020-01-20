@@ -615,7 +615,7 @@ class PhoneInsuranceController extends BaseController
                         ]);
                     }
                 }
-            } elseif ($request->query->get('requster')) {
+            } elseif ($request->query->get('requester')) {
                 // Placeholder for generic use with partners
                 $requester = '?requester=true';
             } else {
@@ -688,7 +688,7 @@ class PhoneInsuranceController extends BaseController
                         }
                     }
                 }
-            } elseif ($request->query->get('requster')) {
+            } elseif ($request->query->get('requester')) {
                 // Placeholder for generic use with partners
                 $requester = 'requesterId';
             }
