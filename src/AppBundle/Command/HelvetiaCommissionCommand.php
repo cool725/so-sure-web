@@ -86,6 +86,7 @@ class HelvetiaCommissionCommand extends ContainerAwareCommand
         $helvetiaPayments = $paymentRepo->getAllPaymentsForPolicyType('helvetia-phone', $start, $end);
         $fine = 0;
         $bad = 0;
+        /** @var Payment $payment */
         foreach ($helvetiaPayments as $payment) {
             $policy = $payment->getPolicy();
             $amount = $payment->getAmount();
