@@ -80,7 +80,8 @@ class BillingDateCommand extends ContainerAwareCommand
         $action = $input->getArgument("action");
         $date = $input->getOption("date");
         $time = $input->getOption("time");
-        $wet = $input->getOption("wet") ?: false;
+
+        $wet = $input->getOption("wet") ? true : false;
         // Process arguments and options.
         if ($date) {
             $date = \DateTime::createFromFormat("d-m-Y", $date);

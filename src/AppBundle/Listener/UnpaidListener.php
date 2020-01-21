@@ -81,7 +81,7 @@ class UnpaidListener
     /**
      * Sends an email notifying the user that they have had a failed payment occur.
      * @param Policy           $policy               is the policy for which payment has failed.
-     * @param int              $number               is the number of times failure has occurred including this time.
+     * @param mixed            $number               is the number of times failure has occurred including this time.
      * @param ScheduledPayment $nextScheduledPayment
      */
     public function emailNotification(Policy $policy, $number, ScheduledPayment $nextScheduledPayment = null)

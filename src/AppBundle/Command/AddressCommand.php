@@ -66,6 +66,7 @@ class AddressCommand extends ContainerAwareCommand
         $number = $input->getArgument('number');
         $useAddress = true === $input->getOption('address');
         $validate = true === $input->getOption('validate');
+        /** @var string $id **/
         $id = $input->getOption('id');
         if ($id) {
             if ($addressData = $this->pcaService->retreive($id)) {
