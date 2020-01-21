@@ -84,11 +84,15 @@ class CheckoutGenerateMissingSchedules extends ContainerAwareCommand
             $toDate = new \DateTime($toDate);
         }
         if (($fromDate && $toDate) && $toDate < $fromDate) {
+            /** @var \DateTime $toDateTime **/
+            $toDateTime = $toDate;
+            /** @var \DateTime $fromDateTime **/
+            $fromDateTime = $fromDate;
             throw new InvalidInputException(
                 sprintf(
                     "to-date %s should not be before from-date %s but it is.",
-                    $toDate->format('d-m-Y'),
-                    $fromDate->format('d-m-Y')
+                    $toDateTime->format('d-m-Y'),
+                    $fromDateTime->format('d-m-Y')
                 )
             );
         }

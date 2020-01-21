@@ -96,10 +96,12 @@ class MixpanelCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $action = $input->getArgument('action');
+        /** @var string $email **/
         $email = $input->getOption('email');
         $id = $input->getOption('id');
         $process = $input->getOption('process');
         $days = $input->getOption('days');
+        /** @var string $type **/
         $type = $input->getOption('type');
         $filename = $input->getOption('filename');
         $user = null;

@@ -169,6 +169,7 @@ class IntercomCommand extends ContainerAwareCommand
         $clear = true === $input->getOption('clear');
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
+        /** @var string $email **/
         $email = $input->getOption('email');
         $requeue = true === $input->getOption('requeue');
         $convertLeadByEmail = true === $input->getOption('convert-lead-by-email');
@@ -187,6 +188,7 @@ class IntercomCommand extends ContainerAwareCommand
         // Mass Scode update option
         $scode = true === $input->getOption('scode');
         // Tag management options
+        /** @var array $tag **/
         $tag = $input->getOption('tag');
         $tagForce = $input->getOption('tag-option') && in_array('force', $input->getOption('tag-option'));
         $untag = $input->getOption('tag-option') && in_array('untag', $input->getOption('tag-option'));
