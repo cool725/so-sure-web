@@ -71,9 +71,13 @@ class HelvetiaCommissionCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var float $tolerance */
         $tolerance = $input->getOption('tolerance');
+        /** @var boolean $wet */
         $wet = $input->getOption('wet') == true;
+        /** @var string $monthString */
         $monthString = $input->getOption('month');
+        /** @var \DateTime|null $month */
         $month = $monthString ? \DateTime::createFromFormat('Y-m', $monthString) : null;
         $start = null;
         $end = null;
