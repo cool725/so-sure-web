@@ -2,8 +2,11 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Classes\Helvetia;
+use AppBundle\Helpers\NumberHelper;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Policy;
+use AppBundle\Document\DateTrait;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,10 +43,10 @@ class HelvetiaCommissionCommand extends ContainerAwareCommand
     {
         $this->setDescription('Detects and can also fix incorrect commission on Helvetia Payments')
             ->addOption(
-                'date',
+                'month',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'The minimum payment date to check on. Format: \'YYYY-MM\'',
+                'A specific month to look at commission errors in. Format: \'YYYY-MM\'',
                 null
             )
             ->addOption(
@@ -52,6 +55,13 @@ class HelvetiaCommissionCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Automatically fix detected issues when possible',
                 null
+            )
+            ->addOption(
+                'tolerance',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Tolerance within to allow differences of commission calculations',
+                0.005
             );
     }
 
@@ -60,9 +70,68 @@ class HelvetiaCommissionCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dateString = $input->getOption('date');
-        $date = $dateString ? \DateTime::createFromFormat('Y-m', $dateString) : new \DateTime();
+        $tolerance = $input->getOption('tolerance');
         $wet = $input->getOption('wet') == true;
-        $output->writeln($date->format('Y-m-d'));
+        $monthString = $input->getOption('month');
+        $month = $monthString ? \DateTime::createFromFormat('Y-m', $monthString) : null;
+        $start = null;
+        $end = null;
+        if ($month) {
+            $start = DateTrait::startOfMonth($month);
+            $end = DateTrait::endOfMonth($month);
+        }
+        /** @var PaymentRepository $paymentRepo */
+        $paymentRepo = $this->dm->getRepository(Payment::class);
+        $helvetiaPayments = $paymentRepo->getAllPaymentsForPolicyType('helvetia-phone', $start, $end);
+        $fine = 0;
+        $bad = 0;
+        foreach ($helvetiaPayments as $payment) {
+            $policy = $payment->getPolicy();
+            $amount = $payment->getAmount();
+            $totalCommission = $payment->getTotalCommission();
+            $brokerCommission = $payment->getBrokerCommission();
+            $coverholderCommission = $payment->getCoverholderCommission();
+            $n = $payment->getPolicy()->getPremium()->fractionOfMonthlyPayments($amount);
+            $expectedTotalCommission = $payment->getAmount() * Helvetia::COMMISSION_PROPORTION;
+            $expectedBrokerCommission = $n * Helvetia::MONTHLY_BROKER_COMMISSION;
+            $expectedCoverholderCommission = $expectedTotalCommission - $expectedBrokerCommission;
+            if (NumberHelper::equalTo($totalCommission, $expectedTotalCommission, $tolerance) &&
+                NumberHelper::equalTo($brokerCommission, $expectedBrokerCommission, $tolerance) &&
+                NumberHelper::equalTo($coverholderCommission, $expectedCoverholderCommission, $tolerance)
+            ) {
+                $fine++;
+            } else {
+                $bad++;
+                $output->writeln(sprintf(
+                    '%s: current (b %.2f + c %.2f == %.2f) != expected (b %2.f + c %2.f == %2.f)',
+                    $payment->getId(),
+                    $brokerCommission,
+                    $coverholderCommission,
+                    $totalCommission,
+                    $expectedBrokerCommission,
+                    $expectedCoverholderCommission,
+                    $expectedTotalCommission
+                ));
+                if ($wet) {
+                    $payment->setBrokerCommission($expectedBrokerCommission);
+                    $payment->setCoverholderCommission($expectedCoverholderCommission);
+                    $payment->setTotalCommission($expectedTotalCommission);
+                    $this->dm->persist($payment);
+                }
+            }
+        }
+        // Say some nice words at the end.
+        $output->writeln("{$fine} payments were fine.");
+        $output->writeln(sprintf(
+            '%d payments were %s.',
+            $bad,
+            $wet ? 'fixed' : 'fixable'
+        ));
+        if ($wet) {
+            $this->dm->flush();
+            $output->writeln("Changes persisted.");
+        } else {
+            $output->writeln("Dry Mode, no changes persisted.");
+        }
     }
 }
