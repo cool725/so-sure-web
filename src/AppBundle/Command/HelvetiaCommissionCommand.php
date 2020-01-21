@@ -7,6 +7,7 @@ use AppBundle\Helpers\NumberHelper;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\DateTrait;
+use AppBundle\Repository\PaymentRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

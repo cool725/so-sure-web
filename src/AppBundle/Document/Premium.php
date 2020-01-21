@@ -260,7 +260,7 @@ abstract class Premium implements EqualsInterface
      * Gives you the number of monthly payments that a given payment amount covers even if it is fractional. Like for
      * example if a person's premium is £15 and the payment is 20, then this function will return 1.33333.
      * @param float $amount is the size of the payment to calculate for.
-     * @return the number of monthly payments that the given amount of money covers.
+     * @return float the number of monthly payments that the given amount of money covers.
      */
     public function fractionOfMonthlyPayments($amount)
     {
