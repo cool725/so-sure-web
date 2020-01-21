@@ -7,7 +7,7 @@
 {% set body_class = 'login' %}
 {% block meta %}
     <meta name="robots" content="noindex">
-    {# <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" /> #}
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
