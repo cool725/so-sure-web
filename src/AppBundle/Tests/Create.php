@@ -17,7 +17,6 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\LogEntry;
-use AppBundle\Document\PolicyTerms;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\Helvetia;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -87,9 +86,6 @@ class Create
         } else {
             $policy = self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
         }
-        $terms = new PolicyTerms();
-        $terms->setVersion('Version 11 January 2019');
-        $policy->setPolicyTerms($terms);
         return $policy;
     }
 

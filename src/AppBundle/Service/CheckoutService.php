@@ -1793,6 +1793,9 @@ class CheckoutService
         if ($policy->getCheckoutPaymentMethod()) {
             $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
         }
+        $refundAmount = $this->convertFromPennies($refundDetails->getValue());
+        $refund->setAmount(0 - $refundAmount);
+        $refund->setCommission(0 - $coverholderCommission, 0 - $brokerCommission);
         $policy->addPayment($refund);
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
@@ -1829,13 +1832,6 @@ class CheckoutService
         $refund->setResponseCode($refundDetails->getResponseCode());
         $refund->setRiskScore($refundDetails->getRiskCheck());
 
-        $refundAmount = $this->convertFromPennies($refundDetails->getValue());
-        $refund->setAmount(0 - $refundAmount);
-        //$refund->setReference($refundModelDetails["yourPaymentReference"]);
-        $refund->setCommission(
-            0 - $coverholderCommission,
-            0 - $brokerCommission
-        );
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         return $refund;

@@ -1122,7 +1122,6 @@ abstract class Policy
         usort($payments, function ($a, $b) {
             return $a->getDate() < $b->getDate();
         });
-        //\Doctrine\Common\Util\Debug::dump($payments, 3);
 
         return $payments[0];
     }

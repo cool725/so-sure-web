@@ -10,6 +10,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Connection\RewardConnection;
@@ -343,33 +344,19 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests to make sure that the refund commission is calculated rightly.
+     * Tests to make sure that refund commission is correctly calculated.
      */
-    public function testGetRefundCommissionAmount()
+    public function testRefundCommission()
     {
-        $user = Create::user();
-        $policy = Create::policy($user, "2019-03-13", Policy::STATUS_CANCELLED, 12);
-        $policy->setEnd(new \DateTime("2019-04-18"));
-        Create::standardPayment($policy, "2019-03-13", true);
-        Create::standardPayment($policy, "2019-04-13", true);
-        $policy->setCancelledReason(Policy::CANCELLED_UPGRADE);
-        $this->assertTrue($policy->getRefundCommissionAmount() < 0);
-        $policy->setCancelledReason(Policy::CANCELLED_COOLOFF);
-        $this->assertTrue($policy->getRefundCommissionAmount() > 0);
-    }
-
-    public function testGetRefundCoverholderCommissionAmount()
-    {
-        // if we create a policy cancelled in cooloff then whatever the commission value is, it should that as a
-        // positive value.
-        // if we create a policy that is cancelled some other way and they were paid up normally they should receive
-        // some positive value based on pro rata.
-        // if we create a policy that is cancelled not in cooloff and one of their payments lacks commission for
-        // mysterious reasons, then the amount should be negative and add up the pro rata amount that was missing
+        $terms = new PolicyTerms();
+        $terms->setVersion('Version 11 January 2019');
         $user = Create::user();
         $a = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
         $b = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
         $c = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
+        $a->setPolicyTerms($terms);
+        $b->setPolicyTerms($terms);
+        $c->setPolicyTerms($terms);
         $a->setCancelledReason(Policy::CANCELLED_COOLOFF);
         $b->setCancelledReason(Policy::CANCELLED_USER_REQUESTED);
         $c->setCancelledReason(Policy::CANCELLED_UPGRADE);
@@ -401,7 +388,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // For B should be the total commission paid - the commission owed pro rata which should be positive.
         $this->assertEquals(
             $b->getRefundCoverholderCommissionAmount(),
-            $b->getCoverholderCommissionPaid() - ($b->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 97 / 366,
+            $b->getCoverholderCommissionPaid() -
+                ($b->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 97 / 366,
             null,
             0.01
         );
@@ -416,7 +404,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // For C should be the total commission paid - the commission owed pro rata which should be negative.
         $this->assertEquals(
             $c->getRefundCoverholderCommissionAmount(),
-            $c->getCoverholderCommissionPaid() - ($c->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 260 / 366,
+            $c->getCoverholderCommissionPaid() -
+                ($c->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 260 / 366,
             null,
             0.01
         );
