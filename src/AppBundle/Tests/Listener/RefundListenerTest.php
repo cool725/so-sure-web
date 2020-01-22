@@ -748,12 +748,12 @@ class RefundListenerTest extends WebTestCase
         );
         $listener->onPolicyCancelledEvent(new PolicyEvent($a, new \DateTime('2020-05-01')));
         $listener->onPolicyCancelledEvent(new PolicyEvent($b, new \DateTime('2020-09-01')));
-        // now make sure that the owed commission is nothing. If so, it has obviously worked correctly.
+        // now make sure that the owed commission is nothing. If so, it has obviously worked correctly. Not for
+        // b though because we cannot do a refund where we take their money as that is not really a refund.
         Create::refresh(static::$dm, $a, $b);
         $a->getLastPaymentDebit()->setSuccess(true);
-        $b->getLastPaymentDebit()->setSuccess(true);
         $this->assertEquals($a->getBrokerCommissionPaid(), $a->getProratedBrokerCommission($a->getEnd()));
-        $this->assertEquals($b->getBrokerCommissionPaid(), $b->getProratedBrokerCommission($b->getEnd()));
+        $this->assertTrue($b->getBrokerCommissionPaid() < $b->getProratedBrokerCommission($b->getEnd()));
     }
 
     private static function prepCheckoutPaymentToAdd(

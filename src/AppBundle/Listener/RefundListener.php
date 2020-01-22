@@ -154,6 +154,7 @@ class RefundListener
             try {
                 $notes = sprintf('cancelled %s', $policy->getCancelledReason());
                 if ($payment instanceof CheckoutPayment) {
+                    var_dump("you cunt");
                     $this->checkoutService->refund(
                         $payment,
                         $refundAmount,

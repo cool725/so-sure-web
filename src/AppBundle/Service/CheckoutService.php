@@ -1788,14 +1788,12 @@ class CheckoutService
         // Refund is a negative payment
         $refund = new CheckoutPayment();
         $refund->setAmount(0 - $amount);
+        $refund->setCommission(0 - $coverholderCommission, 0 - $brokerCommission);
         $refund->setNotes($notes);
         $refund->setSource($source);
         if ($policy->getCheckoutPaymentMethod()) {
             $payment->setDetails($policy->getCheckoutPaymentMethod()->__toString());
         }
-        $refundAmount = $this->convertFromPennies($refundDetails->getValue());
-        $refund->setAmount(0 - $refundAmount);
-        $refund->setCommission(0 - $coverholderCommission, 0 - $brokerCommission);
         $policy->addPayment($refund);
         $this->dm->persist($refund);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
