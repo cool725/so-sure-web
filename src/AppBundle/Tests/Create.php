@@ -17,6 +17,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\LogEntry;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\Helvetia;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -80,10 +81,16 @@ class Create
     public static function policy($user, $start, $status, $installments)
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
+        $policy = null;
         if ($startDate < Salva::getSalvaBinderEndDate()) {
-            return self::salvaPhonePolicy($user, $startDate, $status, $installments);
+            $policy = self::salvaPhonePolicy($user, $startDate, $status, $installments);
+        } else {
+            $policy = self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
         }
-        return self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
+        $terms = new PolicyTerms();
+        $terms->setVersion('Version 11 January 2019');
+        $policy->setPolicyTerms($terms);
+        return $policy;
     }
 
     /**

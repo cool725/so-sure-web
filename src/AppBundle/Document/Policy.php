@@ -3312,8 +3312,7 @@ abstract class Policy
      */
     public function getProratedCoverholderCommissionRefund(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedCoverholderCommission($date) -
-            $this->getCoverholderCommissionPaid());
+        return $this->getCoverholderCommissionPaid() - $this->getProratedCoverholderCommission($date);
     }
 
     /**
@@ -3323,7 +3322,7 @@ abstract class Policy
      */
     public function getProratedBrokerCommissionRefund(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getBrokerCommissionPaid());
+        return $this->getBrokerCommissionPaid() - $this->getProratedBrokerCommission($date);
     }
 
     public function getDaysInPolicyYear()
