@@ -154,7 +154,6 @@ class RefundListener
             try {
                 $notes = sprintf('cancelled %s', $policy->getCancelledReason());
                 if ($payment instanceof CheckoutPayment) {
-
                     $this->checkoutService->refund(
                         $payment,
                         $refundAmount,
@@ -265,7 +264,7 @@ class RefundListener
 
         $sosurePayment = SoSurePayment::init(Payment::SOURCE_SYSTEM);
         $sosurePayment->setAmount($refundAmount);
-        $sosurePayment->setTotalCommission($refundCommissionAmount);
+        $sosurePayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $sosurePayment->setNotes(sprintf('promo %s paid by so-sure', $policy->getPromoCode()));
         $policy->addPayment($sosurePayment);
         $this->dm->flush();

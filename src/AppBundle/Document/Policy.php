@@ -3149,7 +3149,7 @@ abstract class Policy
         if (!$this->isCancelled() || !$this->isRefundAllowed()) {
             return 0;
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffCoverholderCommissionRefund();
+            return $this->getCoverholderCommissionPaid();
         } else {
             return $this->getProratedCoverholderCommissionRefund($this->getEnd());
         }
@@ -3167,7 +3167,7 @@ abstract class Policy
         if (!$this->isCancelled() || !$this->isRefundAllowed()) {
             return 0;
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
-            return $this->getCooloffBrokerCommissionRefund();
+            return $this->getBrokerCommissionPaid();
         } else {
             return $this->getProratedBrokerCommissionRefund($this->getEnd());
         }
