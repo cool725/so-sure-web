@@ -65,3 +65,19 @@
 .strike {
     text-decoration: line-through;
 }
+
+.max {
+
+    &-400 {
+        @include media-breakpoint-up(md) {
+            max-width: 400px;
+        }
+        @include media-breakpoint-up(xl) {
+            max-width: 100%;
+        }
+    }
+}
+
+.flex-1 {
+    flex: 1;
+}
