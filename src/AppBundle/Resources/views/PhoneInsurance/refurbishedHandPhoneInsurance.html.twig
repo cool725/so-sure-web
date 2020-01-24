@@ -1,20 +1,20 @@
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'phone-insurance-second-hand' %}
+{% set body_class = 'phone-insurance-refurbished' %}
 {% set max_width = '400px' %}
 {% if device_category() == 'Desktop' %}
     {% set max_width = '' %}
 {% endif %}
 
 
-{% block title %}Second Hand Phone Insurance From &pound;{{ from_price|number_format(2) }} Monthly | so-sure{% endblock %}
+{% block title %}Refurbished Phone Insurance From &pound;{{ from_price|number_format(2) }} Monthly | so-sure{% endblock %}
 {% block meta %}
-    <meta name="description" content="Even with cheap second hand phones, insurance can bring peace of mind. Get second hand phone insurance with 24-72 hour repair or replacement & money back if you don't claim."/>
+    <meta name="description" content="Even with cheap refurbished phones, insurance can bring peace of mind. Get refurbished phone insurance with 24-72 hour repair or replacement & money back if you don't claim."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Second Hand Phone Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | so-sure' %}
-{% set og_description = "Even with cheap second hand phones, insurance can bring peace of mind. Get second hand phone insurance with 24-72 hour repair or replacement & money back if you don't claim." %}
+{% set og_title = 'Refurbished Phone Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | so-sure' %}
+{% set og_description = "Even with cheap refurbished phones, insurance can bring peace of mind. Get refurbished phone insurance with 24-72 hour repair or replacement & money back if you don't claim." %}
 {% set og_image_facebook = cdn_url ~ '/images/rebrand/phones/generic/so-sure_hero-second-hand.png' %}
 
 {% block cssPage %}
@@ -63,13 +63,13 @@
                             <li class="list-inline-item text-white"
                                 property="itemListElement"
                                 typeof="ListItem">
-                                <span property="name">Second Hand</span>
+                                <span property="name">Refurbished</span>
                                 <meta property="position" content="3">
                             </li>
                         </ul>
                         </div>
-                        <h1 class="text-white fit text-center text-lg-left">Second Hand Phone <br class="d-lg-none"> Insurance <br class="d-none d-lg-inline"> from just <br class="d-lg-none"> <span class="text-deep-sky-blue-d">&pound;{{ from_price|number_format(2) }} per month</span></h1>
-                        <p class="my-4 text-white text-center text-lg-left">Insure your second hand phone with so-sure for the same price as a new model – and still get full coverage, and access to our social insurance reward pot 💸</p>
+                        <h1 class="text-white fit text-center text-lg-left">Refurbished Phone <br class="d-lg-none"> Insurance <br class="d-none d-lg-inline"> from just <br class="d-lg-none"> <span class="text-deep-sky-blue-d">&pound;{{ from_price|number_format(2) }} per month</span></h1>
+                        <p class="my-4 text-white text-center text-lg-left">Insure your refurbished phone with so-sure to get the same price and coverage level as insurance for a new phone, as well as access to our social insurance reward pot 💸</p>
                     </div>
                     <div class="hero__controls text-center text-lg-left mb-5">
                         <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
@@ -97,9 +97,9 @@
         <div class="container-large py-5">
             <div class="row">
                 <div class="col-xl-7">
-                    <h2 class="text-primary mb-4">Second hand phones are a perfect option</h2>
-                    <p class="mb-4">It seems like there's a new flagship phone released every few months by one of the big brands – and people love to keep up with the latest technology. That means there's a lot of barely used second hand phones out there, as phone enthusiasts sell on handsets that are still in great condition to upgrade to the latest model.</p>
-                    <p class="mb-5 mb-xl-0">These second hand phones are a perfect option if you're looking for a slightly cheaper handset, whether that's to replace a lost or stolen phone, or just to avoid a pricey contract. But even with their reduced price tag, you probably still want second hand phone insurance to keep your handset covered and keep you connected.</p>
+                    <h2 class="text-primary mb-4">Refurbished phones are a great option</h2>
+                    <p class="mb-4">Buying the latest phone can be expensive, with contracts for the latest <a href="{{ path('phone_insurance_make', {'make': 'apple'}) }}">iPhone</a> or <a href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}">Samsung</a> models costing up to &pound;70 a month. In the age of the ultra-expensive flagship mobile phone, buying a refurbished or reconditioned handset is one way to cut costs while keeping up with the latest tech.</p>
+                    <p class="mb-5 mb-xl-0">Refurbed phones usually come with a reduced price tag and have the added benefit of being great for the environment (no need to mine more rare metals for internal components). But even with a cheaper refurbished phone, insurance is a good idea, giving you peace of mind that you’ll stay covered, and therefore connected.</p>
                 </div>
                 <div class="col-xl-4 offset-xl-1 text-center">
                     <img src="{{ cdn_url }}/images/onexone.png"
@@ -109,10 +109,10 @@
                 </div>
             </div>
             <hr class="mt-0 mb-5">
-            <div class="row">
+            <div class="row d-lg-flex align-items-lg-center">
                 <div class="col-xl-7 offset-xl-1 order-xl-2">
-                    <h2 class="h3 text-primary mb-4">Second hand phone insurance from so-sure</h2>
-                    <p class="mb-4 mb-5">A lot of traditional insurers won't touch second hand mobile phones with a bargepole - 'Older' handsets are often seen as having a higher breakdown risk. But we're different.  so-sure is one of the UK's only standalone gadget insurers offering phone insurance for second hand phones - and it's no different to insurance for new or refurbished handsets.</p>
+                    <h2 class="h3 text-primary mb-4">Refurbished phone insurance from so-sure</h2>
+                    <p class="mb-4 mb-5">Refurbished phone insurance is harder to come by than insurance for new handsets because insurers tend to see refurbished handsets as higher risk. But we're different.  so-sure is one of the few UK gadget insurers offering refurbished phone insurance that's no different to our standard policies.</p>
                     <h3 class="h4 mb-3 mt-lg-5">As standard, we offer:</h3>
                     <div class="d-lg-flex">
                         <ul class="list-unstyled icn-fa-list mr-lg-3 flex-1">
@@ -154,7 +154,7 @@
     <section class="game-change py-lg-5">
         <div class="container-large py-5">
             <h2 class="h3 text-primary mb-4">We've changed the game</h2>
-            <p class="mb-5">We know how annoying it is to pay into insurance every month and never make a claim, so we've changed the game. Make use of our <a href="{{ path('social_insurance') }}">social insurance</a> feature by connecting with your friends and family members – if none of you make a claim during your policy term, you'll receive money back at the end of the year.</p>
+            <p class="mb-5">What do we mean by <a href="{{ path('social_insurance') }}">social insurance</a>? With so-sure, you can connect with friends and family members to build a group of policies, and if none of you make a claim, you’ll receive money back at the end of the year.</p>
             <hr class="d-none d-lg-block mb-5">
             <div class="row text-lg-left">
                 <div class="col-lg d-lg-flex align-items-lg-center">
@@ -165,7 +165,7 @@
                          width="200px">
                     <div class="">
                         <h3 class="h4 mb-3">Earn Cashback!</h3>
-                        <p class="mb-4">You'll get &pound;10 in your Reward Pot for every social insurance connection you make, up to a maximum of 80% of the value of your total policy.</p>
+                        <p class="mb-4">The reward pot gets filled by up to &pound;10 with every connection you make, up to a maximum of 80% of the total value of your policy.</p>
                     </div>
                 </div>
                 <div class="col-lg d-lg-flex align-items-lg-center">
@@ -176,7 +176,7 @@
                          width="200px">
                     <div class="">
                         <h3 class="h4 mb-3">Available on all models</h3>
-                        <p>Second hand phone insurance is available on all of the models we insure, and we don't care who you bought it from as long as it was originally sold in the UK.</p>
+                        <p>We offer refurbished phone insurance on every single phone we insure new. It also doesn't matter whether you bought your refurbed model direct from the manufacturer, from a scheme like EE's 'Good As New' range, or from a third party retailer. All we ask is that it was originally sold in the UK.</p>
                     </div>
                 </div>
             </div>
@@ -218,15 +218,33 @@
                 </div>
             </div>
             <hr class="mt-0 mb-5">
-            <div class="row">
+            <div class="row d-lg-flex align-items-lg-center">
                 <div class="col-xl-7 offset-xl-1 order-xl-2">
-                    <h2 class="h3 text-primary mb-4">What's the difference between second hand phones and refurbished phones?</h2>
-                    <p class="mb-4">There's one main difference between second hand and refurbished phones. While both come under the umbrella of being 'used', refurbished phones have been tested and verified to ensure that they work properly, while second hand phones generally haven't.</p>
-                    <p class="mb-4">Similarly, you'll be able to buy refurbished phones directly from the manufacturer or through your contract provider, but second hand phones are generally bought from online marketplaces such as eBay, Facebook Marketplace, or Gumtree.</p>
-                    <p class="mb-4">When buying second hand phones online, you should be careful that the deal isn't too good to be true. Some people may try to sell lost or stolen phones or may provide false information about the phone's history. </p>
-                    <p class="mb-4">To double check, make sure that you obtain proof of the IMEI number from the seller, and look it up beforehand using a free online IMEI checker. A phone's IMEI number can reveal a lot about it. If the phone was originally sold in the UK, then congrats – we can insure it here at so-sure.</p>
+                    <h2 class="h3 text-primary mb-4">Are refurbished phones good?</h2>
+                    <p class="mb-4">In theory, refurbed phones can be just as good as new models. To be classed as refurbished, phones have to go through fairly rigorous testing to make sure they're up to scratch. This can include checking that battery capacity is still healthy, making sure all buttons work well, and assessing the screen for any damage.</p>
+                    <p class="mb-4">Many suppliers of refurbished phones will have a grading system to represent the level of visible damage on a phone. Phones described as 'Like New' will have very little to no wear and tear while phones labelled 'Good' or 'Fair' will likely have minor visible damage. You can choose the phone and condition that best suits your needs and your budget.</p>
                 </div>
-                <div class="col-xl-4 order-xl-1">
+                <div class="col-xl-4 order-xl-1 text-center">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_phone-in-box.png"
+                         alt="Phone in box"
+                         class="lozad img-fluid d-none d-xl-block"
+                         width="350px">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_phone-in-box-mb.png"
+                         alt="Phone in box"
+                         class="lozad img-fluid max-400 d-xl-none">
+                </div>
+            </div>
+            <hr class="mt-0 mt-xl-5 mb-5">
+            <div class="row">
+                <div class="col-xl-7">
+                    <h2 class="h3 text-primary mb-4">What's the difference between refurbished phones and second hand phones?</h2>
+                    <p class="mb-4">There's one main difference between second hand and refurbished phones. Whilst both come under the umbrella of being 'used' or 'recycled', refurbished phones have been tested and verified to ensure that they work properly while second hand phones generally haven't. </p>
+                    <p class="mb-4">Usually, you'd buy a refurbed phone through a reputable retailer, as opposed to a second hand handset, which you could buy from a friend or eBay. If you can’t find one at the right price direct from the manufacturer, your phone's network may sell them too. Nowadays, some networks even allow you to buy a refurbished phone on contract.</p>
+                    <p class="mb-4">Here at so-sure, we can insure refurbished phones on exactly the same policy as we would insure brand new phones. That means no inflated cost for 'high risk', as well as all of the same great benefits including our social insurance cash-back reward pot.</p>
+                </div>
+                <div class="col-xl-4 offset-xl-1 text-center">
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/misc/so-sure_friends-whats-the-different-polaroid.png"
                          alt="We're different polaroid so-sure"
