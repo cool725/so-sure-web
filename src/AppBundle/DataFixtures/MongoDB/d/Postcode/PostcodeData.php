@@ -73,6 +73,76 @@ class PostcodeData implements FixtureInterface, ContainerAwareInterface
                 "postcode" => "E6 3EZ",
                 "added" => new \DateTime("2019-02-14"),
                 "notes" => "Suspected Fraud"
+            ],
+            [
+                "postcode" => "GY1",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY2",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY3",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY4",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY5",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY6",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY7",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY8",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY9",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
+            ],
+            [
+                "postcode" => "GY10",
+                "outcode" => true,
+                "banned" => true,
+                "added" => new \DateTime("2020-01-27"),
+                "notes" => "tax"
             ]
         ];
     }
@@ -91,8 +161,23 @@ class PostcodeData implements FixtureInterface, ContainerAwareInterface
             $postcodeDoc->setPostcode($postcode['postcode']);
             $postcodeDoc->setAdded($postcode['added']);
             $postcodeDoc->setNotes($postcode['notes']);
+            $postcodeDoc->setBanned($this->getOr($postcode, 'banned', false));
+            $postcodeDoc->setType($this->getOr($postcode, 'outcode', false) ? 'outcode' : 'postcode');
             $manager->persist($postcodeDoc);
             $manager->flush();
+        }
+    }
+
+    /**
+     * Looks for a value in an array, and if it is not there then it returns a given default.
+     * @param array $container is the array to look in.
+     * @param string $key is the key to look for.
+     * @param mixed $default is the default to return if the key is not found.
+     */
+    private function getOr($container, $key, $default)
+    {
+        if (in_array($key, $container)) {
+            return $container[$key];
         }
     }
 }
