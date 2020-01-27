@@ -65,7 +65,7 @@
                         <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Full cover from &pound;3.49/month
+                                Full cover from &pound;{% if from_price is defined and from_price %}{{ from_price }}{% else %}3.49{% endif %}/month
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>

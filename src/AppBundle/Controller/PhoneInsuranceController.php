@@ -123,6 +123,80 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
+     * SEO Pages - Second Hand Phone Insurance
+     * @Route("/phone-insurance/second-hand", name="phone_insurance_second_hand", options={"sitemap" = true})
+     */
+    public function secondHandPhoneInsuranceAction()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+
+        // To display lowest monthly premium
+        $fromPhones = $repo->findBy([
+            'active' => true,
+        ]);
+
+        $fromPhones = array_filter($fromPhones, function ($phone) {
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        });
+
+        // Sort by cheapest
+        usort($fromPhones, function ($a, $b) {
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        });
+
+        // Select the lowest
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+
+        $data = [
+            'from_price' => $fromPrice,
+            'from_phones' => $fromPhones,
+        ];
+
+        return $this->render('AppBundle:PhoneInsurance:secondHandPhoneInsurance.html.twig', $data);
+    }
+
+    /**
+     * SEO Pages - Refurbished Phone Insurance
+     * @Route("/phone-insurance/refurbished", name="phone_insurance_refurbished", options={"sitemap" = true})
+     */
+    public function refurbishedPhoneInsuranceAction()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+
+        // To display lowest monthly premium
+        $fromPhones = $repo->findBy([
+            'active' => true,
+        ]);
+
+        $fromPhones = array_filter($fromPhones, function ($phone) {
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        });
+
+        // Sort by cheapest
+        usort($fromPhones, function ($a, $b) {
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        });
+
+        // Select the lowest
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+
+        $data = [
+            'from_price' => $fromPrice,
+            'from_phones' => $fromPhones,
+        ];
+
+        return $this->render('AppBundle:PhoneInsurance:refurbishedHandPhoneInsurance.html.twig', $data);
+    }
+
+    /**
      * SEO Pages - Phone Insurance
      * @Route("/phone-insurance", name="phone_insurance", options={"sitemap" = true})
      */

@@ -1077,7 +1077,7 @@ class PolicyService
                     continue;
                 }
             } elseif ($renewal && $i == 1) {
-                $scheduledDate = $this->adjustDayForBilling($now, true);
+                $scheduledDate = $this->adjustDayForBilling($policy->getStart(), true);
             } else {
                 $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates) && $isBacs) {

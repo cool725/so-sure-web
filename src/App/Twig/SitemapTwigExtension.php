@@ -93,6 +93,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/blackberry' => 'Blackberry Insurance',
             '/phone-insurance/vodafone' => 'Vodafone Insurance',
             '/phone-insurance/cat' => 'Cat Insurance',
+            '/phone-insurance/second-hand' => 'Second Hand',
+            '/phone-insurance/refurbished' => 'Refurbished',
             '/claim' => 'Make a claim',
             '/faq' => 'FAQ'
         ];

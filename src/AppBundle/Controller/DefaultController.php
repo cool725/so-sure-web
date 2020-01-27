@@ -78,6 +78,29 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+
+        // To display lowest monthly premium
+        $fromPhones = $repo->findBy([
+            'active' => true,
+        ]);
+
+        $fromPhones = array_filter($fromPhones, function ($phone) {
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        });
+
+        // Sort by cheapest
+        usort($fromPhones, function ($a, $b) {
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        });
+
+        // Select the lowest
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+
         $referral = $request->get('referral');
         $session = $this->get('session');
 
@@ -100,6 +123,7 @@ class DefaultController extends BaseController
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $this->competitorsData(),
+            'from_price' => $fromPrice,
         );
 
         return $this->render($template, $data);

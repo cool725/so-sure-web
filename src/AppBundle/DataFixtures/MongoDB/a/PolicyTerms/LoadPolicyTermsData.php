@@ -38,16 +38,29 @@ class LoadPolicyTermsData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
+    /**
+     * Adds the policy terms to the database based on the static policy terms data.
+     * @param ObjectManager $manager is the object manager with which to persist the terms to the database.
+     */
     private function newPolicyTerms($manager)
     {
-        $versions = count(PolicyTerms::$allVersions);
-        $count = 1;
+        // Find the largest version number.
+        $max = 0;
+        foreach (PolicyTerms::$allVersions as $versionName => $version) {
+            $n = (int)$version;
+            if ($n > $max) {
+                $max = $n;
+            }
+        }
+        // Now add the terms.
         foreach (PolicyTerms::$allVersions as $versionName => $version) {
             $policyTerms = new PolicyTerms();
-            $policyTerms->setLatest($versions == $count);
+            $policyTerms->setLatest((int)$version == $max);
             $policyTerms->setVersion($versionName);
+            if (strpos($version, '_R') !== false) {
+                $policyTerms->setAggregator(true);
+            }
             $manager->persist($policyTerms);
-            $count++;
         }
     }
 }
