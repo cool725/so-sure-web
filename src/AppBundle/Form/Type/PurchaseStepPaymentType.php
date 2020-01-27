@@ -105,7 +105,7 @@ class PurchaseStepPaymentType extends AbstractType
                 if ($purchase->getUser()->allowedMonthlyPayments($this->postcodeService)) {
                     $choices[sprintf('£%.2f Monthly', $monthlyPremiumPrice)] = sprintf('%.2f', $monthlyPremiumPrice);
                 }
-                if ($purchase->getUser()->allowedYearlyPayments()) {
+                if ($purchase->getUser()->allowedYearlyPayments($this->postcodeService)) {
                     $choices[sprintf('£%.2f Yearly', $yearlyPremiumPrice)] = sprintf('%.2f', $yearlyPremiumPrice);
                 }
                 if (count($choices) > 0) {

@@ -38,4 +38,16 @@ class PostcodeRepository extends DocumentRepository
         }
         return false;
     }
+
+    public function getPostcodeIsBanned($postcode)
+    {
+        $postcodeDoc = new Postcode();
+        $postcodeDoc->setPostcode($postcode);
+        $outcode = $postcodeDoc->getOutCode();
+        $outcodes = $this->findBy(['type' => 'outcode', 'postcode' => $outcode, 'banned' => true]);
+        if (count($outcodes) > 0) {
+            return true;
+        }
+        $canonicalPostcode = $postcodeDoc->getPostcodeCanonical();
+    }
 }
