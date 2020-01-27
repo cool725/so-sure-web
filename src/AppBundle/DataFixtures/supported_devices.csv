@@ -553,6 +553,7 @@ AllView,AX4 Nano Plus,AX4Nano_plus,AX4Nano_plus
 AllView,AX501Q,AX501Q,AX501Q
 AllView,AX502,AX502,AX502
 AllView,AX503,AX503,AX503
+AllView,Allview 2K TV,shinagawa,Allview 2K TV
 AllView,C6 Duo,C6_Duo,C6_Duo
 AllView,C6 Quad 4G,C6_Quad_4G,C6Quad_4G
 AllView,E2 Jump,ALLVIEW_E2_Jump,E2_Jump
@@ -1707,6 +1708,7 @@ Azumi,A50 Style Plus,A50_Style_Plus,A50_Style_Plus
 Azumi,A50LT,A50LT,A50LT
 Azumi,A53,Azumi_A53,A53
 Azumi,A57B,Azumi_A57B,A57B
+Azumi,A57h,Azumi_A57h,A57
 Azumi,A5B,Azumi_A5B_BD,A5B
 Azumi,A5_AC11,A5_AC11,A5
 Azumi,AT7,AT7,AT7
@@ -5333,6 +5335,8 @@ General Mobile,GM 6 s,GM6_s_sprout,GM 6
 General Mobile,GM 6 s,GM6_s_sprout,GM6
 General Mobile,GM 8,GM8_sprout,GM 8
 General Mobile,GM 8 d,GM8_d_sprout,GM 8 d
+General Mobile,GM 9 Go,G008,G008
+General Mobile,GM 9 Go,G008_d,G008
 General Mobile,GM 9 Pro,GM9PRO_d_sprout,GM 9 Pro d
 General Mobile,GM 9 Pro,GM9PRO_sprout,GM 9 Pro
 General Mobile,GM5 Plus,gm5plus_s_sprout,GM 5 Plus
@@ -7997,6 +8001,9 @@ Huawei,HONOR 9A,HWDUB-Q,DUB-LX1
 Huawei,HONOR 9X,HWSTK-HF,STK-L22
 Huawei,HONOR 9X,HWSTK-HF,STK-LX1
 Huawei,HONOR 9X,HWSTK-HF,STK-LX3
+Huawei,HONOR 9X lite,HWJSN-H,JSN-L21
+Huawei,HONOR 9X lite,HWJSN-H,JSN-L22
+Huawei,HONOR 9X lite,HWJSN-H,JSN-L23
 Huawei,HONOR V20,HWPCT,PCT-TL10
 Huawei,HONOR View20,HWPCT,PCT-AL10
 Huawei,HONOR View20,HWPCT,PCT-L29
@@ -13270,6 +13277,10 @@ Mantra,MFSTAB,MFSTAB,MFSTAB
 Mantra,MFSTAB_74G,MFSTAB_74G,MFSTAB_74G
 Mantra,mTerminal100,Start,Start
 MarQ,DV6067H,DV6067H,DV6067H
+Mara Phones,MARA Z,Mara_Z_sprout,Mara Z
+Mara Phones,Mara X,Mara_X_sc,Mara X
+Mara Phones,Mara X dual,Mara_X,Mara X dual
+Mara Phones,Mara Z d,Mara_Z_d_sprout,Mara Z d
 Marshall,London,KB-1501,London
 Marvie,MARVIE_CT4,MARVIE-CT4,CT4
 Mascom,Mascom_L850,Mascom_L850,Mascom_L850
@@ -15008,6 +15019,7 @@ Natcom,X1LTE,X1LTE,X1LTE
 Nautilus,NFTM-LAR,nftm_lar,NFTM-LAR
 Nautilus,NFTM-MED,nftm_med,NFTM-MED
 Nautilus,NFTM-SMA,nftm_sma,NFTM-SMA
+Nautilus,NFTM-XSMA,nftm_xsma,NFTM-XSMA
 Navcity,NAVCITY NP-752,NP_752,NP-752
 Navcity,NAVCITY NP-852,NP-852,NP-852
 Navcity,NAVCITY NP-855,NP_855,NP-855
@@ -18006,6 +18018,7 @@ Samsung,Galaxy A70,a70q,SM-A705W
 Samsung,Galaxy A70,a70q,SM-A705YN
 Samsung,Galaxy A70s,a70s,SM-A7070
 Samsung,Galaxy A70s,a70s,SM-A707F
+Samsung,Galaxy A71,a71,SM-A715F
 Samsung,Galaxy A8,SCV32,SCV32
 Samsung,Galaxy A8,a8elte,SM-A800F
 Samsung,Galaxy A8,a8elte,SM-A800YZ
@@ -20287,6 +20300,9 @@ Sharp,AQUOS zero,SG801SH,801SH
 Sharp,AQUOS zero,SH-Z10,SH-Z10
 Sharp,AQUOS zero,SH-Z10A,SH-Z10A
 Sharp,AQUOS zero (SH-M10),SH-M10,SH-M10
+Sharp,AQUOS zero2 906SH,SG906SH,906SH
+Sharp,AQUOS zero2 SH-01M,SH-01M,SH-01M
+Sharp,AQUOS zero2 SHV47,QDA,SHV47
 Sharp,AQUOS \xe3\x82\xb1\xe3\x83\xbc\xe3\x82\xbf\xe3\x82\xa4 SH-02L,SH-02L,SH-02L
 Sharp,AQUOS \xe3\x82\xb1\xe3\x83\xbc\xe3\x82\xbf\xe3\x82\xa4 SH-06G,SH-06G,SH-06G
 Sharp,Android One S1,kaleido_sprout,S1
@@ -20617,6 +20633,7 @@ Skyworth,Euro,SW3_ATV,SWTV
 Skyworth,Europe,SW3H_ATV,SWTV
 Skyworth,Europe,globe_eu,globe
 Skyworth,Hong Kong,open_uhd_hk,open_uhd
+Skyworth,METZ 2K TV,shinagawa,METZ 2K TV
 Skyworth,North America,SW3_ATV,SWTV
 Skyworth,North America,globe_na,globe
 Skyworth,North America,shimbashi,2K TV
@@ -21571,6 +21588,8 @@ TCL,TCL L10,Faraday,5124J
 TCL,TCL L10+,Tokyo,5128A
 TCL,TCL L10+,Tokyo,5128Y
 TCL,TCL L5,U3A_PLUS_4G,5133A
+TCL,TCL L7,Seoul,5102I
+TCL,TCL L7,Seoul,5102M
 TCL,TCL L9,U5A_PLUS_4G,5159A
 TCL,TCL L9,U5A_PLUS_4G,5159J
 TCL,TCL L9 Plus,Wright,5101A
@@ -22190,6 +22209,12 @@ TCT (Alcatel),Alcatel 1B,Seoul,5002A
 TCT (Alcatel),Alcatel 1B,Seoul,5002D
 TCT (Alcatel),Alcatel 1B,Seoul,5002D_EEA
 TCT (Alcatel),Alcatel 1B,Seoul,5002D_RU
+TCT (Alcatel),Alcatel 1B,Seoul,5002F
+TCT (Alcatel),Alcatel 1B,Seoul,5002I
+TCT (Alcatel),Alcatel 1B,Seoul,5002J
+TCT (Alcatel),Alcatel 1B,Seoul,5002L
+TCT (Alcatel),Alcatel 1B,Seoul,5002M
+TCT (Alcatel),Alcatel 1B,Seoul,5002S
 TCT (Alcatel),Alcatel 1B,Seoul,5002X
 TCT (Alcatel),Alcatel 1B,Seoul,5002X_EEA
 TCT (Alcatel),Alcatel 1C,Curie,5003D
@@ -22216,6 +22241,7 @@ TCT (Alcatel),Alcatel 1S,Tokyo,5028Y
 TCT (Alcatel),Alcatel 1S,Tokyo,5028Y_EEA
 TCT (Alcatel),Alcatel 1S,Tokyo,5028Y_RU
 TCT (Alcatel),Alcatel 1T 7 WIFI,U3A_7_WIFI,8068
+TCT (Alcatel),Alcatel 1V,Tokyo_Lite,5007A
 TCT (Alcatel),Alcatel 1V,Tokyo_Lite,5007G
 TCT (Alcatel),Alcatel 1V,Tokyo_Lite,5007U
 TCT (Alcatel),Alcatel 1V,Tokyo_Lite,5007U_EEA
@@ -23187,6 +23213,7 @@ Tesla,M8.1 3G,TTM813G,TTM813G
 Tesla,Smartphone 3.4,Tesla_SP3_4,Tesla_SP3_4
 Tesla,Smartphone 6.4 Lite,Tesla_SP6_4_Lite,Tesla_SP6_4_Lite
 Tesla,Tablet_L7_1,Tablet_L7_1,Tesla L7.1
+Tesla,Tesla 2K TV,shinagawa,Tesla 2K TV
 Tesla,Tesla Smartphone 3.3,Tesla_SP3_3,Tesla_SP3.3
 Tesla,Tesla Smartphone 6.3,Tesla_SP6_3,Tesla_SP6.3
 Tesla,Tesla Smartphone 9.1,L6195,Tesla_SP9.1
