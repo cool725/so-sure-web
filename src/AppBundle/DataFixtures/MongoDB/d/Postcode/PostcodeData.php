@@ -179,5 +179,6 @@ class PostcodeData implements FixtureInterface, ContainerAwareInterface
         if (in_array($key, $container)) {
             return $container[$key];
         }
+        return $default;
     }
 }
