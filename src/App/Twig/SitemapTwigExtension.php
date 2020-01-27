@@ -55,6 +55,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/3-technologies-that-will-shape-the-future-of-insurance' => '3 Technologies that will Shape the Future of Insurance',
             '/blog/phone-insurance-guide' => 'Phone Insurance Guide',
             '/blog/most-durable-phones' => 'Most Durable Phones',
+            '/blog/samsung-galaxy-rumours' => 'Samsung Galaxy S11 (S20) Rumours & News',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',
