@@ -140,7 +140,6 @@ class RefundListener
 
         $payment = $policy->getLastSuccessfulUserPaymentCredit();
         $refundAmount = $policy->getRefundAmount();
-        $refundCommissionAmount = $policy->getRefundCommissionAmount();
         $this->logger->info(sprintf('Processing refund %f (policy %s)', $refundAmount, $policy->getId()));
         if ($refundAmount > 0) {
             if ($refundAmount > $payment->getAmount()) {
@@ -155,9 +154,13 @@ class RefundListener
             try {
                 $notes = sprintf('cancelled %s', $policy->getCancelledReason());
                 if ($payment instanceof CheckoutPayment) {
-                    $this->checkoutService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
-                } elseif ($payment instanceof JudoPayment) {
-                    $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
+                    $this->checkoutService->refund(
+                        $payment,
+                        $refundAmount,
+                        $policy->getRefundCoverholderCommissionAmount(),
+                        $policy->getRefundBrokerCommissionAmount(),
+                        $notes
+                    );
                 } elseif ($payment instanceof BacsPayment) {
                     // Refund is a negative payment
                     $this->bacsService->scheduleBacsPayment(
@@ -225,7 +228,6 @@ class RefundListener
         }
 
         $refundAmount = $policy->getPremium()->getMonthlyPremiumPrice();
-        $refundCommissionAmount = Salva::MONTHLY_TOTAL_COMMISSION;
 
         if ($refundAmount > $payment->getAmount()) {
             $this->logger->error(sprintf(
@@ -242,15 +244,8 @@ class RefundListener
                 $this->checkoutService->refund(
                     $payment,
                     $refundAmount,
-                    $refundCommissionAmount,
-                    sprintf('promo %s refund', $policy->getPromoCode()),
-                    Payment::SOURCE_SYSTEM
-                );
-            } elseif ($payment instanceof JudoPayment) {
-                $this->judopayService->refund(
-                    $payment,
-                    $refundAmount,
-                    $refundCommissionAmount,
+                    Salva::MONTHLY_COVERHOLDER_COMMISSION,
+                    Salva::MONTHLY_BROKER_COMMISSION,
                     sprintf('promo %s refund', $policy->getPromoCode()),
                     Payment::SOURCE_SYSTEM
                 );
@@ -269,7 +264,7 @@ class RefundListener
 
         $sosurePayment = SoSurePayment::init(Payment::SOURCE_SYSTEM);
         $sosurePayment->setAmount($refundAmount);
-        $sosurePayment->setTotalCommission($refundCommissionAmount);
+        $sosurePayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $sosurePayment->setNotes(sprintf('promo %s paid by so-sure', $policy->getPromoCode()));
         $policy->addPayment($sosurePayment);
         $this->dm->flush();

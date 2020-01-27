@@ -1122,7 +1122,6 @@ abstract class Policy
         usort($payments, function ($a, $b) {
             return $a->getDate() < $b->getDate();
         });
-        //\Doctrine\Common\Util\Debug::dump($payments, 3);
 
         return $payments[0];
     }
@@ -3137,6 +3136,42 @@ abstract class Policy
         }
     }
 
+    /**
+     * Gives you the amount of coverholder commission that this policy should be refunded.
+     * @return float the amount of coverholder commission that this policy should be refunded. It can be either
+     *               negative or positive (or zero), but it should be interpreted as meaning that a positive value is
+     *               an amount that must still be taken, and a negative amount means that commission is not owed but
+     *               must actually be returned.
+     */
+    public function getRefundCoverholderCommissionAmount()
+    {
+        if (!$this->isCancelled() || !$this->isRefundAllowed()) {
+            return 0;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+            return $this->getCoverholderCommissionPaid();
+        } else {
+            return $this->getProratedCoverholderCommissionRefund($this->getEnd());
+        }
+    }
+
+    /**
+     * Gives you the amount of broker commission that this policy should be refunded.
+     * @return float the amount of broker commission that this policy should be refunded. It can be either
+     *               negative or positive (or zero), but it should be interpreted as meaning that a positive value is
+     *               an amount that must still be taken, and a negative amount means that commission is not owed but
+     *               must actually be returned.
+     */
+    public function getRefundBrokerCommissionAmount()
+    {
+        if (!$this->isCancelled() || !$this->isRefundAllowed()) {
+            return 0;
+        } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+            return $this->getBrokerCommissionPaid();
+        } else {
+            return $this->getProratedBrokerCommissionRefund($this->getEnd());
+        }
+    }
+
     public function getRefundCommissionAmount($skipAllowedCheck = false, $skipValidate = false)
     {
         // Just in case - make sure we don't refund for non-cancelled policies
@@ -3276,8 +3311,7 @@ abstract class Policy
      */
     public function getProratedCoverholderCommissionRefund(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedCoverholderCommission($date) -
-            $this->getCoverholderCommissionPaid());
+        return $this->getCoverholderCommissionPaid() - $this->getProratedCoverholderCommission($date);
     }
 
     /**
@@ -3287,7 +3321,7 @@ abstract class Policy
      */
     public function getProratedBrokerCommissionRefund(\DateTime $date)
     {
-        return $this->toTwoDp($this->getProratedBrokerCommission($date) - $this->getBrokerCommissionPaid());
+        return $this->getBrokerCommissionPaid() - $this->getProratedBrokerCommission($date);
     }
 
     public function getDaysInPolicyYear()
