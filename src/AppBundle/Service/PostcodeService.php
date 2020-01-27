@@ -49,9 +49,9 @@ class PostcodeService
         return $postcodeRepository->getPostcodeIsAnnualOnly($postcode);
     }
 
-    public function getIsBannedPostCode($postcode)
+    public function getIsBannedPostcode($postcode)
     {
-        /** @var PostCodeRepository $postcodeRepository */
+        /** @var PostcodeRepository $postcodeRepository */
         $postcodeRepository = $this->dm->getRepository(Postcode::class);
         return $postcodeRepository->getPostcodeIsBanned($postcode);
     }
