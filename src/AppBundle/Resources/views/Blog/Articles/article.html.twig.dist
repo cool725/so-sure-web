@@ -8,6 +8,9 @@
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
+{% set og_title = 'Phone Insurance | Is Phone Insurance Worth it? | so-sure' %}
+{% set og_description = "Become a phone insurance expert with our guide to mobile phone insurance. With an FAQ and glossary section, once you’ve finished, you’ll know exactly what to look for and how to make a claim." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/phone-insurance-guide-1.jpg' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
@@ -79,7 +82,9 @@
                             <div class="blog__contents">
                                 <p></p>
                             </div>
-                            <footer></footer>
+                            <footer class="mb-4">
+                                <a href="#" class="btn btn-outline-primary get-a-quote">Get a quote now!</a>
+                            </footer>
                         </article>
                         <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
@@ -91,5 +96,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-page.js') }}"></script>
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}

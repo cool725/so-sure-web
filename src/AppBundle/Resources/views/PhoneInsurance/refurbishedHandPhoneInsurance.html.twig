@@ -1,0 +1,333 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'phone-insurance-refurbished' %}
+{% set max_width = '400px' %}
+{% if device_category() == 'Desktop' %}
+    {% set max_width = '' %}
+{% endif %}
+
+
+{% block title %}Refurbished Phone Insurance From &pound;{{ from_price|number_format(2) }} Monthly | so-sure{% endblock %}
+{% block meta %}
+    <meta name="description" content="Even with cheap refurbished phones, insurance can bring peace of mind. Get refurbished phone insurance with 24-72 hour repair or replacement & money back if you don't claim."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Refurbished Phone Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | so-sure' %}
+{% set og_description = "Even with cheap refurbished phones, insurance can bring peace of mind. Get refurbished phone insurance with 24-72 hour repair or replacement & money back if you don't claim." %}
+{% set og_image_facebook = cdn_url ~ '/images/rebrand/phones/generic/so-sure_hero-second-hand.png' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-lg-6 order-lg-2">
+                    <div class="hero__intro">
+                        <div class="breadcrumbs">
+                        <ul class="list-inline text-center text-lg-left"
+                            vocab="https://schema.org/"
+                            typeof="BreadcrumbList">
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('homepage') }}"
+                                   class="text-columbia-blue-e"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Home</span>
+                                </a>
+                                <meta property="position" content="1">
+                            </li>
+                            <li class="list-inline-item text-white">
+                                <i class="fal fa-angle-right text-white"></i>
+                            </li>
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('phone_insurance') }}"
+                                   class="text-columbia-blue-e"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Phone Insurance</span>
+                                </a>
+                                <meta property="position" content="2">
+                            </li>
+                            <li class="list-inline-item text-white">
+                                <i class="fal fa-angle-right text-white"></i>
+                            </li>
+                            <li class="list-inline-item text-white"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <span property="name">Refurbished</span>
+                                <meta property="position" content="3">
+                            </li>
+                        </ul>
+                        </div>
+                        <h1 class="text-white fit text-center text-lg-left">Refurbished Phone <br class="d-lg-none"> Insurance <br class="d-none d-lg-inline"> from just <br class="d-lg-none"> <span class="text-deep-sky-blue-d">&pound;{{ from_price|number_format(2) }} per month</span></h1>
+                        <p class="my-4 text-white text-center text-lg-left">Insure your refurbished phone with so-sure to get the same price and coverage level as insurance for a new phone, as well as access to our social insurance reward pot 💸</p>
+                    </div>
+                    <div class="hero__controls text-center text-lg-left mb-5">
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
+                        <a href="#"
+                           class="btn btn-outline-deep-sky-blue-d watch-video btn-block-xs"
+                           data-event="watch-video-second-hand-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            Watch our Video
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                   <div class="hero__illustration hero__illustration-second-hand text-center">
+                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-second-hand.png" alt="Second Hand Phones" class="img-fluid lozad animated bounceInUp">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="second-hand pt-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-xl-7">
+                    <h2 class="text-primary mb-4">Refurbished phones are a great option</h2>
+                    <p class="mb-4">Buying the latest phone can be expensive, with contracts for the latest <a href="{{ path('phone_insurance_make', {'make': 'apple'}) }}">iPhone</a> or <a href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}">Samsung</a> models costing up to &pound;70 a month. In the age of the ultra-expensive flagship mobile phone, buying a refurbished or reconditioned handset is one way to cut costs while keeping up with the latest tech.</p>
+                    <p class="mb-5 mb-xl-0">Refurbed phones usually come with a reduced price tag and have the added benefit of being great for the environment (no need to mine more rare metals for internal components). But even with a cheaper refurbished phone, insurance is a good idea, giving you peace of mind that you’ll stay covered, and therefore connected.</p>
+                </div>
+                <div class="col-xl-4 offset-xl-1 text-center">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_hand_holding_phone_stars.png"
+                         alt="Hand holding mobile phone"
+                         class="lozad img-fluid max-400">
+                </div>
+            </div>
+            <hr class="mt-0 mb-5">
+            <div class="row d-lg-flex align-items-lg-center">
+                <div class="col-xl-7 offset-xl-1 order-xl-2">
+                    <h2 class="h3 text-primary mb-4">Refurbished phone insurance from so-sure</h2>
+                    <p class="mb-4 mb-5">Refurbished phone insurance is harder to come by than insurance for new handsets because insurers tend to see refurbished handsets as higher risk. But we're different.  so-sure is one of the few UK gadget insurers offering refurbished phone insurance that's no different to our standard policies.</p>
+                    <h3 class="h4 mb-3 mt-lg-5">As standard, we offer:</h3>
+                    <div class="d-lg-flex">
+                        <ul class="list-unstyled icn-fa-list mr-lg-3 flex-1">
+                            <li class="mb-3">
+                                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                24-72 hour repair or replacement
+                            </li>
+                            <li class="mb-3">
+                                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                International travel cover
+                            </li>
+                            <li class="mb-3">
+                                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                Low excess
+                            </li>
+                        </ul>
+                        <ul class="list-unstyled icn-fa-list mb-lg-5 flex-1">
+                            <li class="mb-3">
+                                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                Up to 80% of your money back
+                            </li>
+                            <li class="mb-3">
+                                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                Coverage for loss, theft, and accidental damage
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-xl-4 order-xl-1">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/misc/so-sure_friends-we-are-different-polaroid.png"
+                         alt="We're different polaroid so-sure"
+                         class="lozad img-fluid max-300">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="game-change py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">We've changed the game</h2>
+            <p class="mb-5">What do we mean by <a href="{{ path('social_insurance') }}">social insurance</a>? With so-sure, you can connect with friends and family members to build a group of policies, and if none of you make a claim, you’ll receive money back at the end of the year.</p>
+            <hr class="d-none d-lg-block mb-5">
+            <div class="row text-lg-left">
+                <div class="col-lg d-lg-flex align-items-lg-center">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_reward-pot-jar.png"
+                         alt="so-sure reward pot jar"
+                         class="lozad d-none d-lg-inline"
+                         width="200px">
+                    <div class="">
+                        <h3 class="h4 mb-3">Earn Cashback!</h3>
+                        <p class="mb-4">The reward pot gets filled by up to &pound;10 with every connection you make, up to a maximum of 80% of the total value of your policy.</p>
+                    </div>
+                </div>
+                <div class="col-lg d-lg-flex align-items-lg-center">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_phone-wink.png"
+                         alt="Phone winking face"
+                         class="lozad d-none d-lg-inline"
+                         width="200px">
+                    <div class="">
+                        <h3 class="h4 mb-3">Available on all models</h3>
+                        <p>We offer refurbished phone insurance on every single phone we insure new. It also doesn't matter whether you bought your refurbed model direct from the manufacturer, from a scheme like EE's 'Good As New' range, or from a third party retailer. All we ask is that it was originally sold in the UK.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="makes py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 mb-5 text-deep-sky-blue-d">Popular brands we cover</h2>
+            <div class=" d-lg-flex align-items-center justify-content-lg-between">
+                <a href="{{ path('phone_insurance_make', {'make': 'apple'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_apple-logo.png" alt="Apple" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_samsung-logo.png" alt="Samsung" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'google'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_google-logo.png" alt="Google" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'htc'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_htc-logo.png" alt="HTC" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'huawei'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_huawei-logo.png" alt="Huawei" class="m-1 m-lg-2 lozad"></a>
+            </div>
+            <div class=" d-lg-flex align-items-center justify-content-lg-between">
+                <a href="{{ path('phone_insurance_make', {'make': 'motorola'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_motorola-logo.png" alt="motorola" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'nokia'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_nokia-logo.png" alt="nokia" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'asus'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_asus-logo.png" alt="Asus" class="m-1 m-lg-2 lozad"></a>
+                <a href="{{ path('phone_insurance_make', {'make': 'sony'}) }}"><img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/manufacturer/so-sure_white_sony-logo.png" alt="Sony" class="m-1 m-lg-2 lozad"></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="second-hand py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-xl-7">
+                    <h2 class="h3 text-primary mb-4">What happens when I need to make a claim?</h2>
+                    <p class="mb-4">Claiming couldn't be easier. To speed up the process, if your phone has been stolen or lost, make sure you contact your network to block your phone, then request both proof of barring and proof of usage documents. Finally, you should get a crime reference number from your local police station, and report it online at <a href="https://www.reportmyloss.com/uk/register" class="text-nowrap" target="_blank" rel="noopener noreferrer"><u>Report My Loss</u></a>.</p>
+                    <p class="mb-5">Then, simply fill out our <a href="{{ path('fos_user_security_login') }}">claims form</a> online and we'll do our best to repair or replace your phone within 24-72 hours.</p>
+                </div>
+                <div class="col-xl-5 text-center">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/claims/so-sure_claim-handler.png"
+                         alt="so-sure claim handler"
+                         class="lozad img-fluid max-400">
+                </div>
+            </div>
+            <hr class="mt-0 mb-5">
+            <div class="row d-lg-flex align-items-lg-center">
+                <div class="col-xl-7 offset-xl-1 order-xl-2">
+                    <h2 class="h3 text-primary mb-4">Are refurbished phones good?</h2>
+                    <p class="mb-4">In theory, refurbed phones can be just as good as new models. To be classed as refurbished, phones have to go through fairly rigorous testing to make sure they're up to scratch. This can include checking that battery capacity is still healthy, making sure all buttons work well, and assessing the screen for any damage.</p>
+                    <p class="mb-4">Many suppliers of refurbished phones will have a grading system to represent the level of visible damage on a phone. Phones described as 'Like New' will have very little to no wear and tear while phones labelled 'Good' or 'Fair' will likely have minor visible damage. You can choose the phone and condition that best suits your needs and your budget.</p>
+                </div>
+                <div class="col-xl-4 order-xl-1 text-center">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_phone-in-box.png"
+                         alt="Phone in box"
+                         class="lozad img-fluid d-none d-xl-block"
+                         width="350px">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_phone-in-box-mb.png"
+                         alt="Phone in box"
+                         class="lozad img-fluid max-400 d-xl-none">
+                </div>
+            </div>
+            <hr class="mt-0 mt-xl-5 mb-5">
+            <div class="row">
+                <div class="col-xl-7">
+                    <h2 class="h3 text-primary mb-4">What's the difference between refurbished phones and second hand phones?</h2>
+                    <p class="mb-4">There's one main difference between second hand and refurbished phones. Whilst both come under the umbrella of being 'used' or 'recycled', refurbished phones have been tested and verified to ensure that they work properly while second hand phones generally haven't. </p>
+                    <p class="mb-4">Usually, you'd buy a refurbed phone through a reputable retailer, as opposed to a second hand handset, which you could buy from a friend or eBay. If you can’t find one at the right price direct from the manufacturer, your phone's network may sell them too. Nowadays, some networks even allow you to buy a refurbished phone on contract.</p>
+                    <p class="mb-4">Here at so-sure, we can insure refurbished phones on exactly the same policy as we would insure brand new phones. That means no inflated cost for 'high risk', as well as all of the same great benefits including our social insurance cash-back reward pot.</p>
+                </div>
+                <div class="col-xl-4 offset-xl-1 text-center">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/misc/so-sure_friends-whats-the-different-polaroid.png"
+                         alt="We're different polaroid so-sure"
+                         class="lozad img-fluid max-400">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Top Models #}
+    <section class="other-phones other-phones-gray py-lg-5" data-background-image="">
+        <div class="container-large py-5">
+            <h2 class="h3 mb-5 text-primary">Popular smartphones we cover</h2>
+            <div class="row justify-content-center">
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="{{ path('phone_insurance_make_model', {'make': 'apple', 'model': 'iphone-x'}) }}">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_half-iphone-x-img.png"
+                             alt="Apple iPhone X Insurance from so-sure"
+                             width="150px"
+                             class="mb-3 lozad">
+                        <h3 class="h6 mb-3">Apple iPhone X</h3>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="{{ path('phone_insurance_make_model', {'make': 'apple', 'model': 'iphone-8'}) }}">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_half-iphone-8-img.png"
+                             alt="Apple iPhone 8 Insurance from so-sure"
+                             width="150px"
+                             class="mb-3 lozad">
+                        <h3 class="h6 mb-3">Apple iPhone 8</h3>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="{{ path('phone_insurance_make_model', {'make': 'apple', 'model': 'iphone-7'}) }}">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_half-iphone-7-img.png"
+                             alt="Apple iPhone 7 Insurance from so-sure"
+                             width="150px"
+                             class="mb-3 lozad">
+                        <h3 class="h6 mb-3">Apple iPhone 7</h3>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="{{ path('phone_insurance_make_model', {'make': 'samsung', 'model': 'galaxy-s8'}) }}">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/samsung/so-sure_half-galaxy-s8-img.png"
+                             alt="Samsung S8 Insurance from so-sure"
+                             width="150px"
+                             class="mb-3 lozad">
+                        <h3 class="h6 mb-3">Samsung S8</h3>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="{{ path('phone_insurance_make_model', {'make': 'samsung', 'model': 'galaxy-s9'}) }}">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/samsung/so-sure_half-galaxy-s9-img.png"
+                             alt="Samsung S9 Insurance from so-sure"
+                             width="150px"
+                             class="mb-3 lozad">
+                        <h3 class="h6 mb-3">Samsung S9</h3>
+                    </a>
+                </div>
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a href="{{ path('phone_insurance_make_model', {'make': 'google', 'model': 'Pixel-3'}) }}">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/google/so-sure_half-pixel-3-img.png"
+                             alt="Google Pixel 3 Insurance from so-sure"
+                             width="150px"
+                             class="mb-3 lozad">
+                        <h3 class="h6 mb-3">Pixel 3</h3>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Banner #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_banner.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/phone-insurance.js') }}"></script>
+{% endblock %}

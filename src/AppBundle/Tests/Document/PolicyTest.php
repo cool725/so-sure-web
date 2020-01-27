@@ -10,6 +10,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Connection\RewardConnection;
@@ -17,6 +18,7 @@ use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Tests\Create;
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\Helvetia;
 
 /**
  * Tests the behaviour of the policy document.
@@ -342,18 +344,78 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Tests to make sure that the refund commission is calculated rightly.
+     * Tests to make sure that refund commission is correctly calculated.
      */
-    public function testGetRefundCommissionAmount()
+    public function testRefundCommission()
     {
+        $terms = new PolicyTerms();
+        $terms->setVersion('Version 11 January 2019');
         $user = Create::user();
-        $policy = Create::policy($user, "2019-03-13", Policy::STATUS_CANCELLED, 12);
-        $policy->setEnd(new \DateTime("2019-04-18"));
-        Create::standardPayment($policy, "2019-03-13", true);
-        Create::standardPayment($policy, "2019-04-13", true);
-        $policy->setCancelledReason(Policy::CANCELLED_UPGRADE);
-        $this->assertTrue($policy->getRefundCommissionAmount() < 0);
-        $policy->setCancelledReason(Policy::CANCELLED_COOLOFF);
-        $this->assertTrue($policy->getRefundCommissionAmount() > 0);
+        $a = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
+        $b = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
+        $c = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
+        $a->setPolicyTerms($terms);
+        $b->setPolicyTerms($terms);
+        $c->setPolicyTerms($terms);
+        $a->setCancelledReason(Policy::CANCELLED_COOLOFF);
+        $b->setCancelledReason(Policy::CANCELLED_USER_REQUESTED);
+        $c->setCancelledReason(Policy::CANCELLED_UPGRADE);
+        $a->setEnd(new \DateTime('2020-01-19'));
+        $b->setEnd(new \DateTime('2020-04-06'));
+        $c->setEnd(new \DateTime('2020-09-16'));
+        Create::standardPayment($a, '2020-01-01', true);
+        Create::standardPayment($b, '2020-01-03', true);
+        Create::standardPayment($b, '2020-02-01', true);
+        Create::standardPayment($b, '2020-03-01', true);
+        Create::standardPayment($b, '2020-04-01', true);
+        Create::standardPayment($c, '2020-01-01', true);
+        Create::standardPayment($c, '2020-02-02', true);
+        Create::standardPayment($c, '2020-03-01', true);
+        Create::standardPayment($c, '2020-04-01', true);
+        Create::standardPayment($c, '2020-05-01', true);
+        Create::standardPayment($c, '2020-06-07', true);
+        Create::standardPayment($c, '2020-07-01', false);
+        Create::standardPayment($c, '2020-08-03', true);
+        Create::standardPayment($c, '2020-09-01', true);
+        // For A should be the full commission paid which is 20% of the premium paid minum the 5p broker commission.
+        $this->assertEquals(
+            $a->getRefundCoverholderCommissionAmount(),
+            $a->getPremium()->getMonthlyPremiumPrice() / 5 - Helvetia::MONTHLY_BROKER_COMMISSION,
+            null,
+            0.01
+        );
+        $this->assertEquals($a->getRefundBrokerCommissionAmount(), Helvetia::MONTHLY_BROKER_COMMISSION, null, 0.01);
+        // For B should be the total commission paid - the commission owed pro rata which should be positive.
+        $this->assertEquals(
+            $b->getRefundCoverholderCommissionAmount(),
+            $b->getCoverholderCommissionPaid() -
+                ($b->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 97 / 366,
+            null,
+            0.01
+        );
+        $this->assertEquals(
+            $b->getRefundBrokerCommissionAmount(),
+            (Helvetia::MONTHLY_BROKER_COMMISSION * 4) - Helvetia::YEARLY_BROKER_COMMISSION * 97 / 366,
+            null,
+            0.01
+        );
+        $this->assertTrue($b->getRefundCoverholderCommissionAmount() > 0);
+        $this->assertTrue($b->getRefundBrokerCommissionAmount() > 0);
+        // For C should be the total commission paid - the commission owed pro rata which should be negative.
+        $this->assertEquals(
+            $c->getRefundCoverholderCommissionAmount(),
+            $c->getCoverholderCommissionPaid() -
+                ($c->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 260 / 366,
+            null,
+            0.01
+        );
+        $this->assertEquals(
+            $c->getRefundBrokerCommissionAmount(),
+            (Helvetia::MONTHLY_BROKER_COMMISSION * 8) - Helvetia::YEARLY_BROKER_COMMISSION * 260 / 366,
+            null,
+            0.01
+        );
+        $this->assertTrue($c->getRefundCoverholderCommissionAmount() < 0);
+        $this->assertTrue($c->getRefundBrokerCommissionAmount() < 0);
     }
 }
