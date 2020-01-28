@@ -151,7 +151,7 @@
                                        name="options"
                                        data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0"
                                        id="renew_yearly_btn"
-                                       autocomplete="off"> &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} a year
+                                       autocomplete="off"> &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }} a year
                             </label>
                         </div>
                     {% else %}
@@ -159,10 +159,10 @@
                                 id="renew_adjusted_yearly_only_btn"
                                 class="btn btn-outline-primary payment-btn mb-4"
                                 data-toggle="button"
-                                data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
+                                data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
                                 aria-pressed="false"
                                 autocomplete="off">
-                            &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} a year
+                            &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }} a year
                         </button>
                     {% endif %}
                 </div>
