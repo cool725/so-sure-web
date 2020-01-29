@@ -44,6 +44,12 @@ class SmsCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 '2 to 4'
             )
+            ->addOption(
+                'welcomePicsureRequired',
+                null,
+                InputOption::VALUE_NONE,
+                'Send the welcome Sms'
+            )
         ;
     }
 
@@ -51,6 +57,7 @@ class SmsCommand extends ContainerAwareCommand
     {
         $policyNumber = $input->getOption('policyNumber');
         $attempt = $input->getOption('attempt');
+        $welcomePicsureRequired = $input->getOption('welcomePicsureRequired');
 
         if ($policyNumber && $attempt) {
             $repo = $this->dm->getRepository(Policy::class);
@@ -61,7 +68,16 @@ class SmsCommand extends ContainerAwareCommand
             }
 
             $smsTemplate = sprintf('AppBundle:Sms:bacs/failedPayment-%d.txt.twig', $attempt);
+            $this->smsService->sendUser($policy, $smsTemplate, ['policy' => $policy]);
+        } elseif ($policyNumber && $welcomePicsureRequired) {
+            $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
+            $policy = $repo->findOneBy(['policyNumber' => $policyNumber]);
+            if (!$policy) {
+                throw new \Exception(sprintf('Unable to find policy %s', $policyNumber));
+            }
 
+            $smsTemplate = 'AppBundle:Sms:picsure-required/welcome.txt.twig';
             $this->smsService->sendUser($policy, $smsTemplate, ['policy' => $policy]);
         } else {
             $output->writeln('Nothing to do');
