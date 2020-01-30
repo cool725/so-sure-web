@@ -551,7 +551,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
             if (!in_array($policy->getId(), Salva::$refundValidationExclusions) &&
                 ($refundMismatch ||$refundCommissionMismatch )) {
-                if ($refund != 0 && $pendingBacsTotal == 0) {
+                if ($refund > 0 && $pendingBacsTotal == 0) {
                     $lines[] = sprintf(
                         'Warning!! Refund Due. Refund %0.2f [Pending %0.2f] / Commission %0.2f [Pending %0.2f]',
                         $refund,

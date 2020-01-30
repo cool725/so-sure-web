@@ -43,6 +43,11 @@ class SmsCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 '2 to 4'
+            )->addOption(
+                'template',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Test any sms template with folder and file e.g. picsure-required/welcome.txt.twig'
             )
         ;
     }
@@ -51,6 +56,7 @@ class SmsCommand extends ContainerAwareCommand
     {
         $policyNumber = $input->getOption('policyNumber');
         $attempt = $input->getOption('attempt');
+        $template = $input->getOption('template');
 
         if ($policyNumber && $attempt) {
             $repo = $this->dm->getRepository(Policy::class);
@@ -61,7 +67,16 @@ class SmsCommand extends ContainerAwareCommand
             }
 
             $smsTemplate = sprintf('AppBundle:Sms:bacs/failedPayment-%d.txt.twig', $attempt);
+            $this->smsService->sendUser($policy, $smsTemplate, ['policy' => $policy]);
+        } elseif ($policyNumber && $template) {
+            $repo = $this->dm->getRepository(Policy::class);
+            /** @var Policy $policy */
+            $policy = $repo->findOneBy(['policyNumber' => $policyNumber]);
+            if (!$policy) {
+                throw new \Exception(sprintf('Unable to find policy %s', $policyNumber));
+            }
 
+            $smsTemplate = 'AppBundle:Sms:'.$template;
             $this->smsService->sendUser($policy, $smsTemplate, ['policy' => $policy]);
         } else {
             $output->writeln('Nothing to do');
