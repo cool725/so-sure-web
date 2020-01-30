@@ -95,7 +95,7 @@ class PaymentRepository extends DocumentRepository
         return $qb->getQuery()->execute();
     }
 
-    /*
+    /**
      * Gives you all successful payments in a given month and optionally of a given type and with a given underwriter.
      * @param \DateTime         $date        is a date within the month in which we are looking for payments.
      * @param string|array|null $type        is the type of payment to look for or null for any, and an array for a set
