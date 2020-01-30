@@ -460,6 +460,7 @@ nelmio_security:
                 - https://api.prodpad.com # necessary?
                 - https://*.postcodeanywhere.co.uk
                 - gsa://onpageload # necessary?
+                - https://*.doubleclick.net
                 - https://cdn.so-sure.com
                 - https://www.youtube.com
                 - https://*.fastly.net
@@ -537,6 +538,7 @@ nelmio_security:
                 - https://*.googletagmanager.com
                 - https://*.googlesyndication.com
                 - https://www.google-analytics.com
+                - https://stats.g.doubleclick.net
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
                 - https://www.linkedin.com
@@ -778,6 +780,7 @@ nelmio_security:
                 - https://secure.checkout.com
                 - https://*.vimeo.com
                 - https://*.hotjar.com
+                - https://*.doubleclick.net
                 - https://*.googletagmanager.com
                 - https://*.iubenda.com
                 - https://*.googlesyndication.com
@@ -845,7 +848,9 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
                 - https://www.googleadservices.com # necessary?
+                - https://*.doubleclick.net
                 - https://www.google.com
+                - https://*.doubleclick.net
                 - https://code.jquery.com
                 - https://cdn.heapanalytics.com
                 - https://*.maxcdn.com
@@ -1120,6 +1125,7 @@ nelmio_security:
                 - https://cdn.checkout.com
                 - https://www.google-analytics.com
                 - http://www.google-analytics.com
+                - https://stats.g.doubleclick.net
                 - https://heapanalytics.com
                 - http://heapanalytics.com
                 - https://*.twitter.com
@@ -1134,6 +1140,7 @@ nelmio_security:
                 - https://track.hubspot.com
                 - https://t.co
                 - https://www.tagserve.com
+                - https://*.doubleclick.net
                 - https://*.fbcdn.net
                 - https://*.vimeocdn.com
                 - https://*.linkedin.com
