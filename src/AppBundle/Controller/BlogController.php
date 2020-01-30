@@ -378,4 +378,43 @@ class BlogController extends BaseController
         return $this->render($template, $data);
     }
     /** @codingStandardsIgnoreEnd */
+
+    /**
+     * @Route("/phone-insurance-guide", name="phone_insurance_guide", options={"sitemap" = true})
+     * @Template
+     */
+    public function phoneInsuranceGuideAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/phone-insurance-guide.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/most-durable-phones", name="most_durable_phones", options={"sitemap" = true})
+     * @Template
+     */
+    public function mostDurablePhonesAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/most-durable-phones.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/samsung-galaxy-rumours", name="samsung_galaxy_rumours", options={"sitemap" = true})
+     * @Template
+     */
+    public function samsungGalaxyS11S20RumoursAndNewsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/samsung-galaxy-s11-s20-rumours-and-news.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

@@ -21,8 +21,8 @@
             {% if policy.hasCashback %}
                 <p class="lead mb-4">Your cashback request was received and will be processed <u>28-45</u> days after your policy has ended.</p>
             {% endif %}
-            <a href="{{ path('user_policy', {'policyId': policy.id }) }}"
-               class="btn btn-outline-primary btn-block-xs mr-md-2">I'm sure</a>
+{#             <a href="{{ path('user_policy', {'policyId': policy.id }) }}"
+               class="btn btn-outline-primary btn-block-xs mr-md-2">I'm sure</a> #}
             <a href="{{ path('user_renew_retry_policy', {'id': policy.id }) }}"
                class="btn btn-success btn-block-xs">I'd like to renew my policy</a>
         </div>

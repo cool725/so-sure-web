@@ -81,6 +81,7 @@ class GoCompare
         1720 => ['make' => 'Samsung', 'model' => 'Galaxy A10', 'memory' => 32],
         1721 => ['make' => 'Samsung', 'model' => 'Galaxy S10 5G', 'memory' => 256],
         1722 => ['make' => 'Samsung', 'model' => 'Galaxy S10 5G', 'memory' => 512],
+        1752 => ['make' => 'Samsung', 'model' => 'Galaxy S10 5G', 'memory' => 32],
 
         1412 => ['make' => 'Huawei', 'model' => 'P20', 'memory' => 128],
         1413 => ['make' => 'Huawei', 'model' => 'P20 Lite', 'memory' => 64],
@@ -100,6 +101,11 @@ class GoCompare
         1625 => ['make' => 'Huawei', 'model' => 'P30 Pro', 'memory' => 128],
         1739 => ['make' => 'Huawei', 'model' => 'Mate 20 X 5G', 'memory' => 128],
         1740 => ['make' => 'Huawei', 'model' => 'Mate 20 X 5G', 'memory' => 256],
+        1753 => ['make' => 'Huawei', 'model' => 'Mate 20', 'memory' => 256],
+        1754 => ['make' => 'Huawei', 'model' => 'Honor 20 Pro', 'memory' => 128],
+        1755 => ['make' => 'Huawei', 'model' => 'Honor 20 Pro', 'memory' => 256],
+        1758 => ['make' => 'Huawei', 'model' => 'P30 Lite', 'memory' => 128],
+        1759 => ['make' => 'Huawei', 'model' => 'Honor 20', 'memory' => 128],
 
         1417 => ['make' => 'Motorola', 'model' => 'Moto X4', 'memory' => 64],
         1418 => ['make' => 'Motorola', 'model' => 'Moto G5s', 'memory' => 32],
@@ -112,6 +118,7 @@ class GoCompare
         1416 => ['make' => 'Sony', 'model' => 'Xperia XA2', 'memory' => 32],
         1462 => ['make' => 'Sony', 'model' => 'Xperia XZ3', 'memory' => 64],
         1744 => ['make' => 'Sony', 'model' => 'Xperia L3', 'memory' => 32],
+        1751 => ['make' => 'Sony', 'model' => 'Xperia 5', 'memory' => 128],
 
         827 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 64],
         835 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 128],
@@ -146,10 +153,10 @@ class GoCompare
         // 1732 => ['make' => 'Oppo', 'model' => 'RX17 Neo', 'memory' => 256],
         1733 => ['make' => 'Oppo', 'model' => 'Reno', 'memory' => 256],
         1734 => ['make' => 'Oppo', 'model' => 'Reno 10x Zoom', 'memory' => 256],
-        // 1735 => ['make' => 'Oppo', 'model' => 'Reno 5G', 'memory' => 256],
         1736 => ['make' => 'Oppo', 'model' => 'RX17 Pro', 'memory' => 128],
         1737 => ['make' => 'Oppo', 'model' => 'Reno Z', 'memory' => 128],
         1738 => ['make' => 'Oppo', 'model' => 'Find X', 'memory' => 256],
+        1760 => ['make' => 'Oppo', 'model' => 'Reno 5G', 'memory' => 256],
 
         1741 => ['make' => 'Xiaomi', 'model' => 'Redmi Note 7', 'memory' => 64],
         1742 => ['make' => 'Xiaomi', 'model' => 'Mi 9T', 'memory' => 64],

@@ -123,6 +123,80 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
+     * SEO Pages - Second Hand Phone Insurance
+     * @Route("/phone-insurance/second-hand", name="phone_insurance_second_hand", options={"sitemap" = true})
+     */
+    public function secondHandPhoneInsuranceAction()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+
+        // To display lowest monthly premium
+        $fromPhones = $repo->findBy([
+            'active' => true,
+        ]);
+
+        $fromPhones = array_filter($fromPhones, function ($phone) {
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        });
+
+        // Sort by cheapest
+        usort($fromPhones, function ($a, $b) {
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        });
+
+        // Select the lowest
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+
+        $data = [
+            'from_price' => $fromPrice,
+            'from_phones' => $fromPhones,
+        ];
+
+        return $this->render('AppBundle:PhoneInsurance:secondHandPhoneInsurance.html.twig', $data);
+    }
+
+    /**
+     * SEO Pages - Refurbished Phone Insurance
+     * @Route("/phone-insurance/refurbished", name="phone_insurance_refurbished", options={"sitemap" = true})
+     */
+    public function refurbishedPhoneInsuranceAction()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+
+        // To display lowest monthly premium
+        $fromPhones = $repo->findBy([
+            'active' => true,
+        ]);
+
+        $fromPhones = array_filter($fromPhones, function ($phone) {
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        });
+
+        // Sort by cheapest
+        usort($fromPhones, function ($a, $b) {
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        });
+
+        // Select the lowest
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+
+        $data = [
+            'from_price' => $fromPrice,
+            'from_phones' => $fromPhones,
+        ];
+
+        return $this->render('AppBundle:PhoneInsurance:refurbishedHandPhoneInsurance.html.twig', $data);
+    }
+
+    /**
      * SEO Pages - Phone Insurance
      * @Route("/phone-insurance", name="phone_insurance", options={"sitemap" = true})
      */
@@ -597,6 +671,7 @@ class PhoneInsuranceController extends BaseController
         $decodedModel = Phone::decodeModel($model);
         $phone = null;
         $aggregator = '';
+        $requester = '';
 
         if ($id) {
             if ($request->query->get('aggregator')) {
@@ -614,6 +689,9 @@ class PhoneInsuranceController extends BaseController
                         ]);
                     }
                 }
+            } elseif ($request->query->get('requester')) {
+                // Placeholder for generic use with partners
+                $requester = '?requester=true';
             } else {
                 /** @var Phone $phone */
                 $phone = $repo->find($id);
@@ -647,7 +725,7 @@ class PhoneInsuranceController extends BaseController
                         ' ',
                         '+',
                         $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory()
-                    ).'GB'.$aggregator
+                    ).'GB'.$aggregator.$requester
             ]);
             return $response;
         }
@@ -669,7 +747,9 @@ class PhoneInsuranceController extends BaseController
         foreach ($phones as $phone) {
             // Loop through each phone and make an array for the response
             $aggregatorId = '';
+            $requester = 'requesterId';
             if ($request->query->get('aggregator')) {
+                $requester = 'aggregatorId';
                 // If aggregator set, look for aggregator ID (if applicable)
                 if ($request->query->get('aggregator') == 'GoCompare') {
                     $goCompare = new GoCompare();
@@ -682,13 +762,16 @@ class PhoneInsuranceController extends BaseController
                         }
                     }
                 }
+            } elseif ($request->query->get('requester')) {
+                // Placeholder for generic use with partners
+                $requester = 'requesterId';
             }
             $list[] = [
                 'id'            => $phone->getId(),
                 'make'          => $phone->getMake(),
                 'model'         => $phone->getModel(),
                 'memory'        => $phone->getMemory(),
-                'aggregatorId'  => $aggregatorId
+                $requester      => $aggregatorId
             ];
         }
         $response = new JsonResponse($list);

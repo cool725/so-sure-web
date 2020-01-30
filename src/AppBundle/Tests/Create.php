@@ -80,10 +80,13 @@ class Create
     public static function policy($user, $start, $status, $installments)
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
+        $policy = null;
         if ($startDate < Salva::getSalvaBinderEndDate()) {
-            return self::salvaPhonePolicy($user, $startDate, $status, $installments);
+            $policy = self::salvaPhonePolicy($user, $startDate, $status, $installments);
+        } else {
+            $policy = self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
         }
-        return self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
+        return $policy;
     }
 
     /**

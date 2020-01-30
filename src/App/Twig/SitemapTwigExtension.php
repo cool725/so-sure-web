@@ -53,6 +53,9 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/disruptive-technology-what-is-it' => 'Disruptive Technology What is it',
             '/blog/our-top-5-winter-sports-insurance-tips' => 'Our Top 5 Winter Sports Insurance Tips',
             '/blog/3-technologies-that-will-shape-the-future-of-insurance' => '3 Technologies that will Shape the Future of Insurance',
+            '/blog/phone-insurance-guide' => 'Phone Insurance Guide',
+            '/blog/most-durable-phones' => 'Most Durable Phones',
+            '/blog/samsung-galaxy-rumours' => 'Samsung Galaxy S11 (S20) Rumours & News',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',
@@ -91,6 +94,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/blackberry' => 'Blackberry Insurance',
             '/phone-insurance/vodafone' => 'Vodafone Insurance',
             '/phone-insurance/cat' => 'Cat Insurance',
+            '/phone-insurance/second-hand' => 'Second Hand',
+            '/phone-insurance/refurbished' => 'Refurbished',
             '/claim' => 'Make a claim',
             '/faq' => 'FAQ'
         ];

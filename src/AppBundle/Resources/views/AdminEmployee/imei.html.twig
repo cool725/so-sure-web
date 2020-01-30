@@ -36,7 +36,15 @@
             {# TODO: Content area #}
             <h2 class="h3 mb-3">History</h2>
             {% if not history or history|length == 0 %}
-                <p class="mb-5">No records found</p>
+                <div class="table-responsive-sm">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td>No records found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <div class="table-responsive-sm mb-5">
                     <table class="table table-striped">
@@ -66,7 +74,15 @@
 
             <h2 class="h3 mb-3">Charges</h2>
             {% if not charges or charges|length == 0 %}
-                <p class="mb-5">No records found</p>
+                <div class="table-responsive-sm">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <td>No records found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <div class="table-responsive-sm mb-5">
                     <table class="table">

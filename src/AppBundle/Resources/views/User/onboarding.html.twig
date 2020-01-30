@@ -55,13 +55,6 @@
     {% endif %}
 {% endblock %}
 
-{% block pixel %}
-    {# Pixels #}
-    {% if environment == 'prod' %}
-        <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width="1" height="1" border="0" class="position-absolute invisible" />
-    {% endif %}
-{% endblock %}
-
 {% block body %}
 
     <section class="onboarding">

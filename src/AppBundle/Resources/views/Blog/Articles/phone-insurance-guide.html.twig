@@ -1,0 +1,188 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Phone Insurance Guide | Is Phone Insurance Worth it? | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Become a phone insurance expert with our guide to mobile phone insurance. With an FAQ and glossary section, once you’ve finished, you’ll know exactly what to look for and how to make a claim."/>
+{% endblock %}
+{% set og_title = 'Phone Insurance | Is Phone Insurance Worth it? | so-sure' %}
+{% set og_description = "Become a phone insurance expert with our guide to mobile phone insurance. With an FAQ and glossary section, once you’ve finished, you’ll know exactly what to look for and how to make a claim." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/phone-insurance-guide-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Phone Insurance Guide</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Phone Insurance Guide</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Jan 8, 2020</time>
+                                        </li>
+                                    </ul>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/phone-insurance-guide-1.jpg"
+                                     alt="Entering passcode phone"
+                                     class="img-fluid lozad mb-5">
+                                <p>We use our phones for everything, and these days, wherever we are, they’re always close by. Phones are our GPS when we’re navigating to a new place, our address book, our camera and our personal computer. You may even <a href="https://www.independent.co.uk/life-style/gadgets-and-tech/news/millennials-generation-z-smartphone-habits-apps-communications-real-life-a8008641.html" target="_blank" rel="noopener noreferrer">sleep with it in arm’s reach</a>, take it to the toilet, or check it if you wake up during the night. But because of how much we use them, it’s a common occurrence for mobile phones to get damaged, lost or even stolen.</p>
+                                <p>That’s where <a href="{{ path('phone_insurance') }}">phone insurance</a> comes in. For the occasions where it’s been dropped, taken from your pocket or left on the shop counter, phone insurance should cover you when you need it the most. This blog will answer some of the most frequently asked questions about phone insurance, so you know exactly what it’s all about, how it works, and whether, for you, it’s worth it.</p>
+                                <ul>
+                                    <li><a href="#why-do-i-need-phone-insurance">Why do I need phone insurance?</a></li>
+                                    <li><a href="#how-does-phone-insurance-work">How does phone insurance work?</a></li>
+                                    <li><a href="#what-does-phone-insurance-cover">What does phone insurance cover?</a></li>
+                                    <li><a href="#is-phone-insurance-worth-it">Is phone insurance worth it?</a></li>
+                                    <li><a href="#how-do-i-get-phone-insurance">How do I get phone insurance?</a></li>
+                                    <li><a href="#how-soon-can-I-claim-on-phone-insurance">How soon can I claim on phone insurance?</a></li>
+                                    <li><a href="#what-to-say-when-claiming-phone-insurance">What to say when claiming phone insurance</a></li>
+                                    <li><a href="#how-to-limit-the-risk-of-theft-and-phone-damage">How to limit the risk of theft and phone damage</a></li>
+                                    <li><a href="#glossary-of-phone-insurance-terms">Glossary of phone insurance terms</a></li>
+                                </ul>
+                                <h2 id="why-do-i-need-phone-insurance">Why do I need phone insurance?</h2>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/phone-insurance-guide-2.jpg "
+                                     alt="Broken phone screen"
+                                     class="img-fluid lozad mb-5">
+                                <p>Think of phone insurance as a security blanket – you know that whatever happens, your phone will be protected against theft, loss or accidental damage – helping you to stay connected no matter what. If you know that you’re likely to end up with a broken screen, for example, phone insurance could be a good idea for you. When the inevitable happens, your phone insurer will sweep in to the rescue, paying for your damage repair. </p>
+                                <h2 id="how-does-phone-insurance-work">How does phone insurance work?</h2>
+                                <p>Each month, you’ll pay in a few pounds to cover you in the event of a phone disaster. If you don’t need a pay out, with so-sure you could get a portion of that money back through our <a href="{{ path('social_insurance') }}">Reward Pot scheme</a>.</p>
+                                <h2 id="what-does-phone-insurance-cover">What does phone insurance cover?</h2>
+                                <p>Just as your phone package will vary depending on what network you go with, what’s included with your phone insurance will differ depending on your supplier. Ask yourself questions to help determine what factors are important to you. Do you want to be covered in the event of theft, accidental damage or breakdowns? Would you like phone accessories like cases, protective screen covers and headphones to be covered too? And how much excess are you willing to pay? These answers will help to determine the level of coverage you choose.</p>
+                                <p>so-sure phone insurance covers:</p>
+                                <ul>
+                                    <li>Accidental damage</li>
+                                    <li>Theft or loss</li>
+                                    <li>Breakdowns</li>
+                                    <li>Accessories up to &pound;100</li>
+                                    <li>International travel</li>
+                                    <li>Phones up to 3 years old</li>
+                                </ul>
+                                <h2 id="phone-insurance-faqs">Phone Insurance FAQs</h2>
+                                <h3 id="is-phone-insurance-worth-it">Is phone insurance worth it?</h3>
+                                <p>These days, smartphones are high value items, and because many of them cost over &pound;500 up-front, a contract is the only way that most of us would afford to have one.</p>
+                                <p>A phone contract splits the cost of the phone over the course of two years, and will include texts, data and phone calls, as well as the handset. Although you might pay anything between &pound;10 a month to &pound;80 a month for your phone contract, if something happens to your phone or it’s beyond repair outside of its warranty, you’ll be liable for the payments to your network provider for the remainder of your contracted terms – even if you cannot use your handset. This is where phone insurance comes in.</p>
+                                <p>In order to make a claim, you’ll need to pay an excess contribution. The amount of excess you pay will depend on the type of claim that you are making, and it must be paid in order for your claim to be settled. </p>
+                                <p>Calculating whether phone insurance is worth it or not for you involves weighing up the cost of the premium and the excess payment with the cost of replacing your phone – and the likelihood that you’ll need to.</p>
+                                <h3 id="how-do-i-get-phone-insurance">How do I get phone insurance?</h3>
+                                <p>It’s possible to get a quote for phone insurance online. You’ll need to know what phone model you have, and you’ll be asked to fill in a range of personal information including your contact details. If you’re happy with the quote that you receive, you can apply for a policy then and there – and you’re on your way to being fully covered.</p>
+                                <h3 id="how-soon-can-I-claim-on-phone-insurance">How soon can I claim on phone insurance?</h3>
+                                <p>You should be aware that the cover with some phone insurance companies doesn’t actually kick in for 14 days. So if anything happens to your phone in that time, you’re not covered, and they won’t pay out. Make sure you check the small print here!</p>
+                                <p>With the more reputable companies, as soon as your phone is lost, damaged or stolen, you can make a claim on your phone insurance – no matter how long you’ve had the policy. The insurance team will undertake necessary checks to ensure that the claim is valid.</p>
+                                <p>It’s worth noting that, if your phone is stolen, you should contact your local police station as soon as you notice it is missing and make a note of the incident number. You should also call your network provider, so they can suspend your account to prevent unauthorised use of your phone. Then, call your insurance provider with this information so that they can begin processing your claim.</p>
+                                <h3 id="what-to-say-when-claiming-phone-insurance">What to say when claiming phone insurance</h3>
+                                <p>When you ring up to make a claim on your insurance, you’ll need to speak honestly with the person on the other end of the telephone. When you ring up, say that you’re looking to make a claim, and the person on the other end of the line will guide you through the next steps.</p>
+                                <p>Typically, you will need:</p>
+                                <ul>
+                                    <li>A crime reference or lost property number</li>
+                                    <li>Proof of purchase</li>
+                                    <li>IMEI number</li>
+                                    <li>Details of how your phone has been damaged or lost</li>
+                                </ul>
+                                <p>If your phone has been lost or stolen, you will also need these two things from your network provider:</p>
+                                <ul>
+                                    <li>Proof of usage</li>
+                                    <li>Proof your phone has been barred</li>
+                                </ul>
+                                <p>With so-sure, the claims process can be done online with our simple form. This can be completed and submitted 24/7 – you’ll only need to a follow-up conversation if we need further documents or details.</p>
+                                <h2 id="how-to-limit-the-risk-of-theft-and-phone-damage">Things to do to limit risk of theft</h2>
+                                <p>Although you can’t predict theft or loss, there are things that you can do to ensure that the risk to your phone is minimised.</p>
+                                <ul>
+                                    <li>Never walk with your phone in your hand (if you’re using GPS, use headphones)</li>
+                                    <li>Always keep your phone stored in an inside pocket</li>
+                                    <li>Be conscious and aware of your surroundings</li>
+                                    <li>Register your phone with <a href="https://www.immobilise.com" target="_blank" rel="noopener noreferrer">www.immobilise.com</a> – the UK’s national property register – to help police reunite you with your items if they go missing</li>
+                                </ul>
+                                <h3>How to limit the risk of phone damage</h3>
+                                <p>Accidents do happen, but if you know you’re a clumsy person, there are things you can do to ensure that the risk of accidental damage is limited:</p>
+                                <ul>
+                                    <li>Invest in a protective phone case and screen protector</li>
+                                    <li>Never walk and text</li>
+                                    <li>Remove dust and debris carefully with a microfibre cloth or cotton wool</li>
+                                    <li>Avoid extreme temperature</li>
+                                    <li>Avoid water or steam</li>
+                                </ul>
+                                <h2 id="glossary-of-phone-insurance-terms">Glossary of phone insurance terms</h2>
+                                <p><strong>Accessories - </strong>Includes but is not limited to chargers, protective cases, stands, headphones, memory cards, speakers and data cables</p>
+                                <p><strong>Accidental damage - </strong>An unintentional incident that impairs the normal function of your mobile phone</p>
+                                <p><strong>Breakdown - </strong> Sudden failure of the mobile phone, resulting in it being unable to function properly</p>
+                                <p><strong>Claim - </strong>An application made for the compensation afforded by an insurance policy. A claim may be accepted or rejected</p>
+                                <p><strong>Excess - </strong> The amount you’ll be required to pay when you make a successful claim on your insurance policy. You pay an initial sum, and the insurer pays the rest</p>
+                                <p><strong>Insurance - </strong>An arrangement you come to with a provider to guarantee compensation in the case of, for example, damage, loss or theft</p>
+                                <p><strong>Loss - </strong>A permanent misplacing of the mobile phone, resulting in you being unable to locate it</p>
+                                <p><strong>Theft - </strong>The physical and permanent removal of the mobile phone without the consent of the owner, with or without violence</p>
+                            </div>
+                            <footer class="mb-4">
+                                <a href="#" class="btn btn-outline-primary get-a-quote">Get a quote now!</a>
+                            </footer>
+                        </article>
+                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

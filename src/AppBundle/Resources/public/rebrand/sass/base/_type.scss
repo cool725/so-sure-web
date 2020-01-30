@@ -28,12 +28,32 @@ a {
     }
 }
 
+strong {
+    font-family: $g-medium;
+}
+
 h1 a, h2 a, h3 a, h4 a, h5 a, h6 a,
 .h1 a, .h2 a, .h3 a, .h4 a, .h5 a, .h6 a {
     font-family: $g-bold;
 
     .sub {
         font-family: $g-regular;
+    }
+}
+
+// Paras shouldn't run wide
+p {
+    // @include media-breakpoint-up(xl) {
+    //     max-width: 960px;
+    //     margin: {
+    //         left: auto;
+    //         right: auto;
+    //     }
+    // }
+
+    a {
+        text-decoration: underline;
+        color: $dodger-blue;
     }
 }
 

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="referrer" content="origin" />
+        {% if robots_noindex is defined and robots_noindex %}
+            <meta name="robots" content="noindex" />
+        {% endif %}
+
+        <title>{% block title %}so-sure{% endblock %}</title>
+
+        <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
+
+        {% block cssPage %}{% endblock %}
+
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
+    </head>
+    <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
+
+        {% include '::flash_rebrand.html.twig' %}
+
+        <main id="content" class="w-100 flex-grow-1">
+            {% block body %}{% endblock %}
+        </main>
+
+        {% block footer %}
+            {% if hide_footer is not defined or not hide_footer %}
+                {% if small_footer is defined and small_footer %}
+                    {% include '::footer_slim.html.twig' %}
+                {% else %}
+                    {% include '::footer_rebrand.html.twig' %}
+                {% endif %}
+            {% endif %}
+        {% endblock %}
+
+        {% include '::footer_data.html.twig' %}
+
+        <script src="{{ asset('css-js/runtime.js') }}"></script>
+        <script src="{{ asset('css-js/vendor.js') }}"></script>
+        <script src="{{ asset('css-js/global.js') }}" async></script>
+
+        {% block javascriptsPage %}{% endblock %}
+
+        {% if environment != 'prod' %}
+            <script src="{{ asset('css-js/dev.js') }}"></script>
+        {% endif %}
+    </body>
+</html>

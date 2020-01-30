@@ -63,6 +63,18 @@
         }
     }
 
+    .hero__illustration-second-hand {
+        height: 180px;
+
+        @include media-breakpoint-up(lg) {
+            height: 100%;
+            max-width: 380px;
+            position: absolute;
+            z-index: 2;
+            left: 100px; top: 20px;
+        }
+    }
+
     .hero__illustration-generic,
     .hero__illustration-iphone-xr,
     .hero__illustration-iphone-xs,
@@ -265,6 +277,10 @@
             transform: translateY(-5px);
         }
     }
+
+    &-gray {
+        background-color: $athens-gray;
+    }
 }
 
 .mini-faq {
@@ -420,5 +436,13 @@
 
     &__desktop {
         position: relative;
+    }
+}
+
+.game-change {
+    background-color: $athens-gray;
+
+    @include media-breakpoint-up(lg) {
+        text-align: center;
     }
 }

@@ -102,6 +102,7 @@ class ImeiCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $imei = $input->getArgument('imei');
+        /** @var string $serial **/
         $serial = $input->getOption('serial');
         $device = $input->getOption('device');
         $memory = $input->getOption('memory');

@@ -7,6 +7,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\CheckoutpayService;
 use AppBundle\Service\CheckoutService;
@@ -27,6 +28,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Tests\Create;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Listener\RefundListener;
 use AppBundle\Event\PolicyEvent;
@@ -695,6 +697,63 @@ class RefundListenerTest extends WebTestCase
         $this->assertEquals(0, $total['total']);
         $this->assertTrue($total['received'] > 0);
         $this->assertTrue($total['refunded'] < 0);
+    }
+
+    /**
+     * Tests to make sure that it sets commission correctly.
+     */
+    public function testCommission()
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion('Version 11 January 2019');
+        $user = Create::user();
+        $a = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
+        $b = Create::policy($user, '2020-01-01', Policy::STATUS_CANCELLED, 12);
+        $a->setPolicyTerms($terms);
+        $b->setPolicyTerms($terms);
+        $a->setCancelledReason(Policy::CANCELLED_USER_REQUESTED);
+        $b->setCancelledReason(Policy::CANCELLED_UPGRADE);
+        $a->setEnd(new \DateTime('2020-04-06'));
+        $b->setEnd(new \DateTime('2020-09-16'));
+        Create::save(
+            static::$dm,
+            $user,
+            $terms
+        );
+        Create::save(
+            static::$dm,
+            $a,
+            $b,
+            Create::standardPayment($a, '2020-01-03', true),
+            Create::standardPayment($a, '2020-02-01', true),
+            Create::standardPayment($a, '2020-03-01', true),
+            Create::standardPayment($a, '2020-04-01', true),
+            Create::standardPayment($b, '2020-01-01', true),
+            Create::standardPayment($b, '2020-02-02', true),
+            Create::standardPayment($b, '2020-03-01', true),
+            Create::standardPayment($b, '2020-04-01', true),
+            Create::standardPayment($b, '2020-05-01', true),
+            Create::standardPayment($b, '2020-06-07', true),
+            Create::standardPayment($b, '2020-07-01', false),
+            Create::standardPayment($b, '2020-08-03', true),
+            Create::standardPayment($b, '2020-09-01', true)
+        );
+        $listener = new RefundListener(
+            static::$dm,
+            static::$checkoutpayService,
+            static::$judopayService,
+            static::$logger,
+            'test',
+            self::$bacsService
+        );
+        $listener->onPolicyCancelledEvent(new PolicyEvent($a, new \DateTime('2020-05-01')));
+        $listener->onPolicyCancelledEvent(new PolicyEvent($b, new \DateTime('2020-09-01')));
+        // now make sure that the owed commission is nothing. If so, it has obviously worked correctly. Not for
+        // b though because we cannot do a refund where we take their money as that is not really a refund.
+        Create::refresh(static::$dm, $a, $b);
+        $a->getLastPaymentDebit()->setSuccess(true);
+        $this->assertEquals($a->getBrokerCommissionPaid(), $a->getProratedBrokerCommission($a->getEnd()));
+        $this->assertTrue($b->getBrokerCommissionPaid() < $b->getProratedBrokerCommission($b->getEnd()));
     }
 
     private static function prepCheckoutPaymentToAdd(
