@@ -63,7 +63,7 @@ trait DateTrait
         return $previousMonth;
     }
 
-    public function startOfMonth(\DateTime $date = null)
+    public static function startOfMonth(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
@@ -122,7 +122,7 @@ trait DateTrait
         return $startYear;
     }
 
-    public function endOfMonth(\DateTime $date = null)
+    public static function endOfMonth(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
