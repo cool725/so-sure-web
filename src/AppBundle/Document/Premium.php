@@ -256,6 +256,17 @@ abstract class Premium implements EqualsInterface
         $this->source = $source;
     }
 
+    /**
+     * Gives you the number of monthly payments that a given payment amount covers even if it is fractional. Like for
+     * example if a person's premium is £15 and the payment is 20, then this function will return 1.33333.
+     * @param float $amount is the size of the payment to calculate for.
+     * @return float the number of monthly payments that the given amount of money covers.
+     */
+    public function fractionOfMonthlyPayments($amount)
+    {
+        return $amount / $this->getMonthlyPremiumPrice();
+    }
+
     public function isEvenlyDivisible($amount, $accountInitial = false)
     {
         if (!$accountInitial) {

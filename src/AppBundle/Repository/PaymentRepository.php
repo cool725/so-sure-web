@@ -74,6 +74,27 @@ class PaymentRepository extends DocumentRepository
             ->execute();
     }
 
+    /**
+     * Gives you all the payments that are referenced to a given policy type.
+     * @param string         $policyType is the type of policy whose payments you are looking for.
+     * @param \DateTime|null $start      is the lowest date at which the payments can have occurred, or null to have no
+     *                                   minimum.
+     * @param \DateTime|null $end        is the highest date at which the payments can have occurred, or null to have
+     *                                   no maximum.
+     * @return Cursor over the found payments.
+     */
+    public function getAllPaymentsForPolicyType($policyType, $start = null, $end = null)
+    {
+        $qb = $this->createQueryBuilder()->field('policy.policy_type')->equals($policyType);
+        if ($start) {
+            $qb->field('date')->gte($start);
+        }
+        if ($end) {
+            $qb->field('date')->lt($end);
+        }
+        return $qb->getQuery()->execute();
+    }
+
     public function getAllPayments(\DateTime $date, $type = null)
     {
         $startMonth = $this->startOfMonth($date);
