@@ -2323,7 +2323,7 @@ class PolicyService
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
         $date = $date ?: new \DateTime();
-        /** @var PolicyTermsRepo $policyTermsRepo */
+        /** @var PolicyTermsRepository $policyTermsRepo */
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findLatestTerms();
