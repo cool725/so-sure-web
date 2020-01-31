@@ -112,4 +112,4 @@ class CancelPolicyCommand extends ContainerAwareCommand
             $output->writeln('<info>Dry Run. No changes persisted.</info>');
         }
     }
-};
+}
