@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\Policy;
 use AppBundle\Service\PolicyService;
+use AppBundle\Repository\PolicyRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -73,9 +74,11 @@ class CancelPolicyCommand extends ContainerAwareCommand
         $success = [];
         $invalid = [];
         $impossible = [];
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         foreach ($ids as $id) {
-            $policy = $policyRepo->findOneById($id);
+            /** @var Policy $policy */
+            $policy = $policyRepo->findOneBy(['_id' => $id]);
             if (!$policy) {
                 $invalid[] = $id;
             } elseif (!$policy->canCancel($reason)) {
