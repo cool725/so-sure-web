@@ -26,7 +26,7 @@
                     {% endif %}
                     <h1 class="h2 text-white mb-5 mb-lg-4">Your Payment Details</h1>
                 </div>
-                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0 align-content-lg-stretch">
                     <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
                         <div class="cardbox__body text-center">
                             <div class="h5 text-white cardbox__title">📆 Billing Date</div>
@@ -53,7 +53,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0 align-content-lg-stretch">
                     <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
                         <div class="cardbox__body text-center">
                             <div class="h5 text-white cardbox__title">
@@ -120,7 +120,7 @@
                             <ul class="list-unstyled">
                                 {% for cashback in user.getDisplayableCashbackSorted %}
                                     <li class="mb-3">
-                                        <strong>&pound;&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</strong> cashback earned for policy: <strong>{{ policy.policyNumber }}</strong>
+                                        <strong>&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</strong> cashback earned for policy: <strong>{{ policy.policyNumber }}</strong>
                                         <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i> Paid</span>
                                     </li>
                                 {% endfor %}

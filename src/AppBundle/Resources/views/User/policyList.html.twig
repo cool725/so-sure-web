@@ -59,15 +59,18 @@
                                 <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                             {% elseif not policyItem.isPicSureValidated %}
                                 <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
-                            {% endif %}
-                            {% if policyItem.getPolicyTermsFiles|length > 0 %}
-                                <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary mr-2"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Terms</a>
-                            {% endif %}
-                            {% if policyItem.getPolicyScheduleFiles|length > 0 %}
-                                <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Schedule</a>
+                            {% else %}
+                                <p>Your phone has been validated 🥳</p>
                             {% endif %}
                             {% if policyItem.displayRepurchase %}
                                 <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success ">Repurchase Policy</a>
+                            {% else %}
+                                {% if policyItem.getPolicyTermsFiles|length > 0 %}
+                                    <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary mr-2"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Terms</a>
+                                {% endif %}
+                                {% if policyItem.getPolicyScheduleFiles|length > 0 %}
+                                    <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Schedule</a>
+                                {% endif %}
                             {% endif %}
                         </div>
                         <div class="excess-item flex-fill">
