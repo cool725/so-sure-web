@@ -59,7 +59,7 @@
                                 <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                             {% elseif not policyItem.isPicSureValidated %}
                                 <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
-                            {% else %}
+                            {% elseif policyItem.isPicSureValidated %}
                                 <p>Your phone has been validated 🥳</p>
                             {% endif %}
                             {% if policyItem.displayRepurchase %}
