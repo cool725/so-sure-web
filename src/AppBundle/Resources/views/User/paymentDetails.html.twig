@@ -1,11 +1,14 @@
 {% extends 'base_rebrand.html.twig' %}
-{% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Welcome back {{ app.user.firstname }} | so-sure{% endblock %}
+{% block title %}Payment Details | so-sure{% endblock %}
+
+{# Set Meta #}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
@@ -14,104 +17,128 @@
 
 {% block body %}
 
-    {# Logic for tabs #}
-    {% set active_tab = 'payment_card' %}
-    {% if form_errors(bacs_form.accountName) or form_errors(bacs_form.sortCode) or form_errors(bacs_form.accountNumber) or form_errors(bacs_form.soleSignature) %}
-        {% set active_tab = 'bacs_setup' %}
-    {% elseif bacs and bacs.isValid %}
-        {% set active_tab = 'bacs_setup_confirm' %}
-    {% elseif app.request.get('_route') == 'user_payment_details_bacs' %}
-        {% set active_tab = 'bacs_setup' %}
-    {% elseif policy and policy.hasPolicyOrUserBacsPaymentMethod %}
-        {% set active_tab = 'payment_bacs' %}
-    {% endif %}
-
-    <section class="hero">
+    <div class="hero">
         <div class="container-large">
-            {# NOTE: This is hidden! Remove d-none for testing #}
-            <ul class="nav nav-tabs d-none" id="payment_sections" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'payment_card' %}active{% endif %}"
-                    id="payment_card_tab"
-                    data-toggle="tab"
-                    href="#payment_card"
-                    role="tab"
-                    aria-controls="payment_card"
-                    aria-selected="{% if active_tab == 'payment_card' %}true{% else %}false{% endif %}">Payment Card</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'payment_bacs' %}active{% endif %}"
-                       id="payment_bacs_tab"
-                       data-toggle="tab"
-                       href="#payment_bacs"
-                       role="tab"
-                       aria-controls="payment_bacs"
-                       aria-selected="{% if active_tab == 'payment_bacs' %}true{% else %}false{% endif %}">Payment Bacs</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'bacs_setup' %}active{% endif %}"
-                       id="bacs_setup_tab"
-                       data-toggle="tab"
-                       href="#bacs_setup"
-                       role="tab"
-                       aria-controls="bacs_setup"
-                       aria-selected="{% if active_tab == 'bacs_setup' %}true{% else %}false{% endif %}">Bacs Setup</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if active_tab == 'bacs_setup_confirm' %}active{% endif %}"
-                       id="bacs_setup_confirm_tab"
-                       data-toggle="tab"
-                       href="#bacs_setup_confirm"
-                       role="tab"
-                       aria-controls="bacs_setup_confirm"
-                       aria-selected="{% if active_tab == 'bacs_setup_confirm' %}true{% else %}false{% endif %}">Bacs Setup Confirm</a>
-                </li>
-            </ul>
-            <div class="tab-content" id="payment_sections_content">
-                <div class="tab-pane {% if active_tab == 'payment_card' %}active{% endif %}"
-                     id="payment_card"
-                     role="tabpanel"
-                     aria-labelledby="payment_card_tab">
-                    {% if policy and policy.isActive %}
-                        {% include 'AppBundle:User:cardDetails.html.twig' %}
+            <div class="row align-items-lg-center">
+                <div class="col-lg-6">
+                    {% if policy is defined and policy %}
+                        <div class="h5 text-columbia-blue-e fit">{{ policy.phone.make }} {{ policy.phone.model }} <span class="mx-2 text-white">|</span> {{ policy.policyNumber }}</div>
                     {% endif %}
+                    <h1 class="h2 text-white mb-5 mb-lg-4">Your Payment Details</h1>
                 </div>
-                <div class="tab-pane {% if active_tab == 'payment_bacs' %}active{% endif %}"
-                     id="payment_bacs"
-                     role="tabpanel"
-                     aria-labelledby="payment_bacs_tab">
-                    {% if policy and policy.isActive %}
-                        {% include 'AppBundle:User:bacsDetails.html.twig' %}
-                    {% endif %}
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                    <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                        <div class="cardbox__body text-center">
+                            <div class="h5 text-white cardbox__title">📆 Billing Date</div>
+                            <div class="cardbox__text">
+                                <p>
+                                    {% if policy and policy.premiumPlan == 'monthly' %}
+                                        Monthly on the {{ policy.billing|date('jS','Europe/London') }}
+                                    {% elseif policy and policy.premiumPlan == 'yearly' %}
+                                        Yearly on the {{ policy.billing|date('jS','Europe/London') }}
+                                    {% else %}
+                                        ❓ Unknown
+                                    {% endif %}
+                                </p>
+                                <a href="#"
+                                   class="btn btn-outline-deep-sky-blue-d btn-block"
+                                   {% if policy.hasCheckoutPaymentMethod != true or policy.premiumPlan == 'yearly' %}
+                                       disabled="disabled"
+                                   {% else %}
+                                       data-toggle="modal"
+                                       data-target="#billing_modal"
+                                   {% endif %}
+                                   >Change date</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="tab-pane {% if active_tab == 'bacs_setup' %}active{% endif %}"
-                     id="bacs_setup"
-                     role="tabpanel"
-                     aria-labelledby="bacs_setup_tab">
-                    {% if policy and policy.isActive %}
-                        {% include 'AppBundle:User:bacsSetupDetails.html.twig' %}
-                    {% endif %}
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                    <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                        <div class="cardbox__body text-center">
+                            <div class="h5 text-white cardbox__title">
+                                {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod %}
+                                    💳 Card Details
+                                {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
+                                    🏦 Direct Debit
+                                {% else %}
+                                    ❓ Unknown
+                                {% endif %}
+                            </div>
+                            <div class="cardbox__text">
+                                <p>
+                                    {% if policy.hasCheckoutPaymentMethod %}
+                                        {{ policy.getCheckoutPaymentMethod }}
+                                    {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
+                                        {{ policy.getPolicyOrUserBacsPaymentMethod }}
+                                    {% else %}
+                                        Not setup
+                                    {% endif %}
+                                </p>
+                                {% set button_text = 'Update details' %}
+                                {% if not bacs_last_payment_in_progress and policy.hasPolicyOrUserBacsPaymentMethod %}
+                                    {% set button_text = 'Switch to card' %}
+                                {% endif %}
+                                <form class="payment-form" method="POST"
+                                      data-public-key="{{ checkoutApiKey(policy) }}"
+                                      data-customer-email="{{ app.user.email }}"
+                                      data-value="1"
+                                      data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"
+                                      data-csrf="{{ csrf_token('checkout') }}"
+                                      data-currency="GBP"
+                                      data-payment-mode="cards"
+                                      data-card-form-mode="cardTokenisation"
+                                      data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                                      data-title="Update card details"
+                                      data-subtitle="Please enter your new card details. You will NOT be charged the £0.01 transaction fee.">
+                                    <input type="button"
+                                           class="btn btn-outline-deep-sky-blue-d btn-block btn-card-pay"
+                                           {# TODO: This doesn't work #}
+                                           {% if policy.canUpdateBacsDetails != true %}
+                                               disabled="disabled"
+                                           {% endif %}
+                                           value="{{ button_text }}">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="tab-pane {% if active_tab == 'bacs_setup_confirm' %}active{% endif %}"
-                     id="bacs_setup_confirm"
-                     role="tabpanel"
-                     aria-labelledby="bacs_setup_confirm_tab">
-                    {% if policy and policy.isActive %}
-                        {% include 'AppBundle:User:bacsSetupConfirm.html.twig' %}
-                    {% endif %}
-                </div>
-                {# Include payment history once or tabs breaks! #}
-                {% if feature_enabled('user-payment-history') or is_granted('ROLE_PREVIOUS_ADMIN') %}
-                    {% if not feature_enabled('user-payment-history') %}
-                        <h4>Admin View Only</h4>
-                    {% endif %}
-                    {% if policy and (active_tab == 'payment_card' or active_tab == 'payment_bacs') %}
-                        {% include 'AppBundle::User/_payments.html.twig' %}
-                    {% endif %}
-                {% endif %}
             </div>
         </div>
-    </section>
+    </div>
+
+    <div class="payments pb-lg-5">
+        <div class="payments-inner pb-5">
+            {% include 'AppBundle::User/_payments.html.twig' %}
+            {% if user.getDisplayableCashbackSorted|length > 0 %}
+                <div class="container-large">
+                    <div class="summary-cardbox my-5">
+                        <div class="summary-cardbox__header">
+                            <h5 class="mb-0">Cashback</h5>
+                        </div>
+                        <div class="summary-cardbox__body">
+                            <ul class="list-unstyled">
+                                {% for cashback in user.getDisplayableCashbackSorted %}
+                                    <li class="mb-3">
+                                        <strong>&pound;&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</strong> cashback earned for policy: <strong>{{ policy.policyNumber }}</strong>
+                                        <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i> Paid</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            {% if cashback.status == 'missing' or cashback.status == 'failed' %}
+                                <hr>
+                                <p>To get your cashback paid out, add or update your bank details here:</p>
+                                <a class="btn btn-outline-primary" href="{{ path('user_cashback', {'id': cashback.id }) }}">Update your bank details</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Components #}
+    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
 
     {# Page Modals #}
     {% if policy and policy.premiumPlan == 'monthly' %}
@@ -147,13 +174,6 @@
         </div>
     {% endif %}
 
-    {# Components #}
-    {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
-
-    {# Page Modals #}
-    {% include 'AppBundle::Purchase/_directDebitModal.html.twig' %}
-    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
-
 {% endblock %}
 
 {% block javascriptsPage %}
@@ -164,5 +184,4 @@
     {% endif %}
     <script src="{{ asset('css-js/user.js') }}"></script>
     <script src="{{ asset('css-js/user-payment.js') }}"></script>
-    <script src="{{ asset('css-js/user-purchase-bacs.js') }}"></script>
 {% endblock %}

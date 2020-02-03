@@ -13,7 +13,7 @@
     padding-bottom: 8rem;
     text-align: center;
     background-color: $crayon-blue;
-    @include blue-gradient;
+    @include blue-gradient-45;
 
     h1 {
         @include media-breakpoint-down(xs) {

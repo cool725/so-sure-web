@@ -9,10 +9,7 @@
                 {% elseif is_granted('ROLE_CLAIMS') %}
                     <a href="{{ path('claims_home') }}" class="h5">Claims</a>
                 {% else %}
-                    <a href="{{ path('user_home') }}" class="h5">
-                        <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
-                        Dashboard
-                    </a>
+                    <a href="{{ path('user_home') }}" class="h5">Dashboard</a>
                 {% endif %}
             </li>
          {% endif %}

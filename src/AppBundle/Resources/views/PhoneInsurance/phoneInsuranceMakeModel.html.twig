@@ -125,7 +125,7 @@
                         </h1>
                         {% if not phone.active %}
                             <p class="text-white my-4">Unfortunately we no longer insure this device as it's either over three years old or replacements/parts are hard to source. We aim to provide you the best possible claims experience and make sure we only cover devices with good replacement/parts availability.</p>
-                            <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Get a Quote</a>
+                            <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled mb-5">Get a Quote</a>
                         {% else %}
                             {% if phone is defined and phone %}
                                 {{ render(controller('AppBundle:Search:memorySearchDropdown', {

@@ -3782,9 +3782,10 @@ abstract class Policy
         $cliffDate = clone $this->getStart();
 
         // pseudo cliff date for displaying a 14 day message
+        // TODO: This needs removing so it's always just 60 days
         if ($pseudo) {
             // add 14 days
-            $cliffDate->add(new \DateInterval('P14D'));
+            $cliffDate->add(new \DateInterval('P60D'));
         } else {
             // add 60 days
             $cliffDate->add(new \DateInterval('P60D'));

@@ -7,7 +7,14 @@
 @import "../../abstracts/palette";
 @import "../../abstracts/variables";
 
+body {
+    // background-color: $athens-gray;
+}
+
 .hero {
+    position: relative;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
     text-align: center;
 }
 

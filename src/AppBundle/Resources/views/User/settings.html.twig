@@ -1,0 +1,86 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set robots_noindex = true %}
+{% set user_mode = true %}
+{% set small_footer = true %}
+
+{% block title %}User: {{ app.user.firstname }}'s Settings | so-sure{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="hero">
+        <div class="container-large pb-5">
+            <h1 class="text-white mb-5 mb-lg-4">
+                <h1 class="h2 text-white mb-5">Settings</h1>
+            </h1>
+        </div>
+    </div>
+
+    <div class="settings pb-lg-5">
+        <div class="container-large pb-5">
+            <div class="summary-cardbox mb-5">
+                <div class="summary-cardbox__header">
+                    <h5 class="mb-0">Personal Information</h5>
+                </div>
+                <div class="summary-cardbox__body">
+                    <div class="row">
+                        <div class="col">
+                            {{ form_start(email_form, {'attr': {'class': ''}}) }}
+                                <div class="form-group">
+                                    {{ form_label(email_form.email, 'Email') }}
+                                     {{ form_widget(email_form.email, {'attr': { 'class':'form-control'} }) }}
+                                     <div class="with-errors">{{ form_errors(email_form.email) }}</div>
+                                </div>
+                                <div class="form-group mb-0">
+                                    {{ form_widget(email_form.update, {'label': 'Change Email', 'attr': {'class': 'btn btn-outline-primary btn-block-xs'}}) }}
+                                </div>
+                            {{ form_end(email_form) }}
+                            {# TODO: Do we even need this? #}
+                            {# <form class="">
+                                <div class="form-group">
+                                    <label for="">Download Policy Data</label>
+                                    <p>Your bones don't break, mine do. That's clear. Your cells react to bacteria and viruses differently than mine. You don't get sick, I do. That's also clear. But for some reason, you and I react the exact same way to water. We swallow it too fast, we choke. We get some in our lungs, we drown. However unreal it may seem, we are connected, you and I. We're on the same curve, just on opposite ends. </p>
+                                    <a href="{{ path('user_data_portability') }}"
+                                       target="_blank" rel="noopener noreferrer"
+                                       class="btn btn-outline-primary"
+                                       title="This will download your policy data in a portable csv format"><i class="fal fa-file-download fa-fw"></i> Download</a>
+                                </div>
+                            </form> #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="summary-cardbox mb-5">
+                <div class="summary-cardbox__header">
+                    <h5 class="mb-0">My Preferences</h5>
+                </div>
+                <div class="summary-cardbox__body">
+                    {# TODO: Needs moving here #}
+                    <p>Update my email preferences from so-sure</p>
+                    <a href="{{ path('optout') }}"
+                       class="btn btn-outline-primary btn-block-xs">Email Preferences</a>
+                    <hr class="my-4">
+                    <p>Download all my policy data</p>
+                     <a href="{{ path('user_data_portability') }}"
+                        target="_blank" rel="noopener noreferrer"
+                        class="btn btn-outline-primary btn-block-xs"
+                        title="This will download your policy data in a portable csv format"><i class="fal fa-file-download fa-fw"></i> Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
+{% endblock %}

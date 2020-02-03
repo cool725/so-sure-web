@@ -11,14 +11,18 @@
             <i class="far fa-sm text-columbia-blue-f fa-chevron-down ml-2"></i></a>
         <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="why_so_sure_nav">
             <a class="dropdown-item dropdown-item-nav mb-0"
-               href="{{ path('user_contact_details_policy') }}">
-               <img src="{{ app.user.getImageUrlFallback }}" class="rounded-circle mr-2" alt="{{ app.user.firstname|first }}. {{ app.user.lastname }}" width="30px">
-               Your account</a>
+               href="{{ path('user_settings_policy') }}">
+               Your settings</a>
             {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                 <a class="dropdown-item dropdown-item-nav mb-0"
                    href="{{ path('homepage', {'_impersonate': '_exit'}) }}">
                    Exit User</a>
             {% else %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('admin_home') }}"
+                       class="dropdown-item dropdown-item-nav mb-0">
+                       Admin</a>
+                {% endif %}
                 <a class="dropdown-item dropdown-item-nav mb-0"
                    href="{{ path('fos_user_security_logout') }}">
                     Log out</a>

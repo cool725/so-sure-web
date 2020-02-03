@@ -1,0 +1,260 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set robots_noindex = true %}
+{% set user_mode = true %}
+{% set small_footer = true %}
+
+{% block title %}Invites | so-sure{% endblock %}
+
+{# Set Meta #}
+{% set og_title = 'Win and save with so-sure!' %}
+{% set og_description = 'Hey, we could win £200 with mobile phone insurer so-sure. It’s super easy to enter!' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if policy.standardSCode is defined and policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="hero">
+        <div class="container-large pb-lg-5">
+            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/user/so-sure_group-gravatar.png" width="250px" alt="so-sure group friends" class="lozad">
+            <h1 class="h2 text-white fit my-4"><span class="sub text-deep-sky-blue-d">How to connect with friends and</span> <br class="d-lg-none">earn Cashback &amp; Rewards</h1>
+            <p class="text-white mb-5">After sending out invites, the friends that choose to insure their phone with so-sure will ba available for you to connect with - for every connection we add &pound;{% if policy.getCurrentConnectionValues %}{% if policy.getCurrentConnectionValues['teaser']|length > 0 %}10{% else %}2{% endif %}{% else %}10{% endif %} to your reward pot - watch the video to find out how it works.</p>
+            <div class="d-lg-none">
+                <a href="#"
+                   class="btn btn-success btn-block-xs mr-md-3 native-share track-data"
+                   data-native-title="{{ og_title }}"
+                   data-native-url="{{ og_url }}"
+                   data-native-text="{{ og_description }}"
+                   data-event="share-user-dashboard-mb">
+                   Invite Friends</a>
+                <a href="#"
+                   class="btn btn-outline-deep-sky-blue-d btn-block-xs btn-copy"
+                   data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+            </div>
+            <div class="win-invite d-none d-lg-flex mb-4">
+                <form id="invite_form_one" autocomplete="nope" class="invite-form text-left flex-grow-1 mr-3">
+                    <input class="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                    <div class="custom-input-with-btn mb-4">
+                        <input type="text" class="form-control form-control-white input-invite" placeholder="Enter email address" name="email_invite" />
+                        <button class="btn btn-success btn-invite btn-sm"
+                                data-path="{{ path('json_invite_email') }}"
+                                data-form="#invite_form_one">Send invite</button>
+                    </div>
+                </form>
+                <a href="#"
+                   class="btn btn-outline-deep-sky-blue-d win-btn btn-copy mr-1"
+                   data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                <div class="d-flex align-items-center justify-content-between">
+                    <a href="#"
+                       class="track-data"
+                       data-sharer="twitter"
+                       data-title="{{ og_description }}"
+                       data-url="{{ og_url }}"
+                       data-via="wearesosure"
+                       data-hashtags="so-sure, phoneinsurance"
+                       data-event="share-twitter-user-dashboard-dt">
+                        <span class="fa-stack fa-2x">
+                            <i class="fas fa-square text-white fa-stack-2x"></i>
+                            <i class="fab fa-twitter text-twitter fa-stack-1x fa-inverse"></i>
+                        </span><span class="sr-only">Tweet</span></a>
+                    <a href="#"
+                       class="track-data"
+                       data-sharer="facebook"
+                       data-title="{{ og_description }}"
+                       data-url="{{ og_url }}"
+                       data-hashtags="so-sure, phoneinsurance"
+                       data-event="share-facebook-user-dashboard-dt">
+                        <span class="fa-stack fa-2x">
+                            <i class="fas fa-square text-white fa-stack-2x"></i>
+                            <i class="fab fa-facebook text-facebook fa-stack-1x fa-inverse"></i>
+                        </span><span class="sr-only">Facebook</span></a>
+                    <a href="#"
+                       class="track-data"
+                       data-sharer="whatsapp"
+                       data-web
+                       data-title="{{ og_description }}"
+                       data-url="{{ og_url }}"
+                       data-event="share-whatsapp-user-dashboard-dt">
+                        <span class="fa-stack fa-2x">
+                            <i class="fas fa-square text-white fa-stack-2x"></i>
+                            <i class="fab fa-whatsapp text-whatsapp fa-stack-1x fa-inverse"></i>
+                        </span><span class="sr-only">Whatsapp</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connections">
+        <div class="connections-list mr-lg-5">
+            <h2 class="h5 text-primary">💰 Connections &amp; Rewards</h2>
+            <div class="connections-list-inner">
+                {% if policy.connections|length > 0 %}
+                    {% for connection in policy.standardConnections %}
+                        <div class="connections-list-item">
+                            <img src="{{ connection.linkedUser.getImageUrlFallback }}"
+                                 alt="{{ connection.linkedUser.name }}"
+                                 class="connection rounded-circle {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}border-danger{% else %}border-primary{% endif %} mr-3"
+                                 width="38px"
+                                 data-toggle="tooltip"
+                                 data-placement="right"
+                                 title="Connected: {{ connection.date|date('dS M') }} - £{{ connection.totalValue|number_format(2, '.', ',')  }}">
+                            <span class="h6 mb-0 flex-grow-1">
+                                {{ connection.linkedUser.name }} <br>
+                                <span class="sub">{{ connection.linkedUser.email }}</span>
+                            </span>
+                            <span class="h6 mb-0">&pound;{{ connection.totalValue|number_format(2, '.', ',')  }}</span>
+                        </div>
+                    {% endfor %}
+                    {% for connection in policy.rewardConnections %}
+                        {% if connection.linkedUser.isInfluencer == true %}
+                            <div class="connections-list-item">
+                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"
+                                     alt="{{ connection.linkedUser.name }}"
+                                     class="connection rounded-circle {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}border-danger{% else %}border-primary{% endif %} mr-3"
+                                     width="38px"
+                                     data-toggle="tooltip"
+                                     data-placement="right"
+                                     title="Connected: {{ connection.date|date('dS M') }} - £{{ connection.totalValue|number_format(2, '.', ',')  }}">
+                                <span class="h6 mb-0 flex-grow-1">
+                                    {{ connection.linkedUser.name }} <br>
+                                    <span class="sub">{{ connection.linkedUser.email }}</span>
+                                </span>
+                                <span class="h6 mb-0">&pound;{{ connection.totalValue|number_format(2, '.', ',')  }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% for connection in policy.rewardConnections %}
+                        {% if connection.linkedUser.isInfluencer == false %}
+                            <div class="connections-list-item">
+                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"
+                                     alt="{{ connection.linkedUser.name }}"
+                                     class="connection rounded-circle {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}border-danger{% else %}border-primary{% endif %} mr-3"
+                                     width="38px"
+                                     data-toggle="tooltip"
+                                     data-placement="right"
+                                     title="Connected: {{ connection.date|date('dS M') }} - £{{ connection.totalValue|number_format(2, '.', ',')  }}">
+                                <span class="h6 mb-0 flex-grow-1">
+                                    {{ connection.linkedUser.name }} <br>
+                                    <span class="sub">{{ connection.linkedUser.email }}</span>
+                                </span>
+                                <span class="h6 mb-0">&pound;{{ connection.totalValue|number_format(2, '.', ',')  }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="connections-list-item">No connections or rewards yet!</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="connections-list">
+            <h2 class="h5 text-primary">✉️ All invites</h2>
+            <div class="connections-list-inner">
+                <h3 class="h6">Received invites</h3>
+                {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
+                    {{ form_start(invitation_form) }}
+                        {% for invitation in policy.user.unprocessedReceivedInvitations %}
+                             <div class="connections-list-item">
+                                <span class="flex-grow-1"
+                                      title="{{ invitation.inviter.name }}">{{ invitation.inviter.name|truncate(30) }}</span>
+                                {{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-danger btn-sm mr-auto'}}) }}
+                                {{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-success  btn-sm ml-2 mr-auto'}}) }}
+                            </div>
+                        {% endfor %}
+                        {{ form_errors(invitation_form) }}
+                    {{ form_end(invitation_form) }}
+                {% else %}
+                    <div class="connections-list-item">No received invites</div>
+                {% endif %}
+                <h3 class="h6">Sent invites</h3>
+                {% if policy.sentInvitations|length > 0 %}
+                    {{ form_start(sent_invitation_form) }}
+                        {% for invitation in policy.sentInvitations|reverse %}
+                             <div class="connections-list-item">
+                                <span class="flex-grow-1"
+                                      title="{{ invitation.inviteeName }}">{{ invitation.inviteeName|truncate(30) }}</span>
+                                {{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-danger btn-sm mr-auto'}}) }}
+                                {{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-primary  btn-sm ml-2 mr-auto'}}) }}
+                            </div>
+                        {% endfor %}
+                        {{ form_errors(sent_invitation_form) }}
+                    {{ form_end(sent_invitation_form) }}
+                {% else %}
+                    <div class="connections-list-item">No sent invites</div>
+                {% endif %}
+                <h3 class="h6">Unconnected policies</h3>
+                {% if policy.hasUnconnectedUserPolicies %}
+                    {{ form_start(unconnected_user_policy_form) }}
+                        {% for unconnectedPolicy in policy.unconnectedUserPolicies %}
+                            <div class="connections-list-item">
+                                <span class="flex-grow-1"
+                                      title="{{ unconnectedPolicy.defaultName }}">{{ unconnectedPolicy.defaultName|truncate(30) }}</span>
+                                {{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-success  btn-sm mr-auto'}}) }}
+                            </div>
+                        {% endfor %}
+                        {{ form_errors(unconnected_user_policy_form) }}
+                    {{ form_end(unconnected_user_policy_form) }}
+                {% else %}
+                    <div class="connections-list-item">No unconnected policies</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if feature_enabled('invite-competition') %}
+        <div id="win_share" class="win py-lg-5">
+            <div class="container d-md-none py-5">
+                <h2 class="h4">Win a &pound;200 Amazon voucher<br><span class="sub">📨  Send more to earn more</span></h2>
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
+                <div class="cardbox cardbox-100 text-center p-4 mb-4">
+                    <h3 class="h4">Share your link to enter</h3>
+                    <p>(more invites = better chance of winning)</p>
+                    <div class="d-flex">
+                        <a href="#"
+                           class="btn btn-outline-primary btn-copy w-100"
+                           data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                        <a href="#"
+                           class="btn btn-outline-primary w-100 ml-3 native-share track-data"
+                           data-native-title="{{ og_title }}"
+                           data-native-url="{{ og_url }}"
+                           data-native-text="{{ og_description }}"
+                           data-event="share-user-dashboard-mb">
+                           💬 Share</a>
+                    </div>
+                </div>
+                <p class="text-left">Know someone that might need mobile insurance? even if they’re not ready now we’ll still enter you both in the draw to win a &pound;200 amazon voucher. As a so-sure customer you can invite as many people as you like (each invite = another entry)</p>
+            </div>
+            <div class="container d-none d-md-block py-5">
+                <div class="d-flex">
+                    <div class="win-dashboard-dial mr-4">
+                        <div class="dashboard-dial-cta mr-3">
+                            <div class="dashboard-dial-cta-inner">
+                                <div class="h2 mb-0 text-white">{{ policy.sentInvitations|length }} 📨</div>
+                                <div class="h6 text-white opacity-75">INVITES SENT</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="win-text mr-1">
+                        <h2 class="h3 mb-2">Win a &pound;200 Amazon voucher 📨 <br> <span class="sub">Send more to earn more</span></h2>
+                        <p class="mb-5">Know someone that might need mobile insurance? even if they're not ready now we'll still enter you both in the draw to <strong>win a &pound;200 amazon voucher</strong>. As a so-sure customer you can invite as many people as you like <span class="text-nowrap">(each invite = another entry)</span></p>
+                    </div>
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="d-none d-xl-inline lozad" width="400px">
+                </div>
+                <hr class="mt-0">
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
+{% endblock %}

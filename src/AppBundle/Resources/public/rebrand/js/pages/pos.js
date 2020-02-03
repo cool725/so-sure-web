@@ -7,7 +7,7 @@ require('../../sass/pages/pos.scss');
 
 // Require components
 require('jquery-validation');
-require('../common/validationMethods.js');
+require('../common/validation-methods.js');
 
 const sosure = sosure || {};
 

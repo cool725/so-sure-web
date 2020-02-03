@@ -1,6 +1,8 @@
 // cards.scss
 
 .cardbox {
+    position: relative;
+    overflow: hidden;
     max-width: 300px;
     background-color: $white;
     border: 1px solid rgba(0, 146, 255, 1);
@@ -9,7 +11,11 @@
     @include border-radius($g-border-radius);
 
     &__body {
-        padding: 2rem;
+        padding: 1.5rem;
+
+        @include media-breakpoint-up(md) {
+            padding: 2rem;
+        }
     }
 
     &__text {
@@ -37,9 +43,54 @@
         max-width: none;
     }
 
+    &-opacity {
+        background-color: rgba(0, 0, 0, 0.1);
+        color: $white;
+    }
+
+    &-center-box {
+        margin-top: -20px;
+        margin-bottom: -20px;
+    }
+
     &-focus {
         border: 2px solid rgba(37,147,243, 0.8);
     }
+
+    &-no-smallscreen-border {
+        border: none;
+
+        @include media-breakpoint-up(md) {
+            border: 1px solid $link-water;
+        }
+    }
+
+    &-divider {
+        border-bottom: 1px solid $link-water;
+
+        &:last-of-type {
+            border-bottom: 0;
+        }
+    }
+
+    &-flex {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.cardbox-ribbon {
+    width: 200px;
+    background: $lust;
+    position: absolute;
+    top: 35px; right: -50px;
+    text-align: center;
+    line-height: 25px;
+    letter-spacing: 1px;
+    color: $white;
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
 }
 
 // Only using px here for consistency
@@ -140,18 +191,33 @@
     display: flex;
     flex-direction: column;
     text-align: left;
-    border: 1px solid rgba(0, 146, 255, 1);
-    @include border-radius($g-border-radius);
+    border-bottom: 1px solid $link-water;
+
+    // @include media-breakpoint-up(lg) {
+        border-bottom: none;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+        @include border-radius($g-border-radius);
+    // }
 
     &__header {
-        padding: 1rem 1.25rem;
-        border-bottom: 2px solid $selago;
+        padding: 1rem 2rem;
+        background-color: $ultramarine;
+        color: $white;
+
+        // @include media-breakpoint-up(lg) {
+            @include border-top-radius($g-border-radius);
+        // }
     }
 
     &__body {
         flex: 1 1 auto;
-        padding: 1.25rem;
+        padding: 2rem;
         background-color: lighten($selago, 5%);
+
+        // @include media-breakpoint-up(lg) {
+            @include border-bottom-radius($g-border-radius);
+        // }
     }
 
     &__cta {
@@ -164,7 +230,10 @@
             background-color: $dodger-blue;
             color: $white;
             cursor: pointer;
-            @include border-bottom-radius($g-border-radius);
+
+            // @include media-breakpoint-up(lg) {
+                @include border-bottom-radius($g-border-radius);
+            // }
 
             &:hover, &:focus {
                 outline: 0;
@@ -193,43 +262,130 @@
 
 // Tabbed Cardbox
 .tabbed-cardbox {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    border: 2px solid $selago;
-    @include border-radius($g-border-radius);
-    overflow: hidden;
 
-    &__header {
-        padding: 0rem;
-        border-bottom: 2px solid $selago;
+    .nav {
+        flex-wrap: nowrap;
+    }
 
-        // Using BS nav-pills
-        .nav-pills {
+    .nav-tabs {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 1rem;
+        border: 0;
 
-            .nav-link {
-                padding-top: 0.8rem;
-                padding-bottom: 0.8rem;
-                opacity: 0.6;
+        @include media-breakpoint-up(md) {
+            margin: 0;
+        }
 
-                &:hover {
-                    background-color: lighten($link-water, 10%);
-                }
+        .nav-item {
+            flex: 1 1 auto;
+        }
+    }
 
-                &.active {
-                    opacity: 1;
-                    // @include linear-gradient(100deg, $crayon-blue, $deep-sky-blue-b);
-                    &:hover {
-                        background-color: $dodger-blue;
-                    }
-                }
+    .nav-link {
+        height: 64px;
+        padding: 1rem 1.5rem;
+        color: $white;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 0;
+        transition: all 0.5s linear;
 
-                @include media-breakpoint-up(md) {
-                    padding-top: 1rem;
-                    padding-bottom: 1rem;
-                }
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .fas {
+            color: $dodger-blue;
+        }
+
+        &.active,
+        &:hover {
+            background-color: $white;
+            color: $zaffre;
+        }
+    }
+
+    .tab-content {
+        border-bottom: 1px solid $link-water;
+    }
+
+    // Add border for larger screens
+    @include media-breakpoint-up(lg) {
+
+        .tab-content {
+            border: {
+                left: 1px solid $link-water;
+                right: 1px solid $link-water;
+                bottom: 1px solid $link-water;
             }
 
+            @include border-bottom-radius($g-border-radius);
+
+            background-color: $white;
+            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                        0 5px 15px 0 rgba(8,27,154,0.08);
+
+            .table-sure {
+
+                tr {
+                    &:last-of-type {
+                        td {
+                            &:first-of-type {
+                                @include border-bottom-left-radius($g-border-radius);
+                            }
+                            &:last-of-type {
+                                @include border-bottom-right-radius($g-border-radius);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+.tabbed-cardbox-info {
+    position: relative;
+    z-index: 100;
+    background-color: rgba(0, 148, 255, 0.1);
+
+    border: {
+        top: 1px solid $dodger-blue;
+        left: 1px solid $link-water;
+        right: 1px solid $link-water;
+    }
+
+    &-item {
+        padding: 1rem;
+        border-bottom: 1px solid $dodger-blue;
+
+        span {
+            font-family: $g-bold;
+        }
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        &-item {
+            padding: 1.5rem 1rem;
+            flex: 1 1 auto;
+
+            border: {
+                bottom: none;
+                right: 1px solid $dodger-blue;
+            }
+
+            &:last-of-type {
+                border-right: none;
+            }
         }
     }
 }
@@ -260,8 +416,6 @@
             font-family: $g-bold;
             color: $white;
             background-color: rgba(255, 255, 255, 0.1);
-            // background-color: rgba(32, 106, 236, 0.8);
-            // background-color: $royal-blue;
             border: 1px solid rgba(37, 147, 243, 0.2);
             border-bottom: none;
             @include border-top-radius($g-border-radius);

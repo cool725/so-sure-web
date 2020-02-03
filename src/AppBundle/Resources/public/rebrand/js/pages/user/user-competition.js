@@ -7,7 +7,7 @@ require('bootstrap/js/dist/tooltip');
 
 // Require components
 require('jquery-validation');
-require('../../common/validationMethods.js');
+require('../../common/validation-methods.js');
 let textFit = require('textfit');
 require('../../components/table.js');
 
@@ -20,7 +20,7 @@ observer.observe();
 
 let Clipboard = require('clipboard');
 
-import tracking from '../../common/trackData.js';
+import tracking from '../../common/track-data.js';
 
 $(function() {
 
@@ -42,7 +42,7 @@ $(function() {
         $('.btn-copy').tooltip({'title':   'Copied 😀','trigger': 'manual'})
                       .tooltip('show');
 
-        tracking('', 'scodecopied', 'user-home');
+        tracking('', 'scodecopied', 'user-competition');
 
         setTimeout(function() {
             $('.btn-copy').tooltip('hide');

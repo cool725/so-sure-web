@@ -8,7 +8,7 @@ require('bootstrap/js/dist/tooltip');
 // Require components
 let textFit = require('textfit');
 require('jquery-validation');
-require('../common/validationMethods.js');
+require('../common/validation-methods.js');
 require('../components/phone-search-dropdown-card.js');
 
 // Lazy load images
@@ -18,7 +18,7 @@ import lozad from 'lozad';
 // Clipboard
 let Clipboard = require('clipboard');
 
-import tracking from '../common/trackData.js';
+import tracking from '../common/track-data.js';
 
 const observer = lozad(); // lazy loads elements with default selector as '.lozad'
 observer.observe();

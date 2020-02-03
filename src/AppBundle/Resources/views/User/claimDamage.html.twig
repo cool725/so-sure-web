@@ -3,124 +3,134 @@
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Damage claim - {{ app.user.firstname }} | so-sure{% endblock %}
+{% block title %}Damage Claim | Claims | so-sure{% endblock %}
 
+{# Set Meta #}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/user-claim.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="hero">
+    <div class="hero">
         <div class="container-large">
-            <h1 class="h2 mb-4 text-center">Complete your damage claim 💔</h1>
+            <h1 class="text-white mb-5 mb-lg-4">Complete your damage claim</h1>
+        </div>
+    </div>
+
+    <div class="claim pb-lg-5">
+        <div class="container pb-5">
             <div class="row">
                 <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
-                    <div class="alert-info p-4 mb-4 rounded">
-                        <p>You can save your progress and come back at a later date if you need more time to get all of the required documents.</p>
-                        <p>Once you've submitted all the required documents, we will review your claim and get back to you within a working day. Once the claim is approved we are normally able to get you back up and running in 24-72 hours, however some repairs may take a little longer.</p>
+                    <div class="cardbox cardbox-100">
+                        <div class="cardbox__body">
+                            <div class="alert-info p-4 mb-4 rounded">
+                                <p>You can save your progress and come back at a later date if you need more time to get all of the required documents.</p>
+                                <p>Once you've submitted all the required documents, we will review your claim and get back to you within a working day. Once the claim is approved we are normally able to get you back up and running in 24-72 hours, however some repairs may take a little longer.</p>
+                            </div>
+                            {{ form_start(claim_form, { 'attr': {
+                                'data-toggle': 'validator',
+                                'class': 'validate-form',
+                                'data-client-validation': form_client_validation
+                            }}) }}
+                                <p>We need a bit more information about your {{ claim.policy.phone }}</p>
+                                <div class="form-row">
+                                    <div class="col-md form-group">
+                                        {{ form_label(claim_form.monthOfPurchase) }}
+                                        {{ form_widget(claim_form.monthOfPurchase, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.monthOfPurchase) }}</div>
+                                    </div>
+                                    <div class="col-md form-group">
+                                        {{ form_label(claim_form.yearOfPurchase) }}
+                                        {{ form_widget(claim_form.yearOfPurchase, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.yearOfPurchase) }}</div>
+                                    </div>
+                                </div>
+                                <div class="form-row mb-4">
+                                    <div class="col-md form-group">
+                                        {{ form_label(claim_form.phoneStatus, 'Phone condition upon purchase') }}
+                                        {{ form_widget(claim_form.phoneStatus, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="with-errros">{{ form_errors(claim_form.phoneStatus) }}</div>
+                                    </div>
+                                </div>
+                                <p>We need a bit more information about the type of damage, for example 'broken screen'. {% if picture_of_phone is defined and picture_of_phone %}We also need a photo of your phone showing the damage. You may need someone else's phone, or if your camera is working, using a mirror in a well lit room so we can clearly see the damage.{% endif %}</p>
+                                <div class="form-row {% if claim_form.pictureOfPhone is not defined %}mb-4{% endif %}">
+                                    <div class="col-md form-group">
+                                        {{ form_label(claim_form.typeDetails, 'What is the type of damage?') }}
+                                        {{ form_widget(claim_form.typeDetails, { 'attr': {'class': 'form-control'}}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.typeDetails) }}</div>
+                                    </div>
+                                    <div id="other_damage"
+                                         class="col-md form-group"
+                                         style="{% if claim.typeDetails != 'other' %}display:none;{% endif %}">
+                                        {{ form_label(claim_form.typeDetailsOther, 'Specify the damage') }}
+                                        {{ form_widget(claim_form.typeDetailsOther, { 'attr': {'class': 'form-control', 'placeholder': 'Keeps turning off etc...'}}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.typeDetailsOther) }}</div>
+                                    </div>
+                                </div>
+                                {% if claim_form.pictureOfPhone is defined %}
+                                    <div class="form-row mb-4">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.pictureOfPhone, 'Picture of damaged phone') }}
+                                            {{ form_widget(claim_form.pictureOfPhone) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#picture_modal">{{ claim.damagePictureFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if claim_form.proofOfUsage is defined %}
+                                    <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                                    <div class="form-row">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.proofOfUsage, 'Proof of usage') }}
+                                            {{ form_widget(claim_form.proofOfUsage) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#usage_modal">{{ claim.proofOfUsageFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if claim_form.proofOfPurchase is defined %}
+                                    <div class="form-row mb-4">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.proofOfPurchase, 'Proof of purchase') }}
+                                            {{ form_widget(claim_form.proofOfPurchase) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#purchase_modal">{{ claim.proofOfPurchaseFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <p class="mt-4 mb-5">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</p>
+                                <div class="form-group d-md-flex justify-content-md-between">
+                                    {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-outline-primary btn-block-xs mr-md-2'}}) }}
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-success  btn-block-xs'}}) }}
+                                </div>
+                            {{ form_end(claim_form) }}
+                        </div>
                     </div>
-                    {{ form_start(claim_form, { 'attr': {
-                        'data-toggle': 'validator',
-                        'class': 'validate-form',
-                        'data-client-validation': form_client_validation
-                    }}) }}
-                        <div class="h5 mb-4">I, {{ username }}, am making a claim for Damage!</div>
-                        <p>We need a bit more information about your {{ claim.policy.phone }}</p>
-                        <div class="form-row">
-                            <div class="col-md form-group">
-                                {{ form_label(claim_form.monthOfPurchase) }}
-                                {{ form_widget(claim_form.monthOfPurchase, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(claim_form.monthOfPurchase) }}</div>
-                            </div>
-                            <div class="col-md form-group">
-                                {{ form_label(claim_form.yearOfPurchase) }}
-                                {{ form_widget(claim_form.yearOfPurchase, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(claim_form.yearOfPurchase) }}</div>
-                            </div>
-                        </div>
-                        <div class="form-row mb-4">
-                            <div class="col-md form-group">
-                                {{ form_label(claim_form.phoneStatus, 'Phone condition upon purchase') }}
-                                {{ form_widget(claim_form.phoneStatus, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="with-errros">{{ form_errors(claim_form.phoneStatus) }}</div>
-                            </div>
-                        </div>
-                        <p>We need a bit more information about the type of damage, for example 'broken screen'. {% if picture_of_phone is defined and picture_of_phone %}We also need a photo of your phone showing the damage. You may need someone else's phone, or if your camera is working, using a mirror in a well lit room so we can clearly see the damage.{% endif %}</p>
-                        <div class="form-row {% if claim_form.pictureOfPhone is not defined %}mb-4{% endif %}">
-                            <div class="col-md form-group">
-                                {{ form_label(claim_form.typeDetails, 'What is the type of damage?') }}
-                                {{ form_widget(claim_form.typeDetails, { 'attr': {'class': 'form-control'}}) }}
-                                <div class="with-errors">{{ form_errors(claim_form.typeDetails) }}</div>
-                            </div>
-                            <div id="other_damage"
-                                 class="col-md form-group"
-                                 style="{% if claim.typeDetails != 'other' %}display:none;{% endif %}">
-                                {{ form_label(claim_form.typeDetailsOther, 'Specify the damage') }}
-                                {{ form_widget(claim_form.typeDetailsOther, { 'attr': {'class': 'form-control', 'placeholder': 'Keeps turning off etc...'}}) }}
-                                <div class="with-errors">{{ form_errors(claim_form.typeDetailsOther) }}</div>
-                            </div>
-                        </div>
-                        {% if claim_form.pictureOfPhone is defined %}
-                            <div class="form-row mb-4">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.pictureOfPhone, 'Picture of damaged phone') }}
-                                    {{ form_widget(claim_form.pictureOfPhone) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#picture_modal">{{ claim.damagePictureFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% if claim_form.proofOfUsage is defined %}
-                            <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
-                            <div class="form-row">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.proofOfUsage, 'Proof of usage') }}
-                                    {{ form_widget(claim_form.proofOfUsage) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#usage_modal">{{ claim.proofOfUsageFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% if claim_form.proofOfPurchase is defined %}
-                            <div class="form-row mb-4">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.proofOfPurchase, 'Proof of purchase') }}
-                                    {{ form_widget(claim_form.proofOfPurchase) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#purchase_modal">{{ claim.proofOfPurchaseFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        <p>I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</p>
-                        <div class="form-group">
-                            {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-outline-primary btn-block-xs mr-md-2'}}) }}
-                            {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
-                        </div>
-                    {{ form_end(claim_form) }}
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    {# Page Modal #}
-    {% include 'AppBundle:User:claimModals.html.twig' %}
+
+    {# Page Modals #}
 
 {% endblock %}
 
