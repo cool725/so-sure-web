@@ -116,9 +116,11 @@
                                 <p>So, if you’re looking to get a new phone this Christmas, shop around and have a think about insurance. It’s easy to just say yes to the insurance policy suggested by the person selling you the phone, or buy the cheapest deal you can find on a price comparison website. But it pays to do some digging and look for insurance that really works for you.</p>
                                 <p>We designed <a href="{{ path('homepage') }}">so-sure</a> with that in mind. And we hope you’ll give us a go this Christmas.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

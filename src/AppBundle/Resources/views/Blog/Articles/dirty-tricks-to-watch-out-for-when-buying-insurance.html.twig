@@ -100,9 +100,11 @@
                                 <p>As the Daily Mail points out,<em>“thousands of people are paying for 'unfair' mobile phone insurance policies with up to 40 exclusions littering the small print.”</em> As we’ve seen, these exclusions can include not keeping your mobile in arm's reach, allowing rain to damage it, or losing it after after having one drink. Claims are being refused for tonnes of tenuous reasons, lining the pockets of insurers and failing phone users who thought they were covered.</p>
                                 <p>To rehabilitate the image of the industry and restore trust in the process of getting covered and making a claim, we need to rethink the entire concept of insurance. <a href="{{ path('homepage') }}">so-sure</a> is a new type of insurer that you can actually rely on. We protect you when you need to claim and reward you when you don't. <a href="{{ path('homepage') }}">Find out more here</a>.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

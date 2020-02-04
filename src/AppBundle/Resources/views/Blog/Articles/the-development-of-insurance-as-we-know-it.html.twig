@@ -97,9 +97,11 @@
                                 <p>Computers had long been used in insurance to maintain data and financial accounts. But the personal computer - and, lately, mobile - changed the way insurance was bought and sold and how policies were priced. Actuarial work became more advanced with the rise of the spreadsheet. Financial insurance, coupled with the growth of the derivatives market, gave rise to a whole new breed of insurance, too.</p>
                                 <p>Look out for our upcoming blog post on the electronification of the insurance market as we bring the story of insurance into the 21st Century.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

@@ -87,9 +87,11 @@
                                 <p>So whilst 2018 was productive, 2019/20 looks set to be exciting too. Our focus for the coming 12 months will be firmly upon two elements. First, we’re looking to take our offering international, launching into the US or Asia-Pacific. Second, we’re going to be launching a home and contents insurance product, building upon the model that we’ve pioneered with mobile phone insurance with great success. If you need us in 2018, that’s where we’ll be!</p>
                                 <p>So here’s to 2019 and beyond. We’ve much to do. And it’s great to have you with us.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>
