@@ -89,8 +89,10 @@ class HelvetiaExportService
             'TotalIpt',
             'TotalBrokerFee',
             'PaidBrokerFee',
+            'PaidMGACommission',
             'PotValue',
-            'MarketingPotValue'
+            'MarketingPotValue',
+            'CashToHelvetia'
         );
         /** @var HelvetiaPhonePolicy $policy */
         foreach ($repo->getAllPoliciesForExport($this->environment) as $policy) {
@@ -113,8 +115,10 @@ class HelvetiaExportService
                 $policy->getProRataIpt(),
                 $policy->getProRataBrokerFee(),
                 $policy->getBrokerCommissionPaid(),
+                $policy->getCoverholderCommissionPaid(),
                 $policy->getPotValue(),
-                $policy->getPromoPotValue()
+                $policy->getPromoPotValue(),
+                $policy->getHelvetiaCash()
             );
         }
         return $lines;
