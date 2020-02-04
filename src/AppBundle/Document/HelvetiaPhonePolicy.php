@@ -5,6 +5,7 @@ namespace AppBundle\Document;
 use AppBundle\Document\Policy\Policy;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Classes\Helvetia;
+use AppBundle\Classes\NoOp;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -37,6 +38,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function setCommission($payment, $allowFraction = false, \DateTime $date = null)
     {
+        NoOp::ignore([$allowFraction, $date]);
         $payment->setCoverholderCommission($payment->getGwp() * Helvetia::COMMISSION_PROPORTION);
         $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
         $payment->setBrokerCommission(Helvetia::MONTHLY_BROKER_COMMISSION * $n);
