@@ -98,9 +98,9 @@ class HelvetiaCommissionCommand extends ContainerAwareCommand
             $brokerCommission = $payment->getBrokerCommission();
             $coverholderCommission = $payment->getCoverholderCommission();
             $n = $payment->getPolicy()->getPremium()->fractionOfMonthlyPayments($amount);
-            $expectedTotalCommission = $payment->getAmount() * Helvetia::COMMISSION_PROPORTION;
             $expectedBrokerCommission = $n * Helvetia::MONTHLY_BROKER_COMMISSION;
-            $expectedCoverholderCommission = $expectedTotalCommission - $expectedBrokerCommission;
+            $expectedCoverholderCommission = $payment->getGwp() * Helvetia::COMMISSION_PROPORTION;
+            $expectedTotalCommission = $expectedBrokerCommission + $expectedCoverholderCommission;
             if (NumberHelper::equalTo($totalCommission, $expectedTotalCommission, $tolerance) &&
                 NumberHelper::equalTo($brokerCommission, $expectedBrokerCommission, $tolerance) &&
                 NumberHelper::equalTo($coverholderCommission, $expectedCoverholderCommission, $tolerance)

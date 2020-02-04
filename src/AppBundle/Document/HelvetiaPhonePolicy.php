@@ -5,6 +5,7 @@ namespace AppBundle\Document;
 use AppBundle\Document\Policy\Policy;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Classes\Helvetia;
+use AppBundle\Classes\NoOp;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -37,25 +38,10 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function setCommission($payment, $allowFraction = false, \DateTime $date = null)
     {
-        $date = $date ?: new \DateTime();
-        if ($this->getPremium()->isEvenlyDivisible($payment->getAmount())) {
-            $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
-            $coverholderCommission = ($this->getPremium()->getMonthlyPremiumPrice() *
-                Helvetia::COMMISSION_PROPORTION - Helvetia::MONTHLY_BROKER_COMMISSION) * $n;
-            $payment->setCommission($coverholderCommission, Helvetia::MONTHLY_BROKER_COMMISSION * $n);
-        } elseif ($allowFraction) {
-            if ($payment->getAmount() >= 0) {
-                $payment->setCommission(
-                    $this->getProratedCoverholderCommissionPayment($date),
-                    $this->getProratedBrokerCommissionPayment($date)
-                );
-            } else {
-                $payment->setCommission(
-                    $this->getProratedCoverholderCommissionRefund($date),
-                    $this->getProratedBrokerCommissionRefund($date)
-                );
-            }
-        }
+        NoOp::ignore([$allowFraction, $date]);
+        $payment->setCoverholderCommission($payment->getGwp() * Helvetia::COMMISSION_PROPORTION);
+        $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
+        $payment->setBrokerCommission(Helvetia::MONTHLY_BROKER_COMMISSION * $n);
     }
 
     /**
@@ -67,8 +53,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         if (!$premium) {
             return 0;
         }
-        // 20% of premium price. Alex said after tax.
-        return $premium->getYearlyPremiumPrice() * Helvetia::COMMISSION_PROPORTION;
+        return $premium->getGwp() * 12 * Helvetia::COMMISSION_PROPORTION + Helvetia::YEARLY_BROKER_COMMISSION;
     }
 
     /**
@@ -76,12 +61,11 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getYearlyCoverholderCommission(): float
     {
-        $yearlyTotal = $this->getYearlyTotalCommission();
-        if ($yearlyTotal < Helvetia::YEARLY_BROKER_COMMISSION) {
+        $premium = $this->getPremium();
+        if (!$premium) {
             return 0;
-        } else {
-            return $yearlyTotal - Helvetia::YEARLY_BROKER_COMMISSION;
         }
+        return $premium->getGwp() * 12 * Helvetia::COMMISSION_PROPORTION;
     }
 
     /**
@@ -89,12 +73,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getYearlyBrokerCommission(): float
     {
-        $yearlyTotal = $this->getYearlyTotalCommission();
-        if ($yearlyTotal < Helvetia::YEARLY_BROKER_COMMISSION) {
-            return $yearlyTotal;
-        } else {
-            return Helvetia::YEARLY_BROKER_COMMISSION;
-        }
+        return Helvetia::YEARLY_BROKER_COMMISSION;
     }
 
     /**
@@ -110,8 +89,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         if ($numPayments > 12 || $numPayments < 0) {
             throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
         }
-        $expectedMonthlyCommission = $numPayments * $this->getPremium()->getMonthlyPremiumPrice() *
-            Helvetia::COMMISSION_PROPORTION;
+        $expectedMonthlyCommission = $numPayments * $this->getPremium()->getGwp() * Helvetia::COMMISSION_PROPORTION;
         $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
         if ($this->isCooloffCancelled()) {
             return 0;
@@ -142,6 +120,15 @@ class HelvetiaPhonePolicy extends PhonePolicy
             $expectedCommission = $this->getProratedCommission($date);
         }
         return $expectedCommission;
+    }
+
+    /**
+     * Gives you the amount of money helvetia should have gotten out of this policy currently.
+     * @return float the amount of cash.
+     */
+    public function getHelvetiaCash()
+    {
+        return $this->getPremiumPaid() - $this->getCoverholderCommissionPaid() - $this->getBrokerCommissionPaid();
     }
 
     /**
