@@ -44,7 +44,6 @@ $(function() {
     });
 
     $('.btn-card-pay').on('click', function(e) {
-        //console.log('click');
         e.preventDefault();
         Checkout.open();
     });

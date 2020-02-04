@@ -3,9 +3,11 @@
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Policy renewed | so-sure{% endblock %}
+{% block title %}Policy Renewed | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
@@ -14,98 +16,120 @@
 
 {% block body %}
 
-    <section class="hero">
+    <div class="hero">
         <div class="container-large">
-            <h1 class="h2 mb-4">Thank you for renewing your policy 🤗</h1>
-            {% if policy.hasCashback %}
-                <p class="lead">Your cashback request was received and will be processed <u>28-45</u> days after your policy has ended.</p>
-            {% endif %}
-            <div class="d-lg-flex justify-content-lg-between mb-4">
-                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">
-                            Your policy
-                        </h5>
-                        <div class="cardbox__text">
-                            <div class="h4">
-                                {{ policy.policyNumber }}
+            <div class="row align-items-lg-center justify-content-lg-start">
+                <div class="col-lg-6">
+                    {% if policy is defined and policy %}
+                        <div class="h5 text-columbia-blue-e fit">{{ policy.phone.make }} {{ policy.phone.model }} <span class="mx-2 text-white">|</span> {{ policy.policyNumber }}</div>
+                    {% endif %}
+                    <h1 class="h2 text-white mb-5 mb-lg-4">Policy Renewed 🤗</h1>
+                    {% if policy.hasCashback %}
+                        <p class="text-white">Your cashback request was received and will be processed <u>28-45</u> days after your policy has ended.</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                    <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                        <div class="cardbox__body text-center">
+                            <div class="h6 text-white cardbox__title">
+                                📆 Your Renewal Date
+                            </div>
+                            <div class="cardbox__text">
+                                <p class="lead mb-0">{{ policy.nextPolicy.start|date("jS M Y") }}</p>
+                                <p>
+                                    <small>
+                                    {% if policy and policy.nextPolicy.premiumPlan == 'monthly' %}
+                                        Billed: Monthly on the {{ policy.nextPolicy.billing|date('jS','Europe/London') }}
+                                    {% elseif policy and policy.nextPolicy.premiumPlan == 'yearly' %}
+                                        Billed: Yearly on the {{ policy.nextPolicy.billing|date('jS','Europe/London') }}
+                                    {% else %}
+                                        Billed:❓ Unknown
+                                    {% endif %}
+                                    </small>
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">
-                            Your renewal date
-                        </h5>
-                        <div class="cardbox__text">
-                            <div class="h4">
-                                {{ policy.nextPolicy.start|date("d/m/Y") }}
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                    <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                        <div class="cardbox__body text-center">
+                            <div class="h6 text-white cardbox__title">
+                                💰 Your Premium
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="cardbox cardbox-100 mb-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">
-                            Your premium
-                        </h5>
-                        <div class="cardbox__text">
-                            <div class="h3">
-                                {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
-                                    &pound;{{ policy.nextPolicy.premium.adjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
-                                {% else %}
-                                    &pound;{{ policy.nextPolicy.premium.adjustedYearlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per year</span>
-                                {% endif %}
+                            <div class="cardbox__text">
+                                <p class="lead mb-0">
+                                    {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
+                                        &pound;{{ policy.nextPolicy.premium.adjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
+                                    {% else %}
+                                        &pound;{{ policy.nextPolicy.premium.adjustedYearlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per year</span>
+                                    {% endif %}
+                                </p>
+                                <p>
+                                    <small>
+                                        {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
+                                            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
+                                                Discount of &pound;{{ policy.nextPolicy.premium.getMonthlyDiscount|number_format(2, '.', ',') }} each month
+                                            {% else %}
+                                                No discount
+                                            {% endif %}
+                                        {% else %}
+                                            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
+                                                Discount of &pound;{{ policy.nextPolicy.premium.annualDiscount|number_format(2, '.', ',') }} a year
+                                            {% else %}
+                                                No discount
+                                            {% endif %}
+                                        {% endif %}
+                                    </small>
+                                </p>
                             </div>
-                            {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
-                                {% if policy.nextPolicy.premium.hasAnnualDiscount %}
-                                    including discount of &pound;{{ policy.nextPolicy.premium.getMonthlyDiscount|number_format(2, '.', ',') }} each month
-                                {% endif %}
-                            {% else %}
-                                {% if policy.nextPolicy.premium.hasAnnualDiscount %}
-                                    including discount of &pound;{{ policy.nextPolicy.premium.annualDiscount|number_format(2, '.', ',') }} for the year
-                                {% endif %}
-                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
-            {% if renew_connections_form.renewalConnections|length > 0%}
+        </div>
+    </div>
+
+    <div class="renew">
+        <div class="container-large py-5">
+            {% if renew_connections_form.renewalConnections|length > 0 %}
                 <p class="mb-4">Make sure that you continue to get your pot reward next year by renewing all your existing connections</p>
-                {{ form_start(renew_connections_form) }}
-                    <div class="row">
-                        {% for renewalConnection in renew_connections_form.renewalConnections %}
-                            <div class="col-lg-4">
-                                <div class="d-flex justify-content-start align-items-center connection mb-4 p-3">
-                                    <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}" alt="{{ renewalConnection.vars.data.linkedUser.name }}"
-                                         title="{{ renewalConnection.vars.data.linkedUser.name }}"
-                                         width="40px"
-                                         class="mr-3 rounded-circle {% if renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}border-danger{% endif %}">
-                                    <span class="h6 mb-0">{{ renewalConnection.vars.data.linkedUser.name }}</span>
-                                    <span class="ml-auto">{{ form_row(renewalConnection.renew) }}</span>
+                <div class="connections">
+                    <div class="connections-list">
+                        <div class="connections-list-inner">
+                            {{ form_start(renew_connections_form) }}
+                                {% for renewalConnection in renew_connections_form.renewalConnections %}
+                                    <div class="connections-list-item">
+                                        <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}"
+                                             alt="{{ renewalConnection.vars.data.linkedUser.name }}"
+                                             class="connection rounded-circle {% if renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}border-danger{% else %}border-primary{% endif %} mr-3"
+                                             width="38px">
+                                        <span class="h6 mb-0 flex-grow-1">
+                                            {{ renewalConnection.vars.data.linkedUser.name }}
+                                        </span>
+                                        <span class="h6 mb-0">
+                                            {{ form_row(renewalConnection.renew) }}
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                                <div class="form-group text-center mt-4">
+                                    {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {{ form_end(renew_connections_form) }}
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <a href="{{ path('user_home') }}"
-                           class="btn btn-outline-primary btn-block-xs mr-md-2">Back</a>
-                        {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
-                    </div>
-                {{ form_end(renew_connections_form) }}
+                </div>
             {% else %}
-                <a href="{{ path('user_home') }}"
-                   class="btn btn-outline-primary btn-block-xs">Back</a>
+                <p class="mb-4">We know how annoying it is to pay into insurance every month and never make a claim, so we've changed the game. Make use of our <a href="{{ path('social_insurance') }}">social insurance</a> feature by connecting with your friends and family members – if none of you make a claim during your policy term, you'll receive money back at the end of the year.</p>
             {% endif %}
         </div>
-    </section>
+    </div>
 
     {# Page Modals #}
-
 
 {% endblock %}
 
 {% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
     <script src="{{ asset('css-js/user-renew.js') }}"></script>
 {% endblock %}

@@ -1,5 +1,7 @@
 // native-share.js
 
+require('sharer.js');
+
 $('.native-share').on('click', function(e) {
     e.preventDefault();
 
@@ -7,7 +9,7 @@ $('.native-share').on('click', function(e) {
         nav_url = $(this).data('native-url'),
         nav_text = $(this).data('native-text');
 
-    console.log(nav_title, nav_url, nav_text);
+    // console.log(nav_title, nav_url, nav_text);
 
     // Check if native share is available
     if (navigator.share) {
@@ -21,7 +23,7 @@ $('.native-share').on('click', function(e) {
     } else {
         // console.log('Native share not available');
         // Needs some kinda default maybe just expand desktop share
-        $(this).fadeOut().next('.non-native-share').removeClass('d-none').show();
+        $(this).fadeOut().next('.non-native-share').removeClass('d-none');
     }
 
 });

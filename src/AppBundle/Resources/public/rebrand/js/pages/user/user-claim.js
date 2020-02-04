@@ -10,7 +10,7 @@ require('tempusdominus-bootstrap-4');
 require('moment');
 require('jquery-validation');
 require('jquery-mask-plugin');
-require('../../common/validationMethods.js');
+require('../../common/validation-methods.js');
 
 
 $(function() {

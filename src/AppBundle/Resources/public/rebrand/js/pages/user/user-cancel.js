@@ -6,8 +6,8 @@ require('../../../sass/pages/user/user-cancel.scss');
 
 // Require components
 require('jquery-validation');
-require('../../common/validationMethods.js');
-import tracking from '../../common/trackData.js';
+require('../../common/validation-methods.js');
+import tracking from '../../common/track-data.js';
 
 $(function() {
 

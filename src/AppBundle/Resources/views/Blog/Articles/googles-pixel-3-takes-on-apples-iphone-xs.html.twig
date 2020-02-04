@@ -166,9 +166,11 @@
                                 <p>To reiterate, this is based on leaked reports of the Pixel 3, but the rumours usually aren’t wrong. In power, size, design and features, the imperious Apple iPhone XS sweeps the board.</p>
                                 <p>The only area where Google truly wins out is price, which, let’s face it, is pretty key. The XS could cost you twice as much as the Pixel 3. Whether it is twice as good, remains to be seen.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

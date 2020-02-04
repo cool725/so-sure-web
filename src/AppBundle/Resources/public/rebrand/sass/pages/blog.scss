@@ -35,6 +35,21 @@
         p, ul, ol {
             margin-bottom: 2rem;
         }
+
+        // Fix for twitter embed
+        .twitter-tweet {
+            margin: {
+                // left: auto;
+                // right: auto;
+                top: 0 !important;
+                bottom: 2rem !important;
+            }
+        }
+    }
+
+    &-footer-cta {
+        text-align: center;
+        margin: 5rem 0 0 0;
     }
 
 }

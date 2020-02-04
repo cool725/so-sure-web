@@ -4052,12 +4052,6 @@ jquery-bridget@^2.0.1:
   dependencies:
     jquery ">=1.4.2 <4"
 
-jquery-circle-progress@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/jquery-circle-progress/-/jquery-circle-progress-1.2.2.tgz#260e9130ac8e2b5572eaa7a93b9e8a6b27bc8eea"
-  dependencies:
-    jquery "*"
-
 jquery-mask-plugin@^1.14.15:
   version "1.14.15"
   resolved "https://registry.yarnpkg.com/jquery-mask-plugin/-/jquery-mask-plugin-1.14.15.tgz#9daabb41024383cba2a793bacfa46ef8f87273a5"
@@ -4068,7 +4062,7 @@ jquery-validation@^1.17.0:
   dependencies:
     jquery "^1.7 || ^2.0 || ^3.1"
 
-jquery@*, jquery@>=1.11, "jquery@>=1.4.2 <4", "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
+jquery@>=1.11, "jquery@>=1.4.2 <4", "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
@@ -4160,10 +4154,6 @@ jsprim@^1.2.2:
     extsprintf "1.3.0"
     json-schema "0.2.3"
     verror "1.10.0"
-
-"jssocials@git://github.com/so-sure/jssocials.git#master":
-  version "1.5.0"
-  resolved "git://github.com/so-sure/jssocials.git#e703dc506076861648b869bf4cb2ea5dd5a2ae04"
 
 killable@^1.0.0:
   version "1.0.0"
@@ -5702,6 +5692,13 @@ process@^0.11.10:
   version "0.11.10"
   resolved "https://registry.yarnpkg.com/process/-/process-0.11.10.tgz#7332300e840161bda3e69a1d1d91a7d4bc16f182"
 
+progressbar.js@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/progressbar.js/-/progressbar.js-1.1.0.tgz#300f99be40ba93fb0867f91dff01771236cade70"
+  integrity sha512-K68/xcyXKo2I6T3PfIkXrRaycxROmWeU4bugb49iulWR25cU94PM0cfZ47S0jDhG5K3vPhZwCOy1fgb5Pgh6UQ==
+  dependencies:
+    shifty "^2.1.2"
+
 promise-inflight@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
@@ -6409,6 +6406,11 @@ shallow-clone@^1.0.0:
     kind-of "^5.0.0"
     mixin-object "^2.0.1"
 
+sharer.js@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/sharer.js/-/sharer.js-0.4.0.tgz#73f2cd36ad82135137d56f17271d2d46a7081a91"
+  integrity sha512-dTKCju0QdewFMHeGHvzYOolNC3DX0HJmQWYSWQVF5qYqDof1Jfq7D43ep3F7aiUVdSoWf/zcOaKFErTlqNKPKQ==
+
 shebang-command@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/shebang-command/-/shebang-command-1.2.0.tgz#44aac65b695b03398968c39f363fee5deafdf1ea"
@@ -6422,6 +6424,11 @@ shebang-regex@^1.0.0:
 shellwords@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
+
+shifty@^2.1.2:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/shifty/-/shifty-2.8.3.tgz#6252b5cd0e873b2e23fb6eddf0540034d6cda980"
+  integrity sha512-/5pEfjV279B7gUFFEItEeBEDyyUFD/H2GNXX130jqJKeWVItDgkKOh2SmKT63Oz8dDP16U8o5bbH9OViYwqI9A==
 
 sigmund@~1.0.0:
   version "1.0.1"

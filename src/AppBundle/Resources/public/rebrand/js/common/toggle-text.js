@@ -1,4 +1,4 @@
-// toggleText.js
+// toggle-text.js
 //
 // TODO: Move or use new data method
 $.fn.extend({

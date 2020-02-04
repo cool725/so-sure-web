@@ -98,9 +98,11 @@
                                 <p>Until now, the insurance industry has been built for insurance companies, by insurance companies. Social insurance changes all that. Its built for consumers, by consumers. Millennials are responding to this message, because they tend to seek out ethical, transparent companies. But social insurance isn’t just for the young, it’s for everyone.</p>
                                 <p>Right now the biggest challenge facing social insurance is a lack of awareness and we have much work to do in order to convince consumers that insurance doesn't have to be boring, stressful and unreliable. Social insurance makes finding, buying and using insurance effortless, intuitive and fair. And it has the potential to restore trust in an entire industry.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

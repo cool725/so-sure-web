@@ -1,4 +1,4 @@
-// validationMethods.js
+// validation-methods.js
 
 const removeAccents = (text) => {
     let accents    = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž',

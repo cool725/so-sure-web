@@ -2,52 +2,70 @@
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Request cashback | so-sure{% endblock %}
+{% block title %}Request Cashback | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="hero">
-        <div class="container">
-            {{ form_start(cashback_form, {'attr': {
-                'data-toggle': 'validator',
-                'class': 'form-400 validate-form-cashback',
-                'autocomplete': 'off'
-            }}) }}
-                <h1 class="h2">Request cashback 💸</h1>
-                <p class="mb-4">Please use this form to request cashback. Note that it will take <u>28-45</u> days from the end of your policy before the bacs transfer will be sent.</p>
-                <div class="form-group">
-                    {{ form_label(cashback_form.accountName, 'Account Name') }}
-                    {{ form_widget(cashback_form.accountName, {'attr': {'class': 'form-control'}}) }}
-                    <div class="with-errors">{{ form_errors(cashback_form.accountName) }}</div>
-                </div>
-                <div class="form-group">
-                    {{ form_label(cashback_form.sortCode, 'Sort Code') }}
-                    {{ form_widget(cashback_form.sortCode, {'attr': {'class': 'form-control'}}) }}
-                    <div class="with-errors">{{ form_errors(cashback_form.sortCode) }}</div>
-                </div>
-                <div class="form-group">
-                    {{ form_label(cashback_form.accountNumber, 'Account Number') }}
-                    {{ form_widget(cashback_form.accountNumber, {'attr': {'class': 'form-control'}}) }}
-                    <div class="with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
-                </div>
-                <div class="form-group">
-                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
-                </div>
-            {{ form_end(cashback_form) }}
+    <div class="hero">
+        <div class="container-large pb-5">
+            <h1 class="text-white mb-5 mb-lg-4">
+                <h1 class="h2 text-white mb-5">Request Cashback</h1>
+            </h1>
         </div>
-    </section>
+    </div>
+
+    <div class="settings pb-lg-5">
+        <div class="container-large pb-5">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="cardbox cardbox-100">
+                        <div class="cardbox__body">
+                            {{ form_start(cashback_form, {'attr': {
+                                'data-toggle': 'validator',
+                                'class': 'form-400 validate-form-cashback',
+                                'autocomplete': 'off'
+                            }}) }}
+                                <p class="mb-4">Please use this form to request cashback. Note that it will take <u>28-45</u> days from the end of your policy before the bacs transfer will be sent.</p>
+                                <div class="form-group">
+                                    {{ form_label(cashback_form.accountName, 'Account Name') }}
+                                    {{ form_widget(cashback_form.accountName, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(cashback_form.accountName) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(cashback_form.sortCode, 'Sort Code') }}
+                                    {{ form_widget(cashback_form.sortCode, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(cashback_form.sortCode) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_label(cashback_form.accountNumber, 'Account Number') }}
+                                    {{ form_widget(cashback_form.accountNumber, {'attr': {'class': 'form-control'}}) }}
+                                    <div class="with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
+                                </div>
+                            {{ form_end(cashback_form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {# Page Modals #}
-
 
 {% endblock %}
 
 {% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
     <script src="{{ asset('css-js/user-cashback.js') }}"></script>
 {% endblock %}

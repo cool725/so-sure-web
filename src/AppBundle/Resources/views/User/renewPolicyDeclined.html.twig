@@ -2,9 +2,11 @@
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Don't Renew my Policy | so-sure{% endblock %}
+{% block title %}Policy Not Renewed | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
@@ -13,26 +15,39 @@
 
 {% block body %}
 
-    <section class="hero">
+    <div class="hero">
         <div class="container-large">
-            <h1 class="h2 mb-4">We’re sorry you’re leaving 😔</h1>
-            <p class="lead">Are you sure you want to leave us?</p>
-            <p class="lead">Your phone will no longer be covered against Water damage, cracked screens, loss and theft!</p>
-            {% if policy.hasCashback %}
-                <p class="lead mb-4">Your cashback request was received and will be processed <u>28-45</u> days after your policy has ended.</p>
-            {% endif %}
-            <a href="{{ path('user_policy', {'policyId': policy.id }) }}"
-               class="btn btn-outline-primary btn-block-xs mr-md-2">I'm sure</a>
-            <a href="{{ path('user_renew_retry_policy', {'id': policy.id }) }}"
-               class="btn btn-success btn-block-xs">I'd like to renew my policy</a>
+            <div class="row align-items-lg-center justify-content-lg-start">
+                <div class="col">
+                    {% if policy is defined and policy %}
+                        <div class="h5 text-columbia-blue-e fit">{{ policy.phone.make }} {{ policy.phone.model }} <span class="mx-2 text-white">|</span> {{ policy.policyNumber }}</div>
+                    {% endif %}
+                    <h1 class="h2 text-white mb-5 mb-lg-4">We're sorry you're leaving 😔</h1>
+                    {% if policy.hasCashback %}
+                        <p class="text-white">Your cashback request was received and will be processed <u>28-45</u> days after your policy has ended.</p>
+                    {% endif %}
+                    <a href="{{ path('user_policy', {'id': policy.id}) }}"
+                       class="btn btn-outline-deep-sky-blue-d btn-block-xs mr-md-2">I'm sure</a>
+                    <a href="{{ path('user_renew_retry_policy', {'id': policy.id }) }}"
+                       class="btn btn-success btn-block-xs">Renew My Policy</a>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
+
+    <div class="renew">
+        <div class="container-large py-5">
+            <div class="h5 mb-4">Are you sure you want to leave us?</div>
+            <p class="mb-4">Your phone will no longer be covered against Water damage, cracked screens, loss and theft!</p>
+            <p class="mb-4">We know how annoying it is to pay into insurance every month and never make a claim, so we've changed the game. Make use of our <a href="{{ path('social_insurance') }}">social insurance</a> feature by connecting with your friends and family members – if none of you make a claim during your policy term, you'll receive money back at the end of the year.</p>
+        </div>
+    </div>
 
     {# Page Modals #}
-
 
 {% endblock %}
 
 {% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
     <script src="{{ asset('css-js/user-renew.js') }}"></script>
 {% endblock %}

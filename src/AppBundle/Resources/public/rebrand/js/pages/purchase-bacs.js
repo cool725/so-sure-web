@@ -8,7 +8,7 @@ require('bootstrap/js/dist/dropdown');
 // Require components
 require('jquery-validation');
 require('jquery-mask-plugin');
-require('../common/validationMethods.js');
+require('../common/validation-methods.js');
 require('../common/checkout.js');
 let textFit = require('textfit');
 

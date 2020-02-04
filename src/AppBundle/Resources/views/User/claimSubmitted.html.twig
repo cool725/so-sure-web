@@ -1,152 +1,164 @@
 {% extends 'base_rebrand.html.twig' %}
-{% form_theme claim_form with 'AppBundle:Form:fields.html.twig' %}
+{% form_theme claim_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Submitted claim - {{ app.user.firstname }} | so-sure{% endblock %}
+{% block title %}Submitted Claim | Claims | so-sure{% endblock %}
+
+{# Set Meta #}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/user-claim.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="hero">
+    <div class="hero">
         <div class="container-large">
-            {% if is_in_review %}
-                <h1 class="h2 mb-4">Claim being reviewed 🕵️‍♂️</h1>
-            {% else %}
-                <h1 class="h2 mb-4">Thank you for submitting your claim 👍</h1>
-            {% endif %}
+            <h1 class="text-white mb-5 mb-lg-4">
+                {% if is_in_review %}
+                    Claim being reviewed
+                {% else %}
+                    Thank you for submitting your claim
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+
+    <div class="claim pb-lg-5">
+        <div class="container pb-5">
             <div class="row">
-                <div class="col-lg-5 order-lg-12">
-                    <div class="bg-selago p-4 mb-4 rounded">
-                        <h2 class="h3 mb-4">Need to upload additional documents? ⚠️</h2>
-                        <p>It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing part of a number that we need. Dont worry, simply just upload another document below and we'll pass that along to the claims team to review.</p>
-                        <p>If you need further assistance in submitting your claim please chat to our friendly customer service team <a href="#" class="open-intercom"><u>here</u></a> Monday to Friday 9-5.30pm.</p>
+                <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                    <div class="cardbox cardbox-100">
+                        <div class="cardbox__body">
+                            <div class="bg-selago p-4 mb-4 rounded">
+                                <h2 class="h3 mb-4">Need to upload additional documents?</h2>
+                                <p>It can happen to anyone. The network didn't give you quite the right document we need. Or perhaps the scan was missing part of a number that we need. Dont worry, simply just upload another document below and we'll pass that along to the claims team to review.</p>
+                                <p>If you need further assistance in submitting your claim please chat to our friendly customer service team <a href="#" class="open-intercom"><u>here</u></a> Monday to Friday 9-5.30pm.</p>
+                            </div>
+                           {% if is_in_review %}
+                                <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your <strong>{{ claim_phone }}</strong> with IMEI <strong>{{ claim.policy.imei }}</strong> is being processed by our claims team.</p>
+                                <p class="mb-4">If you need to upload more documents please use the form below.</p>
+                            {% else %}
+                                <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your <strong>{{ claim_phone }}</strong> with IMEI <strong>{{ claim.policy.imei }}</strong> has been sent to our claims team for processing.</p>
+                                <p class="mb-4">If we need to get in touch we will contact you with the details you provided:</p>
+                                <ul class="mb-4">
+                                    <li class="mb-2">Phone number: <strong>{{ claim.phoneToReach }}</strong></li>
+                                    <li>Time you requested: <strong>{{ claim.timeToReach }}</strong></li>
+                                </ul>
+                                <p class="mb-4">Incorrect details? <a href="#" class="open-intercom"><u>Contact us</u></a> 💬.</p>
+                                <p>Prefer to speak to a human? Call our claims team on <a href="tel:{{ support_number }}">{{ support_number }}</a> (local rates apply).</p>
+                            {% endif %}
+                            <h4 class="mb-4">Upload additional documents</h4>
+                            {{ form_start(claim_form, {'attr': {
+                                'data-toggle': 'validator',
+                                'class': 'validate-form',
+                                'data-client-validation': form_client_validation
+                            }}) }}
+                                {% if claim_form.proofOfUsage is defined %}
+                                    <p>You should request a proof of usage document from your Network Provider that has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                                    <div class="form-row">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.proofOfUsage, 'Proof of usage') }}
+                                            {{ form_widget(claim_form.proofOfUsage) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#usage_modal">{{ claim.proofOfUsageFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if claim_form.pictureOfPhone is defined %}
+                                    <p>Just take a photo of your phone that's damaged. You may need someone else's phone, or if your camera is working, using a mirror in a well lite room is fine.</p>
+                                    <div class="form-row mb-4">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.pictureOfPhone, 'Picture of damaged phone') }}
+                                            {{ form_widget(claim_form.pictureOfPhone) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#picture_modal">{{ claim.damagePictureFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if claim_form.proofOfBarring is defined %}
+                                    <p>You should request a proof of barring document from your Network Provider that has your IMEI number and when it was barred.</p>
+                                    <div class="form-row mb-4">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.proofOfBarring, 'Proof of barring') }}
+                                            {{ form_widget(claim_form.proofOfBarring) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#baring_modal">{{ claim.proofOfBarringFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if claim_form.proofOfLoss is defined %}
+                                    <p>We require a proof of loss document, which you can file online at <a href="https://www.reportmyloss.com/uk/" target="_blank" rel="noopener noreferrer">Report My Loss</a>.</p>
+                                    <div class="form-row mb-4">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.proofOfLoss, 'Proof of barring') }}
+                                            {{ form_widget(claim_form.proofOfLoss) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#baring_modal">{{ claim.proofOfLossFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.proofOfLoss) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if claim_form.proofOfPurchase is defined %}
+                                    <p>We require a proof of purchase document such as a receipt.</p>
+                                    <div class="form-row mb-4">
+                                        <div class="col-md form-group">
+                                            {{ form_label(claim_form.proofOfPurchase, 'Proof of purchase') }}
+                                            {{ form_widget(claim_form.proofOfPurchase) }}
+                                            <small class="form-text">
+                                                <a href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#purchase_modal">{{ claim.proofOfPurchaseFiles|length }} file(s) upload</a>
+                                            </small>
+                                            <div class="with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <p>Upload any other files that will support your claim or as requested by the claims team.</p>
+                                <div class="form-row mb-4">
+                                    <div class="col-md form-group">
+                                        {{ form_label(claim_form.other, 'Supporting files') }}
+                                        {{ form_widget(claim_form.other) }}
+                                        <small class="form-text">
+                                            <a href="#"
+                                               data-toggle="modal"
+                                               data-target="#other_modal">{{ claim.otherFiles|length }} file(s) upload</a>
+                                        </small>
+                                        <div class="with-errors">{{ form_errors(claim_form.other) }}</div>
+                                    </div>
+                                </div>
+                                <div class="form-group text-right">
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Submit', 'attr': {'class': 'btn btn-success  btn-block-xs'}}) }}
+                                </div>
+                            {{ form_end(claim_form) }}
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-7 order-lg-1">
-                    {% if is_in_review %}
-                        <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your {{ claim_phone }} with IMEI {{ claim.policy.imei }} is being processed by our claims team.</p>
-                        <p class="mb-4">If you need to upload more documents please use the form below.</p>
-                    {% else %}
-                        <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your {{ claim_phone }} with IMEI {{ claim.policy.imei }} has been sent to our claims team for processing.</p>
-                        <p class="mb-4">If we need to get in touch we will contact you with the details you provided:</p>
-                        <ul class="mb-4">
-                            <li class="mb-2">Phone number: <strong>{{ claim.phoneToReach }}</strong></li>
-                            <li>Time you requested: <strong>{{ claim.timeToReach }}</strong></li>
-                        </ul>
-                        <p class="mb-4">Incorrect details? <a href="#" class="open-intercom"><u>Contact us</u></a> 💬.</p>
-                    {% endif %}
-                    <h4 class="mb-4">Upload additional documents</h4>
-                    {{ form_start(claim_form, {'attr': {
-                        'data-toggle': 'validator',
-                        'class': 'validate-form',
-                        'data-client-validation': form_client_validation
-                    }}) }}
-                        {% if claim_form.proofOfUsage is defined %}
-                            <p>You should request a proof of usage document from your Network Provider that has your IMEI number and the first and last time that IMEI was used on their network.</p>
-                            <div class="form-row">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.proofOfUsage, 'Proof of usage') }}
-                                    {{ form_widget(claim_form.proofOfUsage) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#usage_modal">{{ claim.proofOfUsageFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% if claim_form.pictureOfPhone is defined %}
-                            <p>Just take a photo of your phone that's damaged. You may need someone else's phone, or if your camera is working, using a mirror in a well lite room is fine.</p>
-                            <div class="form-row mb-4">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.pictureOfPhone, 'Picture of damaged phone') }}
-                                    {{ form_widget(claim_form.pictureOfPhone) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#picture_modal">{{ claim.damagePictureFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% if claim_form.proofOfBarring is defined %}
-                            <p>You should request a proof of barring document from your Network Provider that has your IMEI number and when it was barred.</p>
-                            <div class="form-row mb-4">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.proofOfBarring, 'Proof of barring') }}
-                                    {{ form_widget(claim_form.proofOfBarring) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#baring_modal">{{ claim.proofOfBarringFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% if claim_form.proofOfLoss is defined %}
-                            <p>We require a proof of loss document, which you can file online at <a href="https://www.reportmyloss.com/uk/" target="_blank" rel="noopener noreferrer">Report My Loss</a>.</p>
-                            <div class="form-row mb-4">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.proofOfLoss, 'Proof of barring') }}
-                                    {{ form_widget(claim_form.proofOfLoss) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#baring_modal">{{ claim.proofOfLossFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.proofOfLoss) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% if claim_form.proofOfPurchase is defined %}
-                            <p>We require a proof of purchase document such as a receipt.</p>
-                            <div class="form-row mb-4">
-                                <div class="col-md form-group">
-                                    {{ form_label(claim_form.proofOfPurchase, 'Proof of purchase') }}
-                                    {{ form_widget(claim_form.proofOfPurchase) }}
-                                    <small class="form-text">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#purchase_modal">{{ claim.proofOfPurchaseFiles|length }} file(s) upload</a>
-                                    </small>
-                                    <div class="with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        <p>Upload any other files that will support your claim or as requested by the claims team.</p>
-                        <div class="form-row mb-4">
-                            <div class="col-md form-group">
-                                {{ form_label(claim_form.other, 'Supporting files') }}
-                                {{ form_widget(claim_form.other) }}
-                                <small class="form-text">
-                                    <a href="#"
-                                       data-toggle="modal"
-                                       data-target="#other_modal">{{ claim.otherFiles|length }} file(s) upload</a>
-                                </small>
-                                <div class="with-errors">{{ form_errors(claim_form.other) }}</div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            {{ form_widget(claim_form.confirm, { 'label': 'Submit', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
-                        </div>
-                    {{ form_end(claim_form) }}
-                    <p>Prefer to speak to a human? Call our claims team on <a href="tel:{{ support_number }}">{{ support_number }}</a> (local rates apply).</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    {# Page Modal #}
+    {# Page Modals #}
     {% include 'AppBundle:User:claimModals.html.twig' %}
 
 {% endblock %}

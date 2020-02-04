@@ -107,6 +107,19 @@ abstract class Policy
     const CANCELLED_UPGRADE = 'upgrade';
     const CANCELLED_PICSURE_REQUIRED_EXPIRED = 'picsure-required-expired';
 
+    const CANCELLED_REASONS = [
+        self::CANCELLED_UNPAID,
+        self::CANCELLED_ACTUAL_FRAUD,
+        self::CANCELLED_SUSPECTED_FRAUD,
+        self::CANCELLED_USER_REQUESTED,
+        self::CANCELLED_COOLOFF,
+        self::CANCELLED_BADRISK,
+        self::CANCELLED_DISPOSSESSION,
+        self::CANCELLED_WRECKAGE,
+        self::CANCELLED_UPGRADE,
+        self::CANCELLED_PICSURE_REQUIRED_EXPIRED
+    ];
+
     const PLAN_MONTHLY = 'monthly';
     const PLAN_YEARLY = 'yearly';
 
@@ -3769,9 +3782,10 @@ abstract class Policy
         $cliffDate = clone $this->getStart();
 
         // pseudo cliff date for displaying a 14 day message
+        // TODO: This needs removing so it's always just 60 days
         if ($pseudo) {
             // add 14 days
-            $cliffDate->add(new \DateInterval('P14D'));
+            $cliffDate->add(new \DateInterval('P60D'));
         } else {
             // add 60 days
             $cliffDate->add(new \DateInterval('P60D'));

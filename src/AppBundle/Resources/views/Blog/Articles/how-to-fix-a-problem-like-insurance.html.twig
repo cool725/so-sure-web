@@ -92,9 +92,11 @@
                                 <p>This might sound innovative, perhaps even disruptive, but it’s actually a return to the roots of the insurance industry back in the 17th Century, when <a href="https://en.wikipedia.org/wiki/Mutual_insurance" target="_blank" rel="noopener noreferrer">mutual insurance companies</a> originated in the aftermath of the Great Fire Of London to pool resources and help people cover losses. Unlike traditional mutual models, which pool large numbers of individuals, social insurance is based on people and their personal networks. This allows our customers to share upside and get rewarded when they (and those they know and trust) don’t claim.</p>
                                 <p>InsurTech is hugely exciting and we’re proud to be part of the movement, standing shoulder to shoulder with forward-thinking companies striving to make insurance better. Technology has the potential to optimise operations, leveraging technology to reduce complexity, stress and inefficiencies. However, it’s just a tool. It takes more than tech to rebuild trust with customers. To do that, we need to go back to basics and reform the underlying model. By championing social insurance we can make insurance work harder - and better - for everyone.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

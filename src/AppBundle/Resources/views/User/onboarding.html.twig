@@ -55,13 +55,6 @@
     {% endif %}
 {% endblock %}
 
-{% block pixel %}
-    {# Pixels #}
-    {% if environment == 'prod' %}
-        <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width="1" height="1" border="0" class="position-absolute invisible" />
-    {% endif %}
-{% endblock %}
-
 {% block body %}
 
     <section class="onboarding">
@@ -343,10 +336,32 @@
                             {% if device_category() == 'Mobile' %}
                                 <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
                                     <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
-                                    {# TODO: Rework icons #}
-                                    <div id="onboarding_btn_share"
-                                         data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
-                                         data-share-text="Hey, we could win £200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here:">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <a href="#"
+                                           class="track-data mr-3"
+                                           data-sharer="twitter"
+                                           data-title="{{ og_description }}"
+                                           data-url="{{ og_url }}"
+                                           data-via="wearesosure"
+                                           data-hashtags="so-sure, phoneinsurance"
+                                           data-event="share-twitter-user-dashboard-dt">
+                                           <i class="fab fa-twitter fa-fw fa-2x text-twitter"></i> <span class="sr-only">Tweet</span></a>
+                                        <a href="#"
+                                           class="track-data mr-3"
+                                           data-sharer="facebook"
+                                           data-title="{{ og_description }}"
+                                           data-url="{{ og_url }}"
+                                           data-hashtags="so-sure, phoneinsurance"
+                                           data-event="share-facebook-user-dashboard-dt">
+                                           <i class="fab fa-facebook-square fa-fw fa-2x text-facebook"></i> <span class="sr-only">Facebook</span></a>
+                                        <a href="#"
+                                           class="track-data"
+                                           data-sharer="whatsapp"
+                                           data-web
+                                           data-title="{{ og_description }}"
+                                           data-url="{{ og_url }}"
+                                           data-event="share-whatsapp-user-dashboard-dt">
+                                           <i class="fab fa-whatsapp fa-fw fa-2x text-whatsapp"></i> <span class="sr-only">Whatsapp</span></a>
                                     </div>
                                 </div>
                             {% endif %}
@@ -374,12 +389,34 @@
                             </div>
                         </div>
                         {% if device_category() == 'Desktop' or device_category() == 'Tablet'  %}
-                            <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
+                            <div class="d-flex align-items-center mt-lg-3 mb-4">
                                 <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
-                                {# TODO: Rework icons #}
-                                <div id="onboarding_btn_share"
-                                     data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
-                                     data-share-text="Hey, we could win £200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here:">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <a href="#"
+                                       class="track-data mr-3"
+                                       data-sharer="twitter"
+                                       data-title="{{ og_description }}"
+                                       data-url="{{ og_url }}"
+                                       data-via="wearesosure"
+                                       data-hashtags="so-sure, phoneinsurance"
+                                       data-event="share-twitter-user-dashboard-dt">
+                                       <i class="fab fa-twitter fa-fw fa-2x text-twitter"></i> <span class="sr-only">Tweet</span></a>
+                                    <a href="#"
+                                       class="track-data mr-3"
+                                       data-sharer="facebook"
+                                       data-title="{{ og_description }}"
+                                       data-url="{{ og_url }}"
+                                       data-hashtags="so-sure, phoneinsurance"
+                                       data-event="share-facebook-user-dashboard-dt">
+                                       <i class="fab fa-facebook-square fa-fw fa-2x text-facebook"></i> <span class="sr-only">Facebook</span></a>
+                                    <a href="#"
+                                       class="track-data"
+                                       data-sharer="whatsapp"
+                                       data-web
+                                       data-title="{{ og_description }}"
+                                       data-url="{{ og_url }}"
+                                       data-event="share-whatsapp-user-dashboard-dt">
+                                       <i class="fab fa-whatsapp fa-fw fa-2x text-whatsapp"></i> <span class="sr-only">Whatsapp</span></a>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-center">
@@ -398,6 +435,7 @@
                                    Finish <i class="far fa-long-arrow-right fa-lg ml-2"></i></a></a>
                             </div>
                         {% endif %}
+
                     </div>
                 </div>
                 <div class="carousel-item">
@@ -406,7 +444,7 @@
                             <h2 class="h3 text-primary mb-3">Thanks for choosing <span class="text-nowrap">so-sure 😊</span></h2>
                             <div class="summary-cardbox">
                                 <div class="summary-cardbox__header">
-                                    <h4 class="text-primary mb-0">Policy Summary</h4>
+                                    <h4 class="text-white mb-0">Policy Summary</h4>
                                 </div>
                                 <div class="summary-cardbox__body d-lg-flex align-items-lg-center">
                                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png" alt="so-sure - super quick cover" width="160px" class="d-none d-lg-inline mr-4">
@@ -458,7 +496,7 @@
                                 <a href="{{ path('user_home') }}"
                                    class="btn btn-outline-primary ml-3"
                                    role="button">
-                                   Customer login <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
+                                   My Dashboard <i class="far fa-long-arrow-right fa-lg ml-2"></i></a>
                             </div>
                         {% endif %}
                     </div>

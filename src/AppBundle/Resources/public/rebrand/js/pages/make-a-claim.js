@@ -6,7 +6,7 @@ require('../../sass/pages/make-a-claim.scss');
 
 // Require components
 require('jquery-validation');
-require('../common/validationMethods.js');
+require('../common/validation-methods.js');
 
 // Lazy load images
 require('intersection-observer');

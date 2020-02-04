@@ -100,9 +100,11 @@
                                 <p>And during those 6 months the Moov Nov can track your steps, your sleep, your fitness goals all with 3D motion sensor technology, which it uses to track and analyse all of your activity, all connected to the Moov Now app. It also looks really, really cool.</p>
                                 <p>And the best part? The price. Starting at &pound;65, the Moov now doesn’t even need the January sales to make buying it worthwhile because it’s already such good value. With one of these on your wrist, you’ve really no excuse come January 1st to lace up your trainers and hit the roads. Sorry about that!</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

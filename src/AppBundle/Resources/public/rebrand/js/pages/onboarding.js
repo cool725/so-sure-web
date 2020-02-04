@@ -8,12 +8,10 @@ require('bootstrap/js/dist/carousel');
 
 // Require components
 require('jquery-validation');
-require('../common/validationMethods.js');
-require('jssocials');
-
+require('../common/validation-methods.js');
 let Clipboard = require('clipboard');
 
-import tracking from '../common/trackData.js';
+import tracking from '../common/track-data.js';
 
 $(function() {
 
@@ -143,26 +141,6 @@ $(function() {
         setTimeout(function() {
             $('.btn-copy').tooltip('hide');
         }, 1500);
-    });
-
-    // Social Sharing
-    // NOTE: We use JSSOCIALS - see fork on github for more info
-    const onboardingShare = $('#onboarding_btn_share');
-
-    // Share buttons
-    $(onboardingShare).jsSocials({
-        shares: ['whatsapp', 'twitter', 'facebook'],
-        text:      $(onboardingShare).data('share-text'),
-        url:       $(onboardingShare).data('share-link'),
-        shareIn:   'popup',
-        showLabel: false,
-        showCount: false,
-        on: {
-            click: function(e) {
-                let location = 'onboarding';
-                tracking(this.share, 'invite', location);
-            }
-        }
     });
 
     // Email Invite code

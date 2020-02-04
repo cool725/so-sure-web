@@ -2,61 +2,69 @@
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Make a claim - {{ app.user.firstname }} | so-sure{% endblock %}
+{% block title %}Pay Remainder | Claims | so-sure{% endblock %}
 
+{# Set Meta #}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/user-claim.css') }}">
 {% endblock %}
 
 {% block body %}
 
+    <div class="hero">
+        <div class="container-large">
+            <h1 class="text-white mb-5 mb-lg-4">Make a Claim</h1>
+        </div>
+    </div>
+
     {% set remainderTotal = policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') - policy.premiumPaid | number_format(2, '.', ',') %}
 
-    <section class="hero">
-        <div class="container-large">
-            <h1 class="h2 mb-4">Make a claim 💔</h1>
+    <div class="claim pb-lg-5">
+        <div class="container pb-5">
             <div class="row">
-                <div class="col-lg-5 order-lg-12">
-                    <div class="alert-danger p-4 mb-4 rounded">
-                        <h2 class="h3 text-danger mb-4">Warning loss/theft claims</h2>
-                        <p>Please note that as your policy is less than a month old you are required to pay up the remainder of your policy on all loss or theft claims before the claim can be processed.</p>
-                        <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
-                    </div>
-                </div>
-                <div class="col-lg-7 order-lg-1">
-                    <p class="mb-4">In order to proceed with your loss/theft claim you must pay for the remainder of your policy year in full before being able to continue.</p>
-                    <div class="h4 mb-3"><span class="sub">Paid to date:</span> &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</div>
-                    <div class="h4 mb-5"><span class="sub">Amount left to pay:</span> &pound;{{ remainderTotal }}</div>
-                    <form class="payment-form" method="POST"
-                          data-public-key="{{ checkoutApiKey(policy) }}"
-                          data-customer-email="{{ app.user.email }}"
-                          data-value="{{ convert_to_pennies(amount) }}"
-                          data-url="{{ url('purchase_checkout_claim', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
-                          data-csrf="{{ csrf_token('checkout') }}"
-                          data-currency="GBP"
-                          data-payment-mode="cards"
-                          data-card-form-mode="cardTokenisation"
-                          data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
-                          data-title="Pay now"
-                          data-subtitle="Please enter your card details now">
-                        <div class="form-group">
-                            <input type="submit" class="btn btn-success btn-block-xs btn-card-pay" value="Pay remainder now">
+                <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                    <div class="cardbox cardbox-100">
+                        <div class="cardbox__body">
+                            <div class="alert-danger p-4 mb-4 rounded">
+                                <h2 class="h3 text-danger mb-4">Warning loss/theft claims</h2>
+                                <p>Please note that as your policy is less than a month old you are required to pay up the remainder of your policy on all loss or theft claims before the claim can be processed.</p>
+                                <p>More information can be found in the T&amp;Cs in your policy documentation.</p>
+                            </div>
+                            <p class="mb-4">In order to proceed with your loss/theft claim you must pay for the remainder of your policy year in full before being able to continue.</p>
+                            <div class="h4 mb-3 text-center"><span class="sub">Paid to date:</span> &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</div>
+                            <div class="h4 mb-5 text-center"><span class="sub">Amount left to pay:</span> &pound;{{ remainderTotal }}</div>
+                            <form class="payment-form" method="POST"
+                                  data-public-key="{{ checkoutApiKey(policy) }}"
+                                  data-customer-email="{{ app.user.email }}"
+                                  data-value="{{ convert_to_pennies(amount) }}"
+                                  data-url="{{ url('purchase_checkout_claim', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
+                                  data-csrf="{{ csrf_token('checkout') }}"
+                                  data-currency="GBP"
+                                  data-payment-mode="cards"
+                                  data-card-form-mode="cardTokenisation"
+                                  data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                                  data-title="Pay now"
+                                  data-subtitle="Please enter your card details now">
+                                <div class="form-group text-center">
+                                    <input type="submit" class="btn btn-success btn-block-xs btn-card-pay " value="Pay remainder now">
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-
+    </div>
 
     {# Components #}
     {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
 
-    {# Page Modal #}
+    {# Page Modals #}
 
 {% endblock %}
 

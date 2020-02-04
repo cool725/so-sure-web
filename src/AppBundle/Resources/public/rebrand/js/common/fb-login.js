@@ -1,4 +1,4 @@
-// fbLogin.js
+// fb-login.js
 
 $('.facebook_login').on('click', function() {
     FB.getLoginStatus(function(response) {

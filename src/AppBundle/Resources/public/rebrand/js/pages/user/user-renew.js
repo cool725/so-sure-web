@@ -8,7 +8,7 @@ require('bootstrap/js/dist/button');
 // Require components
 require('jquery-validation');
 require('jquery-mask-plugin');
-require('../../common/validationMethods.js');
+require('../../common/validation-methods.js');
 
 $(function(){
 
@@ -16,7 +16,7 @@ $(function(){
         errorText = $('#renew_errors'),
         renewForm = $('#renew_form_encodedAmount'),
         renewFormCashback = $('#renew_cashback_form_encodedAmount'),
-        paymentBtns = $('.payment-btn');
+        paymentBtns = $('.form-check-input-btn');
 
     // Clear the form values
     const clearValues = (e) => {
@@ -25,7 +25,7 @@ $(function(){
     }
 
     const clearButtons = (e) => {
-        paymentBtns.removeClass('active');
+        paymentBtns.prop('checked', false);
         $('.continue-btn').addClass('disabled');
     }
 
@@ -41,7 +41,7 @@ $(function(){
 
     // Button logic
     $('#renew_cashback_btn').on('click', function(e) {
-        e.preventDefault();
+        // e.preventDefault();
         console.log('Renew GET cashback selected');
         clearValues();
         clearButtons();
@@ -49,14 +49,14 @@ $(function(){
     });
 
     $('#renew_reward_btn').on('click', function(e) {
-        e.preventDefault();
+        // e.preventDefault();
         console.log('Renew USING cashback selected');
         clearValues();
         clearButtons();
         useCashback(false);
     });
 
-    if ($('#renew_adjusted_yearly_only_btn').length) {
+    if ($('.renew-yearly-only').length) {
         limitedToYearly = true;
     }
 
@@ -68,8 +68,10 @@ $(function(){
         if (limitedToYearly) {
             ammount = $(this).data('value');
         } else {
-            ammount = $(this).find('input').data('value');
+            ammount = $(this).val();
         }
+
+        console.log(ammount);
 
         // Set ammount on hidden fields
         renewForm.val(ammount);

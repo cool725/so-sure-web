@@ -102,9 +102,11 @@
                                 <h2>Are you insured?</h2>
                                 <p>The Galaxy S9 might be water resistant, but if you're planning on buying it you should also think about getting insurance <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy-S9'}) }}">Galaxy S9 insurance</a> or <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy-S9+'}) }}">Galaxy S9+ insurance</a>. so-sure can cover you instantly for loss, theft, accidental damage, and out of warranty breakdown from just &pound;10.49 per month - so get peace of mind and get a quote today for your shiny new Samsung Galaxy.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

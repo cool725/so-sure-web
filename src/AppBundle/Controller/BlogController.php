@@ -404,4 +404,30 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/samsung-galaxy-rumours", name="samsung_galaxy_rumours", options={"sitemap" = true})
+     * @Template
+     */
+    public function samsungGalaxyS11S20RumoursAndNewsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/samsung-galaxy-s11-s20-rumours-and-news.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/best-battery-life-phones", name="best_battery_life_phones", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestBatteryLifePhonesAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/best-battery-life-phones.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
