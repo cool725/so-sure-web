@@ -880,7 +880,7 @@ class PurchaseController extends BaseController
             $postcodeService = $this->get('app.postcode');
             if ($price && $user->allowedMonthlyPayments($postcodeService)) {
                 $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
-            } elseif ($price && $user->allowedYearlyPayments()) {
+            } elseif ($price && $user->allowedYearlyPayments($postcodeService)) {
                 $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
             }
         }
