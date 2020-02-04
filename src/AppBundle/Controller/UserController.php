@@ -1311,6 +1311,10 @@ class UserController extends BaseController
             $dm->flush($policy);
         }
 
+        // A/B Hero Image Test
+        // To Test use url param ?force=standard-hero-image / ?force=photo-hero-image
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO);
+
         /** @var RouterService $router */
         $router = $this->get('app.router');
         // TODO: Should this account for policy ID?
