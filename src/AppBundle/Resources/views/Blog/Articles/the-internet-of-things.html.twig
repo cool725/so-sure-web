@@ -100,9 +100,11 @@
                                 <p>Thanks to the telematics and advances in smart phone technology, insurers can now monitor the way that people drive and assess their individual risk. Aggressive drivers can now be admonished for their carelessness and careful drivers can be rewarded through the reduction of their premiums. If you think about it, this makes perfect sense.</p>
                                 <p>The Internet of Things is going to totally change insurance and might be one of the key factors in bringing a relatively staid industry into the modern era. However, it won’t just be technology that changes insurance. New disruptive ideas such as peer-to-peer and social insurance will be essential for bringing it into the 21st century.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

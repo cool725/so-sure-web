@@ -108,9 +108,11 @@
                                 <p>It’s vital that we remember how the principles of insurance haven’t changed in thousands of years. Innovations developed by everyone from the Babylonians to Benjamin Franklin have improved the way insurance is delivered, but the principles of premium, risk and loss remain.</p>
                                 <p>As predicted by Benjamin Franklin, we are risk averse creatures. We prefer prevention to cure. Hence, the popularity of insurance continues to grow and we’re very proud at <a href="{{ path('homepage') }}">so-sure</a> to be shaping the future of this colourful and historic industry.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

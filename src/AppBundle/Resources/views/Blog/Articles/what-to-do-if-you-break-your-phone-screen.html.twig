@@ -103,9 +103,11 @@
                                 <p>Here at <a href="{{ path('homepage') }}">so-sure</a> we know that breaking your screen is really rubbish. So, if your screen is broken, smashed or cracked and you can’t use it any more, we’ll replace or repair it within 24-72 hours.</p>
                                 <p>We believe in a different kind of insurance. We protect you when you need to claim and reward you when you don't. You can <a href="{{ path('homepage') }}">find out more here</a>.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

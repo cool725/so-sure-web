@@ -126,11 +126,11 @@
                                 <p>The Samsung Galaxy Note 10 benefits from a great front and rear camera, as well as an included stylus that helps with usability on the huge screen. The stylus itself also has a great battery life of around 10 hours.</p>
                                 <p>Running on Qualcomm Snapdragon 855 or Exynos 9825, the 3,500 mAh battery will last around 9 hours through a normal day of usage. With superfast charging, a 15-minute boost will see you through to the end of the day. The phone is also wireless charging enabled.</p>
                             </div>
-                            <footer class="mb-4">
-                                <a href="#" class="btn btn-outline-primary get-a-quote">Get a quote now!</a>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
                             </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

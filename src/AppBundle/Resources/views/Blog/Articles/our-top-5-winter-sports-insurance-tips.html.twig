@@ -108,9 +108,11 @@
                                 <p>Staying safe is really simple. Check your policy in detail before you fly. If you want to do activities and ski areas that aren’t covered, then get your insurance upgraded.</p>
                                 <p>As the old ski saying goes: <em>“You can’t buy happiness, but you can buy a ski pass”</em>. But make sure you buy insurance too and have a great time from all of us at <a href="{{ path('homepage') }}">so-sure</a>!</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

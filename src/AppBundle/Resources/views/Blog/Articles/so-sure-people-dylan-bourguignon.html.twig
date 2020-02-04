@@ -92,9 +92,11 @@
                                 <p>so-sure’s recent capital raise was a watershed moment. We secured Europe’s largest insurtech seed funding round, raising €3 million, to execute on our unique approach to re-imagining insurance. Like any CEO, Dylan is always reminding the team that there’s much work to be done! But it feels like we’ve reached a tipping point in terms of investment in the sector. Incumbents are taking notice, and the opportunity to collaborate with established insurers will undoubtedly accelerate the transformation of insurance.</p>
                                 <p>With the right fundamentals now in place, the future looks bright for so-sure and insurtech in general, but most importantly, it looks bright for consumers.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

@@ -403,11 +403,11 @@
                                 <p>If you don’t want durability to be your main deciding factor in buying a new phone - and aren’t quite as excited about military grade phones as you are about iMessage - comprehensive phone insurance is your best bet.</p>
                                 <p>At so-sure, we insure the vast majority of market-leading smartphone models, giving you peace of mind that repairs and replacements are covered with low excess payments starting from just &pound;50.</p>
                             </div>
-                            <footer class="mb-4">
-                                <a href="#" class="btn btn-outline-primary get-a-quote">Get a quote now!</a>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
                             </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

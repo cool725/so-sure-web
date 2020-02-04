@@ -115,9 +115,11 @@
                                 <p>It’s an exciting time of great change in insurance. At <a href="{{ path('homepage') }}">so-sure</a>, we’re here to help you make sense of the future.</p>
                                 <p>Look out for more in-depth analysis of these technologies on the blog. In the meantime, we’d love to hear your thoughts on the future of insurance, so <a href="{{ path('about_how_to_contact_so_sure') }}">drop us a line</a>.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>
