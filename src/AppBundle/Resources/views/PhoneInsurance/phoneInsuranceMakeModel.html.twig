@@ -233,19 +233,19 @@
 
     {% if hide_section == false %}
         {# Extra Content #}
-        <section class="extra-content py-lg-5">
-            <div class="container-large py-5">
-                {% block extra_content_one %}{% endblock %}
-            </div>
-        </section>
+{#         <section class="extra-content py-lg-5">
+            <div class="container-large py-5"> #}
+                {# {% block extra_content_one %}{% endblock %} #}
+{#             </div>
+        </section> #}
     {% endif %}
 
     {# Cover #}
     <section class="cover py-lg-5">
         <div class="container-large {% if hide_section == false %}pt-lg-5{% else %}pt-5{% endif %}">
+            <h2 class="h3 mb-5 text-primary text-center">Comprehensive {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }} Insurance that starts immediately</h2>
             <div class="d-none d-lg-block">
                 {% if hide_section == true %}
-                    <h2 class="h3 mb-5 text-primary text-center">Comprehensive Phone Insurance that starts immediately</h2>
                     <div class="row">
                         <div class="col-md-6">
                             <p class="mb-5">Losing your {{ make_desc }} {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
@@ -254,8 +254,6 @@
                             <p class="mb-5">With our comprehensive insurance, you’ll be fully covered for theft or loss, letting you rest easy if your phone suddenly goes missing. We also provide cover for any accidental damage that happens to your iPhone, such as a cracked screen or accidental water damage.</p>
                         </div>
                     </div>
-                {% else %}
-                    <h2 class="h3 mb-5 text-primary text-center">Relax 😎, we’ve got you covered</h2>
                 {% endif %}
             </div>
             <div class="cover__illustration__mobile text-center d-block d-lg-none">
@@ -354,7 +352,6 @@
 
     <section class="cover__mobile d-block d-lg-none">
         <div class="container-large py-5">
-            <h2 class="h3 mb-4 text-primary text-center">Comprehensive Phone Insurance that starts immediately</h2>
             <div class="row mb-4">
                 <div class="col-lg-6">
                     <p class="mb-3 text-center">Losing your {{ make_desc }} {{ phone.model }} can be a hugely frustrating situation, especially if you rely on your phone to keep in touch with friends, family and colleagues. Our top rated smartphone insurance makes it easier to bounce back after your device is lost, stolen or accidentally gets damaged.</p>
