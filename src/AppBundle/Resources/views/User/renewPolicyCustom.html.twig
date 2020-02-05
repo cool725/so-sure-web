@@ -111,14 +111,14 @@
             {% endif %}
 
             <div class="h5 my-4">
-                {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
+                {% if app.user.allowedMonthly and app.user.allowedYearly %}
                     How would you like to pay?
                 {% else %}
                     Your Yearly Premium
                 {% endif %}
             </div>
             <div id="renew_without_reward_btns" class="form-group">
-                {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
+                {% if app.user.allowedMonthly and app.user.allowedYearly %}
                     <div class="form-check form-check-inline">
                         <input class="form-check-input form-check-input-btn"
                                type="radio"
@@ -149,7 +149,7 @@
 
             {% if policy.potValue > 0 %}
                 <div id="renew_with_reward_btns" class="form-group" style="display: none;">
-                    {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
+                    {% if app.user.allowedMonthly and app.user.allowedYearly %}
                         <div class="form-check form-check-inline">
                             <input class="form-check-input form-check-input-btn"
                                    type="radio"
