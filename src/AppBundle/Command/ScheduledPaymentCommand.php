@@ -45,11 +45,6 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:scheduled:payment')
             ->setDescription('Run any payments that are scheduled to run')
-            ->addArgument(
-                'prefix',
-                InputArgument::REQUIRED,
-                'Prefix'
-            )
             ->addOption(
                 'id',
                 null,
@@ -85,7 +80,13 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Last processing of the day (get all payemnt up to end of day)'
-            );
+            )
+            ->addArgument(
+                'prefix',
+                InputArgument::REQUIRED,
+                'Prefix'
+            )
+        ;
     }
 
     /**
@@ -103,6 +104,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $date = $input->getOption('date');
         $show = true === $input->getOption('show');
         $endOfDay = true === $input->getOption('end-of-day');
+        $prefix = $input->getArgument('prefix');
         $allowMultipleSameDayPayment = true === $input->getOption('allow-multiple-same-day-payment');
         $scheduledDate = null;
         if ($date) {
@@ -119,6 +121,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             try {
                 $scheduledPayment = $this->paymentService->scheduledPayment(
                     $scheduledPayment,
+                    $prefix,
                     $scheduledDate,
                     !$allowMultipleSameDayPayment
                 );
@@ -142,6 +145,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             }
         } else {
             $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForTypes(
+                $prefix,
                 [CheckoutPaymentMethod::class],
                 $scheduledDate
             );
@@ -151,6 +155,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                     if (!$show) {
                         $scheduledPayment = $this->paymentService->scheduledPayment(
                             $scheduledPayment,
+                            $prefix,
                             $scheduledDate
                         );
                     }

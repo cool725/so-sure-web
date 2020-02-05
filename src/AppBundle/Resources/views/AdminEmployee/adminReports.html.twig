@@ -52,6 +52,15 @@
                            aria-controls="scheduled_payments_content"
                            aria-selected="{% if scheduledPayments is defined %}true{% else %}false{% endif %}">Scheduled Payments</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if cumulative is defined %}active{% endif %}"
+                           id="cumulative_policies_tab"
+                           {# data-toggle="tab" #}
+                           href="{{ path('admin_reports_cumulative') }}"
+                           role="tab"
+                           aria-controls="cumulative_policies_content"
+                           aria-selected="{% if cumulative is defined %}true{% else %}false{% endif %}">Cumulative Policies</a>
+                    </li>
                 </ul>
 
                 <div class="tab-content" id="banking_tabs_content">
@@ -526,6 +535,46 @@
                                                 <td>{{ scheduledPayment._id.month }}/{{ scheduledPayment._id.year }}</td>
                                                 <td>&pound;{{ scheduledPayment.total|number_format(2, '.', ',')  }}</td>
                                             </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane fade {% if cumulative is defined %}show active{% endif %}"
+                         id="cumulative_policies_content"
+                         role="tabpanel"
+                         aria-labelledby="cumulative_policies_tab">
+                        {% if cumulative is defined %}
+                            <h3 class="mb-3">Cumulative Policies</h3>
+                            <div class="table-responsive-sm mb-5">
+                                <table class="table table-striped">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Month</th>
+                                            <th>Open Tally</th>
+                                            <th>New (Adjusted)</th>
+                                            <th>Expired</th>
+                                            <th>Cancelled (Adjusted)</th>
+                                            <th>Upgrades</th>
+                                            <th>Close Tally</th>
+                                            <th>Open Queried</th>
+                                            <th>Close Queried</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for month, content in cumulative %}
+                                        <tr>
+                                            <td><strong>{{ month }}</strong></td>
+                                            <td>{{ content.open }}</td>
+                                            <td>{{ content.new }} ({{ content.newAdjusted }})</td>
+                                            <td>{{ content.expired }}</td>
+                                            <td>{{ content.cancelled }} ({{ content.cancelledAdjusted }})</td>
+                                            <td>{{ content.upgrade }}</td>
+                                            <td>{{ content.close }}</td>
+                                            <td>{{ content.queryOpen }}</td>
+                                            <td>{{ content.queryClose }}</td>
+                                        </tr>
                                         {% endfor %}
                                     </tbody>
                                 </table>

@@ -1,9 +1,6 @@
 <?php
 namespace AppBundle\Service;
 
-use AppBundle\Classes\Helvetia;
-use AppBundle\Classes\Salva;
-use AppBundle\Document\File\HelvetiaPaymentFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
@@ -25,7 +22,6 @@ use Psr\Log\LoggerInterface;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Invitation\Invitation;
@@ -54,7 +50,7 @@ use DateTimeZone;
 class ReportingService
 {
     const REPORT_KEY_FORMAT = 'Report:%s:%s:%s';
-    const REPORT_CACHE_TIME = 32400;
+    const REPORT_CACHE_TIME = 3600;
     const REPORT_PERIODS = [
         'last 7 days' => ['start' => '7 days ago', 'end' => 'now'],
         'current month to date' => ['start' => 'first day of this month', 'end' => 'now'],
@@ -649,9 +645,9 @@ class ReportingService
 
     private function getTotalRunRate($newToDateDirectPolicies, $newToDateInvitationPolicies, $newToDateSCodePolicies)
     {
-        return Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, true) +
-            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, true) +
-            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, true);
+        return Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, null, true);
     }
 
     private function getExcludedPolicies($isKpi)
@@ -706,7 +702,7 @@ class ReportingService
 
         $data['totalTotalConnections'] = $connectionRepo->count(null, $totalEnd, null) / 2;
 
-        $policies = $policyRepo->findAllPolicies();
+        $policies = $policyRepo->findAllPolicies($this->environment);
         for ($i = 0; $i <= 10; $i++) {
             $data['policyConnections'][$i]['total'] = 0;
             $data['policyConnections'][$i]['1claim'] = 0;
@@ -884,33 +880,26 @@ class ReportingService
         return $data;
     }
 
-    public function getActivePoliciesCount($date, $underwriter)
+    public function getActivePoliciesCount($date)
     {
         /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->underwriterRepo($underwriter);
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+
         return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
     }
 
-    public function getActivePoliciesWithPolicyDiscountCount($date, $underwriter, $promoOnly = false)
+    public function getActivePoliciesWithPolicyDiscountCount($date)
     {
         /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->underwriterRepo($underwriter);
-        $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
-        $rewardPotLiability = 0;
-        foreach ($policies as $policy) {
-            if ($promoOnly) {
-                $rewardPotLiability += $policy->getPromoPotValue();
-            } else {
-                $rewardPotLiability += $policy->getPotValue();
-            }
-        }
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+
         return $phonePolicyRepo->countAllActivePoliciesWithPolicyDiscountToEndOfMonth($date);
     }
 
-    public function getRewardPotLiability($date, $underwriter, $promoOnly = false)
+    public function getRewardPotLiability($date, $promoOnly = false)
     {
         /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->underwriterRepo($underwriter);
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
         $rewardPotLiability = 0;
         foreach ($policies as $policy) {
@@ -924,79 +913,53 @@ class ReportingService
         return $rewardPotLiability;
     }
 
-    /**
-     * Gives you the payment totals for all the different kinds of payments that there are.
-     * @param \DateTime $date        is the date within the month for which we are getting all these payments.
-     * @param string    $underwriter is the name of the underwriter to get payment totals for.
-     * @param boolean   $useCache    whether to return cached results if they are available. If results are generated
-     *                               then they will be cached regardless.
-     * @return array containing all of the results.
-     */
-    public function getAllPaymentTotals(\DateTime $date, $underwriter, $useCache = true)
+    public function getAllPaymentTotals($isProd, \DateTime $date, $useCache = true)
     {
         $redisKey = sprintf(
             self::REPORT_KEY_FORMAT,
-            'allPayments',
-            $underwriter,
+            'allPaymentsTotal',
+            $isProd ? 'prod' : 'non-prod',
             $date->format('Y-m-d')
         );
         if ($useCache === true && $this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
-        $underwriterPaymentFile = null;
-        $policyTypes = [];
-        if ($underwriter == Salva::NAME) {
-            $underwriterPaymentFile = $this->getSalvaPaymentFile($date);
-            $policyTypes = Salva::POLICY_TYPES;
-        } elseif ($underwriter = Helvetia::NAME) {
-            $underwriterPaymentFile = $this->getHelvetiaPaymentFile($date);
-            $policyTypes = Helvetia::POLICY_TYPES;
-        } else {
-            throw new \InvalidArgumentException("{$underwriter} is not a proper kind of underwriter");
-        }
-        $payments = $this->getPayments($date, $policyTypes);
-        $potRewardPayments = $this->getPayments($date, $policyTypes, 'potReward');
-        $potRewardPaymentsCashback = $this->getPayments($date, $policyTypes, 'potReward', true);
-        $potRewardPaymentsDiscount = $this->getPayments($date, $policyTypes, 'potReward', false);
-        $soSurePotRewardPayments = $this->getPayments($date, $policyTypes, 'sosurePotReward');
-        $soSurePotRewardPaymentsCashback = $this->getPayments($date, $policyTypes, 'sosurePotReward', true);
-        $soSurePotRewardPaymentsDiscount = $this->getPayments($date, $policyTypes, 'sosurePotReward', false);
-        $policyDiscountPayments = $this->getPayments($date, $policyTypes, 'policyDiscount');
-        $policyDiscountRefundPayments = $this->getPayments($date, $policyTypes, 'policyDiscountRefund');
+
+        $payments = $this->getPayments($date);
+        $potRewardPayments = $this->getPayments($date, 'potReward');
+        $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
+        $potRewardPaymentsDiscount = $this->getPayments($date, 'potReward', false);
+        $soSurePotRewardPayments = $this->getPayments($date, 'sosurePotReward');
+        $soSurePotRewardPaymentsCashback = $this->getPayments($date, 'sosurePotReward', true);
+        $soSurePotRewardPaymentsDiscount = $this->getPayments($date, 'sosurePotReward', false);
+        $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
+        $policyDiscountRefundPayments = $this->getPayments($date, 'policyDiscountRefund');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
+
+        // @codingStandardsIgnoreStart
         $data = [
-            'all' => Payment::sumPayments($payments, true),
-            'judo' => Payment::sumPayments($payments, true, JudoPayment::class),
-            'checkout' => Payment::sumPayments($payments, true, CheckoutPayment::class),
-            'sosure' => Payment::sumPayments($payments, true, SoSurePayment::class),
-            'chargebacks' => Payment::sumPayments($payments, true, ChargebackPayment::class),
-            'bacs' => Payment::sumPayments($payments, true, BacsPayment::class),
-            'bacsIndemnity' => Payment::sumPayments($payments, true, BacsIndemnityPayment::class),
-            'potReward' => Payment::sumPayments($potRewardPayments, true, PotRewardPayment::class),
-            'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, true, PotRewardPayment::class),
-            'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, true, PotRewardPayment::class),
-            'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, true, SoSurePotRewardPayment::class),
-            'sosurePotRewardCashback' => Payment::sumPayments(
-                $soSurePotRewardPaymentsCashback,
-                true,
-                SoSurePotRewardPayment::class
-            ),
-            'sosurePotRewardDiscount' => Payment::sumPayments(
-                $soSurePotRewardPaymentsDiscount,
-                true,
-                SoSurePotRewardPayment::class
-            ),
-            'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, true, PolicyDiscountPayment::class),
-            'policyDiscountRefunds' => Payment::sumPayments(
-                $policyDiscountRefundPayments,
-                true,
-                PolicyDiscountRefundPayment::class
-            ),
+            'all' => Payment::sumPayments($payments, $isProd),
+            'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'checkout' => Payment::sumPayments($payments, $isProd, CheckoutPayment::class),
+            'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
+            'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
+            'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
+            'bacsIndemnity' => Payment::sumPayments($payments, $isProd, BacsIndemnityPayment::class),
+            'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
+            'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
+            'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, $isProd, PotRewardPayment::class),
+            'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, $isProd, SoSurePotRewardPayment::class),
+            'sosurePotRewardCashback' => Payment::sumPayments($soSurePotRewardPaymentsCashback, $isProd, SoSurePotRewardPayment::class),
+            'sosurePotRewardDiscount' => Payment::sumPayments($soSurePotRewardPaymentsDiscount, $isProd, SoSurePotRewardPayment::class),
+            'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
+            'policyDiscountRefunds' => Payment::sumPayments($policyDiscountRefundPayments, $isProd, PolicyDiscountRefundPayment::class),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
-            'underwriterPaymentFile' => $underwriterPaymentFile
+            'salvaPaymentFile' => $this->getSalvaPaymentFile($date),
         ];
+        // @codingStandardsIgnoreEnd
         $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($data));
+
         return $data;
     }
 
@@ -1221,10 +1184,10 @@ class ReportingService
 
     private function getAllStartedPolicies(\DateTime $startDate, \DateTime $endDate)
     {
-        // TODO: should this be underwriterified?
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $policyRepo->findAllStartedPolicies($startDate, $endDate);
+        $policies = $policyRepo->findAllStartedPolicies(null, $startDate, $endDate);
+
         return $policies;
     }
 
@@ -1233,23 +1196,15 @@ class ReportingService
         /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
         $cashback = $cashbackRepo->getPaidCashback($date);
+
         return $cashback;
     }
 
-    /**
-     * Gets all the successful payments in the given month for the given underwriter and optionally on the given type
-     * and on a policy with or without cashback.
-     * @param \DateTime    $date        is a date within the month that we are looking at payments for.
-     * @param array        $policyTypes is a list of the types of policy we are looking for payments at.
-     * @param string|null  $type        is the type of payment we are looking for.
-     * @param boolean|null $cashback    is whether the payment's policies have cashback or not, or null for no worries.
-     * @return array containing the found payments.
-     */
-    private function getPayments(\DateTime $date, $policyTypes, $type = null, $cashback = null)
+    private function getPayments(\DateTime $date, $type = null, $cashback = null)
     {
         /** @var PaymentRepository $paymentRepo */
         $paymentRepo = $this->dm->getRepository(Payment::class);
-        $payments = $paymentRepo->getAllPayments($date, $type, $policyTypes);
+        $payments = $paymentRepo->getAllPayments($date, $type);
         if ($cashback !== null) {
             $allPayments = [];
             foreach ($payments as $payment) {
@@ -1257,28 +1212,11 @@ class ReportingService
                     $allPayments[] = $payment;
                 }
             }
+
             return $allPayments;
         }
-        return $payments;
-    }
 
-    /**
-     * Gives you a helvetia payment file for the given month.
-     * @param \DateTime $date is a date within the month that we are looking for a payment file in.
-     * @return HelvetiaPaymentFile|null the payment file if it was found or null if not.
-     */
-    private function getHelvetiaPaymentFile(\DateTime $date)
-    {
-        // TODO: this just returns the first thing it finds which seems stupid, but it's what salva does.
-        /** @var S3FileRepository $repo */
-        $repo = $this->dm->getRepository(HelvetiaPaymentFile::class);
-        $files = $repo->getAllFiles($date, 'helvetiaPayment');
-        if ($files && count($files) > 0) {
-            foreach ($files as $file) {
-                return $file;
-            }
-        }
-        return null;
+        return $payments;
     }
 
     private function getSalvaPaymentFile(\DateTime $date)
@@ -1289,6 +1227,7 @@ class ReportingService
                 return $file;
             }
         }
+
         return null;
     }
 
@@ -1296,6 +1235,7 @@ class ReportingService
     {
         /** @var S3FileRepository $repo */
         $repo = $this->dm->getRepository(SalvaPaymentFile::class);
+
         return $repo->getAllFiles($date, 'salvaPayment');
     }
 
@@ -1335,6 +1275,57 @@ class ReportingService
         $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($results));
 
         return $results;
+    }
+
+    /**
+     * Creates a report in the cumulative style used by dylan, and monthly values calculated in the way that we use
+     * side by side over a series of months.
+     * @param \DateTime $start    is the starting month.
+     * @param \DateTime $end      is the ending month.
+     * @param boolean   $useCache says whether we should try to load from the cache or just skip that.
+     * @return array containing the full report.
+     */
+    public function getCumulativePolicies($start, $end, $useCache = true)
+    {
+        $start = $this->startOfMonth($start);
+        $end = $this->startOfDay($end);
+        $key = sprintf(self::REPORT_KEY_FORMAT, $start->format('Y-m-d.hi'), $end->format('Y-m-d.hi'), "cumulative");
+        if ($useCache === true && $this->redis->exists($key)) {
+            return unserialize($this->redis->get($key));
+        }
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $report = [];
+        $runningTotal = $this->totalAtPoint($start);
+        while ($start < $end) {
+            $endOfMonth = $this->endOfMonth($start);
+            if ($endOfMonth > $end) {
+                $endOfMonth = $end;
+            }
+            $month = [];
+            $month["open"] = $runningTotal;
+            $month["new"] = $policyRepo->countAllStartedPolicies(null, $start, $endOfMonth);
+            $month["expired"] = $policyRepo->countEndingByStatus(Policy::$expirationStatuses, $start, $endOfMonth);
+            $month["cancelled"] = $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, $start, $endOfMonth);
+            $runningTotal += $month["new"];
+            $runningTotal -= $month["expired"];
+            $runningTotal -= $month["cancelled"];
+            $month["close"] = $runningTotal;
+            $month["upgrade"] = $policyRepo->countAllEndingPolicies(
+                Policy::CANCELLED_UPGRADE,
+                $start,
+                $endOfMonth,
+                false
+            );
+            $month["newAdjusted"] = $month["new"] - $month["upgrade"];
+            $month["cancelledAdjusted"] = $month["cancelled"] - $month["upgrade"];
+            $month["queryOpen"] = $this->totalAtPoint($start);
+            $month["queryClose"] = $this->totalAtPoint($endOfMonth);
+            $report[$start->format("F Y")] = $month;
+            $start = $endOfMonth;
+        }
+        $this->redis->setex($key, self::REPORT_CACHE_TIME, serialize($report));
+        return $report;
     }
 
     /**
@@ -1383,31 +1374,17 @@ class ReportingService
     }
 
     /**
-     * Gives you the correct policy repo for the given underwriter.
-     * @param string|null $underwriter is the name of the underwriter to go for. If it is null you get a general phone
-     *                                 policy repo.
-     * @return PhonePolicyRepository for the underwriter you gave.
-     * @throws \InvalidArgumentException if you don't pass either helvetia or salva.
+     * Gives you the total number of policies that are going.
+     * @param \DateTime $date is the date to look at.
+     * @return int the number of policies.
      */
-    private function underwriterRepo($underwriter)
+    private function totalAtPoint(\DateTime $date)
     {
-        $phonePolicyRepo = null;
-        if ($underwriter == Salva::NAME) {
-            /** @var PhonePolicyRepository $phonePolicyRepo */
-            $phonePolicyRepo = $this->dm->getRepository(SalvaPhonePolicy::class);
-        } elseif ($underwriter == Helvetia::NAME) {
-            /** @var PhonePolicyRepository $phonePolicyRepo */
-            $phonePolicyRepo = $this->dm->getRepository(HelvetiaPhonePolicy::class);
-        } elseif ($underwriter === null) {
-            /** @var PhonePolicyRepository $phonePolicyRepo */
-            $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        }
-        if ($phonePolicyRepo) {
-            return $phonePolicyRepo;
-        }
-        throw new \InvalidArgumentException(sprintf(
-            '"%s" is not a valid underwriter name',
-            $underwriter
-        ));
+        /** @var PhonePolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        return $policyRepo->countAllNewPolicies($date) - (
+            $policyRepo->countEndingByStatus(Policy::$expirationStatuses, null, $date) +
+            $policyRepo->countEndingByStatus(Policy::STATUS_CANCELLED, null, $date)
+        );
     }
 }

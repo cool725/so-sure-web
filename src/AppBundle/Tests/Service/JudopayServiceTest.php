@@ -591,7 +591,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $scheduledPayment = $policy->getScheduledPayments()[0];
 
-        self::$judopay->scheduledPayment($scheduledPayment);
+        self::$judopay->scheduledPayment($scheduledPayment, 'TEST');
     }
 
     public function testJudoScheduledPayment()
@@ -637,7 +637,7 @@ class JudopayServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        self::$judopay->scheduledPayment($scheduledPayment, $nextMonth);
+        self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
 
         static::$dm->clear();
@@ -694,7 +694,7 @@ class JudopayServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        self::$judopay->scheduledPayment($scheduledPayment, $nextMonth);
+        self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -752,7 +752,7 @@ class JudopayServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        $scheduledPayment = self::$judopay->scheduledPayment($scheduledPayment, $nextMonth);
+        $scheduledPayment = self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
         $this->assertEquals(JudoPayment::RESULT_SKIPPED, $scheduledPayment->getPayment()->getResult());
         $this->assertEquals(false, $scheduledPayment->getPayment()->isSuccess());
     }
@@ -801,7 +801,7 @@ class JudopayServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        $scheduledPayment = self::$judopay->scheduledPayment($scheduledPayment, $nextMonth);
+        $scheduledPayment = self::$judopay->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
         $this->assertEquals(JudoPayment::RESULT_SKIPPED, $scheduledPayment->getPayment()->getResult());
         $this->assertEquals(false, $scheduledPayment->getPayment()->isSuccess());
     }
@@ -956,7 +956,7 @@ class JudopayServiceTest extends WebTestCase
 
         $initialScheduledPayment = $policy->getNextScheduledPayment();
         $initialScheduledPayment->setScheduled(\DateTime::createFromFormat('U', time()));
-        self::$judopay->scheduledPayment($initialScheduledPayment);
+        self::$judopay->scheduledPayment($initialScheduledPayment, 'TEST');
     }
 
     private function mockMailerSend($times)

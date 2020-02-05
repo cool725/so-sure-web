@@ -938,7 +938,8 @@ class InvitationService
 
     protected function validatePolicy(Policy $policy)
     {
-        if (!$policy->isValidPolicy()) {
+        $prefix = $policy->getPolicyPrefix($this->environment);
+        if (!$policy->isValidPolicy($prefix)) {
             throw new InvalidPolicyException(sprintf(
                 "Policy must be pending/active before inviting/connecting (%s)",
                 $policy->getPolicyNumber()

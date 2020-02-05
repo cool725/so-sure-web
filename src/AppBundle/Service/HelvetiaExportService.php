@@ -5,7 +5,6 @@ namespace AppBundle\Service;
 use AppBundle\Helpers\CsvHelper;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\File\HelvetiaPolicyFile;
-use AppBundle\Document\File\HelvetiaPaymentFile;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\HelvetiaPhonePolicyRepository;
@@ -64,8 +63,7 @@ class HelvetiaExportService
 
     /**
      * Generates the csv data to export to helvetia regarding policies.
-     * @return array in which the first element is an array of csv lines, the second element is the total paid premium,
-     *               and the third element is the total paid broker fee.
+     * @return array of comma seperated value lines.
      */
     public function generatePolicies()
     {
@@ -96,10 +94,8 @@ class HelvetiaExportService
             'MarketingPotValue',
             'CashToHelvetia'
         );
-        $paidPremium = 0;
-        $paidBrokerFee = 0;
         /** @var HelvetiaPhonePolicy $policy */
-        foreach ($repo->getAllPoliciesForExport() as $policy) {
+        foreach ($repo->getAllPoliciesForExport($this->environment) as $policy) {
             $lines[] = CsvHelper::line(
                 $policy->getPolicyNumber(),
                 $policy->getStatus(),
@@ -124,17 +120,14 @@ class HelvetiaExportService
                 $policy->getPromoPotValue(),
                 $policy->getHelvetiaCash()
             );
-            $paidPremium += $policy->getPremiumPaid();
-            $paidBrokerFee += $policy->getTotalCommissionPaid();
         }
-        return [$lines, $paidPremium, $paidBrokerFee];
+        return $lines;
     }
 
     /**
      * Generates the csv data to export to helvetia regarding payments.
      * @param \DateTime $date denotes the month that the payments should be exported for.
-     * @return array containing first an array of the generated comma seperated lines, then the total of the payments,
-     *               and then the number of payments.
+     * @return array of comma seperated value lines.
      */
     public function generatePayments(\DateTime $date)
     {
@@ -142,10 +135,13 @@ class HelvetiaExportService
         $repo = $this->dm->getRepository(Payment::class);
         $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_HELVETIA_PHONE);
         $lines = [];
-        $lines[] = CsvHelper::line('PolicyNumber', 'Date', 'Amount', 'Notes', 'BrokerFee');
-        $total = 0;
-        $n = 0;
-        $daily = [];
+        $lines[] = CsvHelper::line(
+            'PolicyNumber',
+            'Date',
+            'Amount',
+            'Notes',
+            'BrokerFee'
+        );
         /** @var Payment $payment */
         foreach ($payments as $payment) {
             $lines[] = CsvHelper::line(
@@ -155,15 +151,8 @@ class HelvetiaExportService
                 $payment->getNotes(),
                 $payment->getTotalCommission()
             );
-            $total += $payment->getAmount();
-            $n++;
-            $dateKey = $payment->getDate()->format('Ymd');
-            if (!isset($daily[$dateKey])) {
-                $daily[$dateKey] = 0;
-            }
-            $daily[$dateKey] += $payment->getAmount();
         }
-        return [$lines, $total, $n, $daily];
+        return $lines;
     }
 
     /**
@@ -250,7 +239,7 @@ class HelvetiaExportService
             'RenewalPolicyMonthlyPremiumIncDiscount'
         );
         /** @var HelvetiaPhonePolicy $policy */
-        foreach ($repo->getAllExpiredPoliciesForExport() as $policy) {
+        foreach ($repo->getAllExpiredPoliciesForExport($this->environment) as $policy) {
             if (!$this->greaterThanZero($policy->getPotValue())) {
                 continue;
             }
@@ -281,22 +270,14 @@ class HelvetiaExportService
     public function uploadPolicies()
     {
         $date = new \DateTime();
-        list($data, $paidPremium, $paidBrokerFee) = $this->generatePolicies();
+        $data = $this->generatePolicies();
         $filename = sprintf(
             'policies-export-%d-%02d-%s.csv',
             $date->format('Y'),
             $date->format('m'),
             $date->format('U')
         );
-        $s3Key = $this->uploadS3($data, $filename, 'policies', $date);
-        $file = new HelvetiaPolicyFile();
-        $file->setBucket(self::S3_BUCKET);
-        $file->setKey($s3Key);
-        $file->setDate($date);
-        $file->addMetadata('paidPremium', $paidPremium);
-        $file->addMetadata('paidBrokerFee', $paidBrokerFee);
-        $this->dm->persist($file);
-        $this->dm->flush();
+        $this->uploadS3($data, $filename, 'policies', $date);
     }
 
     /**
@@ -306,30 +287,20 @@ class HelvetiaExportService
      */
     public function uploadPayments(\DateTime $date)
     {
-        list($data, $total, $n, $daily) = $this->generatePayments($date);
+        $data = $this->generatePayments($date);
         $filename = sprintf(
             'payments-export-%d-%02d-%s.csv',
             $date->format('Y'),
             $date->format('m'),
             $date->format('U')
         );
-        $s3Key = $this->uploadS3($data, $filename, 'payments', $date);
-        $file = new HelvetiaPaymentFile();
-        $file->setBucket(self::S3_BUCKET);
-        $file->setKey($s3Key);
-        $file->setDate($date);
-        $file->addMetadata('total', $total);
-        $file->addMetadata('numPayments', $n);
-        $file->setDailyTransaction($daily);
-        $file->setFileName($filename);
-        $this->dm->persist($file);
-        $this->dm->flush();
+        $this->uploadS3($data, $filename, 'payments', $date);
     }
 
     /**
-     * Creates a new claims csv export and then uploads it to s3 in according with naming convention.
-     * This function takes no arguments as claims file generation is always up to the present and so the present time
-     * is used for file naming.
+     * Creates a new claims csv export and then uploads it to s3 in according with naming convention, and saves a
+     * record of this upload in our database. This function takes no arguments as claims file generation is always up
+     * to the present and so the present time is used for file naming.
      */
     public function uploadClaims()
     {
@@ -345,9 +316,9 @@ class HelvetiaExportService
     }
 
     /**
-     * Creates a new renewals csv export and then uploads it to s3 in according with naming convention. This function
-     * takes no arguments as renewal file generation is always up to the present and so the present time is used for
-     * file naming.
+     * Creates a new renewals csv export and then uploads it to s3 in according with naming convention, and saves a
+     * record of this upload in our database. This function takes no arguments as renewal file generation is always up
+     * to the present and so the present time is used for file naming.
      */
     public function uploadRenewals()
     {
@@ -365,10 +336,11 @@ class HelvetiaExportService
     /**
      * Uploads an array of csv lines onto s3 as a file.
      * @param array     $data     is the data to upload.
-     * @param string    $filename is the name to give the file on s3.
-     * @param string    $type     determines the sub folder the file will be placed in.
-     * @param \DateTime $date     is the date that the file is for.
-     * @return string the s3 key of the file.
+     * @param string    $filename is the file name the file should have on s3.
+     * @param string    $type     determines the export type subfolder to place the file in.
+     * @param \DateTime $date     determines what yearly subfolder the file will be placed in, and the date it is marked
+     *                         with in our database.
+     * @return string the key to the file on s3.
      */
     private function uploadS3($data, $filename, $type, $date)
     {
@@ -377,6 +349,12 @@ class HelvetiaExportService
         $s3Key = sprintf('%s/%s/%s/%s', $this->environment, $type, $date->format('Y'), $filename);
         $result = $this->s3->putObject(['Bucket' => self::S3_BUCKET, 'Key' => $s3Key, 'SourceFile' => $tmpFile]);
         unlink($tmpFile);
+        $file = new HelvetiaPolicyFile();
+        $file->setBucket(self::S3_BUCKET);
+        $file->setKey($s3Key);
+        $file->setDate($date);
+        $this->dm->persist($file);
+        $this->dm->flush();
         return $s3Key;
     }
 }

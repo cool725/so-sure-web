@@ -276,7 +276,7 @@ class FacebookService
         return $arr;
     }
 
-    public function monthlyLookalike(\DateTime $date)
+    public function monthlyLookalike(\DateTime $date, $prefix = null)
     {
         //$startMonth = new \DateTime('2018-01-01');
         $startMonth = $this->startOfMonth($date);
@@ -285,7 +285,7 @@ class FacebookService
 
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $policyRepo->findAllStartedPolicies($startMonth, $endMonth);
+        $policies = $policyRepo->findAllStartedPolicies($prefix, $startMonth, $endMonth);
         foreach ($policies as $policy) {
             /** @var PhonePolicy $policy */
             $users[] = $policy->getUser();

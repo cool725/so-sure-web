@@ -112,14 +112,16 @@ class PaymentService
     }
 
     public function getAllValidScheduledPaymentsForType(
+        $prefix,
         $type,
         \DateTime $scheduledDate = null,
         $validateBillable = true
     ) {
-        return $this->getAllValidScheduledPaymentsForTypes([$type], $scheduledDate, $validateBillable);
+        return $this->getAllValidScheduledPaymentsForTypes($prefix, [$type], $scheduledDate, $validateBillable);
     }
 
     public function getAllValidScheduledPaymentsForTypes(
+        $prefix,
         $types,
         \DateTime $scheduledDate = null,
         $validateBillable = true
@@ -145,7 +147,7 @@ class PaymentService
             if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
-            if (!$scheduledPayment->getPolicy()->isValidPolicy()) {
+            if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
                 continue;
             }
             if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {
@@ -164,11 +166,12 @@ class PaymentService
 
     public function scheduledPayment(
         ScheduledPayment $scheduledPayment,
+        $prefix = null,
         \DateTime $date = null,
         $abortOnMultipleSameDayPayment = true
     ) {
         try {
-            $scheduledPayment->validateRunable($date);
+            $scheduledPayment->validateRunable($prefix, $date);
         } catch (ScheduledPaymentException $e) {
             /**
              * This should never be thrown as the only place that calls this that is not
@@ -204,6 +207,7 @@ class PaymentService
             try {
                 $payment = $this->checkout->scheduledPayment(
                     $scheduledPayment,
+                    $prefix,
                     $date,
                     $abortOnMultipleSameDayPayment
                 );

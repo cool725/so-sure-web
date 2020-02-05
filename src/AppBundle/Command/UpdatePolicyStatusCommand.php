@@ -52,12 +52,6 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             ->setName('sosure:policy:update-status')
             ->setDescription('Transition policy statuses. Unpaid, Expired, Pending renewal, etc')
             ->addOption(
-                'prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Policy prefix (does nothing)'
-            )
-            ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
@@ -68,6 +62,12 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Do not cancel unpaid policies but do everything else'
+            )
+            ->addOption(
+                'prefix',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy prefix'
             )
             ->addOption(
                 'id',
@@ -99,6 +99,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $dryRun = true === $input->getOption('dry-run');
         $dryUnpaid = true === $input->getOption('dry-unpaid');
         $skipEmail = true === $input->getOption('skip-email');
+        $prefix = $input->getOption('prefix');
         $policyId = $input->getOption('id');
         $skipUnpaidMinTimeframeCheck = $input->getOption('skip-unpaid-timecheck');
 
@@ -113,7 +114,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         if ($dryRun) {
             $copy = 'Dry Run - Should set Metrics for Policy';
         }
-        $metrics = $this->policyService->runMetrics($dryRun);
+        $metrics = $this->policyService->runMetrics($prefix, $dryRun);
         foreach ($metrics as $id => $number) {
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
             $ignoreLineCount++;
@@ -125,6 +126,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
 
         // Unpaid Policies - Cancel
         $cancelled = $this->policyService->cancelUnpaidPolicies(
+            $prefix,
             $dryRun || $dryUnpaid,
             $skipUnpaidMinTimeframeCheck
         );
@@ -154,7 +156,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
 
         // Pending Cancellation Policies - Cancel
-        $pendingCancellation = $this->policyService->cancelPoliciesPendingCancellation($dryRun);
+        $pendingCancellation = $this->policyService->cancelPoliciesPendingCancellation($prefix, $dryRun);
         $copy = 'User Requested Cancellation Policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should cancel Policy (user requested [pending] cancellation)';
@@ -185,7 +187,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             }
         } elseif ($this->featureService->isEnabled(Feature::FEATURE_RENEWAL)) {
             // Create Polices - Pending Renewal
-            $pendingRenewal = $this->policyService->createPendingRenewalPolicies($dryRun);
+            $pendingRenewal = $this->policyService->createPendingRenewalPolicies($prefix, $dryRun);
             $copy = 'Partial Renewal Policy';
             if ($dryRun) {
                 $copy = 'Dry Run - Should create Partial Renewal Policy';
@@ -205,7 +207,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         }
 
         // Renew Policies (Pending Renewal -> Renewed)
-        $renewed = $this->policyService->renewPolicies($dryRun);
+        $renewed = $this->policyService->renewPolicies($prefix, $dryRun);
         $copy = 'Renewed Policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should renew Policy';
@@ -219,7 +221,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $ignoreLineCount++;
 
         // Expire Policies - (Active/Unpaid)
-        $expired = $this->policyService->expireEndingPolicies($dryRun);
+        $expired = $this->policyService->expireEndingPolicies($prefix, $dryRun);
         $copy = 'Expire Policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should expire Policy';
@@ -233,7 +235,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $ignoreLineCount++;
 
         // Activate Policies (Renewed -> Active)
-        $renewal = $this->policyService->activateRenewalPolicies($dryRun);
+        $renewal = $this->policyService->activateRenewalPolicies($prefix, $dryRun);
         $copy = 'Activated Renewal Policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should activate Renewal Policy';
@@ -247,7 +249,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $ignoreLineCount++;
 
         // Unrenew Policies (Renew Declined -> UnRenewed)
-        $unrenewed = $this->policyService->unrenewPolicies($dryRun);
+        $unrenewed = $this->policyService->unrenewPolicies($prefix, $dryRun);
         $copy = 'Unrenewed Policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should unrenew Policy';
@@ -261,7 +263,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $ignoreLineCount++;
 
         // Fully Expire Policies - (from Expired-Claimable)
-        $fullyExpired = $this->policyService->fullyExpireExpiredClaimablePolicies($dryRun);
+        $fullyExpired = $this->policyService->fullyExpireExpiredClaimablePolicies($prefix, $dryRun);
         $copy = 'Fully Expire Policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should fully expire Policy';
@@ -275,7 +277,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $ignoreLineCount++;
 
         // set unpaid Cancelled Mandates
-        $unpaid = $this->policyService->setUnpaidForCancelledMandate($dryRun);
+        $unpaid = $this->policyService->setUnpaidForCancelledMandate($prefix, $dryRun);
         $copy = 'Set Unpaid for Cancelled Mandates';
         if ($dryRun) {
             $copy = 'Dry Run - Should set unpaid';

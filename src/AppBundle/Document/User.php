@@ -815,16 +815,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->policies;
     }
 
-    /**
-     * Gives you all of the user's policies that are valid policies.
-     * @return array containing all of the policies.
-     */
-    public function getAllPolicyPolicies()
+    public function getAllPolicyPolicies($prefix = null)
     {
         $policies = [];
         foreach ($this->getAllPolicies() as $policy) {
             /** @var Policy $policy */
-            if ($policy->isValidPolicy()) {
+            if ($policy->isValidPolicy($prefix)) {
                 $policies[] = $policy;
             }
         }
@@ -2306,16 +2302,19 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * Only the first purchase policy should count for attribution
      */
-    public function getAttributionPolicy()
+    public function getAttributionPolicy($prefix = null)
     {
-        $policies = $this->getAllPolicyPolicies();
+        $policies = $this->getAllPolicyPolicies($prefix);
+
         if (count($policies) == 0) {
             return null;
         }
+
         // sort older to recent
         usort($policies, function ($a, $b) {
             return $a->getStart() > $b->getStart();
         });
+
         return $policies[0];
     }
 
