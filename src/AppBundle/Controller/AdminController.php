@@ -815,6 +815,7 @@ class AdminController extends BaseController
             ->add('export', SubmitType::class)
             ->getForm();
         if ('POST' === $request->getMethod()) {
+            die("Brexit");
             if ($request->request->has('helvetia_form')) {
                 $helvetiaForm->handleRequest($request);
                 if ($helvetiaForm->isValid()) {
