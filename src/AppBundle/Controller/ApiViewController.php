@@ -45,6 +45,8 @@ class ApiViewController extends BaseController
         $latestTerms = $this->getLatestPolicyTerms();
 
         $tmpPolicy = new HelvetiaPhonePolicy();
+        $prefix = $tmpPolicy->getPolicyNumberPrefix();
+
         $maxPotVaue = $request->get('maxPotValue');
         $maxConnections = ceil($maxPotVaue / 10);
         $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
@@ -57,6 +59,8 @@ class ApiViewController extends BaseController
             'claims_default_direct_group' => $this->get('app.feature')->isEnabled(
                 Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP
             ),
+            // don't display promo values
+            // 'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
         );
 
         $template = sprintf(

@@ -18,17 +18,17 @@ class PolicyRepository extends BaseDocumentRepository
     use CurrencyTrait;
     use DateTrait;
 
-    const VALID_REGEX = '/^((?!INVALID).)*$/';
-
-    public function isPromoLaunch()
+    public function isPromoLaunch($policyPrefix)
     {
-        return $this->countAllPolicies() < 1000;
+        return $this->countAllPolicies($policyPrefix) < 1000;
     }
 
     /**
      * All policies that have been created (excluding so-sure test ones)
+     *
+     * @param string $policyPrefix
      */
-    public function countAllPolicies()
+    public function countAllPolicies($policyPrefix)
     {
         return $this->createQueryBuilder()
             ->field('status')->in([
@@ -40,7 +40,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
                 Policy::STATUS_UNPAID
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->getQuery()
             ->execute()
             ->count();
@@ -62,7 +62,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function findPoliciesForPendingCancellation($includeFuture, \DateTime $date = null)
+    public function findPoliciesForPendingCancellation($policyPrefix, $includeFuture, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -74,7 +74,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_UNPAID,
                 Policy::STATUS_PICSURE_REQUIRED
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)));
 
         if ($includeFuture) {
             $qb = $qb->field('pendingCancellation')->notEqual(null);
@@ -95,7 +95,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function findPoliciesForPendingRenewal($date = null)
+    public function findPoliciesForPendingRenewal($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -108,7 +108,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('nextPolicy.$id')->equals(null)
             ->field('end')->lte($renewalDate)
             ->field('end')->gte($date);
@@ -118,7 +118,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function findPoliciesForExpiration($date = null)
+    public function findPoliciesForExpiration($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -129,7 +129,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('end')->lte($date);
 
         return $qb
@@ -137,7 +137,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function findPoliciesForFullExpiration($date = null)
+    public function findPoliciesForFullExpiration($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -149,7 +149,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('end')->lte($date);
 
         return $qb
@@ -157,13 +157,13 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function findUnpaidPoliciesWithCancelledMandates()
+    public function findUnpaidPoliciesWithCancelledMandates($policyPrefix)
     {
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('paymentMethod.bankAccount.mandateStatus')->in([
                 BankAccount::MANDATE_CANCELLED,
                 BankAccount::MANDATE_FAILURE
@@ -174,7 +174,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function findRenewalPoliciesForActivation($date = null)
+    public function findRenewalPoliciesForActivation($policyPrefix, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -184,7 +184,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->field('status')->in([
                 Policy::STATUS_RENEWAL,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('start')->lte($date);
 
         return $qb
@@ -226,7 +226,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function getWeeklyEmail()
+    public function getWeeklyEmail($environment)
     {
         $lastWeek = \DateTime::createFromFormat('U', time());
         $lastWeek->sub(new \DateInterval('P1W'));
@@ -245,9 +245,16 @@ class PolicyRepository extends BaseDocumentRepository
             $qb->expr()->addOr($qb->expr()->field('lastEmailed')->lte($lastWeek))
                 ->addOr($qb->expr()->field('lastEmailed')->exists(false))
         );
-        $qb->addAnd($qb->expr()->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX)));
 
-        return $qb->getQuery()->execute();
+        if ($environment == "prod") {
+            $prodPolicyRegEx = new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix()));
+            $qb->addAnd($qb->expr()->field('policyNumber')->equals($prodPolicyRegEx));
+        } else {
+            $qb->addAnd($qb->expr()->field('policyNumber')->notEqual(null));
+        }
+
+        return $qb->getQuery()
+            ->execute();
     }
 
     public function findPendingMandates(\DateTime $date = null)

@@ -165,7 +165,7 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $scheduledPayment->setScheduled(new \DateTime('2016-01-01 01:00'));
         $policy->addScheduledPayment($scheduledPayment);
 
-        $scheduledPayment->validateRunable(new \DateTime('2016-01-01 02:00'));
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 02:00'));
 
         // test is if the above generates an exception
         $this->assertTrue(true);
@@ -192,7 +192,7 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $scheduledPayment->setPayment($payment);
         $policy->addScheduledPayment($scheduledPayment);
 
-        $scheduledPayment->validateRunable(new \DateTime('2016-01-01 02:00'));
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 02:00'));
     }
 
     /**
@@ -216,7 +216,7 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $scheduledPayment->setPayment($payment);
         $policy->addScheduledPayment($scheduledPayment);
 
-        $scheduledPayment->validateRunable(new \DateTime('2016-01-01 00:00'));
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 00:00'));
     }
 
     /**
@@ -240,7 +240,7 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $scheduledPayment->setPayment($payment);
         $policy->addScheduledPayment($scheduledPayment);
 
-        $scheduledPayment->validateRunable(new \DateTime('2016-01-01 00:00'));
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 00:00'));
     }
 
     /**
@@ -264,7 +264,7 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $scheduledPayment->setPayment($payment);
         $policy->addScheduledPayment($scheduledPayment);
 
-        $scheduledPayment->validateRunable(new \DateTime('2016-01-01 00:00'));
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 00:00'));
     }
 
     /**

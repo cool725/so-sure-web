@@ -53,7 +53,7 @@ class MixpanelListener
             'Policy Id' => $policy->getId(),
             'Payment Source' => $source,
             'Payment Type' => $type,
-            'Use For Attribution' => $policy->useForAttribution() ? 'Yes' : 'No'
+            'Use For Attribution' => $policy->useForAttribution($policy->getPolicyPrefix($this->env)) ? 'Yes' : 'No'
         ]);
     }
 

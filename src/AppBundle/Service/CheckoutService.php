@@ -1314,11 +1314,12 @@ class CheckoutService
      */
     public function scheduledPayment(
         ScheduledPayment $scheduledPayment,
+        $prefix = null,
         \DateTime $date = null,
         $abortOnMultipleSameDayPayment = true
     ) {
         try {
-            $scheduledPayment->validateRunable($date);
+            $scheduledPayment->validateRunable($prefix, $date);
         } catch (ScheduledPaymentException $e) {
             /**
              * This should never be thrown as the only place that calls this that is not

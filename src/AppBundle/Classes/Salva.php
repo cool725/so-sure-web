@@ -23,8 +23,6 @@ class Salva
     const NAME = 'Salva';
     const SALVA_TIMEZONE = 'Europe/London';
 
-    const POLICY_TYPES = [Policy::TYPE_SALVA_PHONE];
-
     public static function getSalvaBinderEndDate()
     {
         return new \DateTime('2020-01-01 00:00:00', SoSure::getSoSureTimezone());
