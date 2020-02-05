@@ -1,11 +1,12 @@
 {% extends 'base_rebrand.html.twig' %}
-{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Renew your policy | so-sure{% endblock %}
+{% block title %}Renew Your Policy | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
@@ -14,61 +15,82 @@
 
 {% block body %}
 
-    <section class="hero">
+    <div class="hero">
         <div class="container-large">
-            <h1 class="h2 mb-4">Renew your policy 🤗</h1>
-            <div class="d-lg-flex justify-content-lg-between mb-4">
-                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">
-                            Renewing your
-                        </h5>
-                        <div class="cardbox__text">
-                            <div class="h4">
-                                {{ policy.phone.make }} {{ policy.phone.model }}
-                                {% if policy.phone.memory %}<span class="sub">{{ policy.phone.memory }}GB</span>{% endif %}
-                            </div>
-                        </div>
-                    </div>
+            <div class="row align-items-lg-center justify-content-lg-start">
+                <div class="col-lg-6">
+                    {% if policy is defined and policy %}
+                        <div class="h5 text-columbia-blue-e fit">{{ policy.phone.make }} {{ policy.phone.model }} <span class="mx-2 text-white">|</span> {{ policy.policyNumber }}</div>
+                    {% endif %}
+                    <h1 class="h2 text-white mb-5 mb-lg-4">Renew Your Policy</h1>
+                    <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}"
+                       class="btn btn-outline-deep-sky-blue-d btn-block-xs mr-md-2">Make Changes</a>
+                    <a href="#"
+                       class="btn btn-success btn-block-xs"
+                       data-toggle="modal"
+                       data-target="#renew_modal">Renew My Policy</a>
                 </div>
-                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">
-                            {% if policy.potValue > 0 %}
-                                Using your Reward Pot 💰
-                            {% else %}
-                                Renewal Price
-                            {% endif %}
-                        </h5>
-                        <div class="cardbox__text">
-                            <div class="h3">
-                                {% if policy.getPremiumPlan == 'monthly' %}
-                                    &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                    <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                        <div class="cardbox__body text-center">
+                            <div class="h6 text-white cardbox__title">
+                                {% if policy.potValue > 0 %}
+                                    💰 Using Cashback
                                 {% else %}
-                                    &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per year</span>
+                                    Renewal Price
                                 {% endif %}
+                            </div>
+                            <div class="cardbox__text">
+                                <div class="h3">
+                                    {% if policy.getPremiumPlan == 'monthly' %}
+                                        &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}
+                                    {% endif %}
+                                </div>
+                                <div class="h6 mb-0">
+                                    {% if policy.getPremiumPlan == 'monthly' %}
+                                        <span class="sub text-columbia-blue-e">per month</span>
+                                    {% else %}
+                                        <span class="sub text-columbia-blue-e">per year</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% if policy.potValue > 0 %}
-                    <div class="cardbox cardbox-100 mb-4">
-                        <div class="cardbox__body">
-                            <h5 class="cardbox__title">
-                                Without Reward Pot 📈
-                            </h5>
-                            <div class="h3">
-                                {% if policy.getPremiumPlan == 'monthly' %}
-                                    &pound;{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
-                                {% else %}
-                                    &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}  <span class="sub">per year</span>
-                                {% endif %}
+                    <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                        <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                            <div class="cardbox__body text-center">
+                                <div class="h6 text-white cardbox__title">📈 Without Cashback</div>
+                                <div class="cardbox__text">
+                                    <div class="h3">
+                                        {% if policy.getPremiumPlan == 'monthly' %}
+                                            &pound;{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="h6 mb-0">
+                                        {% if policy.getPremiumPlan == 'monthly' %}
+                                            <span class="sub text-columbia-blue-e">per month</span>
+                                        {% else %}
+                                            <span class="sub text-columbia-blue-e">per year</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 {% endif %}
             </div>
-            <p class="mb-4">
+        </div>
+    </div>
+
+    <div class="renew">
+        <div class="container-large py-5">
+            <p class="mb-5">
                 {% if renew.getMonthlyPremiumPrice < policy.premium.getMonthlyPremiumPrice %}
                     We have great news. Your renewal premium is less than last year's premium of
                 {% else %}
@@ -80,20 +102,8 @@
                     &pound;{{ policy.getYearlyPremiumPrice|number_format(2, '.', ',') }} per year.
                 {% endif %}</u>
             </p>
-            {# if there is only a single option (e.g. yearly payments w/no cashback), then no need for custom page #}
-            {% if policy.potValue > 0 %}
-                <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}"
-                   class="btn btn-outline-primary btn-block-xs mr-md-2">Make changes</a>
-            {% else %}
-                <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}"
-                   class="btn btn-outline-primary btn-block-xs mr-md-2">Make changes</a>
-            {% endif %}
-            <a href="#"
-               class="btn btn-success btn-block-xs"
-               data-toggle="modal"
-               data-target="#renew_modal">Renew my policy</a>
         </div>
-    </section>
+    </div>
 
     {# Page Modals #}
     <div class="modal fade"
@@ -112,13 +122,13 @@
                 <div class="modal-body">
                     {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                         <p>Please be advised that if you confirm that the below is true and we later discover that it isn’t, your claim might get denied.</p>
-                        <ol>
+                        <ol class="mb-5">
                             <li class="mb-3">My phone is in full working condition and my screen is not cracked</li>
                             <li class="mb-3">I am a resident of the United Kingdom</li>
-                            <li class="mb-4">I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v13.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
+                            <li class="mb-3">I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
                         </ol>
-                        <div class="form-group">
-                            {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
+                        <div class="form-group text-center">
+                            {{ form_widget(renew_form.renew, {'label': 'Renew', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                         </div>
                     {{ form_end(renew_form) }}
                 </div>
@@ -129,5 +139,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
     <script src="{{ asset('css-js/user-renew.js') }}"></script>
 {% endblock %}

@@ -22,6 +22,7 @@ use AppBundle\Service\PaymentService;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\SequenceService;
+use AppBundle\Service\RouterService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -143,11 +144,7 @@ class UserController extends BaseController
                 }
             }
         } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
-            // mainly for facebook registration, although makes sense for all users
-            // check for canPurchasePolicy is necessary to prevent redirect loop
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
-                // TODO: If possible to detect if the user came via the purchase page or via the login page
-                // login page would be nice to add a flash message saying their policy has not yet been purchased
                 if ($user->hasPartialPolicy()) {
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_phone_id', [
@@ -182,6 +179,7 @@ class UserController extends BaseController
 
         $scode = null;
         $codeMessage = null;
+        $codeButtonText = 'Apply Code';
 
         if ($session = $this->get('session')) {
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
@@ -193,18 +191,14 @@ class UserController extends BaseController
         $emailInvitationForm = $this->get('form.factory')
             ->createNamedBuilder('email', EmailInvitationType::class, $emailInvitiation)
             ->getForm();
-        $invitationForm = $this->get('form.factory')
-            ->createNamedBuilder('invitation', InvitationType::class, $user)
-            ->getForm();
-        $sentInvitationForm = $this->get('form.factory')
-            ->createNamedBuilder('sent_invitation', SentInvitationType::class, $policy)
-            ->getForm();
         $scodeForm = $this->get('form.factory')
             ->createNamedBuilder('scode', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
             ->getForm();
-        $unconnectedUserPolicyForm = $this->get('form.factory')
-            ->createNamedBuilder('unconnectedPolicy', UnconnectedUserPolicyType::class, $policy)
+        // @codingStandardsIgnoreStart
+        $scodeFormTwo = $this->get('form.factory')
+            ->createNamedBuilder('scode_two', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
             ->getForm();
+        // @codingStandardsIgnoreEnd
 
         if ($request->request->has('email')) {
             $emailInvitationForm->handleRequest($request);
@@ -231,99 +225,11 @@ class UserController extends BaseController
 
                 return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
             }
-        } elseif ($request->request->has('invitation')) {
-            $invitationForm->handleRequest($request);
-            if ($invitationForm->isSubmitted() && $invitationForm->isValid()) {
-                foreach ($user->getUnprocessedReceivedInvitations() as $invitation) {
-                    if ($invitationForm->get(sprintf('accept_%s', $invitation->getId()))->isClicked()) {
-                        $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
-                        try {
-                            $connection = $invitationService->accept($invitation, $policy);
-                            $this->addFlash(
-                                'success',
-                                sprintf("You're now connected with %s", $invitation->getInviter()->getName())
-                            );
-                        } catch (ClaimException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You or your friend have a claim and are unable to connect.")
-                            );
-                        }
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
-                    } elseif ($invitationForm->get(sprintf('reject_%s', $invitation->getId()))->isClicked()) {
-                        $this->denyAccessUnlessGranted(InvitationVoter::REJECT, $invitation);
-                        $invitationService->reject($invitation);
-                        $this->addFlash(
-                            'warning',
-                            sprintf("You've declined the invitation from %s", $invitation->getInviter()->getName())
-                        );
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
-                    }
-                }
-            }
-        } elseif ($request->request->has('sent_invitation')) {
-            $sentInvitationForm->handleRequest($request);
-            if ($sentInvitationForm->isSubmitted() && $sentInvitationForm->isValid()) {
-                foreach ($policy->getSentInvitations() as $invitation) {
-                    if ($sentInvitationForm->get(sprintf('reinvite_%s', $invitation->getId()))->isClicked()) {
-                        $this->denyAccessUnlessGranted(InvitationVoter::REINVITE, $invitation);
-                        $connection = $invitationService->reinvite($invitation);
-                        $this->addFlash(
-                            'success',
-                            sprintf("Re-sent invitation to %s", $invitation->getInviteeName())
-                        );
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
-                    } elseif ($sentInvitationForm->get(sprintf('cancel_%s', $invitation->getId()))->isClicked()) {
-                        $this->denyAccessUnlessGranted(InvitationVoter::CANCEL, $invitation);
-                        $invitationService->cancel($invitation);
-                        $this->addFlash(
-                            'warning',
-                            sprintf("Cancelled invitation to %s", $invitation->getInviteeName())
-                        );
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
-                    }
-                }
-            }
-        } elseif ($request->request->has('unconnectedPolicy')) {
-            $unconnectedUserPolicyForm->handleRequest($request);
-            if ($unconnectedUserPolicyForm->isSubmitted() && $unconnectedUserPolicyForm->isValid()) {
-                foreach ($policy->getUnconnectedUserPolicies() as $unconnectedPolicy) {
-                    $buttonName = sprintf('connect_%s', $unconnectedPolicy->getId());
-                    if ($unconnectedUserPolicyForm->get($buttonName)->isClicked()) {
-                        try {
-                            $invitationService->connect($policy, $unconnectedPolicy);
-                            $this->addFlash(
-                                'success',
-                                sprintf("You're now connected with %s", $unconnectedPolicy->getDefaultName())
-                            );
-                        } catch (ClaimException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You or your friend have a claim and are unable to connect.")
-                            );
-                        }
-
-                        return new RedirectResponse(
-                            $this->generateUrl('user_policy', ['policyId' => $policy->getId()])
-                        );
-                    }
-                }
-            }
         } elseif ($request->request->has('scode')) {
             $scodeForm->handleRequest($request);
-            if ($scodeForm->isSubmitted() && $scodeForm->isValid()) {
+            $scodeFormTwo->handleRequest($request);
+            // @codingStandardsIgnoreStart
+            if (($scodeForm->isSubmitted() && $scodeForm->isValid()) or ($scodeFormTwo->isSubmitted() && $scodeFormTwo->isValid())) {
                 if ($session = $this->get('session')) {
                     $session->remove('scode');
                 }
@@ -360,7 +266,7 @@ class UserController extends BaseController
                     $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
                     if ($invitation && !$scode->isReward()) {
                         $message = sprintf(
-                            '%s has been invited',
+                            '%s has been invited  to connect',
                             $invitation->getInvitee()->getName()
                         );
                     } else {
@@ -462,31 +368,35 @@ class UserController extends BaseController
                     );
                 }
             }
+            // @codingStandardsIgnoreEnd
         } elseif ($scode) {
             if ($scode->isStandard()) {
-                $codeMessage = sprintf('%s has invited you to connect.', $scode->getUser()->getName());
+                $codeMessage = sprintf('Connect with %s.', $scode->getUser()->getName());
+                $codeButtonText = 'Confirm';
             } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() != true) {
                 // @codingStandardsIgnoreStart
                 $codeMessage = sprintf('Apply your £%0.2f reward bonus from %s', $scode->getReward()->getDefaultValue(), $scode->getUser()->getName());
                 // @codingStandardsIgnoreEnd
+                $codeButtonText = 'Add Reward';
             } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() == true) {
                 // @codingStandardsIgnoreStart
-                $codeMessage = sprintf('%s has invited you to connect.', $scode->getUser()->getName());
+                $codeMessage = sprintf('Connect with %s.', $scode->getUser()->getName());
                 // @codingStandardsIgnoreEnd
+                $codeButtonText = 'Confirm';
             }
         }
 
         $renewMessage = false;
         foreach ($user->getValidPolicies(true) as $checkPolicy) {
             if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
-                $this->addFlash(
-                    'success-raw',
-                    sprintf(
-                        '%s is ready for <a href="%s">renewal</a>',
-                        $checkPolicy->getPolicyNumber(),
-                        $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
-                    )
-                );
+                // $this->addFlash(
+                //     'success-raw',
+                //     sprintf(
+                //         '%s is ready for <a href="%s">renewal</a>',
+                //         $checkPolicy->getPolicyNumber(),
+                //         $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
+                //     )
+                // );
                 $renewMessage = true;
             }
 
@@ -497,28 +407,6 @@ class UserController extends BaseController
                     $url = $this->generateUrl('download_apple', ['medium' => 'pic-sure-warning']);
                 } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
                     $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
-                }
-                if (!$checkPolicy->getPolicyTerms()->isPicsureRequired()) {
-                    if ($url) {
-                        $this->addFlash(
-                            'warning-raw',
-                            sprintf(
-                                'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with our app',
-                                $checkPolicy->getPolicyNumber(),
-                                $url
-                            )
-                        );
-                    } else {
-                        // @codingStandardsIgnoreStart
-                        $this->addFlash(
-                            'warning-raw',
-                            sprintf(
-                                'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
-                                $checkPolicy->getPolicyNumber()
-                            )
-                        );
-                        // @codingStandardsIgnoreEnd
-                    }
                 }
             }
         }
@@ -533,24 +421,228 @@ class UserController extends BaseController
             $fbFriends = $this->getFacebookFriends($request, $policy);
         }
 
-        // @codingStandardsIgnoreStart
-        // $this->addFlash(
-        //     'success',
-        //     "🥳 The app is back up and running you can now validate your device!"
-        // );
-        // @codingStandardsIgnoreEnd
+        // Get max connection
+        $maxConnections = $policy->getMaxConnections();
 
         return array(
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
-            'invitation_form' => $invitationForm->createView(),
+            'scode_form' => $scodeForm->createView(),
+            'scode_form_two' => $scodeFormTwo->createView(),
+            'scode' => $scode,
+            'friends' => $fbFriends,
+            'code_message' => $codeMessage,
+            'max_connections' => $maxConnections,
+            'code_button_text' => $codeButtonText,
+        );
+    }
+
+    /**
+     * @Route("/invites", name="user_invite")
+     * @Route("/invites/{policyId}", name="user_invite_policy", requirements={"policyId":"[0-9a-f]{24,24}"}))
+     * @Template
+     */
+    public function invitesAction(Request $request, $policyId = null)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $scodeRepo = $dm->getRepository(SCode::class);
+        $user = $this->getUser();
+        if ($user->hasPolicyCancelledAndPaymentOwed()) {
+            foreach ($user->getAllPolicies() as $policy) {
+                if ($policy->isCancelledAndPaymentOwed()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_remainder_policy', ['id' => $policy->getId()])
+                    );
+                }
+            }
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
+            if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
+                if ($user->hasPartialPolicy()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_step_phone_id', [
+                            'id' => $user->getPartialPolicies()[0]->getId()
+                        ])
+                    );
+                } else {
+                    return new RedirectResponse($this->generateUrl('purchase_step_phone'));
+                }
+            } else {
+                return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+            }
+        } elseif ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
+        }
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+            if ($user->hasPicsureRequiredPolicy()) {
+                return $this->redirectToRoute("user_home");
+            } else {
+                throw $this->createNotFoundException('No active policy found');
+            }
+        }
+        if ($policyId) {
+            $policy = $policyRepo->find($policyId);
+        } else {
+            $policy = $user->getLatestPolicy();
+        }
+        if ($policy) {
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        }
+
+        $scode = null;
+        $codeMessage = null;
+
+        if ($session = $this->get('session')) {
+            $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
+        }
+
+        /** @var InvitationService $invitationService */
+        $invitationService = $this->get('app.invitation');
+        $emailInvitiation = new EmailInvitation();
+        $emailInvitationForm = $this->get('form.factory')
+            ->createNamedBuilder('email', EmailInvitationType::class, $emailInvitiation)
+            ->getForm();
+        $invitationForm = $this->get('form.factory')
+            ->createNamedBuilder('invitation', InvitationType::class, $user)
+            ->getForm();
+        $sentInvitationForm = $this->get('form.factory')
+            ->createNamedBuilder('sent_invitation', SentInvitationType::class, $policy)
+            ->getForm();
+        $scodeForm = $this->get('form.factory')
+            ->createNamedBuilder('scode', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
+            ->getForm();
+        $unconnectedUserPolicyForm = $this->get('form.factory')
+            ->createNamedBuilder('unconnectedPolicy', UnconnectedUserPolicyType::class, $policy)
+            ->getForm();
+
+        if ($request->request->has('email')) {
+            $emailInvitationForm->handleRequest($request);
+            if ($emailInvitationForm->isSubmitted() && $emailInvitationForm->isValid()) {
+                try {
+                    $invitationService->inviteByEmail(
+                        $policy,
+                        $emailInvitiation->getEmail(),
+                        null,
+                        null,
+                        'User Home'
+                    );
+                    $this->addFlash(
+                        'success',
+                        sprintf('%s was invited', $emailInvitiation->getEmail())
+                    );
+                } catch (SelfInviteException $e) {
+                    $this->addFlash('error', 'Sorry, you are not able to invite yourself');
+                } catch (\Exception $e) {
+                    $msg = sprintf('Sorry, there was an error inviting %s', $emailInvitiation->getEmail());
+                    $this->get('logger')->error($msg, ['exception' => $e]);
+                    $this->addFlash('error', $msg);
+                }
+
+                return new RedirectResponse($this->generateUrl('user_invite_policy', ['policyId' => $policy->getId()]));
+            }
+        } elseif ($request->request->has('invitation')) {
+            $invitationForm->handleRequest($request);
+            if ($invitationForm->isSubmitted() && $invitationForm->isValid()) {
+                foreach ($user->getUnprocessedReceivedInvitations() as $invitation) {
+                    if ($invitationForm->get(sprintf('accept_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                        try {
+                            $connection = $invitationService->accept($invitation, $policy);
+                            $this->addFlash(
+                                'success',
+                                sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                            );
+                        } catch (ClaimException $e) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("You or your friend have a claim and are unable to connect.")
+                            );
+                        }
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_invite_policy', ['policyId' => $policy->getId()])
+                        );
+                    } elseif ($invitationForm->get(sprintf('reject_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::REJECT, $invitation);
+                        $invitationService->reject($invitation);
+                        $this->addFlash(
+                            'warning',
+                            sprintf("You've declined the invitation from %s", $invitation->getInviter()->getName())
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_invite_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
+                }
+            }
+        } elseif ($request->request->has('sent_invitation')) {
+            $sentInvitationForm->handleRequest($request);
+            if ($sentInvitationForm->isSubmitted() && $sentInvitationForm->isValid()) {
+                foreach ($policy->getSentInvitations() as $invitation) {
+                    if ($sentInvitationForm->get(sprintf('reinvite_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::REINVITE, $invitation);
+                        $connection = $invitationService->reinvite($invitation);
+                        $this->addFlash(
+                            'success',
+                            sprintf("Re-sent invitation to %s", $invitation->getInviteeName())
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_invite_policy', ['policyId' => $policy->getId()])
+                        );
+                    } elseif ($sentInvitationForm->get(sprintf('cancel_%s', $invitation->getId()))->isClicked()) {
+                        $this->denyAccessUnlessGranted(InvitationVoter::CANCEL, $invitation);
+                        $invitationService->cancel($invitation);
+                        $this->addFlash(
+                            'warning',
+                            sprintf("Cancelled invitation to %s", $invitation->getInviteeName())
+                        );
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_invite_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
+                }
+            }
+        } elseif ($request->request->has('unconnectedPolicy')) {
+            $unconnectedUserPolicyForm->handleRequest($request);
+            if ($unconnectedUserPolicyForm->isSubmitted() && $unconnectedUserPolicyForm->isValid()) {
+                foreach ($policy->getUnconnectedUserPolicies() as $unconnectedPolicy) {
+                    $buttonName = sprintf('connect_%s', $unconnectedPolicy->getId());
+                    if ($unconnectedUserPolicyForm->get($buttonName)->isClicked()) {
+                        try {
+                            $invitationService->connect($policy, $unconnectedPolicy);
+                            $this->addFlash(
+                                'success',
+                                sprintf("You're now connected with %s", $unconnectedPolicy->getDefaultName())
+                            );
+                        } catch (ClaimException $e) {
+                            $this->addFlash(
+                                'warning',
+                                sprintf("You or your friend have a claim and are unable to connect.")
+                            );
+                        }
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_invite_policy', ['policyId' => $policy->getId()])
+                        );
+                    }
+                }
+            }
+        }
+
+        return [
+            'user' => $user,
+            'policy' => $policy,
+            'email_form' => $emailInvitationForm->createView(),
+            // 'invitation_form' => $invitationForm->createView(),
             'sent_invitation_form' => $sentInvitationForm->createView(),
             'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
-            'friends' => $fbFriends,
-            'code_message' => $codeMessage,
-        );
+        ];
     }
 
     /**
@@ -682,7 +774,7 @@ class UserController extends BaseController
                         'Thanks. Your policy is now scheduled to be renewed on %s',
                         $renewalPolicy->getStart()->format('d M Y')
                     );
-                    $this->addFlash('success', $message);
+                    // $this->addFlash('success', $message);
 
                     return new RedirectResponse(
                         $this->generateUrl('user_policy', ['policyId' => $renewalPolicy->getId()])
@@ -873,7 +965,7 @@ class UserController extends BaseController
                     $message = sprintf(
                         'Your request to terminate your policy has been accepted.'
                     );
-                    $this->addFlash('success', $message);
+                    // $this->addFlash('success', $message);
 
                     return new RedirectResponse(
                         $this->generateUrl('user_renew_declined', ['id' => $id])
@@ -941,9 +1033,7 @@ class UserController extends BaseController
                 $dm->flush();
                 $this->addFlash('success', 'Your connections have been updated');
 
-                return new RedirectResponse(
-                    $this->generateUrl('user_home')
-                );
+                return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
             } else {
                 $this->addFlash(
                     'error',
@@ -1221,12 +1311,22 @@ class UserController extends BaseController
             $dm->flush($policy);
         }
 
+        // A/B Hero Image Test
+        // To Test use url param ?force=standard-hero-image / ?force=photo-hero-image
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO);
+
+        /** @var RouterService $router */
+        $router = $this->get('app.router');
+        // TODO: Should this account for policy ID?
+        $invitePage = $router->generateUrl('user_invite', []);
+
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
             $message = sprintf(
-                'Hey, you already have %d invitation%s. 🤗 <a href="#download-apps">Download</a> our app to connect.',
+                'Hey, you already have %d invitation%s. 🤗 <a href="%s">Connect here</a>.',
                 $countUnprocessedInvitations,
-                $countUnprocessedInvitations > 1 ? 's' : ''
+                $countUnprocessedInvitations > 1 ? 's' : '',
+                $invitePage
             );
             $this->addFlash('success-raw', $message);
         }
@@ -1246,6 +1346,7 @@ class UserController extends BaseController
 
         $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
 
+        // TODO: This should not be a feature
         if ($competitionFeature) {
             $template = 'AppBundle:User:welcomeCompetition.html.twig';
         }
@@ -1276,10 +1377,50 @@ class UserController extends BaseController
      */
     public function paymentDetailsAction(Request $request, $policyId = null)
     {
+        $dm = $this->getManager();
         /** @var User $user */
         $user = $this->getUser();
-        $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
+        if ($user->hasPolicyCancelledAndPaymentOwed()) {
+            foreach ($user->getAllPolicies() as $policy) {
+                if ($policy->isCancelledAndPaymentOwed()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_remainder_policy', ['id' => $policy->getId()])
+                    );
+                }
+            }
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
+            if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
+                if ($user->hasPartialPolicy()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_step_phone_id', [
+                            'id' => $user->getPartialPolicies()[0]->getId()
+                        ])
+                    );
+                } else {
+                    return new RedirectResponse($this->generateUrl('purchase_step_phone'));
+                }
+            } else {
+                return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+            }
+        } elseif ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
+        }
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+            if ($user->hasPicsureRequiredPolicy()) {
+                return $this->redirectToRoute("user_home");
+            } else {
+                throw $this->createNotFoundException('No active policy found');
+            }
+        }
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+
+        // If a user has an unpaid policy, then avoid updating card details (email directing to here)
+        // as its then in a very odd state - card correct, but unpaid. better ask user to take the payment immediately
+        if ($user->hasUnpaidPolicy() && $request->get('_route') != 'user_payment_details_bacs') {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
+        }
+
         if ($policyId) {
             /** @var Policy $policy */
             $policy = $policyRepo->find($policyId);
@@ -1289,14 +1430,6 @@ class UserController extends BaseController
             if (!$policy) {
                 $policy = $user->getLatestPolicy(false);
             }
-        }
-
-        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
-
-        // If a user has an unpaid policy, then avoid updating card details (email directing to here)
-        // as its then in a very odd state - card correct, but unpaid. better ask user to take the payment immediately
-        if ($user->hasUnpaidPolicy() && $request->get('_route') != 'user_payment_details_bacs') {
-            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
         // page no longer makes much sense unless associated with a policy
@@ -1422,12 +1555,12 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/contact-details", name="user_contact_details")
-     * @Route("/contact-details/{policyId}", name="user_contact_details_policy",
+     * @Route("/settings", name="user_settings")
+     * @Route("/settings/{policyId}", name="user_settings_policy",
      *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
-    public function contactDetailsAction(Request $request, $policyId = null)
+    public function settingsAction(Request $request, $policyId = null)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
@@ -1466,11 +1599,11 @@ class UserController extends BaseController
                     }
 
                     if ($policy) {
-                        return $this->redirectToRoute('user_contact_details_policy', [
+                        return $this->redirectToRoute('user_settings_policy', [
                             'policyId' => $policy->getId()
                         ]);
                     } else {
-                        return $this->redirectToRoute('user_contact_details');
+                        return $this->redirectToRoute('user_settings');
                     }
                 }
             }
@@ -1492,9 +1625,10 @@ class UserController extends BaseController
      */
     public function policyListAction($policyId = null)
     {
-        $user = $this->getUser();
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
+        $user = $this->getUser();
+
         if ($policyId) {
             $policy = $policyRepo->find($policyId);
         } else {
@@ -1502,6 +1636,18 @@ class UserController extends BaseController
         }
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        }
+
+        if ($user->hasPolicyCancelledAndPaymentOwed()) {
+            foreach ($user->getAllPolicies() as $policy) {
+                if ($policy->isCancelledAndPaymentOwed()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_remainder_policy', ['id' => $policy->getId()])
+                    );
+                }
+            }
+        } elseif ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
         return [
@@ -1518,6 +1664,31 @@ class UserController extends BaseController
     {
         /** @var User $user */
         $user = $this->getUser();
+        if ($user->hasPolicyCancelledAndPaymentOwed()) {
+            foreach ($user->getAllPolicies() as $policy) {
+                if ($policy->isCancelledAndPaymentOwed()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_remainder_policy', ['id' => $policy->getId()])
+                    );
+                }
+            }
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
+            if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
+                if ($user->hasPartialPolicy()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_step_phone_id', [
+                            'id' => $user->getPartialPolicies()[0]->getId()
+                        ])
+                    );
+                } else {
+                    return new RedirectResponse($this->generateUrl('purchase_step_phone'));
+                }
+            } else {
+                return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+            }
+        } elseif ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
+        }
         $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             if ($user->hasPicsureRequiredPolicy()) {
@@ -2016,63 +2187,6 @@ class UserController extends BaseController
         $fb->post(sprintf('/me/%s:trust', $fbNamespace), [ 'profile' => $id ]);
 
         return new RedirectResponse($this->generateUrl('user_home'));
-    }
-
-    /**
-     * @Route("/invite/{policyId}/{facebookId}", name="user_invite")
-     * @Template
-     */
-    public function inviteAction(Request $request, $policyId, $facebookId)
-    {
-        $user = $this->getUser();
-        $dm = $this->getManager();
-        $policyRepo = $dm->getRepository(Policy::class);
-        $policy = $policyRepo->find($policyId);
-
-        if (!$policy) {
-            throw $this->createNotFoundException('Policy not found');
-        }
-
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-
-        $invitationService = $this->get('app.invitation');
-        // avoid sending email/sms invitations if testing
-        if ($this->getRequestBool($request, 'debug')) {
-            $invitationService->setDebug(true);
-        }
-
-        try {
-            $invitation = $invitationService->inviteByFacebookId($policy, $facebookId);
-
-            $session = $request->getSession();
-            if ($session) {
-                $friends = $session->get('friends');
-                foreach ($friends as $id => $friend) {
-                    if ($friend['id'] == $facebookId) {
-                        unset($friends[$id]);
-                        break;
-                    }
-                }
-                $session->set('friends', $friends);
-            }
-
-            $this->addFlash(
-                'success',
-                sprintf('%s was invited', $invitation->getEmail())
-            );
-        } catch (NotFoundHttpException $e) {
-            $this->addFlash('error', 'Sorry, your facebook friend is not a so-sure customer yet');
-        } catch (DuplicateInvitationException $e) {
-            $this->addFlash('error', 'Sorry, you have already invited this facebook friend');
-        } catch (SelfInviteException $e) {
-            $this->addFlash('error', 'Sorry, you are not able to invite yourself');
-        } catch (\Exception $e) {
-            $msg = sprintf('Sorry, there was an error inviting your friend');
-            $this->get('logger')->error($msg, ['exception' => $e]);
-            $this->addFlash('error', $msg);
-        }
-
-        return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
     }
 
     /**

@@ -163,9 +163,11 @@
                                 <p>All this sounds great, but <a href="https://www.cnet.com/news/iphone-xs-iphone-xr-iphone-xs-max-apple-three-new-iphones-replace-iphone-x/" target="_blank" rel="noopener noreferrer">CNET is claiming that the new iPhone could be slower than Android phones</a>, since Qualcomm is on record saying it isn’t supplying modems to the new iPhone and and its chips are reported to be faster than Intel chips at downloading data.</p>
                                 <p>So, if you’re in the market for a new phone, it might pay to wait and try the new iPhone, which is slated to hit the shops as soon as October and could blow the Samsung Note and the iPhone X out of the water. That’s if you can wait that long.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

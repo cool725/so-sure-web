@@ -102,9 +102,11 @@
                                 <p>UK insurtech is more than a sector. It’s an ecosystem supporting startups and scale ups, helping consumers access insurance services more efficiently via technology. And it’s a threat to the traditional model - but this threat should be seen as an opportunity by the wider industry.</p>
                                 <p>At <a href="{{ path('homepage') }}">so-sure</a>, we find it hard to overstate the importance of insurtech to the health of the insurance industry. Competition is increasing internationally, too, so it’s essential that founders, leaders, regulators and all participants work together to build on successes already achieved. Judging by our peers, that future is in safe hands and it’s one we’re proud to be shaping.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

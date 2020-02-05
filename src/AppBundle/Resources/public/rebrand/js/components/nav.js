@@ -4,7 +4,7 @@
 // const disableBodyScroll = bodyScrollLock.disableBodyScroll;
 // const enableBodyScroll = bodyScrollLock.enableBodyScroll;
 
-import usrAgnt from '../common/setAgent.js';
+import usrAgnt from '../common/set-agent.js';
 
 $(function() {
 

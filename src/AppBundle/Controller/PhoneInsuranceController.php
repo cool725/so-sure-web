@@ -496,6 +496,10 @@ class PhoneInsuranceController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
+        // A/B Hero Image Test
+        // To Test use url param ?force=standard-hero-image / ?force=photo-hero-image
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO);
+
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');

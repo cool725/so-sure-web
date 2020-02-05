@@ -2,7 +2,10 @@
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
+{% set intercom_enabled = false %}
 
 {% block title %}Welcome {{ app.user.firstname }} 🎉 | so-sure{% endblock %}
 
@@ -10,7 +13,7 @@
 {% set og_title = 'Win and save with so-sure!' %}
 {% set og_description = 'Hey, we could win £200 with mobile phone insurer so-sure. It’s super easy to enter!' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
-{% if policy.standardSCode %}
+{% if policy.standardSCode is defined and policy.standardSCode %}
     {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
 {% endif %}
 
@@ -22,352 +25,522 @@
 {% block body %}
 
     {% if policy.policyTerms.isPicSureRequired and policy.picSureStatus != 'approved' %}
-        <section class="hero">
+        <section class="hero hero-invalid">
             <div class="container-large">
-                <div class="row">
-                    <div class="col-12 col-lg-8 offset-lg-2">
-                        <h1 class="h2">Almost there!</h1>
-                        <p class="mb-4">Please be aware that your policy will NOT commence until you have verified the condition of phone with our app. Install the app and follow the instructions.</p>
-                        {% if policy.phone.iTunes %}
-                            <a href="{{ apple_download('user-required-account') }}"
-                               class="btn btn-primary btn-block-xs ga-outbound-click"
-                               data-clicklabel="iTunes"
-                               target="_blank"
-                               rel="noopener noreferrer">
-                                <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
-                        {% endif %}
-                        {% if policy.phone.googlePlay %}
-                            <a href="{{ google_download('user-required-account') }}"
-                               class="btn btn-primary btn-block-xs ga-outbound-click"
-                               data-clicklabel="PlayStore"
-                               target="_blank"
-                               rel="noopener noreferrer">
-                                <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
-                        {% endif %}
-                    </div>
-                </div>
+                <h1 class="h2 mb-4 text-white">Almost there 👍</h1>
+                <p class="lead mb-4 text-white">Please be aware that your policy will NOT commence until you have verified the condition of phone with our app. Install the app and follow the instructions.</p>
+                {% if policy.phone.iTunes %}
+                    <a href="{{ apple_download('user-required-account') }}"
+                       class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
+                       data-clicklabel="iTunes"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                {% endif %}
+                {% if policy.phone.googlePlay %}
+                    <a href="{{ google_download('user-required-account') }}"
+                       class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
+                       data-clicklabel="PlayStore"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                {% endif %}
             </div>
         </section>
     {% else %}
-        <section class="hero">
+        <div class="hero">
             <div class="container-large">
-                <div class="row">
-                    <div class="col-12 col-lg-4 mb-4">
-                        <h1 class="h2 mb-4">Welcome back, <span class="text-nowrap">{{ app.user.firstname }}</span></h1>
+                <div class="d-lg-flex align-items-center text-lg-left">
+                    <div class="flex-grow-1">
                         {% if policy is defined and policy %}
-                            {% if policy.user.getValidPolicies(true) | length == 1 %}
-                                <div class="h6">Policy: <u>{{ policy.policyNumber }}</u></div>
-                            {% else %}
-                                <div class="h6">
-                                    <div class="dropdown">
+                            <div class="h5 text-columbia-blue-e fit">MY SO-SURE <span class="mx-2 text-white">|</span> {{ policy.phone.make }} {{ policy.phone.model }}</div>
+                        {% endif %}
+                        <h1 class="text-white mb-5 mb-lg-4">
+                            Welcome {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}to so-sure{% else %}back{% endif %}, <span class="text-nowrap">{{ app.user.firstname }}</span>
+                        </h1>
+                        {{ form_start(scode_form, {'attr': {
+                            'class': 'w-75 d-none d-lg-block',
+                            'autocomplete': 'off'
+                        }}) }}
+                            <p class="text-white mb-2">
+                                {% if code_message is not null %}
+                                    {{ code_message }} 👇
+                                {% else %}
+                                    Already received an invite code?
+                                    <span class="text-dodger-blue">
                                         <a href="#"
-                                           class="dropdown-toggle"
-                                           id="dropdown_menu_link"
-                                           data-toggle="dropdown"
-                                           aria-haspopup="true"
-                                           aria-expanded="false">
-                                            Policy: <u>{{ policy.policyNumber }}</u>
-                                            <i class="far fa-chevron-down fa-lg fa-fw ml-1"></i>
+                                           data-toggle="modal"
+                                           data-target="#scode_info"
+                                           role="button">
+                                            <i class="fal fa-info-circle fa-fw text-columbia-blue-e"></i>
                                         </a>
-                                        <div class="dropdown-menu" aria-labelledby="dropdown_menu_link">
-                                            {% for policyItem in policy.user.getValidPolicies(true) %}
-                                                <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="dropdown-item">{{ policyItem.defaultName }} <br> <small>({{ policyItem.policyNumber }})</small></a>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            <div class="h6"><span class="sub">{{ policy.start|date('jS M Y') }} - {{ policy.end|date('jS M Y') }}</span></div>
-                            <div class="h6 mb-4">📱<span class="sub">{{ policy.phone }}</span></div>
-                        {% endif %}
-                        {% if policy.canInvite %}
-                            <a href="#"
-                               id="apply_reward_btn"
-                               data-toggle="modal"
-                               data-target="#apply_reward_modal"
-                               data-populate="{% if scode and scode %}true{% endif %}"
-                               class="btn btn-success">
-                               Apply invite or promo code
-                           </a>
-                        {% endif %}
-                        {% if policy.connections|length > 0 %}
-                            <div class="mt-4">
-                                <h5 class="mb-4">My connections</h5>
-                                <div class="d-md-flex flex-wrap align-self-center justify-content-start">
-                                    {% for connection in policy.standardConnections %}
-                                        <span>
-                                            <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection {% if connection.linkedPolicy and connection.linkedPolicy.hasMonetaryClaimed %}connection__claimed{% endif %} mr-2 mr-md-4 mb-2 mb-md-4"
-                                                 alt="{{ connection.linkedUser.name }}"
-                                                 width="50px"
-                                                 data-toggle="tooltip"
-                                                 data-placement="top"
-                                                 title="
-                                                    {{ connection.linkedUser.name }} -
-                                                    Connected on {{ connection.date|date('dS M') }}
-                                                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                                        (£{{ connection.totalValue|number_format(2, '.', ',')  }})
-                                                    {% endif %}
-                                                 ">
-                                        </span>
-                                    {% endfor %}
-                                    {% for connection in policy.rewardConnections %}
-                                        {% if connection.linkedUser.isInfluencer == true %}
-                                            <span>
-                                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection mr-2 mr-md-4 mb-2 mb-md-4"
-                                                     alt="{{ connection.linkedUser.name }}"
-                                                     width="50px"
-                                                     data-toggle="tooltip"
-                                                     data-placement="top"
-                                                     data-test=""
-                                                     title="
-                                                        {{ connection.linkedUser.name }} -
-                                                        Connected on {{ connection.date|date('dS M') }}
-                                                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                                            (£{{ connection.totalValue|number_format(2, '.', ',')  }})
-                                                        {% endif %}
-                                                     ">
-                                            </span>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                                <h5 class="mb-4">My rewards</h5>
-                                <div class="d-md-flex flex-wrap align-self-center justify-content-start">
-                                    {% for connection in policy.rewardConnections %}
-                                        {% if connection.linkedUser.isInfluencer == false %}
-                                            <span>
-                                                <img src="{{ connection.linkedUser.getImageUrlFallback }}"  class="rounded-circle connection mr-2 mr-md-4 mb-2 mb-md-4"
-                                                     alt="{{ connection.linkedUser.name }}"
-                                                     width="50px"
-                                                     data-toggle="tooltip"
-                                                     data-placement="top"
-                                                     data-test=""
-                                                     title="
-                                                        {{ connection.linkedUser.name }} -
-                                                        Reward on {{ connection.date|date('dS M') }}
-                                                        {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                                            (£{{ connection.totalValue|number_format(2, '.', ',')  }})
-                                                        {% endif %}
-                                                     ">
-                                            </span>
-                                        {% endif %}
-                                        {% if loop.length < 1 %}
-                                            <p>asdasdas</p>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="col-12 col-lg-7 offset-lg-1">
-                        <div class="row">
-                            <div class="col-md">
-                                <h5 class="mb-4">Reward Pot</h5>
-                                <div id="reward_pot_chart"
-                                     class="user-chart mb-4"
-                                     data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
-                                     data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
-                                    <div class="user-chart__value">
-                                        <span class="text-dodger-blue h4">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</span>
-                                        <br><small class="opacity-50">OF &pound;{{ policy.maxPot|number_format(2, '.', ',') }} AVAILABLE</small>
-                                    </div>
-                                </div>
-                            </div>
-                            {% if policy.getCurrentConnectionValues %}
-                                <div class="col-md">
-                                    {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
-                                    {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
-                                    <h5 class="mb-4">Connection Bonus</h5>
-                                    <div id="connection_bonus_chart"
-                                         class="user-chart mb-4"
-                                         data-bonus-days-total="{{ days_total }}"
-                                         data-bonus-days-remaining="{{ days_left }}">
-                                        <div class="user-chart__value">
-                                            <span class="text-danger h4">{{ days_left }}</span>
-                                            <br><small class="opacity-50">DAYS</small>
-                                            {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
-                                                <small class="opacity-50">UNTIL BONUS <br> REDUCED</small>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                        {% if policy.canInvite %}
-                            {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                <h5>Earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback by inviting your friends to so-sure</h5>
-                            {% endif %}
-                            <div class="d-lg-flex align-items-lg-center mt-lg-3 mb-4">
-                                <h5 class="text-zaffre mr-lg-3 mb-lg-0">Invite via social:</h5>
-                                {# TODO: Rework icons #}
-                                <div id="onboarding_btn_share"
-                                     data-share-link="{{ url('scode', {'code': policy.standardSCode.code}) }}"
-                                     data-share-text="Hey, we could win £200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here:">
-                                </div>
-                            </div>
-                            <h5 class="text-zaffre">🔗 Share this link</h5>
-                            <div class="custom-input-with-btn mb-4">
-                                <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ url('scode', {'code': policy.standardSCode.code}) }}">
-                                <div id="scode_share" class="sr-only">Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}</div>
-                                <button class="btn btn-primary btn-copy btn-sm track-data"
-                                    data-clipboard-target="#scode_share"
-                                    data-toggle="tooltip"
-                                    data-placement="top"
-                                    data-event="user-welcome-copy-scode">
-                                    copy</button>
-                            </div>
-                            <h5 class="text-zaffre">📨 Invite via email</h5>
-                            <form id="invite_form" autocomplete="nope" class="mb-4">
-                                <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
-                                <div class="custom-input-with-btn mb-4">
-                                    <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                    <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
-                                        Invite</button>
-                                </div>
-                            </form>
-                            {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                                <p>For every person you connect with, we'll add up to &pound;10<sup>*</sup> to your reward pot. If none of you claim, your cash will be returned at the end of your policy year.</p>
-                                {% if policy.getCurrentConnectionValues %}
-                                    {% if policy.getCurrentConnectionValues['description']|length > 0 %}
-                                        <p>{{ policy.getCurrentConnectionValues['description'] }}</p>
-                                    {% endif %}
-                                        <p><i><sup>*</sup> Each connection made is worth &pound;10 in the first 2 months and &pound;2 thereafter.</i></p>
+                                    </span>
                                 {% endif %}
-                            {% endif %}
-                        {% endif %}
-                        {% if friends %}
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <span class="h5">Here are your facebook friends you can invite</span>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    {% for friend in friends %}
-                                        <li class="list-group-item">
-                                            <div class="d-md-flex align-items-center">
-                                                <img class="d-none d-md-inline rounded-circle mr-2 mr-md-4" src="{{ friend['picture']['url']|replace({'http:': 'https:' }) }}" width="50px" />
-                                                <h6 class="flex-grow-1">
-                                                    {{ friend['name'] }} <br>
-                                                    <span class="sub mt-2"><a href="https://www.facebook.com/search/people/?q={{ friend['name'] }}" target="_blank" rel="noopener noreferrer">See on facebook</a></span>
-                                                </h6>
-                                                <a href="{{ path('user_invite', {policyId: policy.id, facebookId: friend['id']}) }}" class="btn btn-primary btn-sm">Invite</a>
-                                            </div>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                        {% if policy.hasUnconnectedUserPolicies %}
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <span class="h5">Connect with your other policies</span>
-                                </div>
-                                {{ form_start(unconnected_user_policy_form) }}
-                                    <ul class="list-group list-group-flush">
-                                        {% for unconnectedPolicy in policy.unconnectedUserPolicies %}
-                                            <li class="list-group-item">
-                                                <div class="d-md-flex align-items-center">
-                                                    <img src="{{ app.user.getImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ unconnectedPolicy.defaultName }}" width="50px">
-                                                    <h6 class="flex-grow-1">
-                                                        {{ unconnectedPolicy.defaultName }} <br>
-                                                        <span class="sub mt-2">{{ unconnectedPolicy.policyNumber }} <br>Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London') }}</span>
-                                                    </h6>
-                                                    {{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-outline-primary btn-sm'}}) }}
-                                                </div>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                    {{ form_errors(unconnected_user_policy_form) }}
-                                {{ form_end(unconnected_user_policy_form) }}
-                            </div>
-                        {% endif %}
-                        {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <span class="h5">Received invitations</span>
-                                </div>
-                                {{ form_start(invitation_form) }}
-                                    <ul class="list-group list-group-flush">
-                                        {% for invitation in policy.user.unprocessedReceivedInvitations %}
-                                            <li class="list-group-item">
-                                                <div class="d-md-flex align-items-center">
-                                                    <img src="{{ invitation.inviter.getImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ invitation.inviter.name }}" width="50px">
-                                                    <h6 class="flex-grow-1">
-                                                        {{ invitation.inviter.name }} <br>
-                                                        <span class="sub mt-2">Received on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}</span>
-                                                    </h6>
-                                                    <ul class="list-inline">
-                                                        <li class="list-inline-item">{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
-                                                        <li class="list-inline-item">{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                    {{ form_errors(invitation_form) }}
-                                {{ form_end(invitation_form) }}
-                            </div>
-                        {% endif %}
-                        {% if policy.sentInvitations|length > 0 %}
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <span class="h5">Sent invitations</span>
-                                </div>
-                                {{ form_start(sent_invitation_form) }}
-                                    <ul class="list-group list-group-flush">
-                                        {% for invitation in policy.sentInvitations|reverse %}
-                                            <li class="list-group-item">
-                                                <div class="d-md-flex align-items-center">
-                                                    <img src="{{ invitation.inviteeImageUrlFallback }}" class="d-none d-md-inline rounded-circle mr-2 mr-md-4" alt="{{ invitation.inviteeName }}" width="50px">
-                                                    <h6 class="flex-grow-1">
-                                                        {{ invitation.inviteeName }} <br>
-                                                        <span class="sub mt-2">Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}</span>
-                                                    </h6>
-                                                    <ul class="list-inline">
-                                                        <li class="list-inline-item">{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-outline-grey btn-sm'}}) }}</li>
-                                                        <li class="list-inline-item">{{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-primary btn-sm'}}) }}</li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                    {{ form_errors(sent_invitation_form) }}
-                                {{ form_end(sent_invitation_form) }}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        {# Page Modal #}
-        <div class="modal fade"
-             id="apply_reward_modal"
-             tabindex="-1" role="dialog"
-             aria-labelledby="apply_reward_modal"
-             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add code</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <i class="fal fa-times text-white"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        {% if code_message is not null %}
-                            <div class="h6">{{ code_message }} 🥳</div>
-                        {% endif %}
-                        {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
-                            <div class="custom-input-with-btn mb-4">
-                                {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
-                                {{ form_widget(scode_form.submit, {'label': 'Apply', 'attr': {'class': 'btn btn-success btn-sm'}}) }}
+                            </p>
+                            <div class="custom-input-with-btn">
+                                {{ form_widget(scode_form.scode, {'attr': {
+                                    'placeholder': 'Enter Code',
+                                    'class': 'form-control form-control-white form-control-shadow'
+                                }}) }}
+                                {{ form_widget(scode_form.submit, {'label': code_button_text, 'attr': {
+                                    'class': 'btn btn-success btn-sm'
+                                }}) }}
                             </div>
                         {{ form_end(scode_form) }}
+                    </div>
+                    <div class="d-lg-flex align-items-lg-center justify-content-lg-end">
+                        <div class="dashboard-dial"
+                             id="reward_pot_dial"
+                             data-pot-value="{{ policy.potValue|number_format(2, '.', ',') }}"
+                             data-max-pot="{{ policy.maxPot|number_format(2, '.', ',') }}">
+                            <div class="dashboard-dial-inner">
+                                <div class="dashboard-dial-content">
+                                    <div class="h6 mb-1">REWARD POT</div>
+                                    <div class="h3 mb-0 text-primary">&pound;{{ policy.potValue|number_format(2, '.', ',') }}</div>
+                                </div>
+                                <div class="dashboard-dial-content hideme">
+                                    <div class="h6 mb-1">CONNECTIONS</div>
+                                    <div class="h3 mb-0 text-primary">{{ policy.connections|length }}/{{ max_connections }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-dial-row">
+                            <div class="dashboard-dial-cta d-lg-none">
+                                <div class="dashboard-dial-cta-inner">
+                                    <div class="h3 mb-0 text-white">{{ policy.sentInvitations|length }} 📨</div>
+                                    <div class="h6 text-white">INVITES <br> SENT</div>
+                                </div>
+                            </div>
+                            {% set days_total = null %}
+                            {% set days_left = 0 %}
+                            {% if policy.getCurrentConnectionValues %}
+                                {% set days_total = ((policy.getCurrentConnectionValues['end_date'] - policy.getCurrentConnectionValues['start_date']) / 86400) | number_format(0, '.', ',') %}
+                                {% set days_left = ((policy.getCurrentConnectionValues['end_date'] - "now"|date('U')) / 86400) | number_format(0, '.', ',') %}
+                            {% endif %}
+                            {% if policy.potValue == policy.maxPot %}
+                                {# If max pot show full and change message #}
+                                {% set days_total = 60 %}
+                                {% set days_left = 60 %}
+                            {% endif %}
+                            <div class="dashboard-dial-inside">
+                                <div class="dashboard-dial-inside-inner"
+                                     id="connection_bonus_dial"
+                                     data-bonus-days-total="{{ days_total }}"
+                                     data-bonus-days-remaining="{{ days_left }}">
+                                    <div class="dashboard-dial-inside-content">
+                                        {% if policy.potValue == policy.maxPot %}
+                                            <div class="h1 mb-0 text-primary">🥳</div>
+                                            <div class="h6 mb-1">WHOOP!</div>
+                                            <div class="h6 text-primary"><span class="sub">Full Pot</span></div>
+                                        {% else %}
+                                            <div class="h3 mb-0 text-primary">{{ days_left }} <span class="h5">DAYS</span></div>
+                                            <div class="h6 mb-1">REMAINING</div>
+                                            {% if policy.getCurrentConnectionValues %}
+                                                {% if policy.getCurrentConnectionValues['teaser']|length > 0 %}
+                                                    <div class="h6 text-primary"><span class="sub">Until bonus<br> reduced</span></div>
+                                                {% else %}
+                                                    <div class="h6 text-primary"><span class="sub">To earn <br> cashback</span></div>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_start(scode_form_two, {'attr': {
+                            'class': 'd-lg-none mb-4',
+                            'autocomplete': 'off'
+                        }}) }}
+                            <p class="text-white mb-2">
+                                {% if code_message is not null %}
+                                    {{ code_message }} 👇
+                                {% else %}
+                                    Already received an invite code?
+                                    <span class="text-dodger-blue">
+                                        <a href="#"
+                                           data-toggle="modal"
+                                           data-target="#scode_info"
+                                           role="button">
+                                            <i class="fal fa-info-circle fa-fw text-columbia-blue-e"></i>
+                                        </a>
+                                    </span>
+                                {% endif %}
+                            </p>
+                            <div class="custom-input-with-btn">
+                                {{ form_widget(scode_form_two.scode, {'attr': {
+                                    'placeholder': 'Enter Code',
+                                    'class': 'form-control form-control-white form-control-shadow'
+                                }}) }}
+                                {{ form_widget(scode_form_two.submit, {'label': code_button_text, 'attr': {
+                                    'class': 'btn btn-success btn-sm'
+                                }}) }}
+                            </div>
+                        {{ form_end(scode_form_two) }}
+                        <a href="{{ path('user_invite') }}" class="btn btn-success btn-shadow btn-block-xs d-lg-none">Invite Friends</a>
                     </div>
                 </div>
             </div>
         </div>
+
+        {# Set to-dos #}
+        {% set toDoOne = false %}
+        {% set toDoTwo = false %}
+        {% set toDoThree = false %}
+
+        {# Check all to-dos for step 1 #}
+        {% if policy is defined and policy and policy.phoneVerified and (policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod or policy.hasPolicyOrUserBacsPaymentMethod) %}
+            {% set toDoOne = true %}
+        {% endif %}
+
+        {# Check all to-dos for step 2 #}
+        {% if policy.picSureStatus != '' and (policy.picSureStatus == 'approved' or policy.picSureStatus == 'preapproved')  %}
+            {% set toDoTwo = true %}
+        {% endif %}
+
+        {# Check all to-dos for step 3 #}
+        {% if policy.sentInvitations|length > 0 and policy.connections|length >= max_connections %}
+            {% set toDoThree = true %}
+        {% endif %}
+
+        <div class="to-do py-lg-5">
+            <div class="container-large py-5">
+                <h2 class="mb-5">{{ app.user.firstname }}'s To-Do List 📋</h2>
+                <div class="timeline d-lg-none mb-3">
+                    <div class="timeline-block {% if toDoOne %}timeline-block-complete-green{% else %}timeline-block-complete{% endif %}">
+                        <div class="timeline-point">
+                            <i class="far {% if toDoOne %}fa-check{% else %}fa-mobile-android{% endif %} fa-lg fa-fw text-white"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="h6">{% if toDoOne %}Complete{% else %}To-Do{% endif %}</div>
+                            <div class="h5 text-primary mb-4">Activate Account</div>
+                            <ul class="list-unstyled icn-fa-list">
+                                <li class="mb-3">
+                                    {% if policy is defined and policy %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Sign up to so-sure
+                                </li>
+                                <li class="mb-3">
+                                    {% if policy.phoneVerified %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Verify phone number
+                                </li>
+                                <li>
+                                    {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod or policy.hasPolicyOrUserBacsPaymentMethod %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Setup payment
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="timeline-block {% if toDoTwo %}timeline-block-complete-green{% else %}timeline-block-complete{% endif %}">
+                        <div class="timeline-point">
+                            <i class="far {% if toDoTwo %}fa-check{% else %}fa-qrcode{% endif %} fa-lg fa-fw text-white"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="h6">{% if toDoTwo %}Complete{% else %}To-Do{% endif %}</div>
+                            <div class="h5 text-primary mb-4">Reduce Excess</div>
+                            <ul class="list-unstyled icn-fa-list {% if not toDoTwo %}mb-4{% endif %}">
+                                <li class="mb-3">
+                                    {% if policy.picSureStatus != '' %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Take phone selfie
+                                </li>
+                                <li>
+                                    {% if policy.picSureStatus == 'approved' or policy.picSureStatus == 'preapproved' %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    so-sure confirmation
+                                </li>
+                            </ul>
+                            {# TODO: Needs hooking up #}
+                            {# {% if not toDoTwo %}
+                                <a href="#" class="btn btn-success btn-block ">Send Download Link</a>
+                            {% endif %} #}
+                        </div>
+                    </div>
+                    <div class="timeline-block {% if toDoThree %}timeline-block-complete-green{% else %}timeline-block-complete{% endif %}">
+                        <div class="timeline-point">
+                            <i class="far {% if toDoThree %}fa-check{% else %}fa-pound-sign{% endif %} fa-lg fa-fw text-white"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="h6">{% if toDoThree %}Complete{% else %}To-Do{% endif %}</div>
+                            <div class="h5 text-primary mb-4">Earn &pound;{{ policy.maxPot|number_format(0, '.', ',') }} Cashback</div>
+                            <ul class="list-unstyled icn-fa-list mb-4">
+                                <li class="mb-3">
+                                    {% if policy.sentInvitations|length > 0 %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Send invites to to join so-sure
+                                </li>
+                                <li>
+                                    {% if policy.connections|length >= max_connections %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Connect to {{ max_connections }} friends
+                                </li>
+                            </ul>
+                            <a href="{{ path('user_invite') }}" class="btn btn-success btn-block ">Invite Friends</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-none d-lg-flex justify-content-lg-between">
+                    <div class="cardbox cardbox-100 mr-5 {% if toDoOne %}border-success{% else %}cardbox-center-box{% endif %}">
+                        {% if not toDoOne %}<div class="cardbox-ribbon"><small>INCOMPLETE</small></div>{% endif %}
+                        <div class="cardbox__body">
+                            <span class="fa-stack fa-lg mb-2">
+                                <i class="fas fa-circle fa-stack-2x {% if toDoOne %}text-success{% else %}text-primary{% endif %}"></i>
+                                <i class="fas {% if toDoOne %}fa-check{% else %}fa-mobile-android{% endif %} fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <div class="mb-2">{% if toDoOne %}Complete{% else %}To-Do{% endif %}</div>
+                            <div class="h4 cardbox__title text-primary mb-4">Activate Account</div>
+                            <div class="cardbox__text">
+                                <ul class="list-unstyled text-left pl-xl-4 icn-fa-list">
+                                    <li class="mb-3">
+                                        {% if policy is defined and policy %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Sign up to so-sure
+                                    </li>
+                                    <li class="mb-3">
+                                        {% if policy.phoneVerified %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Verify phone number
+                                    </li>
+                                    <li>
+                                        {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod or policy.hasPolicyOrUserBacsPaymentMethod %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Setup payment
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cardbox cardbox-100 mr-5 {% if toDoTwo %}border-success{% else %}cardbox-center-box{% endif %}">
+                        {% if not toDoTwo %}<div class="cardbox-ribbon"><small>INCOMPLETE</small></div>{% endif %}
+                        <div class="cardbox__body">
+                            <span class="fa-stack fa-lg mb-2">
+                                <i class="fas fa-circle fa-stack-2x {% if toDoTwo %}text-success{% else %}text-primary{% endif %}"></i>
+                                <i class="fas {% if toDoTwo %}fa-check{% else %}fa-qrcode{% endif %} fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <div class="mb-2">{% if toDoTwo %}Complete{% else %}To-Do{% endif %}</div>
+                            {# TODO: Adjust for agg policy #}
+                            <div class="h4 cardbox__title text-primary mb-4">Reduce Excess</div>
+                            <div class="cardbox__text">
+                                <ul class="list-unstyled text-left pl-xl-4 icn-fa-list {% if not toDoTwo %}mb-4{% endif %}">
+                                    <li class="mb-3">
+                                        {% if policy.picSureStatus != '' %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Take phone selfie
+                                    </li>
+                                    <li>
+                                        {% if policy.picSureStatus == 'approved' or policy.picSureStatus == 'preapproved' %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        so-sure confirmation
+                                    </li>
+                                </ul>
+                                {# TODO: Needs hooking up #}
+                                {# {% if not toDoTwo %}
+                                    <a href="#" class="btn btn-success btn-block-xs ">Send Download Link</a>
+                                {% endif %} #}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cardbox cardbox-100 {% if toDoThree %}border-success{% else %}cardbox-center-box{% endif %}">
+                        {% if not toDoThree %}<div class="cardbox-ribbon"><small>INCOMPLETE</small></div>{% endif %}
+                        <div class="cardbox__body">
+                            <span class="fa-stack fa-lg mb-2">
+                                <i class="fas fa-circle fa-stack-2x {% if toDoThree %}text-success{% else %}text-primary{% endif %}"></i>
+                                <i class="fas {% if toDoThree %}fa-check{% else %}fa-pound-sign{% endif %} fa-stack-1x fa-inverse"></i>
+                            </span>
+                            <div class="mb-2">{% if toDoThree %}Complete{% else %}To-Do{% endif %}</div>
+                            <div class="h4 cardbox__title text-primary mb-4">Earn &pound;{{ policy.maxPot|number_format(0, '.', ',') }} Cashback</div>
+                            <div class="cardbox__text">
+                                <ul class="list-unstyled text-left pl-xl-4 icn-fa-list {% if not toDoThree %}mb-4{% endif %}">
+                                    <li class="mb-3">
+                                        {% if policy.sentInvitations|length > 0 %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Send invites to to join so-sure
+                                    </li>
+                                    <li>
+                                        {% if policy.connections|length >= max_connections %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Connect to {{ max_connections }} friends
+                                    </li>
+                                </ul>
+                                {% if not toDoThree %}
+                                    <a href="{{ path('user_invite') }}" class="btn btn-success btn-block-xs ">Invite Friends</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cashback py-lg-5">
+            <div class="container py-5">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/user/so-sure_group-gravatar.png" width="250px" alt="so-sure group friends" class="lozad">
+                <h2 class="text-white fit my-4"><span class="sub text-deep-sky-blue-d">How to connect with friends and</span> <br class="d-lg-none">earn Cashback &amp; Rewards</h2>
+                <p class="text-white mb-5">After sending out invites, the friends that choose to insure their phone with so-sure will ba available for you to connect with - for every connection we add &pound;{% if policy.getCurrentConnectionValues %}{% if policy.getCurrentConnectionValues['teaser']|length > 0 %}10{% else %}2{% endif %}{% else %}10{% endif %} to your reward pot - watch the video to find out how it works.</p>
+                <div class="d-md-flex justify-content-md-center">
+                    <a href="{{ path('user_invite') }}"
+                       class="btn btn-success btn-block-xs order-md-2">Invite Friends</a>
+                    <a href="#"
+                       class="btn btn-outline-deep-sky-blue-d watch-video track-data btn-block-xs order-md-1 mr-md-3"
+                       data-event="watch-video-user-dashboard"
+                       data-toggle="modal"
+                       data-target="#sosure-video-modal"
+                       data-src="https://www.youtube.com/embed/2AjD09ZQhQ4">
+                        Watch video
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if feature_enabled('invite-competition') %}
+            <div id="win_share" class="win py-lg-5">
+                <div class="container d-md-none py-5">
+                    <h2 class="h4">Win a &pound;200 Amazon voucher<br><span class="sub">📨  Send more to earn more</span></h2>
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
+                    <div class="cardbox cardbox-100 text-center p-4 mb-4">
+                        <h3 class="h4">Share your link to enter</h3>
+                        <p>(more invites = better chance of winning)</p>
+                        <div class="d-flex">
+                            <a href="#"
+                               class="btn btn-outline-primary btn-copy w-100"
+                               data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                            <a href="#"
+                               class="btn btn-outline-primary w-100 ml-3 native-share track-data"
+                               data-native-title="{{ og_title }}"
+                               data-native-url="{{ og_url }}"
+                               data-native-text="{{ og_description }}"
+                               data-event="share-user-dashboard-mb">
+                               💬 Share</a>
+                        </div>
+                    </div>
+                    <p class="text-left">Know someone that might need mobile insurance? even if they’re not ready now we’ll still enter you both in the draw to win a &pound;200 amazon voucher. As a so-sure customer you can invite as many people as you like (each invite = another entry)</p>
+                </div>
+                <div class="container d-none d-md-block py-5">
+                    <div class="d-flex">
+                        <div class="win-dashboard-dial mr-4">
+                            <div class="dashboard-dial-cta mr-3">
+                                <div class="dashboard-dial-cta-inner">
+                                    <div class="h2 mb-0 text-white">{{ policy.sentInvitations|length }} 📨</div>
+                                    <div class="h6 text-white opacity-75">INVITES SENT</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="win-text mr-1">
+                            <h2 class="h3 mb-2">Win a &pound;200 Amazon voucher 📨 <br> <span class="sub">Send more to earn more</span></h2>
+                            <p class="mb-5">Know someone that might need mobile insurance? even if they're not ready now we'll still enter you both in the draw to <strong>win a &pound;200 amazon voucher</strong>. As a so-sure customer you can invite as many people as you like <span class="text-nowrap">(each invite = another entry)</span></p>
+                        </div>
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="d-none d-xl-inline lozad" width="400px">
+                    </div>
+                    <hr class="mt-0 mb-5">
+                    <div class="win-invite">
+                        <form id="invite_form_one" autocomplete="nope" class="invite-form flex-grow-1 mr-3">
+                            <input class="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                            <div class="custom-input-with-btn mb-4">
+                                <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
+                                <button class="btn btn-success btn-invite btn-sm"
+                                        data-path="{{ path('json_invite_email') }}"
+                                        data-form="#invite_form_one">Send invite</button>
+                            </div>
+                        </form>
+                        <a href="#"
+                           class="btn btn-outline-primary win-btn btn-copy mr-3"
+                           data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <a href="#"
+                               class="track-data mr-3"
+                               data-sharer="twitter"
+                               data-title="{{ og_description }}"
+                               data-url="{{ og_url }}"
+                               data-via="wearesosure"
+                               data-hashtags="so-sure, phoneinsurance"
+                               data-event="share-twitter-user-dashboard-dt">
+                               <i class="fab fa-twitter fa-fw fa-2x text-twitter"></i> <span class="sr-only">Tweet</span></a>
+                            <a href="#"
+                               class="track-data mr-3"
+                               data-sharer="facebook"
+                               data-title="{{ og_description }}"
+                               data-url="{{ og_url }}"
+                               data-hashtags="so-sure, phoneinsurance"
+                               data-event="share-facebook-user-dashboard-dt">
+                               <i class="fab fa-facebook-square fa-fw fa-2x text-facebook"></i> <span class="sr-only">Facebook</span></a>
+                            <a href="#"
+                               class="track-data"
+                               data-sharer="whatsapp"
+                               data-web
+                               data-title="{{ og_description }}"
+                               data-url="{{ og_url }}"
+                               data-event="share-whatsapp-user-dashboard-dt">
+                               <i class="fab fa-whatsapp fa-fw fa-2x text-whatsapp"></i> <span class="sr-only">Whatsapp</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     {% endif %}
 
+    {# Page Modals #}
+    <div class="modal fade"
+         id="scode_info"
+         tabindex="-1" role="dialog"
+         aria-labelledby="scode_info"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="h5 modal-title">Apply your invite or promocode</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">If you have received an invite or a promocode, enter it in the box below. We are constantly trying to give you the best value for money, this is our way to say thank you for being a loyal user!</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 

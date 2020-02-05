@@ -1,6 +1,6 @@
-// fixedWidth.js
+// fixed-width.js
 
-fixedWidth = () => {
+const fixedWidth = () => {
     let parentWidth = $('.fixed-width').parent().width();
     $('.fixed-width').width(parentWidth);
 }

@@ -99,9 +99,11 @@
                                 <p>One solution that a lot of people are suggesting is ‘basic income’. This is where governments provide a monthly allowance to cover people’s essential expenses such as food, clothing and housing. Countries such as Switzerland, Holland and Canada have already started to seriously consider enacting it within the next year or so. The idea is that robots would generate money (<a href="https://www.weforum.org/agenda/2015/06/the-radical-solution-to-robots-taking-our-jobs/" target="_blank" rel="noopener noreferrer">automation is expected to add .7 trillion each year to the world economy</a>), which could used to provide basic income to those it displaces.</p>
                                 <p>Whatever happens, it’s clear that we need to have a solution ready for when automation does happen — before it might be too late.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

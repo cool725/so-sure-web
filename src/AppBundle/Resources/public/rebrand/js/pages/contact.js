@@ -7,7 +7,7 @@ require('../../sass/pages/contact.scss');
 
 // Require components
 require('jquery-validation');
-require('../common/validationMethods.js');
+require('../common/validation-methods.js');
 
 $(function() {
 

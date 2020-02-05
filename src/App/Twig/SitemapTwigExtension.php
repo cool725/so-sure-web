@@ -56,6 +56,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/phone-insurance-guide' => 'Phone Insurance Guide',
             '/blog/most-durable-phones' => 'Most Durable Phones',
             '/blog/samsung-galaxy-rumours' => 'Samsung Galaxy S11 (S20) Rumours & News',
+            '/blog/best-battery-life-phones' => 'Phones With The Best Battery Life',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

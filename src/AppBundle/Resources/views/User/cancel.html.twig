@@ -1,10 +1,12 @@
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'user' %}
-{# {% set user_mode = true %} #}
+{% set body_class = 'user-cancel' %}
+{% set robots_noindex = true %}
+{% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Cancel your policy | so-sure{% endblock %}
+{% block title %}Cancel Your Policy | so-sure{% endblock %}
 {% block meta %}
     <meta name="robots" content="noindex">
 {% endblock %}

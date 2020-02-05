@@ -2198,10 +2198,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
-    public function allowedYearlyPayments()
+    public function allowedYearlyPayments(PostcodeService $postcodeService)
     {
         // No need to require Billing address as no postcode check
         if (!$this->hasValidDetails()) {
+            $this->allowedYearly = false;
+            return false;
+        }
+        $postcode = $this->getBillingAddress()->getPostcode();
+        if ($postcodeService->getIsBannedPostcode($postcode)) {
             $this->allowedYearly = false;
             return false;
         }

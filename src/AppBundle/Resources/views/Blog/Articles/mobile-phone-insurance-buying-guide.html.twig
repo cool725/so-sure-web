@@ -108,9 +108,11 @@
                                 <p>Chances are, if a company are trying to catch you out, they’ve caught someone else out doing the same. Check out the companies reviews on TrustPilot, Google, Facebook etc. Also check out how they deal with customer issues to help understand if they actually care.</p>
                                 <p>We hope this has been of help, if you are interested in protecting your phone visit our site to <a href="{{ path('homepage') }}">get a quote</a>.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

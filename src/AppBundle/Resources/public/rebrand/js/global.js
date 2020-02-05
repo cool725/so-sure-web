@@ -8,10 +8,10 @@ require('bootstrap/js/dist/alert');
 require('bootstrap/js/dist/dropdown');
 
 // Require components
-require('./common/trackData.js');
-require('./common/fbLogin.js');
-require('./common/toggleText.js');
-require('./common/appendEmail.js');
+require('./common/track-data.js');
+require('./common/fb-login.js');
+require('./common/toggle-text.js');
+require('./common/append-email.js');
 require('./components/nav.js');
 require('./components/phone-search-dropdown.js');
 require('./components/memory-search-dropdown.js');
@@ -22,4 +22,5 @@ require('./components/cardbox.js');
 require('./components/modalVideo.js');
 require('./components/get-quote.js');
 require('./common/native-share.js');
+require('./common/scroll-to.js');
 

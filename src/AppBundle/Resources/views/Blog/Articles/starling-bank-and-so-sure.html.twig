@@ -98,9 +98,11 @@
                                 <p>so-sure reduces excesses for customers by employing patent pending anti-fraud AI technology to detect and deter fraud. It also uses new claim processing technology that has reduced average claim processing time from days to hours.</p>
                                 <p>The platform takes advantage of beautiful design to make it easy for someone to buy an insurance policy, supported by simple Ts&amp;Cs that cover customers for loss, theft, damage, accidental damage, out of warranty breakdown and accessories. Its online claims process is simple and hassle free, backed up by superb customer service.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

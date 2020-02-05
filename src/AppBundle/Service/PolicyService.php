@@ -2311,9 +2311,10 @@ class PolicyService
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
         $date = $date ?: new \DateTime();
+        /** @var PolicyTermsRepository $policyTermsRepo */
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         /** @var PolicyTerms $latestTerms */
-        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $latestTerms = $policyTermsRepo->findLatestTerms();
         $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
         $this->priceService->setPhonePolicyPremium(
             $newPolicy,

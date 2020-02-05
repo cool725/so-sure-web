@@ -1,34 +1,43 @@
 {% extends 'base_rebrand.html.twig' %}
-{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Welcome back {{ app.user.firstname }} | so-sure{% endblock %}
-
+{% block title %}
+    {% if app.user.canPurchasePolicy %}
+        Welcome back {{ app.user.firstname }} | so-sure
+    {% elseif app.user.canPurchasePolicy(false) %}
+        Welcome back {{ app.user.firstname }} | so-sure
+    {% else %}
+        Sorry | so-sure
+    {% endif %}
+{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="hero">
+    <section class="hero hero-invalid">
         <div class="container-large">
             {% if app.user.canPurchasePolicy %}
                 {% if app.user.policies|length > 0 %}
-                    <h1 class="h2 mb-4">You don't have any active polices.</h1>
+                    <h1 class="h2 mb-4 text-white">You don't have any active polices.</h1>
                 {% else %}
-                    <h1 class="h2 mb-4">Oops! Looks like you haven't purchased a policy with us yet...</h1>
+                    <h1 class="h2 mb-4 text-white">Oops! Looks like you haven't purchased a policy with us yet...</h1>
                 {% endif %}
-                <p>Head to the <a href="{{ path('homepage') }}">homepage</a> to get a quote.</p>
+                <p class="text-white lead">Head to the <a href="{{ path('homepage') }}" class="text-white"><u>homepage</u></a> to get a quote.</p>
             {% elseif app.user.canPurchasePolicy(false) %}
                 <h1 class="h2 mb-4">You've reached the maximum number of allowed policies.</h1>
-                <p><a href="{{ path('about_how_to_contact_so_sure') }}"><u>Contact us</u></a> for more details.</p>
+                <p class="text-white lead"><a href="{{ path('about_how_to_contact_so_sure') }}" class="text-white"><u>Contact us</u></a> for more details.</p>
             {% else %}
                 <h1 class="h2 mb-4">Sorry, but you are not able to purchase a policy.</h1>
-                <p><a href="{{ path('about_how_to_contact_so_sure') }}"><u>Contact us</u></a> for more details.</p>
+                <p class="text-white lead"><a href="{{ path('about_how_to_contact_so_sure') }}" class="text-white"><u>Contact us</u></a> for more details.</p>
             {% endif %}
         </div>
     </section>

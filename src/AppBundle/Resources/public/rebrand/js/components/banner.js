@@ -1,6 +1,6 @@
 // banner.js
 
-import tracking from '../common/trackData.js';
+import tracking from '../common/track-data.js';
 
 $(function() {
 

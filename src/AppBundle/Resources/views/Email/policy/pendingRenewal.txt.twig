@@ -11,13 +11,13 @@ For comparison the premium paid last year was £{{ policy.premium.monthlyPremium
 
 The excess for your policy is
 {% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus == 'approved' %}
-Damage claims: &pound;{{ policy.premium.picSureExcess.damage }}
-Warranty claims: &pound;{{ policy.premium.picSureExcess.warranty }}
-Loss and Theft Claims: &pound;{{ policy.premium.picSureExcess.loss }}
+Damage claims: &pound;{{ policy.nextPolicy.premium.picSureExcess.damage }}
+Warranty claims: &pound;{{ policy.nextPolicy.premium.picSureExcess.warranty }}
+Loss and Theft Claims: &pound;{{ policy.nextPolicy.premium.picSureExcess.loss }}
 {% else %}
-Damage claims: &pound;{{ policy.premium.excess.damage }}
-Warranty claims: &pound;{{ policy.premium.excess.warranty }}
-Loss and Theft Claims: &pound;{{ policy.premium.excess.loss }}
+Damage claims: &pound;{{ policy.nextPolicy.premium.excess.damage }}
+Warranty claims: &pound;{{ policy.nextPolicy.premium.excess.warranty }}
+Loss and Theft Claims: &pound;{{ policy.nextPolicy.premium.excess.loss }}
 {% endif %}
 
 You should check that the level of cover is appropriate for your needs and, if you wish, compare prices and over offered by other providers.

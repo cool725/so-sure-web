@@ -5,7 +5,7 @@ require('tempusdominus-bootstrap-4');
 require('moment');
 require('jquery-validation');
 require('jquery-mask-plugin');
-require('../../common/validationMethods.js');
+require('../../common/validation-methods.js');
 import bsCustomFileInput from 'bs-custom-file-input'
 
 $(function() {
@@ -20,6 +20,8 @@ $(function() {
             onkeyup: false,
             onclick: false,
             onfocusout: false,
+            validClass: 'is-valid-ss',
+            errorClass: 'is-invalid',
             rules: {
                 "claim_theftloss_form[hasContacted]" : {
                     required: true

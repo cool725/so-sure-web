@@ -1,4 +1,4 @@
-// trackData.js
+// track-data.js
 
 const tracking = (name, type, location, callback) => {
     let url;
@@ -39,11 +39,16 @@ $(function() {
             blank    = $(this).data('event-blank'),
             location = $(this).data('event-location'),
             type     = $(this).data('event-type'),
-            once     = $(this).data('event-once');
+            once     = $(this).data('event-once'),
+            log      = $(this).data('event-log');
 
         if (!blank) {
             // if not true prevent default behavior
             e.preventDefault();
+        }
+
+        if (log) {
+            console.log(name, url);
         }
 
         if (once != true) {

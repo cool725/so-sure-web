@@ -1,11 +1,12 @@
 {% extends 'base_rebrand.html.twig' %}
-{# {% form_theme bacs_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %} #}
 
 {# Set vars #}
 {% set body_class = 'user' %}
+{% set robots_noindex = true %}
 {% set user_mode = true %}
+{% set small_footer = true %}
 
-{% block title %}Make changes to your renewal | so-sure{% endblock %}
+{% block title %}Renewal Policy Changes | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
@@ -14,189 +15,205 @@
 
 {% block body %}
 
-    <section class="hero">
+    <div class="hero">
         <div class="container-large">
-            <h1 class="h2 mb-4">Renew your policy 🤗</h1>
-            <div class="d-lg-flex justify-content-lg-between mb-4">
-                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">
-                            Renewing your
-                        </h5>
-                        <div class="cardbox__text">
-                            <div class="h4">
-                                {{ policy.phone.make }} {{ policy.phone.model }}
-                                {% if policy.phone.memory %}<span class="sub">{{ policy.phone.memory }}GB</span>{% endif %}
-                            </div>
-                        </div>
-                    </div>
+            <div class="row align-items-lg-center justify-content-lg-start">
+                <div class="col-lg-6">
+                    {% if policy is defined and policy %}
+                        <div class="h5 text-columbia-blue-e fit">{{ policy.phone.make }} {{ policy.phone.model }} <span class="mx-2 text-white">|</span> {{ policy.policyNumber }}</div>
+                    {% endif %}
+                    <h1 class="h2 text-white mb-5 mb-lg-4">Renewal Changes</h1>
                 </div>
-                <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                    <div class="cardbox__body">
-                        <h5 class="cardbox__title">
-                            {% if policy.potValue > 0 %}
-                                With Reward Pot 💰
-                            {% else %}
-                                Renewal Price
-                            {% endif %}
-                        </h5>
-                        <div class="cardbox__text">
-                            <div class="h3">
-                                {% if policy.getPremiumPlan == 'monthly' %}
-                                    &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                    <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                        <div class="cardbox__body text-center">
+                            <div class="h6 text-white cardbox__title">
+                                {% if policy.potValue > 0 %}
+                                    💰 Using Cashback
                                 {% else %}
-                                    &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per year</span>
+                                    Renewal Price
                                 {% endif %}
+                            </div>
+                            <div class="cardbox__text">
+                                <div class="h3">
+                                    {% if policy.getPremiumPlan == 'monthly' %}
+                                        &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}
+                                    {% endif %}
+                                </div>
+                                <div class="h6 mb-0">
+                                    {% if policy.getPremiumPlan == 'monthly' %}
+                                        <span class="sub text-columbia-blue-e">per month</span>
+                                    {% else %}
+                                        <span class="sub text-columbia-blue-e">per year</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% if policy.potValue > 0 %}
-                    <div class="cardbox cardbox-100 mb-4 mr-lg-4">
-                        <div class="cardbox__body">
-                            <h5 class="cardbox__title">
-                                Without Reward Pot 📈
-                            </h5>
-                            <div class="h3">
-                                {% if policy.getPremiumPlan == 'monthly' %}
-                                    &pound;{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }} <span class="sub">per month</span>
-                                {% else %}
-                                    &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}  <span class="sub">per year</span>
-                                {% endif %}
+                    <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
+                        <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
+                            <div class="cardbox__body text-center">
+                                <div class="h6 text-white cardbox__title">📈 Without Cashback</div>
+                                <div class="cardbox__text">
+                                    <div class="h3">
+                                        {% if policy.getPremiumPlan == 'monthly' %}
+                                            &pound;{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="h6 mb-0">
+                                        {% if policy.getPremiumPlan == 'monthly' %}
+                                            <span class="sub text-columbia-blue-e">per month</span>
+                                        {% else %}
+                                            <span class="sub text-columbia-blue-e">per year</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 {% endif %}
             </div>
+        </div>
+    </div>
+
+    <div class="renew">
+        <div class="container-large py-5">
             {% if policy.potValue > 0 %}
-                <h4 class="mb-4">Would you like to use your pot to renew?</h4>
-                <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
-                    <label class="btn btn-outline-primary active"
-                           id="renew_reward_btn">
-                        <input type="radio"
-                               name="options"
-                               {% if app.user.allowedMonthly and not app.user.allowedYearlyPayments %}
-                                    data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1"
-                               {% elseif not app.user.allowedMonthly and app.user.allowedYearlyPayments %}
-                                    data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
-                               {% endif %}
-                               autocomplete="off"
-                               checked> 💰 Yes use reward pot
-                    </label>
-                    <label class="btn btn-outline-primary"
-                           id="renew_cashback_btn">
-                        <input type="radio"
-                               name="options"
-                               {% if app.user.allowedMonthly and not app.user.allowedYearlyPayments %}
-                                    data-value="{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|0"
-                               {% elseif not app.user.allowedMonthly and app.user.allowedYearlyPayments %}
-                                    data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0"
-                               {% endif %}
-                               autocomplete="off"> 💸 No I want cashback
-                    </label>
+                <div class="h5 mb-4">Would you like to use your pot to renew?</div>
+                <div class="form-group">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="exampleRadios"
+                               id="renew_reward_btn"
+                               value="option1">
+                        <label class="form-check-label" for="renew_reward_btn">
+                            Yes use reward pot 💰
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="exampleRadios"
+                               id="renew_cashback_btn"
+                               value="option2">
+                        <label class="form-check-label" for="renew_cashback_btn">
+                            No I want cashback 💸
+                        </label>
+                    </div>
                 </div>
             {% endif %}
-            {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
-                <h4 class="mb-4">How would you like to pay?</h4>
-            {% else %}
-                <h4 class="mb-4">Your yearly premium</h4>
-            {% endif %}
 
-            <div id="renew_without_reward_btns">
-                {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
-                    <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
-                        <label class="btn btn-outline-primary payment-btn"
-                               id="renew_adjusted_monthly_btn">
-                            <input type="radio"
-                                   name="options"
-                                   data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1"
-                                   autocomplete="off"
-                                   checked> &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} a month
+            <div class="h5 my-4">
+                {% if app.user.allowedMonthly and app.user.allowedYearly %}
+                    How would you like to pay?
+                {% else %}
+                    Your Yearly Premium
+                {% endif %}
+            </div>
+            <div id="renew_without_reward_btns" class="form-group">
+                {% if app.user.allowedMonthly and app.user.allowedYearly %}
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input form-check-input-btn"
+                               type="radio"
+                               name="exampleRadioss"
+                               id="renew_adjusted_monthly_btn"
+                               value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1"
+                               data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1">
+                        <label class="form-check-label" for="renew_adjusted_monthly_btn">
+                            &pound;{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }} a month
                         </label>
-                        <label class="btn btn-outline-primary payment-btn"
-                               id="renew_adjusted_yearly_btn">
-                            <input type="radio"
-                                   name="options"
-                                   data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
-                                   autocomplete="off"> &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} a year
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input form-check-input-btn"
+                               type="radio"
+                               name="exampleRadioss"
+                               id="renew_adjusted_yearly_btn"
+                               value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
+                               data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1">
+                        <label class="form-check-label" for="renew_adjusted_yearly_btn">
+                            &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} a year
                         </label>
                     </div>
                 {% else %}
-                    <button type="button"
-                            id="renew_adjusted_yearly_only_btn"
-                            class="btn btn-outline-primary payment-btn mb-4"
-                            data-toggle="button"
-                            data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
-                            aria-pressed="false"
-                            autocomplete="off">
-                        &pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} a year
-                    </button>
+                    <p class="lead renew-yearly-only"
+                       data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1">&pound;{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }} a year</p>
                 {% endif %}
             </div>
 
             {% if policy.potValue > 0 %}
-                <div id="renew_with_reward_btns" style="display: none;">
-                    {% if app.user.allowedMonthly and app.user.allowedYearlyPayments %}
-                        <div class="btn-group btn-group-toggle mb-5" data-toggle="buttons">
-                            <label class="btn btn-outline-primary payment-btn"
-                                   id="renew_monthly_btn">
-                                <input type="radio"
-                                       name="options"
-                                       data-value="{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0"
-                                       autocomplete="off"
-                                       checked> &pound;{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                <div id="renew_with_reward_btns" class="form-group" style="display: none;">
+                    {% if app.user.allowedMonthly and app.user.allowedYearly %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input form-check-input-btn"
+                                   type="radio"
+                                   name="exampleRadiosss"
+                                   id="renew_monthly_btn"
+                                   value="{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0"
+                                   data-value="{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0">
+                            <label class="form-check-label" for="renew_monthly_btn">
+                                &pound;{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
                             </label>
-                            <label class="btn btn-outline-primary payment-btn">
-                                <input type="radio"
-                                       name="options"
-                                       data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0"
-                                       id="renew_yearly_btn"
-                                       autocomplete="off"> &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }} a year
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input form-check-input-btn"
+                                   type="radio"
+                                   name="exampleRadiosss"
+                                   id="renew_yearly_btn"
+                                   value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0"
+                                   data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">
+                            <label class="form-check-label" for="renew_yearly_btn">
+                                &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }} a year
                             </label>
                         </div>
                     {% else %}
-                        <button type="button"
-                                id="renew_adjusted_yearly_only_btn"
-                                class="btn btn-outline-primary payment-btn mb-4"
-                                data-toggle="button"
-                                data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
-                                aria-pressed="false"
-                                autocomplete="off">
-                            &pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }} a year
-                        </button>
+                        <p class="lead renew-yearly-only"
+                           data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">&pound;{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }} a year</p>
                     {% endif %}
                 </div>
             {% endif %}
-            <a href="{{ path('user_renew_policy', {'id': policy.id}) }}"
-               class="btn btn-outline-primary btn-block-xs mr-md-2">Back</a>
-            {% if policy.potValue > 0 %}
+
+            <div class="form-group mt-4">
+                <a href="{{ path('user_renew_policy', {'id': policy.id}) }}"
+                   class="btn btn-outline-primary btn-block-xs mr-md-2">Back</a>
+
+                {% if policy.potValue > 0 %}
+                    <a href="#"
+                       id="renew_with_cashback_continue_btn"
+                       data-toggle="modal"
+                       data-target="#renew_cashback_modal"
+                       class="btn btn-success btn-block-xs continue-btn disabled"
+                       style="display: none;">Continue</a>
+                {% endif %}
+
                 <a href="#"
-                   id="renew_with_cashback_continue_btn"
+                   id="renew_without_continue_btn"
                    data-toggle="modal"
-                   data-target="#renew_cashback_modal"
-                   class="btn btn-success btn-block-xs continue-btn disabled"
-                   style="display: none;">Continue</a>
-            {% endif %}
-            <a href="#"
-               id="renew_without_continue_btn"
-               data-toggle="modal"
-               data-target="#renew_modal"
-               class="btn btn-success btn-block-xs continue-btn disabled">Continue</a>
-            <div class="mt-4">
+                   data-target="#renew_modal"
+                   class="btn btn-success btn-block-xs continue-btn disabled">Continue</a>
+            </div>
+
+            <div class="form-group mt-4">
                 {% if policy.potValue > 0 %}
                     <a href="#"
                        data-toggle="modal"
                        data-target="#cashback_modal"
-                       class="btn-simple-link mr-md-2">Don't keep me insured, just get cashback</a>
+                       class="btn-simple-link mr-md-2">Cancel Insurance (Get Cashback)</a>
                 {% else %}
                     <a href="#"
                        data-toggle="modal"
                        data-target="#decline_modal"
-                       class="btn-simple-link mr-md-2">Don't keep me insured</a>
+                       class="btn-simple-link mr-md-2">Cancel Insurance</a>
                 {% endif %}
             </div>
         </div>
-    </section>
+    </div>
 
     {# Page Modals #}
     <div class="modal fade"
@@ -215,12 +232,12 @@
                 <div class="modal-body">
                     {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                         <p>Please be advised that if you confirm that the below is true and we later discover that it isn’t, your claim might get denied.</p>
-                        <ol class="mb-4">
+                        <ol class="mb-5">
                             <li class="mb-3">My phone is in full working condition and my screen is not cracked</li>
                             <li class="mb-3">I am a resident of the United Kingdom</li>
-                            <li>I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v13.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
+                            <li class="mb-3">I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
                         </ol>
-                        <div class="form-group">
+                        <div class="form-group text-center">
                             {{ form_widget(renew_form.renew, {'label': 'Renew', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                         </div>
                     {{ form_end(renew_form) }}
@@ -249,27 +266,28 @@
                         'autocomplete': 'off'
                     }}) }}
                         <p>Please be advised that if you confirm that the below is true and we later discover that it isn’t, your claim might get denied.</p>
-                        <ol class="mb-4">
+                        <ol class="mb-5">
                             <li class="mb-3">My phone is in full working condition and my screen is not cracked</li>
                             <li class="mb-3">I am a resident of the United Kingdom</li>
-                            <li>I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v13.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
+                            <li class="mb-3">I have read &amp; understood the <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>policy document here</u></a></li>
                         </ol>
+                        <p>Add your bank details to receive cashback:</p>
                         <div class="form-group">
                             {{ form_label(renew_cashback_form.accountName, 'Account Name') }}
                             {{ form_widget(renew_cashback_form.accountName, {'attr': {'class': 'form-control'}}) }}
                             <div class="with-errors">{{ form_errors(renew_cashback_form.accountName) }}</div>
                         </div>
                         <div class="form-group">
-                            {{ form_label(renew_cashback_form.sortCode, 'Account Name') }}
+                            {{ form_label(renew_cashback_form.sortCode, 'Sort Code') }}
                             {{ form_widget(renew_cashback_form.sortCode, {'attr': {'class': 'form-control'}}) }}
                             <div class="with-errors">{{ form_errors(renew_cashback_form.sortCode) }}</div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-5">
                             {{ form_label(renew_cashback_form.accountNumber, 'Account Number') }}
                             {{ form_widget(renew_cashback_form.accountNumber, {'attr': {'class': 'form-control'}}) }}
                             <div class="with-errors">{{ form_errors(renew_cashback_form.accountNumber) }}</div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group text-center">
                             {{ form_widget(renew_cashback_form.renew, {'label': 'Renew and get cashback', 'attr': {'class': 'btn btn-success btn-block-xs'}}) }}
                         </div>
                     {{ form_end(renew_cashback_form) }}
@@ -293,10 +311,11 @@
                 </div>
                 <div class="modal-body">
                     <p>Use this form to terminate your policy and request transfer of your reward pot cashback. Please note the following:</p>
-                    <ul class="mb-4">
+                    <ul class="mb-5">
                         <li class="mb-3">You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and will not be renewed</li>
                         <li class="mb-3">It will take 28-45 days from the end of your policy before the bacs transfer will be sent</li>
                     </ul>
+                    <p>Add your bank details to receive cashback:</p>
                     {{ form_start(cashback_form, {'attr': {
                         'data-toggle': 'validator',
                         'class': 'validate-form-cashback',
@@ -312,12 +331,12 @@
                             {{ form_widget(cashback_form.sortCode, {'attr': {'class': 'form-control'}}) }}
                             <div class="with-errors">{{ form_errors(cashback_form.sortCode) }}</div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-5">
                             {{ form_label(cashback_form.accountName, 'Account Number') }}
                             {{ form_widget(cashback_form.accountNumber, {'attr': {'class': 'form-control'}}) }}
                             <div class="with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group text-center">
                             {{ form_widget(cashback_form.cashback, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block-xs'}}) }}
                         </div>
                     {{ form_end(cashback_form) }}
@@ -341,12 +360,12 @@
                 </div>
                 <div class="modal-body">
                     <p>Use this form to terminate your policy. Please note the following:</p>
-                    <ul class="mb-4">
+                    <ul class="mb-5">
                         <li class="mb-3">You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and will not be renewed</li>
                         <li class="mb-3">It will take 28-45 days from the end of your policy before the bacs transfer will be sent</li>
                     </ul>
                     {{ form_start(decline_form) }}
-                        <div class="form-group">
+                        <div class="form-group text-center">
                             {{ form_widget(decline_form.decline, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block-xs'}}) }}
                         </div>
                     {{ form_end(decline_form) }}
@@ -358,5 +377,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
+    <script src="{{ asset('css-js/user.js') }}"></script>
     <script src="{{ asset('css-js/user-renew.js') }}"></script>
 {% endblock %}

@@ -91,8 +91,10 @@ class HelvetiaExportService
             'TotalIpt',
             'TotalBrokerFee',
             'PaidBrokerFee',
+            'PaidMGACommission',
             'PotValue',
-            'MarketingPotValue'
+            'MarketingPotValue',
+            'CashToHelvetia'
         );
         $paidPremium = 0;
         $paidBrokerFee = 0;
@@ -115,10 +117,12 @@ class HelvetiaExportService
                 $policy->getProRataPremium(),
                 $policy->getPremiumPaid(),
                 $policy->getProRataIpt(),
-                $policy->getYearlyTotalCommission(),
-                $policy->getTotalCommissionPaid(),
+                $policy->getProRataBrokerFee(),
+                $policy->getBrokerCommissionPaid(),
+                $policy->getCoverholderCommissionPaid(),
                 $policy->getPotValue(),
-                $policy->getPromoPotValue()
+                $policy->getPromoPotValue(),
+                $policy->getHelvetiaCash()
             );
             $paidPremium += $policy->getPremiumPaid();
             $paidBrokerFee += $policy->getTotalCommissionPaid();

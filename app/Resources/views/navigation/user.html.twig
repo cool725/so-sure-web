@@ -1,18 +1,18 @@
 {% if policy is defined and policy %}
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-        <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}nav-active{% endif %}">
+        <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_home' or app.request.get('_route') == 'user_policy' %}nav-active{% endif %}">
             <i class="fas fa-user fa-fw mr-2"></i> Dashboard</a>
     </li>
     {% if policy.displayRenewal %}
         <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
             <a href="{{ path('user_renew_policy', {'id': policy.id }) }}" class="nav-link {% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' or app.request.get('_route') == 'user_renew_completed' or app.request.get('_route') == 'user_renew_declined' %}nav-active{% endif %}">
-                <i class="fal fa-star-exclamation fa-fw mr-2"></i> Renew</a>
+                <i class="fas fa-circle fa-fw text-success mr-2"></i> Renew</a>
         </li>
     {% endif %}
-{#     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-        <a href="" class="nav-link">
+    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
+        <a href="{{ path('user_invite_policy', {'id': policy.id }) }}" class="nav-link {% if app.request.get('_route') == 'user_invite_policy' or app.request.get('_route') == 'user_invite' %}nav-active{% endif %}">
             <i class="fas fa-users fa-fw mr-2"></i> Invites</a>
-    </li> #}
+    </li>
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
         <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_claim' or app.request.get('_route') == 'user_claim_policy' or app.request.get('_route') == 'claimed_submitted_policy' or app.request.get('_route') == 'claimed_damage_policy' or app.request.get('_route') == 'claimed_theftloss_policy' %}active{% endif %}">
             <i class="fal fa-mobile-android fa-fw mr-2"></i> Claims</a>
@@ -30,10 +30,10 @@
         <a href="{{ path('user_home') }}" class="nav-link {% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}">
             <i class="fas fa-user fa-fw mr-2"></i> Dashboard</a>
     </li>
-{#     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
-        <a href="" class="nav-link">
+    <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
+        <a href="{{ path('user_invite') }}" class="nav-link {% if app.request.get('_route') == 'user_invite' or app.request.get('_route')  == 'user_invite' %}active{% endif %}">
             <i class="fas fa-users fa-fw mr-2"></i> Invites</a>
-    </li> #}
+    </li>
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
         <a href="{{ path('user_claim') }}" class="nav-link {% if app.request.get('_route') == 'user_claim' or app.request.get('_route') == 'user_claim_policy' or app.request.get('_route') == 'claimed_submitted_policy' or app.request.get('_route') == 'claimed_damage_policy' or app.request.get('_route') == 'claimed_theftloss_policy' %}active{% endif %}">
             <i class="fal fa-mobile-android fa-fw mr-2"></i> Claims</a>

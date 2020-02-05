@@ -6,8 +6,8 @@ require('../../sass/pages/login.scss');
 
 // Require components
 require('jquery-validation');
-require('../common/validationMethods.js');
-require('../common/toggleText.js');
+require('../common/validation-methods.js');
+require('../common/toggle-text.js');
 
 // Lazy load images
 // require('intersection-observer');
