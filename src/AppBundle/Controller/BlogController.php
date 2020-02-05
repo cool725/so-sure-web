@@ -430,4 +430,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/best-phone-cases", name="best_phone_cases", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestPhoneCasesAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/best-phone-cases.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
