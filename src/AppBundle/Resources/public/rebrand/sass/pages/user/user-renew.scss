@@ -7,15 +7,95 @@
 @import "../../abstracts/palette";
 @import "../../abstracts/variables";
 
-// body {
-//     padding-top: 10rem;
-// }
+body {
+    background-color: $athens-gray;
+}
 
-// .hero {
-//     padding-bottom: 4rem;
-// }
+.hero {
+    position: relative;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
+    text-align: center;
 
-.connection {
-    border: 2px solid rgba(37,147,243, 0.2);
-    @include border-radius(6px);
+    @include blue-gradient-45;
+
+    .container-large {
+        position: relative;
+        z-index: 4;
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+        transform: scaleX(-1);
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
+
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
+        }
+    }
+}
+
+.connections {
+    background-color: $athens-gray;
+    position: relative;
+    z-index: 100;
+
+    &-list {
+        margin-bottom: 2rem;
+        background-color: $white;
+        @include border-radius($g-border-radius);
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                    0 5px 15px 0 rgba(8,27,154,0.08);
+
+        h2 {
+            border-bottom: 2px solid $dodger-blue;
+            margin: 0;
+            padding: 1.5rem 2rem;
+        }
+
+        &-inner {
+
+            @include media-breakpoint-up(lg) {
+                // height: 450px;
+                overflow-y: scroll;
+            }
+        }
+
+        h3 {
+            padding: 1.5rem 2rem;
+            margin-bottom: 0;
+            // border-bottom: 1px solid $dodger-blue
+        }
+
+        &-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2rem;
+            // border-bottom: 1px solid $dodger-blue;
+
+            span {
+                line-height: 1.5;
+            }
+
+            &:nth-child(even) {
+                background-color: $athens-gray;
+            }
+        }
+
+        @include media-breakpoint-up(lg) {
+
+        }
+    }
 }

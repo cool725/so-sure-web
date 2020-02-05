@@ -380,7 +380,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // For A should be the full commission paid which is 20% of the premium paid minum the 5p broker commission.
         $this->assertEquals(
             $a->getRefundCoverholderCommissionAmount(),
-            $a->getPremium()->getMonthlyPremiumPrice() / 5 - Helvetia::MONTHLY_BROKER_COMMISSION,
+            $a->getPremium()->getGwp() / 5,
             null,
             0.01
         );
@@ -388,8 +388,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // For B should be the total commission paid - the commission owed pro rata which should be positive.
         $this->assertEquals(
             $b->getRefundCoverholderCommissionAmount(),
-            $b->getCoverholderCommissionPaid() -
-                ($b->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 97 / 366,
+            $b->getCoverholderCommissionPaid() - ($b->getPremium()->getGwp() * 12 / 5) * 97 / 366,
             null,
             0.01
         );
@@ -404,8 +403,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         // For C should be the total commission paid - the commission owed pro rata which should be negative.
         $this->assertEquals(
             $c->getRefundCoverholderCommissionAmount(),
-            $c->getCoverholderCommissionPaid() -
-                ($c->getPremium()->getYearlyPremiumPrice() / 5 - Helvetia::YEARLY_BROKER_COMMISSION) * 260 / 366,
+            $c->getCoverholderCommissionPaid() - ($c->getPremium()->getGwp() * 12 / 5) * 260 / 366,
             null,
             0.01
         );

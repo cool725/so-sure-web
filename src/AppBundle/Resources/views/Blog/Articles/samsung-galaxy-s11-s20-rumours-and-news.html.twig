@@ -108,11 +108,11 @@
                                 <p>Many leaks reveal 'Picasso' to be Samsung's codename for the S11, in keeping with the company's tendency to name their devices after artists (the Galaxy Note 10 was named da Vinci). This would be particularly apt for the S11, given its purported facial recognition upgrade, and the fact Picasso was renowned for his portraits.</p>
                                 <p>A final speculative rumour suggests that the S11 may include a spectrometer, which is a device used to determine an object's chemical composition. And while this would certainly push smartphone innovation in the right direction, we feel this feature is a little far-fetched and niche to be rolled out as part of Samsung's flagship smartphone range.</p>
                             </div>
-                            <footer class="mb-4">
-                                <a href="#" class="btn btn-outline-primary get-a-quote">Get a quote now!</a>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
                             </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

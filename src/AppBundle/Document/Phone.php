@@ -1354,7 +1354,7 @@ class Phone
             $monthlyPremium = null;
         }
         $yearlyPremium = $yearlyPhonePrice->getYearlyPremiumPrice();
-        if ($user && !$user->allowedYearlyPayments()) {
+        if ($user && !$user->allowedYearlyPayments($postcodeService)) {
             $yearlyPremium = null;
         }
 

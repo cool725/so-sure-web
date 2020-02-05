@@ -7,7 +7,7 @@ require('bootstrap/js/dist/dropdown');
 
 // Require components
 require('jquery-validation');
-require('../common/validationMethods.js');
+require('../common/validation-methods.js');
 let textFit = require('textfit');
 
 const sosure = sosure || {};

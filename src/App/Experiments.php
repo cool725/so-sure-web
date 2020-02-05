@@ -7,7 +7,7 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-
+        SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO, ['standard-hero-image', 'photo-hero-image'],
     ];
 
     private static $authExperiments = [];

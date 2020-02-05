@@ -54,10 +54,14 @@
             <div class="row">
                 <div class="col-lg-6 d-none d-lg-block">
                     <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% if hero_image_exp is defined and hero_image_exp == 'photo-hero-image' %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-polaroid-desktop.png" alt="Polaroid Woman On Phone" class="img-fluid lozad">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% endif %}
                     </div>
                 </div>
-                <div class="col-lg-5 offset-md-2 offset-lg-1">
+                <div class="offset-md-1 col-lg-5 offset-lg-1">
                     <div class="hero__intro">
                         <h1 class="mb-4 text-white fit">
                             Mobile Insurance<br><span class="sub text-deep-sky-blue-d">that's Simply Better 🇬🇧</span>
@@ -85,20 +89,26 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="hero__controls pb-3">
-                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
-                        <a href="#cred"
-                           id="watch_tv_advert"
-                           class="btn btn-outline-deep-sky-blue-d d-none d-lg-inline">
-                            Watch the Ad
-                        </a>
+                    <div class="hero__controls {% if hero_image_exp is defined and hero_image_exp == 'photo-hero-image' %}text-center text-lg-left{% endif %} pb-3">
+                        <a href="#" class="btn btn-success btn-block-xs btn-shadow mr-sm-2 get-a-quote disabled">Get a Quote</a>
+                        {% if hero_image_exp is defined and hero_image_exp != 'photo-hero-image' %}
+                            <a href="#cred"
+                               id="watch_tv_advert"
+                               class="btn btn-outline-deep-sky-blue-d d-none d-lg-inline">
+                                Watch the Ad
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <div class="hero__illustration d-block d-lg-none mt-4">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
+                        {% if hero_image_exp is defined and hero_image_exp == 'photo-hero-image' %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-polaroid-mobile.png" alt="Woman On Phone Looking Up" class="img-fluid lozad">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -195,7 +205,7 @@
                         <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                         Watch our Video
                     </a>
-                    <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled">Get a Quote</a>
+                    <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">Get a Quote</a>
                 </div>
             </div>
         </div>

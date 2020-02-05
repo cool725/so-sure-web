@@ -35,7 +35,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if app.user.allowedYearlyPayments %}
+                {% if app.user.allowedYearly %}
                     <div class="col-6">
                         <div class="radio-btn {% if purchase_form.vars.value.amount ==
                             phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year" data-premium-param="yearly">

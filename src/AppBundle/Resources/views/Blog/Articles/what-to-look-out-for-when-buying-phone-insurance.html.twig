@@ -112,9 +112,11 @@
                                 <p>At <a href="{{ path('homepage') }}">so-sure</a> we believe that this kind of social insurance is the future. So we’re bringing it back, with the help of slick technology and a business model engineered around customers rather than profits.</p>
                                 <p>We’re starting with phone insurance, because too many consumers are being overcharged and underserved by the insurance industry. We take a completely different approach, protecting you when you need to claim and rewarding you when you don't. In doing so, we’re helping to make insurance fair, reliable and rewarding for all people.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

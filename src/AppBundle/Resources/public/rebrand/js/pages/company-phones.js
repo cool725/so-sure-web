@@ -8,7 +8,7 @@ require('../../sass/pages/company-phones.scss');
 // Require components
 let textFit = require('textfit');
 require('jquery-validation');
-require('../common/validationMethods.js');
+require('../common/validation-methods.js');
 
 // Lazy load images
 require('intersection-observer');

@@ -104,9 +104,11 @@
                                 <p>Our business is at the heart of this revolution. We’re designing a form of insurance that is, first and foremost, consumer-centric. We pay out if you and your connected friends don’t claim. We treat you like people, not fraudsters. We aspire to offer you first class customer experience if you do claim. We believe in keeping our promises. In short, our incentives are aligned with our customers’.</p>
                                 <p>In a future series of posts, I’m going to set out how we’re going to restore trust in the insurance industry. With these good intentions, my team at <a href="{{ path('homepage') }}">so-sure</a> and I hope to redesign insurance and make tragedies like the alleged Boots/TIF fraud a thing of the past. Why don’t you join us?</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

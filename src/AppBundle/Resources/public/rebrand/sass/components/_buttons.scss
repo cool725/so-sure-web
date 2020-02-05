@@ -1,14 +1,6 @@
 // button.scss
-
-// Add shadow to solid buttons
 .btn {
     font-family: $g-bold;
-    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
-                0 5px 15px 0 rgba(8,27,154,0.2);
-
-    &:hover {
-        box-shadow: none;
-    }
 }
 
 .btn.disabled,
@@ -18,20 +10,13 @@
     opacity: 0.20;
 }
 
-// Remove box-shadow on outline buttons
-a[class*="btn-outline-"],
-.btn-circle,
-button[class*="btn-outline-"],
-input[type="submit"][class*="btn-outline-"],
-input[type="button"][class*="btn-outline-"],
-.btn-no-shadow,
-.btn-secondary,
-.btn-link {
-    box-shadow: none;
-}
+.btn-shadow {
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
+                0 5px 15px 0 rgba(8,27,154,0.2);
 
-.btn-no-shadow {
-    box-shadow: none;
+    &:hover {
+        box-shadow: none;
+    }
 }
 
 // Modify white btns to match design

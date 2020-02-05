@@ -94,9 +94,11 @@
                                 <p>Nokia have had some hard times as of late and were more affected than anyone by the iPhones endless dominance. However, they do still have a reputation as a very innovative, thoughtful company and they have started to put themselves back in the picture by manufacturing new versions of their classic phones. The 3310 is being marketed as a nearly indestructible phone with a never ending battery life.</p>
                                 <p>There are a lot of phones out there which can’t do either of those things so it’ll be really fascinating to see whether the MWC audience takes to it or not.</p>
                             </div>
-                            <footer></footer>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

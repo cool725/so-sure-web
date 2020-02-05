@@ -1,4 +1,4 @@
-// setAgent.js
+// set-agent.js
 
 let usrAgnt = null;
 let navi = navigator.userAgent.toLowerCase();

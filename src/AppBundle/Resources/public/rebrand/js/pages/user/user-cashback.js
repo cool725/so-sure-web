@@ -8,7 +8,7 @@
 // Require components
 require('jquery-validation');
 require('jquery-mask-plugin');
-require('../../common/validationMethods.js');
+require('../../common/validation-methods.js');
 
 
 $(function(){

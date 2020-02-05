@@ -82,11 +82,11 @@
                             <div class="blog__contents">
                                 <p></p>
                             </div>
-                            <footer class="mb-4">
-                                <a href="#" class="btn btn-outline-primary get-a-quote">Get a quote now!</a>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
                             </footer>
                         </article>
-                        <nav><a href="{{ path('blog_index') }}">Back</a></nav>
                     </div>
                 </div>
             </div>

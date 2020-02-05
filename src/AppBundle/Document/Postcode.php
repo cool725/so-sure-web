@@ -50,6 +50,12 @@ class Postcode
      */
     protected $notes;
 
+    /**
+     * This means the postcode cannot have policies sold in it AT ALL.
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $banned;
+
     public function __construct()
     {
     }
@@ -150,6 +156,24 @@ class Postcode
     {
         $this->notes = $notes;
         return $this;
+    }
+
+    /**
+     * Tells you if this postcode is banned.
+     * @return boolean true if it is banned.
+     */
+    public function getBanned()
+    {
+        return $this->banned;
+    }
+
+    /**
+     * Lets you set this postcode as bannned.
+     * @param boolean $banned is whether or not this postcode should be banned.
+     */
+    public function setBanned($banned)
+    {
+        $this->banned = $banned;
     }
 
     public function canonicalizePostCode($postcode)

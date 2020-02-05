@@ -60,6 +60,11 @@ label {
     }
 }
 
+.form-control-shadow {
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
+                0 5px 15px 0 rgba(8,27,154,0.2);
+}
+
 .form-control-white + .is-invalid {
     color: #fff;
 }
