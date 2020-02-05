@@ -140,7 +140,7 @@ class OneOffCommand extends ContainerAwareCommand
 
     private function facebookAds(InputInterface $input, OutputInterface $output)
     {
-        $this->facebookService->monthlyLookalike(new \DateTime(), 'VAGRANT');
+        $this->facebookService->monthlyLookalike(new \DateTime());
     }
 
     private function intercomConversation(InputInterface $input, OutputInterface $output)

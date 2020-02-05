@@ -64,6 +64,11 @@ class BacsCommand extends ContainerAwareCommand
         $this
             ->setName('sosure:bacs')
             ->setDescription('Run a bacs export')
+            ->addArgument(
+                'prefix',
+                InputArgument::REQUIRED,
+                'Prefix (does nothing)'
+            )
             ->addOption(
                 'debug',
                 null,
@@ -111,13 +116,7 @@ class BacsCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Only Reprocess metadata'
-            )
-            ->addArgument(
-                'prefix',
-                InputArgument::REQUIRED,
-                'Prefix'
-            )
-        ;
+            );
     }
 
     /**
@@ -134,7 +133,6 @@ class BacsCommand extends ContainerAwareCommand
         $onlyCredits = true === $input->getOption('only-credits');
         $onlyDebits = true === $input->getOption('only-debits');
         $metadata = true === $input->getOption('metadata');
-        $prefix = $input->getArgument('prefix');
         $processingDate = null;
 
         $now = \DateTime::createFromFormat('U', time());
@@ -159,7 +157,7 @@ class BacsCommand extends ContainerAwareCommand
         }
 
         $debitPayments = [];
-        $runDebits = $this->bacsService->hasMandateOrPaymentDebit($prefix, $processingDate);
+        $runDebits = $this->bacsService->hasMandateOrPaymentDebit($processingDate);
         if ($onlyCredits) {
             $runDebits = false;
         }
@@ -168,7 +166,7 @@ class BacsCommand extends ContainerAwareCommand
         }
 
         $creditPayments = [];
-        $runCredits = $this->bacsService->hasPaymentCredits($prefix, $processingDate);
+        $runCredits = $this->bacsService->hasPaymentCredits($processingDate);
         if ($onlyDebits) {
             $runCredits = false;
         }
@@ -199,7 +197,6 @@ class BacsCommand extends ContainerAwareCommand
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
-        $prefix = $input->getArgument('prefix');
 
         if ($debug) {
             $skipS3 = true;
@@ -234,7 +231,6 @@ class BacsCommand extends ContainerAwareCommand
 
         $output->writeln('Exporting Debit Payments');
         $debitPayments = $this->bacsService->exportPaymentsDebits(
-            $prefix,
             $processingDate,
             $serialNumber,
             $data,
@@ -286,7 +282,6 @@ class BacsCommand extends ContainerAwareCommand
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
-        $prefix = $input->getArgument('prefix');
 
         if ($debug) {
             $skipS3 = true;
@@ -307,7 +302,6 @@ class BacsCommand extends ContainerAwareCommand
 
         $output->writeln('Exporting Credit Payments');
         $creditPayments = $this->bacsService->exportPaymentsCredits(
-            $prefix,
             $processingDate,
             $serialNumber,
             $data,

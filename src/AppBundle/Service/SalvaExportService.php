@@ -236,7 +236,7 @@ class SalvaExportService
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPolicy(null)));
         /** @var SalvaPhonePolicy $policy */
-        foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
+        foreach ($repo->getAllPoliciesForExport($date) as $policy) {
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $data = $this->transformPolicy($policy, $version);
                 $paidPremium += $data[16];
@@ -392,7 +392,7 @@ class SalvaExportService
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] =  sprintf('%s', $this->formatLine($this->transformRenewal(null)));
         /** @var SalvaPhonePolicy $policy */
-        foreach ($repo->getAllExpiredPoliciesForExport($date, $this->environment) as $policy) {
+        foreach ($repo->getAllExpiredPoliciesForExport($date) as $policy) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
                 continue;
@@ -743,7 +743,7 @@ class SalvaExportService
         }
     }
 
-    public function process($max, $prefix = null)
+    public function process($max)
     {
         $count = 0;
         while ($count < $max) {
@@ -772,7 +772,7 @@ class SalvaExportService
                 if (!$policy) {
                     throw new \Exception(sprintf('Unable to find policyId: %s', $data['policyId']));
                 }
-                if (!$policy->isValidPolicy($prefix)) {
+                if (!$policy->isValidPolicy()) {
                     throw new \Exception(sprintf('Invalid policy - policyId: %s', $data['policyId']));
                 }
 

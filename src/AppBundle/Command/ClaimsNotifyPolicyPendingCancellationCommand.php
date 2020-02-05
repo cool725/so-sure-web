@@ -28,12 +28,6 @@ class ClaimsNotifyPolicyPendingCancellationCommand extends ContainerAwareCommand
             ->setName('sosure:claims:notify-pending-cancellation')
             ->setDescription('Notify claims handlers of policies w/open claims to be cancelled soon')
             ->addOption(
-                'prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Policy prefix'
-            )
-            ->addOption(
                 'days',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -44,9 +38,8 @@ class ClaimsNotifyPolicyPendingCancellationCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $prefix = $input->getOption('prefix');
         $days = $input->getOption('days');
-        $count = $this->policyService->notifyPendingCancellations($prefix, $days);
+        $count = $this->policyService->notifyPendingCancellations($days);
         $output->writeln(sprintf('%d policies with open claims will be cancelled. Email report sent.', $count));
     }
 }

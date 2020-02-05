@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Service\ReportingService;
 use AppBundle\Service\StatsService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -54,11 +55,14 @@ class StatsCommand extends ContainerAwareCommand
             sprintf('%d-%d-01', $lastMonth->format('Y'), $lastMonth->format('m'))
         );
 
-        $paymentTotals = $this->reportingService->getAllPaymentTotals($production, $date);
-        $activePolicies = $this->reportingService->getActivePoliciesCount($date);
-        $activePoliciesWithDiscount = $this->reportingService->getActivePoliciesWithPolicyDiscountCount($date);
-        $rewardPotLiability = $this->reportingService->getRewardPotLiability($date);
-        $rewardPromoPotLiability = $this->reportingService->getRewardPotLiability($date, true);
+        $paymentTotals = $this->reportingService->getAllPaymentTotals($date, Salva::NAME);
+        $activePolicies = $this->reportingService->getActivePoliciesCount($date, Salva::NAME);
+        $activePoliciesWithDiscount = $this->reportingService->getActivePoliciesWithPolicyDiscountCount(
+            $date,
+            Salva::NAME
+        );
+        $rewardPotLiability = $this->reportingService->getRewardPotLiability($date, Salva::NAME);
+        $rewardPromoPotLiability = $this->reportingService->getRewardPotLiability($date, Salva::NAME, true);
         $rewardPotLiabilitySalva = $rewardPotLiability - $rewardPromoPotLiability;
         if (isset($paymentTotals['all']['avgPayment'])) {
             $this->statsService->set(Stats::ACCOUNTS_AVG_PAYMENTS, $date, $paymentTotals['all']['avgPayment']);

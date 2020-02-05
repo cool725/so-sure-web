@@ -118,12 +118,6 @@ class BICommand extends ContainerAwareCommand
                 'show debug output'
             )
             ->addOption(
-                'prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Policy prefix'
-            )
-            ->addOption(
                 'only',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -166,7 +160,6 @@ class BICommand extends ContainerAwareCommand
         $exclude = $input->getOption('exclude');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
-        $prefix = $input->getOption('prefix');
         $timezone = new \DateTimeZone($input->getOption('timezone') ?: 'UTC');
         // Figure out exports to run.
         $exports = [];
@@ -181,7 +174,7 @@ class BICommand extends ContainerAwareCommand
             $lines = [];
             switch ($export) {
                 case 'policies':
-                    $lines = $this->exportPolicies($prefix, $skipS3, $timezone);
+                    $lines = $this->exportPolicies($skipS3, $timezone);
                     break;
                 case 'claims':
                     $lines = $this->exportClaims($skipS3, $timezone);
@@ -376,12 +369,11 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on policies.
-     * @param string        $prefix   is the policy prefix for which we are checking on policies.
      * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
      * @param \DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of policy data.
      */
-    private function exportPolicies($prefix, $skipS3, \DateTimeZone $timezone)
+    private function exportPolicies($skipS3, \DateTimeZone $timezone)
     {
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
@@ -389,7 +381,7 @@ class BICommand extends ContainerAwareCommand
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
-        $policies = $phonePolicyRepo->findAllStartedPolicies($prefix, new \DateTime(SoSure::POLICY_START))->toArray();
+        $policies = $phonePolicyRepo->findAllStartedPolicies(new \DateTime(SoSure::POLICY_START))->toArray();
         $lines = [];
         $lines[] = CsvHelper::line(
             'Policy Number',

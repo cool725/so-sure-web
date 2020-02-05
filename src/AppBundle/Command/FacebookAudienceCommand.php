@@ -28,12 +28,6 @@ class FacebookAudienceCommand extends ContainerAwareCommand
             ->setName('sosure:facebook:audience')
             ->setDescription('create custom & lookalike audiences')
             ->addOption(
-                'prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Optional prefix'
-            )
-            ->addOption(
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -44,7 +38,6 @@ class FacebookAudienceCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $prefix = $input->getOption('prefix');
         $dateOption = $input->getOption('date');
         if ($dateOption) {
             $date = new \DateTime($dateOption);
@@ -53,7 +46,7 @@ class FacebookAudienceCommand extends ContainerAwareCommand
             $date = $date->sub(new \DateInterval('P1M'));
         }
 
-        $result = $this->facebookService->monthlyLookalike($date, $prefix);
+        $result = $this->facebookService->monthlyLookalike($date);
 
         $output->writeln(sprintf('Finished'));
     }
