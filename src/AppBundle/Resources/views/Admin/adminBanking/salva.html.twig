@@ -4,6 +4,7 @@
         {% set sosureTotal = 0 %}
         {% set sosureShiftedTotal = 0 %}
         {% set salvaTotal = 0 %}
+        {% set helvetiaTotal = 0 %}
         {% for day,ymd in dates.ymd %}
             {% if sosure['dailyTransaction'][day] is defined %}
                 {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
@@ -14,6 +15,9 @@
             {% if salva['dailyTransaction'][ymd] is defined %}
                 {% set salvaTotal = salvaTotal + salva['dailyTransaction'][ymd] %}
             {% endif %}
+            {% if helvetia['dailyTransaction'][ymd] is defined %}
+                {% set helvetiaTotal = helvetiaTotal + helvetia['dailyTransaction'][ymd] %}
+            {% endif %}
         {% endfor %}
         <table class="table table-striped mb-5">
             <thead class="thead-light">
@@ -21,6 +25,7 @@
                     <th></th>
                     <th>so-sure</th>
                     <th>Salva</th>
+                    <th>Helvetia</th>
                     <th>Diff</th>
                 </tr>
             </thead>
@@ -44,8 +49,16 @@
                     <td class="{{ color }}">
                         &pound;{{ salva['monthlyTransaction']|number_format(2, '.', ',') }}
                     </td>
+                    {% if equal_to_two_dp(helvetia['monthlyTransaction'], helvetiaTotal) %}
+                        {% set color = 'table-success' %}
+                    {% else %}
+                        {% set color = 'table-danger' %}
+                    {% endif %}
+                    <td class="{{ color }}">
+                        &pound;{{ helvetia['monthlyTransaction']|number_format(2, '.', ',') }}
+                    </td>
                     <td>
-                        &pound;{{ (sosure['monthlyTransaction'].total - salva['monthlyTransaction'])|number_format(2, '.', ',') }}
+                        &pound;{{ sosure['monthlyTransaction'].total - (salva['monthlyTransaction']|number_format(2, '.', ',') + helvetia['monthlyTransaction']|number_format(2, '.', ',')) }}
                     </td>
                 </tr>
             </tbody>
@@ -62,6 +75,7 @@
                     <th>so-sure (tz)</th>
                     <th>so-sure</th>
                     <th>Salva</th>
+                    <th>Helvetia</th>
                     <th>Diff</th>
                     <th>Cumulative Diff</th>
                 </tr>
@@ -70,8 +84,8 @@
                 {% set cumulative = 0 %}
                 {% for day,ymd in dates.ymd %}
                     {% set color = '' %}
-                    {% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined  %}
-                        {% if equal_to_two_dp(sosure['dailyTransaction'][day], salva['dailyTransaction'][ymd]) %}
+                    {% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined and helvetia['dailyTransaction'][ymd] %}
+                        {% if equal_to_two_dp(sosure['dailyTransaction'][day], salva['dailyTransaction'][ymd], helvetia['dailyTransaction'][ymd]) %}
                             {% set color = 'table-success' %}
                         {% else %}
                             {% set color = 'table-danger' %}
@@ -97,15 +111,21 @@
                                 -
                             {% endif %}
                         </td>
-                        <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined %}
-                                {% set diff = sosure['dailyTransaction'][day] - salva['dailyTransaction'][ymd] %}
+                        <td>{% if helvetia['dailyTransaction'][ymd] is defined %}
+                                &pound;{{ helvetia['dailyTransaction'][ymd]|number_format(2, '.', ',') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined and helvetia['dailyTransaction'][ymd] is defined %}
+                                {% set diff = sosure['dailyTransaction'][day] - (salva['dailyTransaction'][ymd] + helvetia['dailyTransactions'][ymd]) %}
                                 {% set cumulative = cumulative + diff %}
                                 &pound;{{ diff|number_format(2, '.', ',') }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
-                        <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined %}
+                        <td>{% if sosure['dailyTransaction'][day] is defined and salva['dailyTransaction'][ymd] is defined and helvetia['dailyTransaction'][ymd] is defined %}
                                 &pound;{{ cumulative|number_format(2, '.', ',') }}
                             {% else %}
                                 -
@@ -125,7 +145,10 @@
                         &pound;{{ salvaTotal|number_format(2, '.', ',') }}
                     </td>
                     <td>
-                        &pound;{{ (sosureTotal - salvaTotal)|number_format(2, '.', ',') }}
+                        &pound;{{ helvetiaTotal|number_format(2, '.', ',') }}
+                    </td>
+                    <td>
+                        &pound;{{ (sosureTotal - (salvaTotal + helvetiaTotal))|number_format(2, '.', ',') }}
                     </td>
                     <td></td>
                 </tr>
