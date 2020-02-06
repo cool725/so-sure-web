@@ -769,6 +769,7 @@ class AdminController extends BaseController
      */
     public function adminAccountsHelvetiaPrintAction($year, $month)
     {
+        set_time_limit(600);
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
         $templating = $this->get('templating');
         $snappyPdf = $this->get('knp_snappy.pdf');
@@ -806,6 +807,7 @@ class AdminController extends BaseController
      */
     public function adminAccountsHelvetiaAction(Request $request, $year = null, $month = null)
     {
+        set_time_limit(600);
         $now = new \DateTime();
         $year = $year ?: $now->format('Y');
         $month = $month ?: $now->format('m');
