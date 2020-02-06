@@ -13,6 +13,7 @@ use AppBundle\Document\File\BarclaysStatementFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Document\File\HelvetiaPaymentFile;
 use AppBundle\Document\File\CashflowsFile;
 use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\Payment\JudoPayment;
@@ -303,13 +304,10 @@ class BankingService
         if ($useCache === true && $this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
-
         /** @var S3FileRepository $salvaFileRepo */
         $salvaFileRepo = $this->dm->getRepository(SalvaPaymentFile::class);
-
         $monthlySalvaFiles = $salvaFileRepo->getMonthlyFiles($date);
         $monthlyPerDaySalvaTransaction = SalvaPaymentFile::combineDailyTransactions($monthlySalvaFiles);
-
         $salva = [
             'dailyTransaction' => $monthlyPerDaySalvaTransaction,
             'monthlyTransaction' => SalvaPaymentFile::totalCombinedFiles(
@@ -318,10 +316,35 @@ class BankingService
                 $month
             ),
         ];
-
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($salva));
-
         return $salva;
+    }
+
+    public function getHelvetiaBanking(\DateTime $date, $year, $month, $useCache = true)
+    {
+        $redisKey = sprintf(
+            self::CACHE_KEY_FORMAT,
+            'HelvetiaBanking',
+            $this->environment === "prod" ? 'prod' : 'non-prod',
+            $date->format('Y-m-d')
+        );
+        if ($useCache === true && $this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+        /** @var S3FileRepository $helvetiaFileRepo */
+        $helvetiaFileRepo = $this->dm->getRepository(HelvetiaPaymentFile::class);
+        $monthlyHelvetiaFiles = $helvetiaFileRepo->getMonthlyFiles($date);
+        $monthlyPerDayHelvetiaTransaction = HelvetiaPaymentFile::combineDailyTransactions($monthlyHelvetiaFiles);
+        $helvetia = [
+            'dailyTransaction' => $monthlyPerDayHelvetiaTransaction,
+            'monthlyTransaction' => HelvetiaPaymentFile::totalCombinedFiles(
+                $monthlyPerDayHelvetiaTransaction,
+                $year,
+                $month
+            ),
+        ];
+        $this->redis->setex($redisKey, self::CACHE_TIME, serialize($helvetia));
+        return $helvetia;
     }
 
     public function getBarclaysBanking(\DateTime $date, $year, $month, $useCache = true)

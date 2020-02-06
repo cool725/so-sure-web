@@ -14,6 +14,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\DiscriminatorMap({
  *      "salvaPayment"="SalvaPaymentFile",
  *      "salvaPolicy"="SalvaPolicyFile",
+ *      "helvetiaPayment"="HelvetiaPaymentFile",
  *      "helvetiaPolicy"="HelvetiaPolicyFile",
  *      "judo"="JudoFile",
  *      "checkout"="CheckoutFile",

@@ -15,6 +15,7 @@ use AppBundle\Document\File\CashflowsFile;
 use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\File\SalvaPaymentFile;
+use AppBundle\Document\File\HelvetiaPaymentFile;
 use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\Form\CreateScheduledPayment;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
@@ -780,7 +781,7 @@ class AdminController extends BaseController
         $html = $templating->render('AppBundle:Pdf:adminAccountsHelvetia.html.twig', [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Helvetia::NAME, !$this->isProduction()),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Helvetia::NAME),
             'activePolicies' => $reportingService->getActivePoliciesCount($date, Helvetia::NAME),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount(
                 $date,
@@ -839,7 +840,7 @@ class AdminController extends BaseController
         return [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Helvetia::NAME, !$this->isProduction()),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Helvetia::NAME),
             'activePolicies' => $reportingService->getActivePoliciesCount($date, Helvetia::NAME),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount(
                 $date,
@@ -873,7 +874,7 @@ class AdminController extends BaseController
         $html = $templating->render('AppBundle:Pdf:adminAccountsSalva.html.twig', [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME, !$this->isProduction()),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME),
             'activePolicies' => $reportingService->getActivePoliciesCount($date, Salva::NAME),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount(
                 $date,
@@ -946,7 +947,7 @@ class AdminController extends BaseController
         $data = [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME, !$this->isProduction()),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($date, Salva::NAME),
             'activePolicies' => $reportingService->getActivePoliciesCount($date, Salva::NAME),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount(
                 $date,
@@ -1520,6 +1521,7 @@ class AdminController extends BaseController
             'reconciliationForm' => $reconciliationForm->createView(),
             'dates' => $this->getYMD($year, $month),
             'salva' => $bankingService->getSalvaBanking($date, $year, $month),
+            'helvetia' => $bankingService->getHelvetiaBanking($date, $year, $month),
             'sosure' => $sosure,
             'reconciliation' => $bankingService->getReconcilationBanking($date),
             'year' => $date->format('Y'),

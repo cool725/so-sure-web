@@ -140,7 +140,7 @@ class AdminReportsCommand extends ContainerAwareCommand
      */
     private function cacheAccountsReport(OutputInterface $output, $underwriter)
     {
-        $date = $this->startOfMonth(new \DateTime);
+        $date = $this->startOfMonth(new \DateTime());
         $lastMonth = $this->startOfPreviousMonth($date);
         $twoMonths = $this->startOfPreviousMonth($lastMonth);
         $threeMonths = $this->startOfPreviousMonth($twoMonths);
