@@ -331,7 +331,7 @@ class BankingService
         if ($useCache === true && $this->redis->exists($redisKey)) {
             return unserialize($this->redis->get($redisKey));
         }
-        /** @var S3FileRepository $salvaFileRepo */
+        /** @var S3FileRepository $helvetiaFileRepo */
         $helvetiaFileRepo = $this->dm->getRepository(HelvetiaPaymentFile::class);
         $monthlyHelvetiaFiles = $helvetiaFileRepo->getMonthlyFiles($date);
         $monthlyPerDayHelvetiaTransaction = HelvetiaPaymentFile::combineDailyTransactions($monthlyHelvetiaFiles);
