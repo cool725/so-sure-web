@@ -76,17 +76,4 @@ class ReportController extends AbstractController
         $report["scheduledPayments"] = $this->reporting->getScheduledPayments();
         return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
     }
-
-    /**
-     * This action returns a page with policy data generated in the same style as used by Dylan side by side with data
-     * generated in the same style as used in the main claims report.
-     * @Route("/admin/reports/cumulative", name="admin_reports_cumulative")
-     */
-    public function cumulativeReportAction()
-    {
-        $start = new \DateTime();
-        $start->setDate(2016, 9, 1);
-        $report["cumulative"] = $this->reporting->getCumulativePolicies($start, new \DateTime());
-        return $this->render("AppBundle:AdminEmployee:adminReports.html.twig", $report);
-    }
 }

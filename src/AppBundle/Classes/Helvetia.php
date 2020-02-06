@@ -15,4 +15,5 @@ class Helvetia
     const COMMISSION_PROPORTION = 0.2;
     const TIMEZONE = 'Europe/Zurich';
     const NAME = 'Helvetia';
+    const POLICY_TYPES = [Policy::TYPE_HELVETIA_PHONE];
 }

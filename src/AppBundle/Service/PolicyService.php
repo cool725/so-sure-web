@@ -501,7 +501,7 @@ class PolicyService
             $user = $policy->getUser();
 
             $prefix = $policy->getPolicyPrefix($this->environment);
-            if ($policy->isValidPolicy($prefix)) {
+            if ($policy->isValidPolicy()) {
                 $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
 
                 return false;
@@ -649,7 +649,7 @@ class PolicyService
         if ($policy instanceof PhonePolicy) {
             /** @var PhonePolicyRepository $repo */
             $repo = $this->dm->getRepository(PhonePolicy::class);
-            $isPreLaunchPolicy = $repo->isPromoLaunch($policy->getPolicyNumberPrefix());
+            $isPreLaunchPolicy = $repo->isPromoLaunch();
         }
 
         if ($isOct2016 && ($isPreLaunchPolicy || $isPreLaunchUser)) {
@@ -1670,18 +1670,11 @@ class PolicyService
         }
     }
 
-    public function getPoliciesPendingCancellation($includeFuture = false, $prefix = null, \DateTime $date = null)
+    public function getPoliciesPendingCancellation($includeFuture = false, \DateTime $date = null)
     {
-        if (!$prefix) {
-            $policy = new HelvetiaPhonePolicy();
-            $prefix = $policy->getPolicyPrefix($this->environment);
-            if (!$prefix) {
-                $prefix = $policy->getPolicyNumberPrefix();
-            }
-        }
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
-        return $repo->findPoliciesForPendingCancellation($prefix, $includeFuture, $date);
+        return $repo->findPoliciesForPendingCancellation($includeFuture, $date);
     }
 
     public function getPoliciesForUnRenew(\DateTime $date = null)
@@ -1700,10 +1693,10 @@ class PolicyService
         return $repo->findPendingRenewalPoliciesForRenewed($date);
     }
 
-    public function cancelPoliciesPendingCancellation($prefix = null, $dryRun = false, \DateTime $date = null)
+    public function cancelPoliciesPendingCancellation($dryRun = false, \DateTime $date = null)
     {
         $cancelled = [];
-        $policies = $this->getPoliciesPendingCancellation(false, $prefix, $date);
+        $policies = $this->getPoliciesPendingCancellation(false, $date);
         foreach ($policies as $policy) {
             $cancelled[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
@@ -1723,11 +1716,8 @@ class PolicyService
         return $cancelled;
     }
 
-    public function unrenewPolicies($prefix = null, $dryRun = false, \DateTime $date = null)
+    public function unrenewPolicies($dryRun = false, \DateTime $date = null)
     {
-        // Have a feeling I will need prefix in the future here
-        \AppBundle\Classes\NoOp::ignore([$prefix]);
-
         $expired = [];
         $policies = $this->getPoliciesForUnRenew($date);
         foreach ($policies as $policy) {
@@ -1748,11 +1738,8 @@ class PolicyService
         return $expired;
     }
 
-    public function renewPolicies($prefix = null, $dryRun = false, \DateTime $date = null)
+    public function renewPolicies($dryRun = false, \DateTime $date = null)
     {
-        // Have a feeling I will need prefix in the future here
-        \AppBundle\Classes\NoOp::ignore([$prefix]);
-
         $renewed = [];
         $policies = $this->getPoliciesForRenew($date);
         foreach ($policies as $policy) {
@@ -1774,22 +1761,23 @@ class PolicyService
         return $renewed;
     }
 
-    public function cancelUnpaidPolicies($prefix, $dryRun = false, $skipUnpaidMinTimeframeCheck = false)
+    public function cancelUnpaidPolicies($dryRun = false, $skipUnpaidMinTimeframeCheck = false)
     {
         $cancelled = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
+        /** @var Policy $policy */
         foreach ($policies as $policy) {
             try {
                 /** @var Policy $policy */
-                if ($policy->shouldExpirePolicy() && $policy->shouldCancelPolicy($prefix)) {
+                if ($policy->shouldExpirePolicy() && $policy->shouldCancelPolicy()) {
                     $msg = sprintf(
                         'Skipping Cancelling Policy as it should be expired %s / %s',
                         $policy->getPolicyNumber(),
                         $policy->getId()
                     );
                     $this->logger->error($msg);
-                } elseif ($policy->shouldCancelPolicy($prefix)) {
+                } elseif ($policy->shouldCancelPolicy()) {
                     $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                     if (!$dryRun) {
                         $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
@@ -1840,12 +1828,12 @@ class PolicyService
         return $cancelled;
     }
 
-    public function activateRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
+    public function activateRenewalPolicies($dryRun = false, \DateTime $date = null)
     {
         $renewals = [];
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findRenewalPoliciesForActivation($prefix);
+        $policies = $policyRepo->findRenewalPoliciesForActivation();
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $renewals[$policy->getId()] = $policy->getPolicyNumber();
@@ -1866,12 +1854,12 @@ class PolicyService
         return $renewals;
     }
 
-    public function expireEndingPolicies($prefix, $dryRun = false, \DateTime $date = null)
+    public function expireEndingPolicies($dryRun = false, \DateTime $date = null)
     {
         $expired = [];
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findPoliciesForExpiration($prefix, $date);
+        $policies = $policyRepo->findPoliciesForExpiration($date);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $expired[$policy->getId()] = $policy->getPolicyNumber();
@@ -1892,7 +1880,7 @@ class PolicyService
         return $expired;
     }
 
-    public function setUnpaidForCancelledMandate($prefix, $dryRun = false, \DateTime $date = null)
+    public function setUnpaidForCancelledMandate($dryRun = false, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -1900,7 +1888,7 @@ class PolicyService
         $unpaid = [];
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findUnpaidPoliciesWithCancelledMandates($prefix);
+        $policies = $policyRepo->findUnpaidPoliciesWithCancelledMandates();
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             if ($policy->isPolicyPaidToDate($date, true, false, true)) {
@@ -1926,7 +1914,7 @@ class PolicyService
         return $unpaid;
     }
 
-    public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false, \DateTime $date = null)
+    public function fullyExpireExpiredClaimablePolicies($dryRun = false, \DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -1934,7 +1922,7 @@ class PolicyService
         $fullyExpired = [];
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findPoliciesForFullExpiration($prefix);
+        $policies = $policyRepo->findPoliciesForFullExpiration();
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             $fullyExpired[$policy->getId()] = $policy->getPolicyNumber();
@@ -1976,7 +1964,7 @@ class PolicyService
         return $fullyExpired;
     }
 
-    public function runMetrics($prefix, $dryRun)
+    public function runMetrics($dryRun)
     {
         $lines = [];
         /** @var PhonePolicyRepository $phonePolicyRepo */
@@ -1993,7 +1981,7 @@ class PolicyService
         ];
 
         foreach ($metrics as $metric => $date) {
-            $policies = $phonePolicyRepo->findAllActiveUnpaidPolicies(null, $date, $prefix, $metric);
+            $policies = $phonePolicyRepo->findAllActiveUnpaidPolicies(null, $date, $metric);
             foreach ($policies as $policy) {
                 /** @var Policy $policy */
                 if (isset($lines[$policy->getId()])) {
@@ -2219,12 +2207,12 @@ class PolicyService
         // although the policy end status is probably set at the same time
     }
 
-    public function createPendingRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
+    public function createPendingRenewalPolicies($dryRun = false, \DateTime $date = null)
     {
         $pendingRenewal = [];
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findPoliciesForPendingRenewal($prefix, $date);
+        $policies = $policyRepo->findPoliciesForPendingRenewal($date);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
             if ($policy->canCreatePendingRenewal($date)) {
@@ -2247,7 +2235,7 @@ class PolicyService
         return $pendingRenewal;
     }
 
-    public function notifyPendingCancellations($prefix, $days = null)
+    public function notifyPendingCancellations($days = null)
     {
         $count = 0;
         if (!$days) {
@@ -2258,7 +2246,7 @@ class PolicyService
         $date = \DateTime::createFromFormat('U', time());
         $date = $date->add(new \DateInterval(sprintf('P%dD', $days)));
 
-        $pendingCancellationPolicies = $policyRepo->findPoliciesForPendingCancellation($prefix, false, $date);
+        $pendingCancellationPolicies = $policyRepo->findPoliciesForPendingCancellation(false, $date);
         foreach ($pendingCancellationPolicies as $policy) {
             /** @var Policy $policy */
             if ($policy->hasOpenClaim()) {
@@ -2273,7 +2261,7 @@ class PolicyService
 
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         foreach ($policies as $policy) {
-            if ($policy->shouldCancelPolicy($prefix, $date) && $policy->hasOpenClaim()) {
+            if ($policy->shouldCancelPolicy($date) && $policy->hasOpenClaim()) {
                 foreach ($policy->getClaims() as $claim) {
                     /** @var Policy $policy */
                     if ($claim->isOpen()) {
@@ -2576,6 +2564,7 @@ class PolicyService
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $policy;
         $policies = $repo->findDuplicateImei($phonePolicy->getImei());
+        /** @var Policy $checkPolicy */
         foreach ($policies as $checkPolicy) {
             /** @var Policy $checkPolicy */
             if (!$checkPolicy->getStatus() &&

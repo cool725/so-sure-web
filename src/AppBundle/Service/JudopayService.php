@@ -826,11 +826,10 @@ class JudopayService
      */
     public function scheduledPayment(
         ScheduledPayment $scheduledPayment,
-        $prefix = null,
         \DateTime $date = null,
         $abortOnMultipleSameDayPayment = true
     ) {
-        $scheduledPayment->validateRunable($prefix, $date);
+        $scheduledPayment->validateRunable($date);
 
         $payment = null;
         $policy = $scheduledPayment->getPolicy();

@@ -643,7 +643,7 @@ class CheckoutServiceTest extends WebTestCase
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $scheduledPayment = $policy->getScheduledPayments()[0];
 
-        self::$checkout->scheduledPayment($scheduledPayment, 'TEST');
+        self::$checkout->scheduledPayment($scheduledPayment);
     }
 
     public function testCheckoutScheduledPayment()
@@ -686,7 +686,7 @@ class CheckoutServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        self::$checkout->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        self::$checkout->scheduledPayment($scheduledPayment, $nextMonth);
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
 
         static::$dm->clear();
@@ -740,7 +740,7 @@ class CheckoutServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        self::$checkout->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        self::$checkout->scheduledPayment($scheduledPayment, $nextMonth);
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -795,7 +795,7 @@ class CheckoutServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        $scheduledPayment = self::$checkout->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        $scheduledPayment = self::$checkout->scheduledPayment($scheduledPayment, $nextMonth);
         $this->assertEquals(JudoPayment::RESULT_SKIPPED, $scheduledPayment->getPayment()->getResult());
         $this->assertEquals(false, $scheduledPayment->getPayment()->isSuccess());
     }
@@ -846,7 +846,7 @@ class CheckoutServiceTest extends WebTestCase
         $nextMonth = $this->convertTimezone($nextMonth, SoSure::getSoSureTimezone());
         $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
 
-        $scheduledPayment = self::$checkout->scheduledPayment($scheduledPayment, 'TEST', $nextMonth);
+        $scheduledPayment = self::$checkout->scheduledPayment($scheduledPayment, $nextMonth);
         $this->assertEquals(JudoPayment::RESULT_SKIPPED, $scheduledPayment->getPayment()->getResult());
         $this->assertEquals(false, $scheduledPayment->getPayment()->isSuccess());
     }
@@ -1000,7 +1000,7 @@ class CheckoutServiceTest extends WebTestCase
 
         $initialScheduledPayment = $policy->getNextScheduledPayment();
         $initialScheduledPayment->setScheduled(\DateTime::createFromFormat('U', time()));
-        self::$checkout->scheduledPayment($initialScheduledPayment, 'TEST');
+        self::$checkout->scheduledPayment($initialScheduledPayment);
     }
 
     private function mockDispatcher($times)
