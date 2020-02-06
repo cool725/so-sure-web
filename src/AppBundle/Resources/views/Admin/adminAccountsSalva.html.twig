@@ -31,7 +31,7 @@
                             <div class="input-group date mr-md-2"
                                  id="date_time_picker"
                                  data-target-input="nearest"
-                                 data-url="{{ path('admin_accounts') }}">
+                                 data-url="{{ path('admin_accounts_salva') }}">
                                 <input type="text"
                                        class="form-control datetimepicker-input"
                                        data-target="#date_time_picker"
@@ -49,17 +49,15 @@
                             </button>
                         </div>
                         <div class="form-group">
-                            {{ form_start(salvaForm) }}
-                                <a class="btn btn-info mr-md-2" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
-                                    <i class="fa fa-print fa-fw"></i></a>
-                                {{ form_widget(salvaForm.export, {'label': 'Salva', 'title': 'Re-export to Salva', 'attr': {'class': 'btn btn-warning salva-export'}}) }}
-                            {{ form_end(salvaForm) }}
+                            <a class="btn btn-info mr-md-2" target="_blank" href="{{ path('admin_accounts_salva_print', {'year': year, 'month': month}) }}" rel="noopener noreferrer">
+                                <i class="fa fa-print fa-fw"></i>
+                            </a>
                         </div>
                     </form>
                 </div>
             </div>
 
-            {% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
+            {% include 'AppBundle:Admin:adminAccountsSalvaData.html.twig' %}
 
             {% for file in files %}
                 {% if file.fileType == 'SalvaPaymentFile' or file.fileType == 'SalvaPolicyFile' %}

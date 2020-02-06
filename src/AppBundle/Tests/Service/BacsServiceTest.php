@@ -177,7 +177,7 @@ class BacsServiceTest extends WebTestCase
         $now = \DateTime::createFromFormat('U', time());
         $oneYear = clone $now;
         $oneYear = $oneYear->add(new \DateInterval('P1Y'));
-        self::$bacsService->exportPaymentsDebits('TEST', $oneYear, '1', $metaData);
+        self::$bacsService->exportPaymentsDebits($oneYear, '1', $metaData);
 
         $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
@@ -214,19 +214,19 @@ class BacsServiceTest extends WebTestCase
 
         $metaData = [];
 
-        $debits = self::$bacsService->exportPaymentsDebits('TEST', $oneMonth, '1', $metaData);
+        $debits = self::$bacsService->exportPaymentsDebits($oneMonth, '1', $metaData);
         $this->assertEquals(1, count($debits));
         static::$dm->flush();
 
         // re-running should fail as changed to pending
-        $debits = self::$bacsService->exportPaymentsDebits('TEST', $oneMonth, '1', $metaData);
+        $debits = self::$bacsService->exportPaymentsDebits($oneMonth, '1', $metaData);
         $this->assertEquals(0, count($debits));
         static::$dm->flush();
 
         // Cancelled mandate should prevent payments
         $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
         static::$dm->flush();
-        $debits = self::$bacsService->exportPaymentsDebits('TEST', $twoMonth, '1', $metaData);
+        $debits = self::$bacsService->exportPaymentsDebits($twoMonth, '1', $metaData);
         $this->assertEquals(0, count($debits));
         static::$dm->flush();
 
@@ -234,7 +234,7 @@ class BacsServiceTest extends WebTestCase
         $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_SUCCESS);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         static::$dm->flush();
-        $debits = self::$bacsService->exportPaymentsDebits('TEST', $threeMonth, '1', $metaData);
+        $debits = self::$bacsService->exportPaymentsDebits($threeMonth, '1', $metaData);
         $this->assertEquals(0, count($debits));
         static::$dm->flush();
     }
@@ -244,7 +244,7 @@ class BacsServiceTest extends WebTestCase
         $now = \DateTime::createFromFormat('U', time());
         $oneYear = clone $now;
         $oneYear = $oneYear->add(new \DateInterval('P1Y'));
-        self::$bacsService->exportPaymentsCredits('TEST', $oneYear, '1', $metaData);
+        self::$bacsService->exportPaymentsCredits($oneYear, '1', $metaData);
 
         $now = \DateTime::createFromFormat('U', time());
         $user = static::createUser(
@@ -281,13 +281,12 @@ class BacsServiceTest extends WebTestCase
 
         $metaData = [];
 
-        $credits = self::$bacsService->exportPaymentsCredits('TEST', $oneMonth, '1', $metaData);
+        $credits = self::$bacsService->exportPaymentsCredits($oneMonth, '1', $metaData);
         $this->assertEquals(0, count($credits));
         static::$dm->flush();
 
         self::$bacsService->scheduleBacsPayment($policy, -5, ScheduledPayment::TYPE_REFUND, 'test', null, $now);
-        $credits = self::$bacsService->exportPaymentsCredits('TEST', $now, '1', $metaData);
+        $credits = self::$bacsService->exportPaymentsCredits($now, '1', $metaData);
         $this->assertEquals(1, count($credits));
-
     }
 }

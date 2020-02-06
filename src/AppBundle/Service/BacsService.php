@@ -1790,7 +1790,7 @@ class BacsService
         ]);
     }
 
-    public function hasMandateOrPaymentDebit($prefix, \DateTime $date = null)
+    public function hasMandateOrPaymentDebit(\DateTime $date = null)
     {
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
@@ -1818,7 +1818,6 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            $prefix,
             BacsPaymentMethod::class,
             $advanceDate
         );
@@ -1836,7 +1835,7 @@ class BacsService
         return false;
     }
 
-    public function hasPaymentCredits($prefix, \DateTime $date = null)
+    public function hasPaymentCredits(\DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -1846,7 +1845,6 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            $prefix,
             BacsPaymentMethod::class,
             $advanceDate,
             false
@@ -1980,7 +1978,6 @@ class BacsService
     }
 
     public function generatePaymentsDebits(
-        $prefix,
         \DateTime $date,
         &$metadata,
         $update = true
@@ -1993,7 +1990,6 @@ class BacsService
 
         $this->warnings = [];
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            $prefix,
             BacsPaymentMethod::class,
             $advanceDate
         );
@@ -2091,13 +2087,12 @@ class BacsService
 
     /**
      * Converts scheduled refunds for bacs into bacs payments.
-     * @param string    $prefix   is the policy number prefix that the owning policies must have.
      * @param \DateTime $date     is the date to be considered the current time.
      * @param array     $metadata is a list of metadata to be updated.
      * @param boolean   $update   is whether to update the scheduled payments or only return the list of new payments.
      * @return array containing the list of generated credit payments.
      */
-    public function generatePaymentsCredits($prefix, \DateTime $date, &$metadata, $update = true)
+    public function generatePaymentsCredits(\DateTime $date, &$metadata, $update = true)
     {
         $payments = [];
         $this->warnings = [];
@@ -2107,7 +2102,6 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            $prefix,
             BacsPaymentMethod::class,
             $advanceDate,
             false
@@ -2307,7 +2301,6 @@ class BacsService
     }
 
     public function exportPaymentsDebits(
-        $prefix,
         \DateTime $date,
         $serialNumber,
         &$metadata,
@@ -2321,7 +2314,7 @@ class BacsService
             $lines[] = $this->getHeader();
         }
 
-        $payments = $this->generatePaymentsDebits($prefix, $date, $metadata, $update);
+        $payments = $this->generatePaymentsDebits($date, $metadata, $update);
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
@@ -2398,7 +2391,6 @@ class BacsService
     }
 
     public function exportPaymentsCredits(
-        $prefix,
         \DateTime $date,
         $serialNumber,
         &$metadata,
@@ -2410,7 +2402,7 @@ class BacsService
             $lines[] = $this->getHeader();
         }
 
-        $credits = $this->generatePaymentsCredits($prefix, $date, $metadata, $update);
+        $credits = $this->generatePaymentsCredits($date, $metadata, $update);
 
         $metadata['credit-amount'] = 0;
         foreach ($credits as $payment) {
