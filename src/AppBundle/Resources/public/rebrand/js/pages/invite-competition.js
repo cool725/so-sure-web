@@ -10,13 +10,6 @@ require('bootstrap/js/dist/tab');
 let textFit = require('textfit');
 require('../components/table.js');
 
-// Lazy load images
-require('intersection-observer');
-import lozad from 'lozad';
-
-const observer = lozad(); // lazy loads elements with default selector as '.lozad'
-observer.observe();
-
 $(function() {
 
     // Use textfit plugin for h1 tag

@@ -23,4 +23,5 @@ require('./components/modalVideo.js');
 require('./components/get-quote.js');
 require('./common/native-share.js');
 require('./common/scroll-to.js');
+require('./common/lazy-images.js');
 

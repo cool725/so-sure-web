@@ -73,8 +73,8 @@ $dropdown-border-radius:         6px;
 $dropdown-border-width:          0;
 
 $dropdown-link-color:            $dodger-blue;
-$dropdown-link-hover-color:      $dodger-blue;
-$dropdown-link-hover-bg:         rgba(37, 147, 243, 0.2);
+$dropdown-link-hover-color:      darken($dodger-blue, 15%);
+$dropdown-link-hover-bg:         $white;
 
 $dropdown-link-active-color:     $zaffre;
 $dropdown-link-active-bg:        rgba(37, 147, 243, 0.2);
