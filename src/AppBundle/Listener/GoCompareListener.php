@@ -101,7 +101,12 @@ class GoCompareListener
 
         $providerParam = 0;
         $sourceParam = 0;
-        if ($attribution->getCampaignSource() == 'PYG') {
+        if ($attribution->getCampaignSource() == 'uSwitch' || $attribution->getCampaignSource() == 'uSwitchTest') {
+            // PYG - 70; Go Compare - 180; MSM - 179
+            $providerParam = 693;
+            // 1 – Moneysupermarket; 3 – Compare The Market; 2 – Go Compare; 4 – Confused; 5 – Protect Your
+            $sourceParam = 7;
+        } elseif ($attribution->getCampaignSource() == 'PYG') {
             // PYG - 70; Go Compare - 180; MSM - 179
             $providerParam = 70;
             // 1 – Moneysupermarket; 3 – Compare The Market; 2 – Go Compare; 4 – Confused; 5 – Protect Your
