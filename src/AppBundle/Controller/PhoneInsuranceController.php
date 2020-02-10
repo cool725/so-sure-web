@@ -352,6 +352,30 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
+     * SEO Pages - Phone Insurance > Make > Model - Legacy Route
+     * @Route("/phone-insurance/samsung/s8", name="phone_insurance_make_model_s8")
+     */
+    public function phoneInsuranceS8RedirectAction()
+    {
+        return $this->redirectToRoute('phone_insurance_make_model', [
+            'make' => 'samsung',
+            'model' => 'galaxy-s8',
+        ], 301);
+    }
+
+    /**
+     * SEO Pages - Phone Insurance > Make > Model - Legacy Route
+     * @Route("/phone-insurance/samsung/s9", name="phone_insurance_make_model_s9")
+     */
+    public function phoneInsuranceS9RedirectAction()
+    {
+        return $this->redirectToRoute('phone_insurance_make_model', [
+            'make' => 'samsung',
+            'model' => 'galaxy-s9',
+        ], 301);
+    }
+
+    /**
      * SEO Pages - Phone Insurance > Make > Model
      * @Route("/phone-insurance/{make}/{model}", name="phone_insurance_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
