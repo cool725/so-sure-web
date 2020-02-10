@@ -306,7 +306,7 @@ class DirectGroupService extends ExcelSftpService
                             $msg = sprintf(
                                 'There is open claim %s against policy %s that is older (%s) then the closed claim (%s) of %s and needs to be closed. Unable to determine imei. [%s]',
                                 $openClaimsNumber[$directGroupClaim->getPolicyNumber()],
-                                $claim->getPolicyNumber(),
+                                $claim->getPolicy()->getPolicyNumber(),
                                 $openClaims[$directGroupClaim->getPolicyNumber()] ?
                                     $openClaims[$directGroupClaim->getPolicyNumber()]->format('Y-m-d') :
                                     '?',
