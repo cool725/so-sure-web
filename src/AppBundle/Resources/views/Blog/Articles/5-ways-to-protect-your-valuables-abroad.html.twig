@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="There’s nothing better than a winter holiday… but nothing’s more stressful than when something goes wrong whilst you’re on it. It might sound boring and, of course, you can get ripped off anywhere, but planning ahead and being careful whilst travelling can help reduce the risks and keep your valuables safe."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="2019 feels like a significant year in our development. We know that we’ll only achieve our goals as a company if we are meeting the needs of our customers, and that means working hard every day to try and fix the broken model of insurance."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

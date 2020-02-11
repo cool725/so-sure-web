@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Social insurance is often referred to as a revolutionary new type of insurance. A sea-change shift in the way that consumers and insurers approach risk."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

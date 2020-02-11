@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers.<"/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

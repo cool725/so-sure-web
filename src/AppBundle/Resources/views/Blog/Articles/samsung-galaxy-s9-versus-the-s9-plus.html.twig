@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Firstly they are even more brilliant than the previous Galaxy phones. Both have great battery life, storage capabilities (so much more storage for all your cool photos and videos) ..festivals here we come! Oh yeah and did Samsung mention their amazing new camera lens that takes crystal clear photos anywhere in any light (we’re sure you have see the huge billboards all over the place)."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

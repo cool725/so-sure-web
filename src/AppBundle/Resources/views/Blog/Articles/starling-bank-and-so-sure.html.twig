@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Starling Bank today welcomes so-sure, the pioneering start-up mobile insurance company, to its in-app Marketplace. The partnership will mean that Starling customers will now be able apply for mobile phone insurance within minutes, directly from their Starling app."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

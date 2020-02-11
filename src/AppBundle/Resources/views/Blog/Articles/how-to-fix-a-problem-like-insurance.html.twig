@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers. In the long run, what’s good for customers is good for insurers. But short-term thinking has blighted the industry and created a needless asymmetry between buyers and sellers."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

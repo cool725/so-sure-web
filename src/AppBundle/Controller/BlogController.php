@@ -443,4 +443,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/iphone-problems-and-solutions", name="iphone_problems_and_solutions", options={"sitemap" = true})
+     * @Template
+     */
+    public function commoniPhoneProblemsAndSolutionsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/iphone-problems-and-solutions.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
