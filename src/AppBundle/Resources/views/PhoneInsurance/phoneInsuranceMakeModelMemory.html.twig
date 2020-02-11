@@ -198,19 +198,19 @@
                             <li class="text-white mb-5">
                                 <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
                                 {% if validation_required is not null %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14_R.pdf"
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        class="track-data text-white"
                                        data-event="user-download-sample-policy-doc-quote-agg"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14_R.pdf"><u>Download a copy of our Policy Document</u></a>
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><u>Download a copy of our Policy Document</u></a>
                                 {% else %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        class="track-data text-white"
                                        data-event="user-download-sample-policy-doc-quote"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"><u>Download a copy of our Policy Document</u></a>
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><u>Download a copy of our Policy Document</u></a>
                                 {% endif %}
                             </li>
                         </ul>
