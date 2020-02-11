@@ -603,7 +603,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertEquals(false, $data['different_make']);
         $this->assertEquals(false, $data['rooted']);
     }
-    
+
     public function testQuoteKnownDeviceTooMuchMemory()
     {
         $crawler = self::$client->request(
@@ -1558,5 +1558,59 @@ class ApiControllerTest extends BaseApiControllerTest
             'bar' => 'foo'
         ]));
         $data = $this->verifyResponse(200);
+    }
+
+    public function testMobileOtpRequest()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testMobileOtpLogin', $this),
+            'foo',
+            true
+        );
+
+        $mobileNumber = $user->getMobileNumber();
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/mobile-otp';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array(
+            'mobile_number' => $mobileNumber
+        ));
+        $data = $this->verifyResponse(200);
+    }
+
+    public function testMobileOtpLogin()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testMobileOtpLogin', $this),
+            'foo',
+            true
+        );
+
+        $otp = '123456';
+        $mobileNumber = $user->getMobileNumber();
+        $redis = $this->getRedis();
+        $key = sprintf('Mobile:Validation:%s:%s', $user->getId(), $otp);
+        $redis->setex($key, 600000, $otp);
+
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/login';
+        $data = [
+            'mobile_number' => $mobileNumber,
+            'code' => $otp,
+        ];
+
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/mobile-otp';
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(200);
+    }
+
+    private function getRedis()
+    {
+        /** @var Client $redis */
+        $redis = $this->getContainer(true)->get('snc_redis.default');
+
+        return $redis;
     }
 }
