@@ -72,18 +72,10 @@ Vagrant.configure("2") do |config|
     dev1804_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
     dev1804_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
     dev1804_config.vm.network "private_network", ip: "10.0.4.2"
-
-    # Update to handle Catalina
-    nfsPath = "."
-    if Dir.exists?("/Systems/Volumes/Data")
-        nfsPath = "/Systems/Volumes/Data" + Dir.pwd
-        dev1804_config.vm.synced_folder nfsPath, "/vagrant", type: "nfs", nfs_export: false
-    else
-        dev1804_config.vm.synced_folder nfsPath, "/vagrant", nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
-        #dev1804_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
-        #dev1804_config.vm.synced_folder ".", "/vagrant"
-    end
-
+    #dev1804_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
+    dev1804_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
+    # dev1804_config.vm.synced_folder "/System/Volumes/Data/Users/nickwaller/Web/so-sure-web", "/vagrant", type: "nfs", nfs_export: false
+    #dev1804_config.vm.synced_folder ".", "/vagrant"
     dev1804_config.ssh.forward_agent = true
     dev1804_config.vm.provision "shell",
         inline: $script
