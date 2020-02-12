@@ -21,6 +21,7 @@ class Lead
     const SOURCE_LAUNCH_USA = 'launch-usa';
     const SOURCE_BUY = 'buy';
     const SOURCE_SAVE_QUOTE = 'save-quote';
+    const SOURCE_SEND_QUOTE = 'send-quote';
     const SOURCE_INVITE_NOT_READY = 'invite-not-ready';
     const SOURCE_PURCHASE_FLOW = 'purchase-flow';
     const SOURCE_CONTACT_US = 'contact-us';
@@ -91,7 +92,7 @@ class Lead
      * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote",
      *                 "purchase-flow", "contact-us",
      *                 "invitation", "scode", "affiliate",
-     *                 "invite-not-ready", "competition", "aggregator"}, strict=true)
+     *                 "invite-not-ready", "competition", "aggregator", "send-quote"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

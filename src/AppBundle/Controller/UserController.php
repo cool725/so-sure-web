@@ -1314,6 +1314,8 @@ class UserController extends BaseController
         // A/B Hero Image Test
         // To Test use url param ?force=standard-hero-image / ?force=photo-hero-image
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO);
+        // A/B Send Quote
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SEND_QUOTE);
 
         /** @var RouterService $router */
         $router = $this->get('app.router');

@@ -12,6 +12,9 @@ require('../components/banner.js');
 require('../components/phone-search-dropdown-card.js');
 let textFit = require('textfit');
 require('../components/table.js');
+require('jquery-validation');
+require('../common/validation-methods.js');
+
 
 let jQueryBridget = require('jquery-bridget');
 let Flickity = require('flickity');
@@ -50,6 +53,5 @@ $(function() {
     let knowledgeBaseM = $('.knowledge-base__mobile'),
         cardboxHeight  = knowledgeBaseM.children(':first').height() / 2;
         knowledgeBaseM.css('top', -cardboxHeight);
-
 });
 
