@@ -99,23 +99,14 @@ $(function(){
 
     textFit($('.fit')[0], {detectMultiLine: false});
 
-    sosure.purchaseStepPhone.init();
-
     // Trim as you type
     // TODO: Rework as it's affecting validation - possible fix for now
     let imei  = $('.imei'),
         phone = imei.data('make');
 
-    // Trim whitespace and / after user has entered
-    imei.on('blur', function() {
-        let oimei = $(this).val();
-        let timei = oimei.replace(/[\s\/]/g, '');
-        $(this).val(timei);
-        // If valid hide the warning
-        // if (phone == 'Samsung') {
-        //     if ($(this).valid()) {
-        //         $('.samsung-imei').hide();
-        //     }
-        // }
+    imei.change(function(event) {
+        $(this).val($(this).val().replace(/\s/g,''));
     });
+
+    sosure.purchaseStepPhone.init();
 });
