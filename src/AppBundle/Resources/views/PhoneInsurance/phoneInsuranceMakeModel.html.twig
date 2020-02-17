@@ -50,7 +50,7 @@
 {% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance From £' ~ phone_price|number_format(2) ~ ' Monthly | so-sure' %}
 {% set og_url = canonical|url_decode %}
 {% set og_description = make_desc ~ ' ' ~ with_phone ~ ' ' ~ add_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
-{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
