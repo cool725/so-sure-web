@@ -58,6 +58,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/samsung-galaxy-rumours' => 'Samsung Galaxy S11 (S20) Rumours & News',
             '/blog/best-battery-life-phones' => 'Phones With The Best Battery Life',
             '/blog/iphone-problems-and-solutions' => 'Most Common iPhone Problems And Solutions',
+            '/blog/best-phone-cases' => 'Best Phone Cases 2020',
+            '/blog/best-car-phone-mounts' => 'Best Car Phone Mounts 2020',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

@@ -456,4 +456,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/best-car-phone-mounts", name="best_car_phone_mounts", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestCarPhoneMountsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/best-car-phone-mounts.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
