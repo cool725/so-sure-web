@@ -238,6 +238,24 @@
                                     Setup payment
                                 </li>
                             </ul>
+                            {% if not toDoOne %}
+                                {% if policy.phone.iTunes %}
+                                    <a href="{{ apple_download('dashboard-mobile-one') }}"
+                                       class="btn btn-success btn-block ga-outbound-click"
+                                       data-clicklabel="iTunes"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <i class="fab fa-apple mr-2 fa-lg"></i> Download the app</a>
+                                {% endif %}
+                                {% if policy.phone.googlePlay %}
+                                    <a href="{{ google_download('dashboard-mobile-one') }}"
+                                       class="btn btn-success btn-block ga-outbound-click"
+                                       data-clicklabel="PlayStore"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <i class="fab fa-android mr-2 fa-lg"></i> Download the app</a>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="timeline-block {% if toDoTwo %}timeline-block-complete-green{% else %}timeline-block-complete{% endif %}">
@@ -265,10 +283,24 @@
                                     so-sure confirmation
                                 </li>
                             </ul>
-                            {# TODO: Needs hooking up #}
-                            {# {% if not toDoTwo %}
-                                <a href="#" class="btn btn-success btn-block ">Send Download Link</a>
-                            {% endif %} #}
+                            {% if not toDoTwo %}
+                                {% if policy.phone.iTunes %}
+                                    <a href="{{ apple_download('dashboard-mobile-one') }}"
+                                       class="btn btn-success btn-block ga-outbound-click"
+                                       data-clicklabel="iTunes"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <i class="fab fa-apple mr-2 fa-lg"></i> Download the app</a>
+                                {% endif %}
+                                {% if policy.phone.googlePlay %}
+                                    <a href="{{ google_download('dashboard-mobile-one') }}"
+                                       class="btn btn-success btn-block ga-outbound-click"
+                                       data-clicklabel="PlayStore"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        <i class="fab fa-android mr-2 fa-lg"></i> Download the app</a>
+                                {% endif %}
+                            {% endif %}
                         </div>
                     </div>
                     <div class="timeline-block {% if toDoThree %}timeline-block-complete-green{% else %}timeline-block-complete{% endif %}">
@@ -296,7 +328,7 @@
                                     Connect to {{ max_connections }} friends
                                 </li>
                             </ul>
-                            <a href="{{ path('user_invite') }}" class="btn btn-success btn-block ">Invite Friends</a>
+                            <a href="{{ path('user_invite') }}" class="btn btn-success btn-block">Invite Friends</a>
                         </div>
                     </div>
                 </div>
@@ -311,7 +343,7 @@
                             <div class="mb-2">{% if toDoOne %}Complete{% else %}To-Do{% endif %}</div>
                             <div class="h4 cardbox__title text-primary mb-4">Activate Account</div>
                             <div class="cardbox__text">
-                                <ul class="list-unstyled text-left pl-xl-4 icn-fa-list">
+                                <ul class="list-unstyled text-left pl-xl-4 icn-fa-list {% if not toDoOne %}mb-4{% endif %}">
                                     <li class="mb-3">
                                         {% if policy is defined and policy %}
                                             <i class="far fa-check fa-lg fa-fw text-success"></i>
@@ -320,7 +352,7 @@
                                         {% endif %}
                                         Sign up to so-sure
                                     </li>
-                                    <li class="mb-3">
+                                    <li class="">
                                         {% if policy.phoneVerified %}
                                             <i class="far fa-check fa-lg fa-fw text-success"></i>
                                         {% else %}
@@ -328,15 +360,33 @@
                                         {% endif %}
                                         Verify phone number
                                     </li>
-                                    <li>
+ {#                                    <li>
                                         {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod or policy.hasPolicyOrUserBacsPaymentMethod %}
                                             <i class="far fa-check fa-lg fa-fw text-success"></i>
                                         {% else %}
                                             <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                         {% endif %}
                                         Setup payment
-                                    </li>
+                                    </li> #}
                                 </ul>
+                                {% if not toDoOne %}
+                                    {% if policy.phone.iTunes %}
+                                        <a href="{{ apple_download('dashboard-mobile-one') }}"
+                                           class="btn btn-success ga-outbound-click"
+                                           data-clicklabel="iTunes"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the app</a>
+                                    {% endif %}
+                                    {% if policy.phone.googlePlay %}
+                                        <a href="{{ google_download('dashboard-mobile-one') }}"
+                                           class="btn btn-success ga-outbound-click"
+                                           data-clicklabel="PlayStore"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-android mr-2 fa-lg"></i> Download the app</a>
+                                    {% endif %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -369,10 +419,24 @@
                                         so-sure confirmation
                                     </li>
                                 </ul>
-                                {# TODO: Needs hooking up #}
-                                {# {% if not toDoTwo %}
-                                    <a href="#" class="btn btn-success btn-block-xs ">Send Download Link</a>
-                                {% endif %} #}
+                                {% if not toDoTwo %}
+                                    {% if policy.phone.iTunes %}
+                                        <a href="{{ apple_download('dashboard-mobile-one') }}"
+                                           class="btn btn-success ga-outbound-click"
+                                           data-clicklabel="iTunes"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the app</a>
+                                    {% endif %}
+                                    {% if policy.phone.googlePlay %}
+                                        <a href="{{ google_download('dashboard-mobile-one') }}"
+                                           class="btn btn-success ga-outbound-click"
+                                           data-clicklabel="PlayStore"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            <i class="fab fa-android mr-2 fa-lg"></i> Download the app</a>
+                                    {% endif %}
+                                {% endif %}
                             </div>
                         </div>
                     </div>
