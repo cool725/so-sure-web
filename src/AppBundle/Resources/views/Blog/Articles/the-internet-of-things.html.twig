@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="You’ve probably heard of the Internet of Things (IoT) even if you only have a passing interest in new technology. However, for those that haven’t, it’s essentially a system of interconnected ‘things’ or devices, which are able to send each other information without human instruction. ‘Things’ is quite a loose term and can mean anything from household appliances, such as dishwashers to more advanced things such as cars and vehicles."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

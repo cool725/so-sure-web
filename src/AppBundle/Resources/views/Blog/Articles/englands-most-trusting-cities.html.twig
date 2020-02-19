@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Are English cities really untrusting and detached from their neighbours? According to our latest research survey, we suggest urban neighbours trust and know one another better than you might think."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

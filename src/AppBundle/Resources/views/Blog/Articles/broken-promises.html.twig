@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="The news last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building "/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

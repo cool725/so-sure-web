@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance phone-insurance-make' %}
+{% set intercom_enabled = false %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
@@ -29,7 +30,7 @@
 {% endblock %}
 {% set og_title = with_phone ~ ' Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | so-sure' %}
 {% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
-{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
@@ -145,7 +146,7 @@
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
-    <section class="make py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/homepage/so-sure_intro-illustration.png">
+    <section class="make py-lg-5">
         <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-6">
@@ -187,12 +188,13 @@
     {# Reviews #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_reviews.html.twig' %}
 
-    <section class="travel py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png">
+    <section class="travel py-lg-5"
+             data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.jpg">
         <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="travel__illustration">
-                        <img src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png" alt="so-sure - happy customers" class="d-lg-none img-fluid mb-4">
+                        <img src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.jpg" alt="so-sure - happy customers" class="d-lg-none img-fluid mb-4">
                     </div>
                 </div>
                 <div class="col-lg-6">

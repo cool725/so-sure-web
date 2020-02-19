@@ -878,10 +878,10 @@ class PurchaseController extends BaseController
             $price = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
             /** @var PostcodeService $postcodeService */
             $postcodeService = $this->get('app.postcode');
-            if ($price && $user->allowedMonthlyPayments($postcodeService)) {
-                $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
-            } elseif ($price && $user->allowedYearlyPayments($postcodeService)) {
+            if ($price && $user->allowedYearlyPayments($postcodeService)) {
                 $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
+            } elseif ($price && $user->allowedMonthlyPayments($postcodeService)) {
+                $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
             }
         }
 

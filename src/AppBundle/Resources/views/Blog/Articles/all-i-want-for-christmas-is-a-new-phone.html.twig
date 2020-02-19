@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Time to cram a tree into the back of your car and hope it isn’t too dishevelled by the time you get it home. Time to run around the shops like a headless turkey as you scramble to buy presents for your family without bankrupting yourself. And maybe, just maybe, it’s time to treat yourself to a shiny new phone."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

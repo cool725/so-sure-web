@@ -11,12 +11,6 @@ require('bootstrap/js/dist/tooltip');
 // Require components
 require('jquery-validation');
 require('../../common/validation-methods.js');
-// Lazy load images
-require('intersection-observer');
-import lozad from 'lozad';
-
-const observer = lozad(); // lazy loads elements with default selector as '.lozad'
-observer.observe();
 
 let Clipboard = require('clipboard');
 let textFit = require('textfit');

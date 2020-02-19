@@ -1,0 +1,120 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Best Car Phone Mounts | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Choose the car phone mount that suits you to get the hands-free experience in your car."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Best Car Phone Mounts | so-sure' %}
+{% set og_description = "Choose the car phone mount that suits you to get the hands-free experience in your car." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/best-car-phone-mounts-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Best Car Phone Mounts 2020</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Best Car Phone Mounts 2020</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Feb 17, 2020</time>
+                                        </li>
+                                    </ul>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/best-car-phone-mounts-1.jpg"
+                                     alt="Best Car Phone Mounts"
+                                     class="img-fluid lozad mb-5">
+                                <p>It's been illegal in the UK to <a href="https://www.gov.uk/using-mobile-phones-when-driving-the-law" target="_blank" rel="noopener noreferrer">hold your phone while driving</a> since 2003, and the penalty for breaking the law has steadily risen since.</p>
+                                <p>If you use your smartphone as a sat-nav or to control the music in your car, it's a great idea to invest in a car phone mount so that you can keep your phone at the level of your eyeline but without blocking your view of the road. This will allow you to stay in control of your vehicle, operating your phone without breaking the law either with touch or by using voice commands.</p>
+                                <p>To enter the hands-free access world, you need an effective phone mount for your car. These are some of the best car phone mounts on the market at the moment, judged by their grip, ease of operation, and versatility.</p>
+                                <h2><a href="https://www.amazon.co.uk/VANMASS-SmartTouch-Upgraded-Dashboard-Windscreen/dp/B07Z3K8YWR/" target="_blank" rel="noopener noreferrer">VANMASS Car Phone Holder 3 in 1</a></h2>
+                                <p>This 3-in-1 car phone holder is ideal for many different types of car. Its functionality allows you to choose which mode of mounting works best for you, whether that's using your air vents, dashboard, or windscreen as the mounting surface. Its adjustable grip means that it works with most popular phones, and a strong suction cup ensures that it can stay securely attached even on the bumpiest roads. What’s more, it's also easy to operate with one hand: just squeeze to clamp and tap to release.</p>
+                                <h2><a href="https://www.amazon.co.uk/dp/B00RVHC2B0" target="_blank" rel="noopener noreferrer">MPOW Grip Pro 2</a></h2>
+                                <p>If you don’t use your CD player, why not use that dead space to mount your phone instead? This CD player mounted phone holder keeps your phone at an easily accessible height. Slip and shock resistant, it will keep your phone in place whilst being easy to operate. Its adjustability also means that you can mount practically any phone in any sized case, whilst being able to easily adjust the viewing angles so you can get the perfect perspective.</p>
+                                <h2><a href="https://www.amazon.co.uk/dp/B01N7VARIG" target="_blank" rel="noopener noreferrer">Belkin Car Vent Mount</a></h2>
+                                <p>This phone mount allows you to use your phone landscape as well as portrait, minimising the chances of it potentially obstructing your view of the road. Attach it with a clip to the air vent of your car and adjust it so that it fits your phone, with the rubberised grips holding your phone securely in place. Even better, a cable holder on the reverse of the mount keeps your charging cable in place.</p>
+                                <h2><a href="https://www.amazon.co.uk/dp/B07GDPYKWJ/" target="_blank" rel="noopener noreferrer">Kenu Airframe QI Wireless Charging Car Mount</a></h2>
+                                <p>The Kenu Airframe is about as streamlined as car mounts get. If looks are important to you, it's a great option, with a minimal impact on the appearance of your car’s interior. Clip it into the air vent and use its adjustable swivel joint to get the perfect angle. What's more, if you have a wireless charging enabled phone that’s Qi compatible, it will automatically charge when placed into the car mount.</p>
+                                <h2><a href="https://www.amazon.co.uk/dp/B01JG7ZMIW/" target="_blank" rel="noopener noreferrer">Yosh Magnetic Car Mount</a></h2>
+                                <p>This small car mount has an excellent design, perfect for smaller cars where anything too large would look out of place. Clip it onto the air vent, add the magnetic sticker to your phone case and you're ready to go. Although the Yosh is cheap, it compromises on some design features, as unlike other car mounts it's non-adjustable, meaning you might not end up with the best viewing angle of your phone. However, it is incredibly easy to use, and doesn’t create any blind spots in your windscreen, making it a safe option.</p>
+                                <h2>Where should I mount my phone in the car?</h2>
+                                <p>Decide where you’d like to mount your mobile before buying the mount, as that’ll definitely inform which model you end up choosing. Although some are adjustable and provide a number of mounting options, most don’t – so if you want to try out a few options, buying a 3-in-1 mount is the safest bet.</p>
+                                <p>Consider the size of your car, your height and your comfort. Remember too that dashboard mounts are most likely to be directly in your eyeline while air vent mounts may require you to glance away from the road.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

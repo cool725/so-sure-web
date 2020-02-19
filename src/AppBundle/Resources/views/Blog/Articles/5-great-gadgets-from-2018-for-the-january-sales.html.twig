@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

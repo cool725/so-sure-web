@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="A trip to the slopes with family and friends is one of the best holidays of the year but, let’s face it, skiing isn’t the safest, so it’s vitally important that you travel and ski with the correct insurance."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

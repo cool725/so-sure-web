@@ -40,6 +40,7 @@ class PromoController extends BaseController
 
         $scode = null;
         $custom = null;
+        $code = mb_strtoupper($code);
 
         try {
             if ($scode = $repo->findOneBy(['code' => $code, 'active' => true, 'type' => Scode::TYPE_REWARD])) {

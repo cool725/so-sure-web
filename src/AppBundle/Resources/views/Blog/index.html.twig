@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Stay up to date with the latest insurance and mobile phone news, or subscribe to receive updates on new information and latest product releases."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
@@ -47,6 +48,38 @@
                             </ul>
                         </div>
                         <h1 class="text-primary mb-5">so-sure Blog</h1>
+
+                        {# Feb 17, 2020 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('best_car_phone_mounts') }}">Best Car Phone Mounts 2020</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Feb 17, 2020</time>
+                                </li>
+                            </ul>
+                            <p class="lead">It's been illegal in the UK to hold your phone while driving since 2003, and the penalty for breaking the law has steadily risen since...</p>
+                            <p><a href="{{ path('best_car_phone_mounts') }}">Read more</a></p>
+                        </article>
+
+                        {# Feb 10, 2020 #}
+                        <article class="my-5">
+                            <h2><a href="{{ path('iphone_problems_and_solutions') }}">Most Common iPhone Problems And Solutions</a></h2>
+                            <ul class="list-inline">
+                                <li class="list-inline-item">
+                                    <div rel="author">Susan</div>
+                                </li>
+                                <li class="list-inline-item">|</li>
+                                <li class="list-inline-item">
+                                    <time>Feb 10, 2020</time>
+                                </li>
+                            </ul>
+                            <p class="lead">iPhones are some of the most popular phones on the market: their features include excellent cameras, incredible ease of use and a market leading app platform. But, as with any other type of phone, not everyone has a fantastic experience...</p>
+                            <p><a href="{{ path('iphone_problems_and_solutions') }}">Read more</a></p>
+                        </article>
 
                         {# Feb 05, 2020 #}
                         <article class="my-5">

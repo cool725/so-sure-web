@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
+{% set intercom_enabled = false %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
@@ -49,7 +50,7 @@
 {% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance From £' ~ phone_price|number_format(2) ~ ' Monthly | so-sure' %}
 {% set og_url = canonical|url_decode %}
 {% set og_description = make_desc ~ ' ' ~ with_phone ~ ' ' ~ add_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
-{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
@@ -408,11 +409,11 @@
     </section>
 
     {# Why Insure Continued #}
-    <section class="why-insure-continued py-lg-5" data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png">
+    <section class="why-insure-continued lozad py-lg-5">
         <div class="container-large py-5">
             <div class="row">
                 <div class="col-lg-6">
-                    <img src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.png" alt="so-sure - happy customers" class="d-lg-none img-fluid mb-4">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.jpg" alt="so-sure - happy customers" class="d-lg-none lozad img-fluid mb-4">
                 </div>
                 <div class="col-lg-6">
                     <h2 class="h3 mb-4 text-primary">With great {{ make_desc }} {{ with_phone }} Insurance, comes great responsibility</h2>

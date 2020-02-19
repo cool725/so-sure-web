@@ -30,41 +30,6 @@
         <div id="step--one-controls"
              class="form-group form-controls {% if showDOB %}step--hide{% endif %}">
 
-{#             <h6 class="text-grey my-4">
-                or login via social networks
-                {% if feature_enabled('starling') and starling %}
-                    &amp; partners
-                {% endif %}
-            </h6>
- #}
-            {# Social Logins #}
-{#             <div class="form-group">
-                <a href="#"
-                   formnovalidate="formnovalidate"
-                   class="btn btn-facebook facebook_login"
-                   {% if app.user %}disabled{% endif %}>
-                    <i class="fab fa-facebook-square fa-lg"></i>
-                    <span class="sr-only">Facebook</span>
-                </a>
-                <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
-                   class="btn btn-google"
-                   formnovalidate="formnovalidate"
-                   {% if app.user %}disabled{% endif %}>
-                    <i class="fab fa-google fa-lg"></i>
-                    <span class="sr-only">Google</span>
-                </a>
-                {% if feature_enabled('starling') and starling %}
-                <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
-                   class="btn btn-starling"
-                   formnovalidate="formnovalidate"
-                   {% if app.user %}disabled{% endif %}>
-                    <img src="{{ cdn_url }}/images/StarlingMarkIcon.png" class="mx-1" height="15px">
-                    <span class="sr-only">Starling</span>
-                </a>
-                {% endif %}
-            </div> #}
-
-
             <div class="form-group text-md-right mt-5">
                 <a href="#"
                    id="step--validate"
@@ -75,7 +40,6 @@
                 </a>
             </div>
         </div>
-
     </div>
 
     <div class="form-step {% if not showDOB %}step--hide{% endif %}">

@@ -28,6 +28,9 @@ class SixpackService
     // Exp 1
     const EXPERIMENT_HERO_IMAGE_PHOTO = 'Hero Image';
 
+    // Exp 2
+    const EXPERIMENT_SEND_QUOTE = 'Send Quote';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -110,7 +113,7 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_HERO_IMAGE_PHOTO,
         // Exp 2
-        // self::EXPERIMENT_NEW_FUNNEL_V2,
+        self::EXPERIMENT_SEND_QUOTE,
         // Exp 3
         // self::EXPERIMENT_UK_FLAG,
         // Exp 4
@@ -196,7 +199,7 @@ class SixpackService
      */
     public static $purchaseConversionSimple = [
         // Exp 1
-        // self::EXPERIMENT_NEW_FUNNEL_V2,
+        // self::EXPERIMENT_SEND_QUOTE,
         // Exp 2
         //
         // Exp 3
@@ -227,7 +230,7 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_HERO_IMAGE_PHOTO,
         // Exp 2
-        // self::EXPERIMENT_UK_FLAG,
+        self::EXPERIMENT_SEND_QUOTE,
         // Exp 3
         // self::EXPERIMENT_HOMEPAGE_TAGLINE,
         // Exp 4

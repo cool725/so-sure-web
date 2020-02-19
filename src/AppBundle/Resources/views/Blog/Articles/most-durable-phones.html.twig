@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="With the rugged smartphone market in full swing, we share our top seven durable handset recommendations that’ll keep you connected, whatever the weather."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 {% set og_title = 'The Most Durable Rugged Smartphones | so-sure' %}
 {% set og_description = "With the rugged smartphone market in full swing, we share our top seven durable handset recommendations that’ll keep you connected, whatever the weather." %}

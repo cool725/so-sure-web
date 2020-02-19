@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="The Mobile World Congress is the biggest mobile phone event of the year and is popping off next Monday in the beautiful city of Barcelona. The event is pretty much Christmas for people like us (we love mobile phones!)."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
