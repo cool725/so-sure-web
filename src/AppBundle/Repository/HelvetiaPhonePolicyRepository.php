@@ -52,7 +52,8 @@ class HelvetiaPhonePolicyRepository extends PhonePolicyRepository
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->field('policy_type')->equals(Policy::TYPE_HELVETIA_PHONE);
         return $qb->getQuery()->execute();
     }
 }
