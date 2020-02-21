@@ -482,4 +482,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/why-does-my-phone-keep-crashing", name="why_does_my_phone_keep_crashing", options={"sitemap" = true})
+     * @Template
+     */
+    public function whyDoesMyPhoneKeepCrashingAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/why-does-my-phone-keep-crashing.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

@@ -1,0 +1,138 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Why Does My Phone Keep Crashing | Phone Keeps Restarting | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="If you're all out of luck and your phone keeps crashing, restarting or freezing, why not try our quick answer sheet to find out what's going wrong. "/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Why Does My Phone Keep Crashing | Phone Keeps Restarting | so-sure' %}
+{% set og_description = "If you're all out of luck and your phone keeps crashing, restarting or freezing, why not try our quick answer sheet to find out what's going wrong." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/why-does-my-phone-keep-crashing-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Why Does My Phone Keep Crashing</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Why Does My Phone Keep Crashing?</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Feb 19, 2020</time>
+                                        </li>
+                                    </ul>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/why-does-my-phone-keep-crashing-1.jpg"
+                                     alt="Phone not working"
+                                     class="img-fluid lozad mb-5">
+                                <p>There are many reasons why your phone could crash, and they'll be different depending on what make and model you have. It could be anything: an app, the age of your phone, or even a problem with the operating system you've got installed.</p>
+                                <p>If your phone is still under warranty or if you have <a href="{{ path('phone_insurance') }}">phone insurance</a>, regular phone crashes might be a symptom of a bigger problem that's covered by your policy, so make sure to contact your phone's manufacturer and then your insurer. What's more likely, however, is that there's a minor problem with your hardware or software to which these common fixes could be a simple solution. Just be aware, any serious DIY phone repairs could void your warranty or insurance.</p>
+                                <h2>Why is my Android phone crashing?</h2>
+                                <h3>Low on storage</h3>
+                                <p>As your phone reaches its storage capacity, it will slow down. This is likely to happen with older phones or phones that need an SD card upgrade. Delete any items that are taking up storage like old texts, photos or apps to try and regain performance.</p>
+                                <h3>Software conflict</h3>
+                                <p>Some apps are known to conflict, leading to crashes and reboots. To fix this problem, simply uninstall apps methodically until you’ve figured out which ones are causing the issue.</p>
+                                <h3>Contact problems</h3>
+                                <p>If your phone has recently been dropped or subjected to water damage, there's a chance that internal components have become partially disconnected or otherwise damaged, which could be leading to your issues with crashing.</p>
+                                <h3>Battery issue</h3>
+                                <p>Unfortunately, long term use shortens phone battery life and will likely eventually cause crashes. If the battery and the connector have damaged contact points, you might also suffer from regular crashes. To solve these issues, you could try changing the original battery or wiping the connector with a cloth.</p>
+                                <h3>Virus infection</h3>
+                                <p>Although both the App Store and Google Play Store are fairly well moderated and generally safe, apps or internet downloads can still contain harmful malware or viruses. Identify apps that could cause trouble before you download them by checking reviews and install an antivirus app for extra protection.</p>
+                                <h3>General fixes for Android phone crashes</h3>
+                                <p>Whilst we always recommend taking your phone to your manufacturer for repairs, these common fixes could help to solve the problem at home. Just be aware that any solution that you choose to undertake is done so at your own risk – it could void your warranty or insurance.</p>
+                                <p>If your phone is still crashing, try turning it off, and taking the battery out and putting it back in again. Then, charge your phone to 100%.</p>
+                                <p>If it's still unresponsive, remove the back cover, take out the SIM, SD card and battery for 5-10 seconds, reseat the battery and recharge if necessary.</p>
+                                <p>If the worst comes to the worst and still there is no response from your phone, you can press the power key to factory reset it, at your own risk. But first, make sure that your data is backed up onto a computer or SD card.</p>
+                                <hr class="my-5">
+                                <h2>Why is my iPhone crashing?</h2>
+                                <h3>Outdated iOS</h3>
+                                <p>Run an update on your phone as it is plugged in to charge. Your phone will suggest doing this overnight, and you'll need to make sure that there is enough storage space on your phone for the update to load.</p>
+                                <h3>Memory</h3>
+                                <p>If there isn't enough memory on your phone, it will struggle to run any of the apps or receive texts, for example. When it comes to it, you won't even be able to update your phone to the newest operating system. If you have a memory problem, the best thing to do could be to buy a new iPhone, as these phones do not support external storage.</p>
+                                <h3>Battery issue</h3>
+                                <p>It's common that iPhones will begin to run out of juice whilst on 20% battery. If this is the case for you and your phone is in warranty or is insured, you may be able to get it repaired or replaced. If not, you should clean the charger port and invest in a fast charging cable to hopefully feel the difference.</p>
+                                <h3>App failure</h3>
+                                <p>This can cause the iPhone to restart and crash frequently. Be sure to check whether you have updated all your apps, and then uninstall any faulty apps to see if the issue is fixed. Who knows, in the next app update there could be some bug fixes, and you’ll be able to redownload them again.</p>
+                                <h3>Rebooting after an update</h3>
+                                <p>If your phone randomly reboots after an update to the newest iOS, or even after connecting to a computer, you're not alone. But if your phone is continuously rebooting, it could be because of a bad update, malware attack, unstable driver or hardware issues. Run a virus scan and try to get your phone in for repair as soon as possible.</p>
+                                <h3>General fixes for iPhone crashes</h3>
+                                <p>Whilst we always recommend taking your phone to your manufacturer for repairs, these common fixes could help to solve the problem at home. For iPhone users, it's important to back up your phone onto your computer or iCloud account before starting. Just be aware that any solution that you choose to undertake is done so at your own risk – it could void your warranty or insurance.</p>
+                                <p>To reset all settings and restore to a factory default, go to Settings &gt; General &gt; Reset, then enter your passcode, then tap Reset All Settings. This will erase all of your data.</p>
+                                <p>You may need to do a Hard Reset if your phone restarts constantly and won't turn on. This will erase all of your data. Depending on what phone you have: <strong>iPhone 6/6s and the earlier models</strong>, hold down both Sleep/Wake and Home buttons for at least 10 seconds, then let go the buttons when Apple logo appears. For <strong>iPhone 7 or 7 plus</strong>, hold down Volume Down and Sleep/Wake buttons at the same time for at least 10 seconds and then release them until you see the Apple logo. For <strong>iPhone 8 and X</strong>, press and hold Volume Up button for a few seconds and quickly release it. Press and hold the Volume Down button for a few seconds and quickly release it. Finally, press and hold the Sleep/Wake button and release it when seeing the Apple logo.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
