@@ -60,6 +60,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/iphone-problems-and-solutions' => 'Most Common iPhone Problems And Solutions',
             '/blog/best-phone-cases' => 'Best Phone Cases 2020',
             '/blog/best-car-phone-mounts' => 'Best Car Phone Mounts 2020',
+            '/blog/most-instagrammed-dog-breeds' => 'Most Instagrammed Dog Breeds',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

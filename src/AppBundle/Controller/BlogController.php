@@ -469,4 +469,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/most-instagrammed-dog-breeds", name="most_instagrammed_dog_breeds", options={"sitemap" = true})
+     * @Template
+     */
+    public function mostInstagrammedDogBreedsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/most-instagrammed-dog-breeds.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
