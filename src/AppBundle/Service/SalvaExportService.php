@@ -540,6 +540,10 @@ class SalvaExportService
                 }
             }
             $incurredDate = $potReward ? $potReward->getDate() : $policy->getStaticEnd();
+            $renewalPolicyNumber = '';
+            if ($nextPolicy instanceof SalvaPhonePolicy) {
+                $renewalPolicyNumber = $nextPolicy->getSalvaPolicyNumber();
+            }
             $data = [
                 $policy->getSalvaPolicyNumber(),
                 $this->toTwoDp($policy->getPotValue()),
@@ -552,7 +556,7 @@ class SalvaExportService
                 ($policy->getCashback() && $policy->getCashback()->getStatus() == Cashback::STATUS_PAID) ?
                     $this->adjustDate($policy->getCashback()->getDate(), false) :
                     '',
-                $policy->isRenewed() ? $nextPolicy->getSalvaPolicyNumber() : '',
+                $renewalPolicyNumber,
                 $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyPremiumPrice() : '',
                 $policy->isRenewed() ? $nextPolicy->getPremium()->getAnnualDiscount() : '',
                 $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyDiscount() : '',
@@ -814,7 +818,7 @@ class SalvaExportService
                 throw $e;
             }
         }
-        
+
         return $count;
     }
 
@@ -1220,7 +1224,7 @@ class SalvaExportService
 
         return $dom->schemaValidate($schema);
     }
-    
+
     public function send($xml, $schema)
     {
         $client = new Client();
