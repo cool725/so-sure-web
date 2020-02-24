@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="In short, a disruptive technology is something that transforms a historically expensive product, which only a few people with a lot of money and a lot of skill have access to, by making it more affordable and available to a wider group of people."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

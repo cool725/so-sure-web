@@ -352,6 +352,30 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
+     * SEO Pages - Phone Insurance > Make > Model - Legacy Route
+     * @Route("/phone-insurance/samsung/s8", name="phone_insurance_make_model_s8")
+     */
+    public function phoneInsuranceS8RedirectAction()
+    {
+        return $this->redirectToRoute('phone_insurance_make_model', [
+            'make' => 'samsung',
+            'model' => 'galaxy-s8',
+        ], 301);
+    }
+
+    /**
+     * SEO Pages - Phone Insurance > Make > Model - Legacy Route
+     * @Route("/phone-insurance/samsung/s9", name="phone_insurance_make_model_s9")
+     */
+    public function phoneInsuranceS9RedirectAction()
+    {
+        return $this->redirectToRoute('phone_insurance_make_model', [
+            'make' => 'samsung',
+            'model' => 'galaxy-s9',
+        ], 301);
+    }
+
+    /**
      * SEO Pages - Phone Insurance > Make > Model
      * @Route("/phone-insurance/{make}/{model}", name="phone_insurance_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
@@ -497,12 +521,35 @@ class PhoneInsuranceController extends BaseController
         $instore = $this->get('session')->get('store');
 
         // A/B Hero Image Test
+        // To Test use url param ?force=no-send-quote / ?force=send-quote
+        $sendQuoteExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_SEND_QUOTE,
+            ['no-send-quote', 'send-quote'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
+        // A/B Hero Image Test
         // To Test use url param ?force=standard-hero-image / ?force=photo-hero-image
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
+
+        $lead = new Lead();
+        $lead->setSource(Lead::SOURCE_SEND_QUOTE);
+        $leadForm = $this->get('form.factory')
+            ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
+            ->getForm();
+
+        // if no price, will be sample policy of £100 annually
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        $maxPot = $price ? $price->getMaxPot() : 80;
+        $maxConnections = $price ? $price->getMaxConnections() : 8;
+        $annualPremium = $price ? $price->getYearlyPremiumPrice() : 100;
+        $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
+        $expIntercom = null;
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('buy_form')) {
@@ -554,16 +601,53 @@ class PhoneInsuranceController extends BaseController
                         return $this->redirectToRoute('purchase');
                     }
                 }
+            } elseif ($request->request->has('lead_form')) {
+                try {
+                    $leadForm->handleRequest($request);
+
+                    if ($leadForm->isValid()) {
+                        $leadRepo = $dm->getRepository(Lead::class);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
+                        if (!$existingLead) {
+                            $dm->persist($lead);
+                            $dm->flush();
+                        } else {
+                            $lead = $existingLead;
+                        }
+                        $days = new \DateTime();
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
+                        $mailer = $this->get('app.mailer');
+                        // @codingStandardsIgnoreStart
+                        $mailer->sendTemplate(
+                            sprintf('Your saved so-sure quote for %s', $phone),
+                            $lead->getEmail(),
+                            'AppBundle:Email:quote/priceGuarantee.html.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()],
+                            'AppBundle:Email:quote/priceGuarantee.txt.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()]
+                        );
+                        // @codingStandardsIgnoreEnd
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                        $this->get('app.mixpanel')->queuePersonProperties([
+                            '$email' => $lead->getEmail()
+                        ], true);
+                        $this->addFlash('success', sprintf(
+                            "Thanks! An email of your quote is on it's way"
+                        ));
+                        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SEND_QUOTE);
+                    } else {
+                        $this->addFlash('error', sprintf(
+                            "Sorry, didn't quite catch that email. Please try again."
+                        ));
+                    }
+                } catch (\Exception $ex) {
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
+                    $this->addFlash('error', sprintf(
+                        "Sorry, didn't quite catch that email.  Please try again."
+                    ));
+                }
             }
         }
-
-        // if no price, will be sample policy of £100 annually
-        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        $maxPot = $price ? $price->getMaxPot() : 80;
-        $maxConnections = $price ? $price->getMaxConnections() : 8;
-        $annualPremium = $price ? $price->getYearlyPremiumPrice() : 100;
-        $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
-        $expIntercom = null;
 
         // only need to run this once - if its a post, then ignore
         if ('GET' === $request->getMethod() && $price) {
@@ -600,6 +684,8 @@ class PhoneInsuranceController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'O2',
+            'lead_form' => $leadForm->createView(),
+            'send_quote' => $sendQuoteExp,
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }

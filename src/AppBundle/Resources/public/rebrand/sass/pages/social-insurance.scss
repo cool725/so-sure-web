@@ -252,39 +252,54 @@
 //     }
 // }
 
-.reviews {
-    padding-bottom: 200px;
-    margin-bottom: 4rem;
+// .reviews {
+//     padding-bottom: 200px;
+//     margin-bottom: 4rem;
 
-    .carousel-inner {
-        min-height: 280px;
-        background: $white url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
+//     .carousel-inner {
+//         min-height: 280px;
+//         background: $white url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
 
-        @include media-breakpoint-up(lg) {
-            min-height: none;
-        }
+//         @include media-breakpoint-up(lg) {
+//             min-height: none;
+//         }
+//     }
+
+//     background: $white url('#{$cdn_url}/images/rebrand/rewardpot/so-sure_reviews-image-alt.png') no-repeat 80px bottom;
+//     background-size: 450px;
+
+//     @include media-breakpoint-up(sm) {
+//         background-position: 300px bottom;
+//     }
+
+//     @include media-breakpoint-up(lg) {
+//         padding-bottom: inherit;
+//         margin-bottom: 0;
+//         background: $white url('#{$cdn_url}/images/rebrand/rewardpot/so-sure_reviews-image-alt.png') no-repeat 800px 50px;
+//         background-size: 600px;
+//     }
+
+//     @include media-breakpoint-up(xl) {
+//         background-position: 940px 50px;
+//         background-size: 700px;
+//     }
+
+//     @include media-breakpoint-up(fk) {
+//         background-position: 1400px 50px;
+//     }
+// }
+.our-reviews {
+    background-color: $pattens-blue;
+    text-align: center;
+    position: relative;
+
+    .reviews {
+        position: relative;
+        z-index: 4;
     }
 
-    background: $white url('#{$cdn_url}/images/rebrand/rewardpot/so-sure_reviews-image-alt.png') no-repeat 80px bottom;
-    background-size: 450px;
-
-    @include media-breakpoint-up(sm) {
-        background-position: 300px bottom;
-    }
-
-    @include media-breakpoint-up(lg) {
-        padding-bottom: inherit;
-        margin-bottom: 0;
-        background: $white url('#{$cdn_url}/images/rebrand/rewardpot/so-sure_reviews-image-alt.png') no-repeat 800px 50px;
-        background-size: 600px;
-    }
-
-    @include media-breakpoint-up(xl) {
-        background-position: 940px 50px;
-        background-size: 700px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 1400px 50px;
+    svg {
+        position: absolute;
+        bottom: 100%; left: 0;
     }
 }

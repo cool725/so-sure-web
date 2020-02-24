@@ -1,13 +1,7 @@
 // rewards.js
 
-// require('../../../sass/pages/picsure.scss');
-
-// Require BS component(s)
-// e.g. require('bootstrap/js/dist/carousel');
-
 // Require components
 require('tempusdominus-bootstrap-4');
-// e.g. require('../components/banner.js');
 
 $(function(){
 

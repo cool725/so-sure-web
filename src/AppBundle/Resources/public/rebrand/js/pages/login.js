@@ -9,13 +9,6 @@ require('jquery-validation');
 require('../common/validation-methods.js');
 require('../common/toggle-text.js');
 
-// Lazy load images
-// require('intersection-observer');
-// import lozad from 'lozad';
-
-// const observer = lozad(); // lazy loads elements with default selector as '.lozad'
-// observer.observe();
-
 // Facebook
 AccountKit_OnInteractive = () => {
     AccountKit.init({

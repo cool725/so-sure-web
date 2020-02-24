@@ -3,6 +3,7 @@ namespace AppBundle\Security;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
+use AppBundle\Classes\Helvetia;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -16,6 +17,7 @@ class PolicyVoter extends Voter
     const RENEW = 'renew';
     const CASHBACK = 'cashback';
     const REPURCHASE = 'repurchase';
+    const UPGRADE = 'upgrade';
 
     public function supports($attribute, $subject)
     {
@@ -28,6 +30,7 @@ class PolicyVoter extends Voter
             self::CONNECT,
             self::RENEW,
             self::REPURCHASE,
+            self::UPGRADE
         ])) {
             return false;
         }
@@ -65,13 +68,21 @@ class PolicyVoter extends Voter
             }
         }
 
-        if (in_array($attribute, [
-            self::EDIT,
-        ])) {
+        if ($attribute == self::EDIT) {
             if (in_array($policy->getStatus(), [
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
                 Policy::STATUS_EXPIRED,
+            ])) {
+                return false;
+            }
+        }
+
+        if ($attribute == self::UPGRADE) {
+            if ($policy->getUnderwriterName() != Helvetia::NAME || !in_array($policy->getStatus(), [
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED
             ])) {
                 return false;
             }

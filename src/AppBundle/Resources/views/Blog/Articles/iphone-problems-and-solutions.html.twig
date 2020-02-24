@@ -1,0 +1,123 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}iPhone Problems & Solutions | Problems with iPhone | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="iPhones are the most popular phone on the market, but it’s not always plain sailing. If you’re having some trouble, check out our blog on iPhone problems here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'iPhone Problems & Solutions | Problems with iPhone | so-sure' %}
+{% set og_description = "iPhones are the most popular phone on the market, but it’s not always plain sailing. If you’re having some trouble, check out our blog on iPhone problems here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/iphone-problems-and-solutions-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Most Common iPhone Problems And Solutions</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Most Common iPhone Problems And Solutions</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Feb 10, 2020</time>
+                                        </li>
+                                    </ul>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/iphone-problems-and-solutions-1.jpg"
+                                     alt="Hands holding phones"
+                                     class="img-fluid lozad mb-5">
+                                <p>iPhones are some of the most popular phones on the market: their features include excellent cameras, incredible ease of use and a market leading app platform. But, as with any other type of phone, not everyone has a fantastic experience from start to finish with an iPhone. There are many common problems with iPhones that plenty of users come across. Here's our list of some of the most prevalent ones and what the most likely solutions are.</p>
+                                <h2>Difficulty connecting iPhone to Wi-Fi</h2>
+                                <p>This can be an incredibly annoying (and costly) problem as, until it’s solved, you'll be forced to use your data allocation for everyday browsing and downloading, which could quickly eat up your full allowance.</p>
+                                <p>One common solution for an iPhone not connecting to WiFi is to try turning your phone off and on again, and if it's still not working, go to Settings &gt; WiFi and change the HTTP Proxy to Auto Settings.</p>
+                                <h2>Slow iPhone</h2>
+                                <p>iPhones aren't designed to be long-life items, and regular updates from Apple mean that if your model is too old to be updated with the latest software, it will stop working correctly. If this is the case for you, you may not have much other choice but to buy a new phone.</p>
+                                <p>For example, the oldest phone that iOS 12 is compatible with is the iPhone 5S – if your phone is older than that, some of its features and/or some apps may stop working. Frustratingly, this may mean you’ll have to consider buying a new mobile. If your iPhone is running slowly, try searching for and installing software updates to see if they help.</p>
+                                <h2>Smashed iPhone screen</h2>
+                                <p>One of the best things about iPhones is their sleek design, but this can also prove a problem. Not everyone wants a phone case, preferring to see the original design without a cover, but the metal shell has very little grip and the screens are made of glass. These two factors combined mean that it’s very common to see people with cracked iPhone screens.</p>
+                                <p>It might sound reductive to say this, but the best way to deal with this problem is to prevent it from happening in the first place. Buy a <a href="{{ path('best_phone_cases') }}">good quality case</a> and screen protector for your phone.</p>
+                                <p>If it's too late for you on that front, your best bet is to get it fixed as soon as possible to stop the problem getting worse. If you have <a href="{{ path('phone_insurance_make', {'make': 'apple'}) }}">iPhone insurance</a>, it'll often cover smashed screens.</p>
+                                <h2>Rapid battery drain</h2>
+                                <p>If you notice that your battery is starting to run out quickly, it could be the number of apps running on your phone. Remove the apps or turn them off and put your phone on low power mode to see if that fixes the problem.</p>
+                                <p>If the battery continues to underperform, reboot the phone by pressing the sleep/wake button and the home button until the Apple logo shows.</p>
+                                <p>To check your iPhone's battery health, go to Settings &gt; Battery &gt; Battery Health. At 100% health, your phone should be operating at peak battery performance. If your phone's battery health is at 79% or less, it has been significantly degraded, and should be replaced.</p>
+                                <p>If you have a continuing problem, as a last resort you can restore your phone to factory settings by going to Settings &gt; General &gt; Reset &gt; Erase All Content and Settings &gt; Erase Now</p>
+                                <h2>Touchscreen not working</h2>
+                                <p>Although a less common problem, iPhones are also known to very occasionally have touchscreen issues, sometimes manifesting as the touchscreen just not working or displaying a black screen.</p>
+                                <p>To attempt to fix this issue, try restarting your device and then charge it for an hour. If the screen is cracked and not responding, you’ll need to get your iPhone repaired instead.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

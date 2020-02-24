@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Tests\Create;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use AppBundle\Security\PolicyVoter;
 
@@ -55,6 +56,7 @@ class PolicyVoterTest extends WebTestCase
         $this->assertTrue(self::$policyVoter->supports('cashback', $policy));
         $this->assertTrue(self::$policyVoter->supports('renew', $policy));
         $this->assertTrue(self::$policyVoter->supports('repurchase', $policy));
+        $this->assertTrue(self::$policyVoter->supports('upgrade', $policy));
     }
 
     public function testVoteOk()
@@ -121,5 +123,27 @@ class PolicyVoterTest extends WebTestCase
 
         $policy->setStatus(Policy::STATUS_EXPIRED);
         $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::EDIT, $policy, $token));
+    }
+
+    /**
+     * Tests that upgrade is only allowed for helvetia policies and that the normal rules apply too.
+     */
+    public function testVoteUpgrade()
+    {
+        $userA = Create::user();
+        $userB = Create::user();
+        $policyA = Create::policy($userA, '2019-01-01', Policy::STATUS_ACTIVE, 12);
+        $policyB = Create::policy($userA, '2020-01-01', Policy::STATUS_ACTIVE, 12);
+        $policyC = Create::policy($userB, '2020-01-01', Policy::STATUS_CANCELLED, 12);
+        // Test with the first user that they can upgrade their helvetia policy and not their salva.
+        $token = new PreAuthenticatedToken($userA, '1', 'test');
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::UPGRADE, $policyA, $token));
+        $this->assertTrue(self::$policyVoter->voteOnAttribute(PolicyVoter::UPGRADE, $policyB, $token));
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::UPGRADE, $policyC, $token));
+        // Now test that the second guy can only upgrade his own policy.
+        $token = new PreAuthenticatedToken($userB, '1', 'test');
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::UPGRADE, $policyA, $token));
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::UPGRADE, $policyB, $token));
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::UPGRADE, $policyC, $token));
     }
 }

@@ -36,6 +36,13 @@
             margin-bottom: 2rem;
         }
 
+        blockquote {
+            p {
+                color: $dark;
+                font-style: italic;
+            }
+        }
+
         // Fix for twitter embed
         .twitter-tweet {
             margin: {

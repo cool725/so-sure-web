@@ -56,7 +56,7 @@
 {% set og_title = make_desc ~ ' ' ~ with_phone ~ add_phone ~ ' Insurance For £' ~ prices['monthly'].monthlyPremiumPrice ~ ' Monthly | so-sure' %}
 {% set og_url = canonical|url_decode %}
 {% set og_description = make_desc ~ ' ' ~ with_phone ~ ' ' ~ add_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ make_desc ~ ' ' ~ with_phone ~ ' insurance that\'s simply better.' %}
-{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
@@ -151,9 +151,13 @@
                                 <small>Not the phone you're looking for?</small>
                             </a>
                         </div>
+                        {% set button_text = 'Get Started' %}
+                        {% if send_quote is defined and send_quote == 'send-quote' %}
+                            {% set button_text = 'Buy Now' %}
+                        {% endif %}
                         {{ form_start(buy_form, {'attr': { 'class': 'my-5'}}) }}
                             {{ form_widget(buy_form.buy, {
-                                'label': 'Get Started',
+                                'label': button_text,
                                 'attr': {
                                     'class': 'btn btn-success btn-block-xs btn-shadow mr-sm-2'
                             }}) }}
@@ -169,6 +173,25 @@
                         {{ form_end(buy_form) }}
                         {% if validation_required is not null %}
                             <p class="text-white">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
+                        {% endif %}
+                        {% if (send_quote is defined and send_quote == 'send-quote') and (validation_required is null) %}
+                            <p class="text-white">Not ready yet? Enter your email address to send you this quote 🤔</p>
+                            {{ form_start(lead_form, {'attr': {
+                                'data-toggle': 'validator',
+                                'class': 'validate-form',
+                                'data-client-validation': form_client_validation,
+                                'autocomplete': 'off'
+                            }}) }}
+                                <div class="custom-input-with-btn">
+                                    {{ form_widget(lead_form.email, {'attr': {
+                                        'placeholder': 'Enter email address',
+                                        'class': 'form-control form-control-white form-control-shadow'
+                                    }}) }}
+                                    {{ form_widget(lead_form.save, {'label': 'Send Quote', 'attr': {
+                                        'class': 'btn btn-primary btn-sm'
+                                    }}) }}
+                                </div>
+                            {{ form_end(lead_form) }}
                         {% endif %}
                         <h2 class="h4 text-columbia-blue-e my-4">Insurance Product Information Document:</h2>
                         <ul class="list-unstyled icn-fa-list mb-0">
@@ -198,19 +221,19 @@
                             <li class="text-white mb-5">
                                 <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
                                 {% if validation_required is not null %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14_R.pdf"
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        class="track-data text-white"
                                        data-event="user-download-sample-policy-doc-quote-agg"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14_R.pdf"><u>Download a copy of our Policy Document</u></a>
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><u>Download a copy of our Policy Document</u></a>
                                 {% else %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        class="track-data text-white"
                                        data-event="user-download-sample-policy-doc-quote"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v14.pdf"><u>Download a copy of our Policy Document</u></a>
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><u>Download a copy of our Policy Document</u></a>
                                 {% endif %}
                             </li>
                         </ul>

@@ -443,4 +443,56 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/iphone-problems-and-solutions", name="iphone_problems_and_solutions", options={"sitemap" = true})
+     * @Template
+     */
+    public function commoniPhoneProblemsAndSolutionsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/iphone-problems-and-solutions.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/best-car-phone-mounts", name="best_car_phone_mounts", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestCarPhoneMountsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/best-car-phone-mounts.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/most-instagrammed-dog-breeds", name="most_instagrammed_dog_breeds", options={"sitemap" = true})
+     * @Template
+     */
+    public function mostInstagrammedDogBreedsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/most-instagrammed-dog-breeds.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/why-does-my-phone-keep-crashing", name="why_does_my_phone_keep_crashing", options={"sitemap" = true})
+     * @Template
+     */
+    public function whyDoesMyPhoneKeepCrashingAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/why-does-my-phone-keep-crashing.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Insurtech is everywhere. And it’s only getting bigger. At so-sure we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}

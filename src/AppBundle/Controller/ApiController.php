@@ -22,10 +22,12 @@ use AppBundle\Document\Feature;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ArrayToApiArrayTrait;
+use AppBundle\Document\Charge;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Validator\Constraints\UkMobileValidator;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -61,6 +63,7 @@ class ApiController extends BaseController
             $googleUserData = null;
             $oauthEchoUserData = null;
             $accountKitUserData = null;
+            $mobileUserData = null;
             if (isset($data['email_user'])) {
                 $emailUserData = $data['email_user'];
                 if (!$this->validateFields($emailUserData, ['email', 'password'])) {
@@ -83,6 +86,11 @@ class ApiController extends BaseController
                 if (!$this->validateFields($accountKitUserData, ['authorization_code'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
+            } elseif (isset($data['mobile_user'])) {
+                $mobileUserData = $data['mobile_user'];
+                if (!$this->validateFields($mobileUserData, ['mobile_number','otp'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
             } else {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
@@ -90,6 +98,7 @@ class ApiController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = null;
+            $otp = null;
             if ($emailUserData) {
                 $email = mb_strtolower($this->getDataString($emailUserData, 'email'));
                 $user = $repo->findOneBy(['emailCanonical' => $email]);
@@ -104,6 +113,13 @@ class ApiController extends BaseController
 
                 $facebook = $this->get('app.facebook');
                 $mobileNumber = $facebook->getAccountKitMobileNumber($authorizationCode);
+                $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
+            } elseif ($mobileUserData) {
+                $otp = $this->getDataString($mobileUserData, 'otp');
+
+                $validator = new UkMobileValidator();
+                $mobileNumber = $validator->conform($this->getDataString($mobileUserData, 'mobile_number'));
+                $mobileNumber = $this->normalizeUkMobile($mobileNumber);
                 $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
             }
 
@@ -185,6 +201,14 @@ class ApiController extends BaseController
                 // user was found with mobile number above.
                 $user->setMobileNumberVerified(true);
                 $dm->flush();
+            } elseif ($mobileUserData) {
+                $sms = $this->get('app.sms');
+                if ($sms->checkValidationCodeForUser($user, $otp)) {
+                    $user->setMobileNumberVerified(true);
+                    $dm->flush();
+                } else {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_VERIFY_CODE, 'No matching code', 422);
+                }
             }
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
@@ -210,6 +234,87 @@ class ApiController extends BaseController
             $this->get('logger')->error('Error in api loginAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * Request a one time password to login with mobile number
+     * @Route("/mobile-otp", name="mobile_otp")
+     * @Method({"POST"})
+     */
+    public function mobileOtp(Request $request)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+
+            $validator = new UkMobileValidator();
+            $mobileNumber = $validator->conform($data['mobile_number']);
+
+            $mobileNumber = $this->normalizeUkMobile($mobileNumber);
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->findOneBy(["mobileNumber" => $mobileNumber]);
+
+            if (!$user) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 404);
+            }
+
+            /** @var RateLimitService $rateLimit */
+            $rateLimit = $this->get('app.ratelimit');
+            // Success logins should clear the rate limit (further below)
+            if (!$rateLimit->allowedByUser($user)) {
+                // If rate limiting occurs for a user, then the user should be locked
+                $user->setLocked(true);
+                $dm->flush();
+            }
+
+            if (!$user->isEnabled()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_RESET_PASSWORD,
+                    'User account is temporarily disabled - reset password',
+                    422
+                );
+            } elseif ($user->isLocked()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_USER_SUSPENDED,
+                    'User account is suspended - contact us',
+                    422
+                );
+            }
+
+            // In order for the locked, logic to occur, must be before rate limiting
+            if (!$rateLimit->allowedByDevice(
+                RateLimitService::DEVICE_TYPE_LOGIN,
+                $this->getCognitoIdentityIp($request),
+                $this->getCognitoIdentityId($request)
+            )) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
+            }
+
+            $sms = $this->get('app.sms');
+            $code = $sms->setValidationCodeForUser($user);
+            $status = $sms->sendTemplate(
+                $mobileNumber,
+                'AppBundle:Sms:login-code.txt.twig',
+                ['code' => $code],
+                $user->getLatestPolicy(),
+                Charge::TYPE_SMS_VERIFICATION
+            );
+
+            if ($status) {
+                return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+            } else {
+                $this->get('logger')->error('Error sending SMS.', ['mobile' => $mobileNumber]);
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_SEND_SMS, 'Error sending SMS', 422);
+            }
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, $e->getMessage(), 500);
         }
     }
 

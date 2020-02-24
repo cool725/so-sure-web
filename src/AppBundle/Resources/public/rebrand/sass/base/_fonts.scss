@@ -9,6 +9,7 @@
          url('#{$cdn_url}/fonts/gordita-light-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 $g-light: 'gorditalight', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -22,6 +23,7 @@ $g-light: 'gorditalight', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
          url('#{$cdn_url}/fonts/gordita-regular-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 $g-regular: 'gorditaregular', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -34,6 +36,7 @@ $g-regular: 'gorditaregular', -apple-system, BlinkMacSystemFont, "Segoe UI", Rob
          url('#{$cdn_url}/fonts/gordita-medium-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 
 }
 

@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Keep your handset safe with our picks of the best phone cases, whether you're looking for pure protection or good looks too."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 {% set og_title = 'Best Phone Cases For Protection | so-sure' %}
 {% set og_description = "Keep your handset safe with our picks of the best phone cases, whether you’re looking for pure protection or good looks too." %}

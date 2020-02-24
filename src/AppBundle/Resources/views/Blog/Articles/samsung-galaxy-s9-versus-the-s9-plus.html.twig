@@ -7,6 +7,7 @@
 
 {% block meta %}
     <meta name="description" content="Firstly they are even more brilliant than the previous Galaxy phones. Both have great battery life, storage capabilities (so much more storage for all your cool photos and videos) ..festivals here we come! Oh yeah and did Samsung mention their amazing new camera lens that takes crystal clear photos anywhere in any light (we’re sure you have see the huge billboards all over the place)."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
@@ -100,7 +101,7 @@
                                     <li>Carphone Warehouse are giving you a free sim card</li>
                                 </ul>
                                 <h2>Are you insured?</h2>
-                                <p>The Galaxy S9 might be water resistant, but if you're planning on buying it you should also think about getting insurance <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy-S9'}) }}">Galaxy S9 insurance</a> or <a href="{{ path('phone_insurance_make_model', {'make': 'Samsung', 'model': 'Galaxy-S9+'}) }}">Galaxy S9+ insurance</a>. so-sure can cover you instantly for loss, theft, accidental damage, and out of warranty breakdown from just &pound;10.49 per month - so get peace of mind and get a quote today for your shiny new Samsung Galaxy.</p>
+                                <p>The Galaxy S9 might be water resistant, but if you're planning on buying it you should also think about getting insurance <a href="{{ path('phone_insurance_make_model', {'make': 'samsung', 'model': 'galaxy-s9'}) }}">Galaxy S9 insurance</a> or <a href="{{ path('phone_insurance_make_model', {'make': 'samsung', 'model': 'galaxy-S9-plus'}) }}">Galaxy S9+ insurance</a>. so-sure can cover you instantly for loss, theft, accidental damage, and out of warranty breakdown from just &pound;10.49 per month - so get peace of mind and get a quote today for your shiny new Samsung Galaxy.</p>
                             </div>
                             <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
                             <footer class="my-4">

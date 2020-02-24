@@ -12,6 +12,9 @@ require('../components/banner.js');
 require('../components/phone-search-dropdown-card.js');
 let textFit = require('textfit');
 require('../components/table.js');
+require('jquery-validation');
+require('../common/validation-methods.js');
+
 
 let jQueryBridget = require('jquery-bridget');
 let Flickity = require('flickity');
@@ -19,13 +22,6 @@ let Flickity = require('flickity');
 // make Flickity a jQuery plugin
 Flickity.setJQuery( $ );
 jQueryBridget( 'flickity', Flickity, $ );
-
-// Lazy load images
-require('intersection-observer');
-import lozad from 'lozad';
-
-const observer = lozad(); // lazy loads elements with default selector as '.lozad'
-observer.observe();
 
 $(function() {
 
@@ -57,6 +53,5 @@ $(function() {
     let knowledgeBaseM = $('.knowledge-base__mobile'),
         cardboxHeight  = knowledgeBaseM.children(':first').height() / 2;
         knowledgeBaseM.css('top', -cardboxHeight);
-
 });
 

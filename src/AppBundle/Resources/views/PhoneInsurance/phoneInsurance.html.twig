@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance' %}
+{% set intercom_enabled = false %}
 
 {% block title %}Mobile Phone Insurance From &pound;{{ from_price|number_format(2) }} Monthly | so-sure{% endblock %}
 {% block meta %}
@@ -10,7 +11,7 @@
 {% endblock %}
 {% set og_title = 'Mobile Phone Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | so-sure' %}
 {% set og_description = "Choose Phone Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. We insure hundreds of different phone models. Find your best price today." %}
-{% set og_image_facebook = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
