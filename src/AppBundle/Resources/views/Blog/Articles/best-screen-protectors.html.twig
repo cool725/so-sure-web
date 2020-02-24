@@ -1,0 +1,130 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Best Screen Protectors | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="While smartphone screens are becoming more robust, even the strongest glass is susceptible to shattering when dropped. Check out our screen protector top picks to keep your phone screen – and bank balance – firmly intact."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Best Screen Protectors | so-sure' %}
+{% set og_description = "While smartphone screens are becoming more robust, even the strongest glass is susceptible to shattering when dropped. Check out our screen protector top picks to keep your phone screen – and bank balance – firmly intact." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/best-screen-protectors-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Best Screen Protectors</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Best Screen Protectors</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Feb 24, 2020</time>
+                                        </li>
+                                    </ul>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/best-screen-protectors-1.jpg"
+                                     alt="Best Screen Protectors"
+                                     class="img-fluid lozad mb-5">
+                                <p>While Smartphones screens are becoming more robust, even the strongest glass is susceptible to shattering when dropped. To prevent avoidable damage, it's worth investing in a screen protector. The sheer number of screen protectors available, however, can blur what should be a crystal-clear decision.</p>
+                                <p>That's why we've done the hard work for you! See below for our top screen protector buying tips and handy list of the best available on the market today. To further reinforce your phone's protection, check out our <a href="{{ path('phone_insurance') }}">comprehensive phone insurance plans</a> that offer loss, theft and accidental damage (including screen cracks) as standard, while also providing up to 80% cashback at the end of your policy.</p>
+                                <h2>What kind of screen protector should I look for?</h2>
+                                <p>The two main types of screen protector are made of different materials. Plastic protectors offer an inexpensive way to protect your device, while tempered glass varieties are harder and provide more robust protection, albeit at a higher price. Nevertheless, for both types, you should expect to pay between &pound;2-15, which is very reasonable considering the cost of some smartphone repairs.</p>
+                                <p>Premium screen protectors usually try to justify their lofty price tags with lifetime guarantees. In such cases, reading the small print is essential. Some manufacturers require return postage for the damaged protector, for instance, when it may actually be cheaper to buy a new protector.</p>
+                                <h2>Types of plastic screen protector</h2>
+                                <p>There are two main types of screen protector in the plastic category: Polyethylene Terephthalate (PET) and Thermoplastic Polyurethane (TPU). The former is made from flexible material and costs less than TPU, but TPU offers more robust protection despite being more difficult to apply correctly.</p>
+                                <h2>Which screen protector offers the best protection?</h2>
+                                <p>For ultimate damage resistance, opt for tempered glass. Being considerably thicker than plastic (0.3-0.5mm compared to 0.1mm), it offers greater protection against cracks, scratches and bends. Plastic protectors, on the other hand, can provide adequate temporary protection on holiday, for example, or for your second or spare handset.</p>
+                                <p>Finally, bear in mind that most screen protectors are designed to match specific devices. This includes cut-outs for components, such as headphone jacks, fingerprint readers, the screen etc. So be sure to check if the protector is compatible with your handset before buying.</p>
+                                <h2>Top 5 screen protectors</h2>
+                                <h3><a href="https://www.ijetech.com/product-category/screen-protectors/" target="_blank" rel="noopener noreferrer">JETech</a></h3>
+                                <p>JETech offers a substantial range of durable, affordable screen protectors that cater to a host of phone manufacturers, including Apple. The reinforced tempered glass resists scratches up to an incredible 9H on the Mohs Scale of Mineral Hardness. For context, diamonds come in at 10H while talc scores 1H, underscoring the protector’s considerable ruggedness.</p>
+                                <p>What’s more, JETech’s protectors prevent your screen being affected by fingerprints and dust, while maintaining transparency and rapid responsiveness. There are two protectors per pack and a lifetime warranty. Simple, hassle-free installation is also guaranteed, although these protectors do not extend over curved screens.</p>
+                                <h3><a href="https://rhinoshield.eu/" target="_blank" rel="noopener noreferrer">RhinoShield</a></h3>
+                                <p>RhinoShield protectors also feature 9H hardness material, offering scratch protection against everyday objects such as coins, keys, and even knives.</p>
+                                <p>Built-in water-oil-repellency provides resistance against screen smudges, moisture and debris, while its 99% clear transparency guarantees a crystal-clear HD display, without interfering with touchscreen use or 3D touch. RhinoShield also optimises its protectors for curved screens, and caters to most leading phone brands, such as Samsung, Apple and Sony.</p>
+                                <p>Accidental drops and knocks are also safeguarded against, courtesy of RhinoSheild’s hammer-tested durability, which purportedly absorbs over 5 times the impact energy of Gorilla Glass 3.</p>
+                                <h3><a href="https://www.omoton.com/pages/screen-protector" target="_blank" rel="noopener noreferrer">Omoton</a></h3>
+                                <p>Omoton's ultra-thin screen protectors prioritise scratch resistance, while also offering simple, bubble-free installation and the capacity to fend off smudges and oil residue. Many products in the range come with a lifetime warranty too, providing extra peace of mind.</p>
+                                <h3><a href="https://www.spigen.co.uk/tempered-glass.html" target="_blank" rel="noopener noreferrer">Spigen</a></h3>
+                                <p>Spigen's huge range of tempered glass screen protectors come with a rugged 9H hardness rating that'll reinforce your phone's scratch resistance, while their oleophobic coating prevents oily fingerprints from marring your view. And while they're not the cheapest protectors on the market, when combined with a Spigen case, you'll be hard pressed to find better all-round smartphone protection.</p>
+                                <h3><a href="https://www.tech21.com/en_gb/" target="_blank" rel="noopener noreferrer">Tech21</a></h3>
+                                <p>Tech21's innovative self-healing and 'BulletShield; technology are natural by products of the company's mission to create the most intelligent phone protection on the planet. The self-healing properties, for instance, smooth over minor scratches, while BulletShield provides premium impact resistance against drops. Like the Spigen series, Tech21's screen protectors are designed to work together with their cases, providing comprehensive protection when paired together.</p>
+                                <h2>How do I apply a screen protector?</h2>
+                                <p>Relax and take your time. Ensure no dust or air bubbles are trapped between the screen and protector, before following the instructions included. Alternatively, you could head over to Youtube.com, where you'll find a host of useful tutorials on applying screen protectors correctly. While perhaps a little unconventional, some people advise applying screen protectors in the bathroom while the shower is running as the steam reduces dust particles.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

@@ -495,4 +495,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/best-screen-protectors", name="best_screen_protectors", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestScreenProtectorsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/best-screen-protectors.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
