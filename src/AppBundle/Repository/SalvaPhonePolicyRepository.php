@@ -58,8 +58,7 @@ class SalvaPhonePolicyRepository extends PhonePolicyRepository
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
-            ->field('policy_type')->equals(Policy::TYPE_SALVA_PHONE);
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         return $qb->getQuery()->execute();
     }
 }
