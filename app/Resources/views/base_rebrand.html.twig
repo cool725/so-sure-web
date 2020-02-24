@@ -7,6 +7,7 @@
         {% if robots_noindex is defined and robots_noindex %}
             <meta name="robots" content="noindex" />
         {% endif %}
+        {% include '::meta_rebrand.html.twig' %}
 
         <title>{% block title %}so-sure{% endblock %}</title>
 
@@ -15,8 +16,6 @@
         {% block cssPage %}{% endblock %}
 
         <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
-
-        {% include '::meta_rebrand.html.twig' %}
 
         {% block meta %}{% endblock %}
 
