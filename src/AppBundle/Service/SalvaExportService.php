@@ -541,7 +541,7 @@ class SalvaExportService
             }
             $incurredDate = $potReward ? $potReward->getDate() : $policy->getStaticEnd();
             $renewalPolicyNumber = '';
-            if ($policy instanceof SalvaPhonePolicy) {
+            if ($nextPolicy instanceof SalvaPhonePolicy) {
                 $renewalPolicyNumber = $nextPolicy->getSalvaPolicyNumber();
             }
             $data = [
