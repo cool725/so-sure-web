@@ -27,10 +27,13 @@
 <meta name="msapplication-square150x150logo" content="{{ cdn_url }}/images/rebrand/favicons/ms-icon-150x150.png" />
 <meta name="msapplication-square310x310logo" content="{{ cdn_url }}/images/rebrand/favicons/ms-icon-310x310.png" />
 
-{# Open Graph/Facebook #}
+{# Open Graph/Facebook/Twitter/Web #}
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@wearesosure" />
+<meta name="twitter:creator" content="@wearesosure" />
+<meta property="fb:pages" content="781483845311300" />
 <meta property="fb:app_id" content="{{ fb_appid }}" />
 <meta property="og:type" content="website" />
-
 {% if og_url is defined %}
     <meta property="og:url" content="{{ og_url }}" />
 {% elseif route_exists(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) %}
@@ -39,20 +42,15 @@
 {% if og_title is defined %}
   <meta property="og:title" content="{{ og_title }}" />
 {% else %}
-  <meta property="og:title" content="Welcome to Social Insurance" />
+  <meta property="og:title" content="so-sure | Social Insurance" />
 {% endif %}
 {% if og_description is defined %}
     <meta property="og:description" content="{{ og_description }}" />
 {% else %}
-    <meta property="og:description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim)." />
+    <meta property="og:description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure." />
 {% endif %}
 {% if og_image is defined %}
     <meta property="og:image" content="{{ og_image }}" />
 {% else %}
-  <meta property="og:image" content="{{ cdn_url }}/images/rebrand/og/so-sure_og-image-2.png" />
+    <meta property="og:image" content="{{ cdn_url }}/images/rebrand/og/so-sure_og-image-2.png" />
 {% endif %}
-<meta property="fb:pages" content="781483845311300" />
-
-{# Twitter #}
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:site" content="@wearesosure" />
