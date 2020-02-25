@@ -1,0 +1,30 @@
+<div class="d-flex align-items-center justify-content-start">
+    <a href="#"
+       data-sharer="twitter"
+       data-title="{{ og_title}}"
+       data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
+       data-via="wearesosure"
+       data-hashtags="so-sure, phoneinsurance">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-square text-athens-gray fa-stack-2x"></i>
+            <i class="fab fa-twitter text-twitter fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Tweet</span></a>
+    <a href="#"
+       data-sharer="facebook"
+       data-title="{{ og_title}}"
+       data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
+       data-hashtags="so-sure, phoneinsurance">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-square text-athens-gray fa-stack-2x"></i>
+            <i class="fab fa-facebook text-facebook fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Facebook</span></a>
+    <a href="#"
+       data-sharer="whatsapp"
+       data-web
+       data-title="{{ og_title}}"
+       data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-square text-athens-gray fa-stack-2x"></i>
+            <i class="fab fa-whatsapp text-whatsapp fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Whatsapp</span></a>
+</div>

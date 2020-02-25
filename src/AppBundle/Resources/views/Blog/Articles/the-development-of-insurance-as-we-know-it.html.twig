@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'The Development of Insurance as we know it - Blog | so-sure' %}
+{% set og_description = "By the 1700s, sections of society, such as business communities and lives, could now be insured. Insurance no longer meant just single item insurance, like one journey, one cargo or one house. It included national insurance, medical insurance and pensions, too." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}
@@ -74,6 +77,7 @@
                                             <time>Sep 13, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

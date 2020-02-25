@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'so-sure people: Dylan Bourguignon - Blog | so-sure' %}
+{% set og_description = "Dylan is a down to earth kind of guy who would rather get his head down, manage the team and deal with customers that write blog posts extolling his virtues. But he’s happy for me to do it! I recently sat down with him to hear the story behind so-sure." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Nov 16, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

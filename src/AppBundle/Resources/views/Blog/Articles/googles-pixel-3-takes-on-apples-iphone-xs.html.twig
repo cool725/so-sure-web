@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'Google’s Pixel 3 takes on Apple’s iPhone XS - Blog | so-sure' %}
+{% set og_description = "In the latest instalment of the fight for smartphone supremacy, we’re welcoming Apple again into the ring with its latest release, the iPhone XS. Its challenger this month is the mighty Google and their Pixel 3, which is yet to be released but one of the worst kept secrets in phone history thanks to its alleged availability on the Russian black market." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Sep 24, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

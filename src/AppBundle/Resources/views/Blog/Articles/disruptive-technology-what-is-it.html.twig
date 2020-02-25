@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'Disruptive Technology - what is it? - Blog | so-sure' %}
+{% set og_description = "In short, a disruptive technology is something that transforms a historically expensive product, which only a few people with a lot of money and a lot of skill have access to, by making it more affordable and available to a wider group of people." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Jun 29, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

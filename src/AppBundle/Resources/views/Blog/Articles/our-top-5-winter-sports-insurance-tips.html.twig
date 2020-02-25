@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'Our Top 5 Winter Sports Insurance Tips - Blog | so-sure' %}
+{% set og_description = " trip to the slopes with family and friends is one of the best holidays of the year but, let’s face it, skiing isn’t the safest, so it’s vitally important that you travel and ski with the correct insurance." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Nov 29, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'Money Saving Tips - Blog | so-sure' %}
+{% set og_description = "Everyone (well nearly everyone) is in the same financial boat. Working, getting paid, living it large and then waiting for pay day! In these summer months it is expensive, lots of drinks to buy in the sun, summer holidays on the beach. Anyway, as its summer, and we are not detoxing our bodies, we’re here to show you how to perform a financial detox on your wallet." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Jun 29, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'All I want for Christmas is a new phone - Blog | so-sure' %}
+{% set og_description = "Time to cram a tree into the back of your car and hope it isn’t too dishevelled by the time you get it home. Time to run around the shops like a headless turkey as you scramble to buy presents for your family without bankrupting yourself. And maybe, just maybe, it’s time to treat yourself to a shiny new phone." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Dec 17, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

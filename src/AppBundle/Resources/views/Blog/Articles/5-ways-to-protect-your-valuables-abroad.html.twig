@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = '5 ways to protect your valuables abroad - Blog | so-sure' %}
+{% set og_description = "There’s nothing better than a winter holiday… but nothing’s more stressful than when something goes wrong whilst you’re on it. It might sound boring and, of course, you can get ripped off anywhere, but planning ahead and being careful whilst travelling can help reduce the risks and keep your valuables safe." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Nov 7, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

@@ -6,9 +6,12 @@
 {% block title %}3 Technologies That Will Shape The Future of Insurance - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers.<"/>
+    <meta name="description" content="Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
+
+{% set og_title = '3 Technologies That Will Shape The Future of Insurance - Blog | so-sure' %}
+{% set og_description = "Today, we’re looking to the future to see what technologies are shaping the insurance industry of tomorrow and asking what impact they will have on the industry and on consumers." %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Oct 24, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

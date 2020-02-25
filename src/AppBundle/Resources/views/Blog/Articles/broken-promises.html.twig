@@ -6,9 +6,12 @@
 {% block title %}Broken Promises - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="The news last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building "/>
+    <meta name="description" content="The news last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building"/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
+
+{% set og_title = '}Broken Promises - Blog | so-sure' %}
+{% set og_description = "The news last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building" %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Nov 26, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

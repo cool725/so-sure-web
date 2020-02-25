@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'The Internet Of Things - Blog | so-sure' %}
+{% set og_description = "You’ve probably heard of the Internet of Things (IoT) even if you only have a passing interest in new technology. However, for those that haven’t, it’s essentially a system of interconnected ‘things’ or devices, which are able to send each other information without human instruction. ‘Things’ is quite a loose term and can mean anything from household appliances, such as dishwashers to more advanced things such as cars and vehicles." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Jun 29, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

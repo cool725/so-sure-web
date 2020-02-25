@@ -10,6 +10,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'How To Fix A Problem Like Insurance - Blog | so-sure' %}
+{% set og_description = "It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers. In the long run, what’s good for customers is good for insurers. But short-term thinking has blighted the industry and created a needless asymmetry between buyers and sellers." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -75,6 +78,7 @@
                                             <time>Aug 10, 2018</time>
                                         </li>
                                     </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

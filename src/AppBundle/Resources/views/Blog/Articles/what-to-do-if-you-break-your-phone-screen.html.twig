@@ -11,6 +11,9 @@
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
+{% set og_title = 'What to do if you break your phone screen - Blog | so-sure' %}
+{% set og_description = "Nearly all breakages occur due to accidental damage, which means you’ll only be covered for repair or replacement if you have phone insurance. So, it’s worth digging into that pesky small print to check where you stand with regards to accidental damage." %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
@@ -65,6 +68,7 @@
                                                 <meta property="position" content="3">
                                             </li>
                                         </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                     </div>
                                     <h1 class="text-primary mb-4">What to do if you break your phone screen</h1>
                                     <ul class="list-inline">
