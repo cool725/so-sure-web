@@ -202,7 +202,7 @@
 <li class="nav-item d-none-xxs {{ menu_show }} pr-xl-4">
     {% if app.user is not null and app.user %}
         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-            <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}"
+            <a href="{{ path('admin_home', {'_impersonate': '_exit'}) }}"
                class="btn btn-outline-deep-sky-blue-d btn-sm show-in-nav btn-swap hideme"
                title="{{ app.user.email }}"
                ><i class="fas fa-user fa-fw"></i>
@@ -235,7 +235,7 @@
 <li class="nav-item d-none {{ menu_breakpoint }}">
     {% if app.user is not null and app.user %}
         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-            <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email|truncate(10)~'.'  }}</u></a>
+            <a href="{{ path('admin_home', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email|truncate(10)~'.'  }}</u></a>
         {% else %}
             <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
         {% endif %}

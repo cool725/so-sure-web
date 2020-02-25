@@ -26,7 +26,7 @@
             </ul>
             {% if app.user is not null and app.user %}
                 {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                    <span class="navbar-text"><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></span>
+                    <span class="navbar-text"><a href="{{ path('admin_home', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></span>
                 {% else %}
                     <span class="navbar-text"><a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a></span>
                 {% endif %}

@@ -15,7 +15,7 @@
                Your settings</a>
             {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                 <a class="dropdown-item dropdown-item-nav mb-0"
-                   href="{{ path('homepage', {'_impersonate': '_exit'}) }}">
+                   href="{{ path('admin_home', {'_impersonate': '_exit'}) }}">
                    Exit User</a>
             {% else %}
                 {% if is_granted('ROLE_ADMIN') %}
