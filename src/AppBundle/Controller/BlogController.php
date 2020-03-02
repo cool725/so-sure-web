@@ -523,7 +523,7 @@ class BlogController extends BaseController
         // To display lowest monthly premium
         $iPhones = $repo->findBy([
             'active' => true,
-            'highlight' => true,
+            'topPhone' => true,
             'make' => 'Apple'
         ]);
 
