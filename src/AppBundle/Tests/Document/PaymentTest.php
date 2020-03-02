@@ -294,20 +294,22 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
     public function setCommissionFractionalRefundData()
     {
         return [
-            "Mr F. A." => [95, 4, -12.35, -0.7, -0.05]
+            "Mr F. A." => [new \DateTime('2019-11-09'), 95, 4, -12.35, -0.7, -0.05]
         ];
     }
 
     /**
      * Tests setting the commission for a fractional refund.
-     * @param int   $age                   is the age of the policy in days.
-     * @param int   $nPayments             is the number of valid payments to add to the policy.
-     * @param float $amount                is the value of the refund to check.
-     * @param float $coverholderCommission is the amount of coverholder commission to expect.
-     * @param float $brokerCommission      is the amount of broker commission to expect.
+     * @param \DateTime $start                 is when the policy starts.
+     * @param int       $age                   is the age of the policy in days.
+     * @param int       $nPayments             is the number of valid payments to add to the policy.
+     * @param float     $amount                is the value of the refund to check.
+     * @param float     $coverholderCommission is the amount of coverholder commission to expect.
+     * @param float     $brokerCommission      is the amount of broker commission to expect.
      * @dataProvider setCommissionFractionalRefundData
      */
     public function testSetCommissionFractionalRefund(
+        $start,
         $age,
         $nPayments,
         $amount,
@@ -319,10 +321,9 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $premium->setGwp(1);
         $premium->setIpt(1);
         $policy->setPremium($premium);
-        $date = new \DateTime();
-        $end = $this->addDays($date, $age);
-        $policyEnd = (clone $date)->add(new \DateInterval("P1Y"));
-        $policy->setStart($date);
+        $end = $this->addDays($start, $age);
+        $policyEnd = (clone $start)->add(new \DateInterval("P1Y"));
+        $policy->setStart($start);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setEnd($policyEnd);
         $policy->setStaticEnd($policyEnd);

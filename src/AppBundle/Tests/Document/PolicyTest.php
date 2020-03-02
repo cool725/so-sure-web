@@ -291,8 +291,8 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         }
         // make sure the date is indeed 30 days after the missing payment.
         $this->assertEquals(
-            $this->startOfDay((clone $date)->add(new \DateInterval("P30D"))),
-            $this->startOfDay($policy->getPolicyExpirationDate($date))
+            (clone $date)->add(new \DateInterval("P30D"))->format('Ymd'),
+            $policy->getPolicyExpirationDate($date)->format('Ymd')
         );
     }
 
