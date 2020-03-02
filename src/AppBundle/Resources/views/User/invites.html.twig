@@ -9,9 +9,16 @@
 {% block title %}Invites | so-sure{% endblock %}
 
 {# Set Meta #}
-{% set og_title = 'Win and save with so-sure!' %}
-{% set og_description = 'Hey, we could win £200 with mobile phone insurer so-sure. It’s super easy to enter!' %}
-{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if feature_enabled('invite-competition') %}
+    {% set og_title = 'We can both win £20, it’s super easy, check it out' %}
+    {% set og_description = "Check out so-sure to win £20 and benefit from their excellent perks: one month free, up to 80% cash back, etc. It’s super easy to enter!" %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
+{% else %}
+    {% set og_title = 'Sign up and save' %}
+    {% set og_description = 'Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance.' %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% endif %}
+
 {% if policy.standardSCode is defined and policy.standardSCode %}
     {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
 {% endif %}
@@ -212,7 +219,7 @@
     {% if feature_enabled('invite-competition') %}
         <div id="win_share" class="win py-lg-5">
             <div class="container d-md-none py-5">
-                <h2 class="h4">Win a &pound;200 Amazon voucher<br><span class="sub">📨  Send more to earn more</span></h2>
+                <h2 class="h4">10 customers will win a &pound;20 Amazon voucher<br><span class="sub">📨  Send more to earn more</span></h2>
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
                 <div class="cardbox cardbox-100 text-center p-4 mb-4">
                     <h3 class="h4">Share your link to enter</h3>
@@ -220,7 +227,7 @@
                     <div class="d-flex">
                         <a href="#"
                            class="btn btn-outline-primary btn-copy w-100"
-                           data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                           data-clipboard-text="Hey, we could win &pound;20 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
                         <a href="#"
                            class="btn btn-outline-primary w-100 ml-3 native-share track-data"
                            data-native-title="{{ og_title }}"
@@ -230,7 +237,7 @@
                            💬 Share</a>
                     </div>
                 </div>
-                <p class="text-left">Know someone that might need mobile insurance? even if they’re not ready now we’ll still enter you both in the draw to win a &pound;200 amazon voucher. As a so-sure customer you can invite as many people as you like (each invite = another entry)</p>
+                <p class="text-left">Know someone that might need mobile insurance? even if they’re not ready now we’ll still enter you both in the draw to win a &pound;20 amazon voucher. As a so-sure customer you can invite as many people as you like (each invite = another entry)</p>
             </div>
             <div class="container d-none d-md-block py-5">
                 <div class="d-flex">
@@ -243,8 +250,8 @@
                         </div>
                     </div>
                     <div class="win-text mr-1">
-                        <h2 class="h3 mb-2">Win a &pound;200 Amazon voucher 📨 <br> <span class="sub">Send more to earn more</span></h2>
-                        <p class="mb-5">Know someone that might need mobile insurance? even if they're not ready now we'll still enter you both in the draw to <strong>win a &pound;200 amazon voucher</strong>. As a so-sure customer you can invite as many people as you like <span class="text-nowrap">(each invite = another entry)</span></p>
+                        <h2 class="h3 mb-2">10 customers will win a &pound;20 Amazon voucher 📨 <br> <span class="sub">Send more to earn more</span></h2>
+                        <p class="mb-5">Know someone that might need mobile insurance? even if they're not ready now we'll still enter you both in the draw to <strong>win a &pound;20 amazon voucher</strong>. As a so-sure customer you can invite as many people as you like <span class="text-nowrap">(each invite = another entry)</span></p>
                     </div>
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="d-none d-xl-inline lozad" width="400px">
                 </div>
