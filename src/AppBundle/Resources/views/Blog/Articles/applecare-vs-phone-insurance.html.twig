@@ -1,0 +1,218 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}AppleCare+ vs iPhone Insurance | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Do you really need AppleCare or AppleCare+ to cover your iPhone? Check out our guide comparing Apple’s service versus phone insurance."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'AppleCare+ vs iPhone Insurance | so-sure' %}
+{% set og_description = "Do you really need AppleCare or AppleCare+ to cover your iPhone? Check out our guide comparing Apple’s service versus phone insurance." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/applecare-vs-phone-insurance-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">AppleCare+ vs iPhone Insurance</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">AppleCare+ vs iPhone Insurance</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">so-sure</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Feb 27, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/applecare-vs-phone-insurance-1.jpg"
+                                     alt="Apple Logo on glass building"
+                                     class="img-fluid lozad mb-5">
+                                <p>AppleCare, Apple's own proprietary service for insuring products, is available for iPhones, but how well does it stack up next to actual <a href="{{ path('phone_insurance_make', {'make': 'apple'}) }}">iPhone insurance</a>? And what is AppleCare+ anyway? In this blog, we’ll map out the key differences between the policies so you can make an informed decision on how best to protect your iPhone.</p>
+                                <h2>AppleCare</h2>
+                                <p>AppleCare is an extended version of Apple’s standard warranty. The basic version covers you for manufacturing defects up to 12 months after your purchase. It also includes 90 days of telephone tech support, covering software such as the iOS platform, cloud-based services, FaceTime and more.</p>
+                                <h3>What is AppleCare+?</h3>
+                                <p>AppleCare+ lasts for two years and offers more comprehensive coverage than regular AppleCare, covering your device against accidental damage, for example. The plan doesn't cover the costs entirely though; you'll need to pay an excess of &pound;25 for a damaged screen and &pound;79 for any other type of damage</p>
+                                <p>Another key difference between the plans is when you can buy them. As standard AppleCare is essentially a warranty extension, you can purchase it any time so long as the original warranty is still active. AppleCare+, on the other hand, must be bought within 60 days of purchasing your iPhone, and you’ll need your receipt to prove it.</p>
+                                <p>One significant omission from Apple's protection plans is that neither of them cover you against theft or loss, so the question is, is it worth it?</p>
+                                <h3>Is AppleCare+ worth it?</h3>
+                                <p>If you’re parting with cash to cover your iPhone, you should do so with the knowledge that you’re going to use it. A recent Which? Reliability Survey revealed that 69% of iPhones remained in full working order after two years, so is it worth shelling out the hefty outlay for cover you won’t need?</p>
+                                <p>If you’re an average iPhone user, the answer is most likely no. But if your pocket is home to a top end handset like the iPhone X or iPhone 11, you might face a trickier decision. To help you make an informed choice, we’ve provided a handy comparison table below.</p>
+                                <h3>AppleCare vs AppleCare+</h3>
+                                <table class="table mt-3 mb-5">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>AppleCare</th>
+                                            <th>AppleCare+</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Is repair or replacement offered?</td>
+                                            <td>Both</td>
+                                            <td>Both</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Is accidental damage covered?</td>
+                                            <td>No</td>
+                                            <td>Yes, up to two claims in 24 months</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Is software covered?</td>
+                                            <td>No</td>
+                                            <td>Yes</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Coverage period</td>
+                                            <td>12 months after purchase</td>
+                                            <td>24 months after purchase</td>
+                                        </tr>
+                                        <tr>
+                                            <td>How to claim</td>
+                                            <td>Apple (in store, online or by phone)</td>
+                                            <td>Apple (in store, online or by phone)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Tech support?</td>
+                                            <td>For 90 days after purchase</td>
+                                            <td>For 24 months after purchase</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <h3>How much does AppleCare+ cost?</h3>
+                                <p>Please note, the prices in the right-hand column do not include the excess fees required should you make a claim. Excess fees are &pound;25 for screen damage and &pound;79 for any other type of damage.</p>
+                                <table class="table mt-3 mb-5">
+                                    <thead>
+                                        <tr>
+                                            <th>Model</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>iPhone X</td>
+                                            <td>&pound;199</td>
+                                        </tr>
+                                        <tr>
+                                            <td>iPhone 8 Plus, 7 Plus, 6s Plus</td>
+                                            <td>&pound;149</td>
+                                        </tr>
+                                        <tr>
+                                            <td>iPhone 8, 7, 6s</td>
+                                            <td>&pound;129</td>
+                                        </tr>
+                                        <tr>
+                                            <td>iPhone SE</td>
+                                            <td>&pound;89</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p>Having covered the key differences and price breakdowns between Apple's insurance plans, let's review a viable alternative: so-sure iPhone insurance.</p>
+                                <h2>so-sure iPhone insurance</h2>
+                                <p>At so-sure, we believe your iPhone insurance policy should include real benefits and rewards. How about 24/7 online claims reporting, a rapid repair and replacement service, and money back when you don’t claim? You can get all this and more with so-sure.</p>
+                                <p>Our comprehensive iPhone insurance keeps your iPhone fully covered for loss, theft and accidental damage as standard, both at home and abroad, giving you peace of mind wherever your next adventure takes you. Second hand and refurbished handsets up to 3 years old are also included in our iPhone insurance policy, as well as coverage for up to &pound;100 worth of iPhone accessories.</p>
+                                <h3>Social insurance</h3>
+                                <p>Our <a href="{{ path('social_insurance') }}">social insurance</a> allows you to connect your policy to friends and family members. And if no one makes a claim for the duration of your policy year, we’ll give you up to 80% of your premium back.</p>
+                                <p>So how does this work exactly?</p>
+                                <p>Well, if you were to buy iPhone insurance with us and invite your best friend to buy a policy for his or her phone too, you can then connect your policies. Once connected, you'll each receive &pound;10 in your <a href="{{ path('social_insurance') }}">Reward Pot</a>, which is essentially our group no claims bonus. If neither of you makes a claim for the duration of your policy, we will reimburse you the value of your Reward Pot at the end of it.</p>
+                                <p>See below for a simple price breakdown and comparison table that pits our plan against Apple’s flagship insurance policy, AppleCare+.</p>
+                                <h3>How much does iPhone insurance cost?</h3>
+                                <table class="table mt-3 mb-5">
+                                    <thead>
+                                        <tr>
+                                            <th>Model</th>
+                                            <th>Price per month</th>
+                                            <th>Total price of 1-year policy</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for iPhone in iphones_prices %}
+                                            <tr>
+                                                <td><a href="{{ path('phone_insurance_make_model', {'make': iPhone.makeCanonical, 'model': iPhone.modelCanonical|replace({' ': '-'})}) }}">{{ iPhone.model }}</a></td>
+                                                <td>&pound;{{ iPhone.getCurrentMonthlyPhonePrice.getMonthlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                                                <td>&pound;{{ iPhone.getCurrentYearlyPhonePrice.getYearlyPremiumPrice|number_format(2, '.', ',') }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <h3>so-sure iPhone insurance vs AppleCare+</h3>
+                                {% include 'AppBundle::Default/_comparisonTableAppleCare.html.twig' %}
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

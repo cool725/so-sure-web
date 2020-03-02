@@ -2,23 +2,22 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Form\Type\ContactUsType;
-use AppBundle\Service\IntercomService;
-use AppBundle\Service\MailerService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-use AppBundle\Document\Lead;
+use AppBundle\Service\IntercomService;
+use AppBundle\Service\MailerService;
+
+use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePrice;
+use AppBundle\Document\PhoneTrait;
 
 /**
  * @Route("/blog")
@@ -505,6 +504,34 @@ class BlogController extends BaseController
         $data = [];
 
         $template = 'AppBundle:Blog:Articles/best-screen-protectors.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/applecare-vs-phone-insurance", name="applecare_vs_phone_insurance", options={"sitemap" = true})
+     * @Template
+     */
+    public function appleCareVsPhoneInsuranceAction()
+    {
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+
+        // To display lowest monthly premium
+        $iPhones = $repo->findBy([
+            'active' => true,
+            'highlight' => true,
+            'make' => 'Apple'
+        ]);
+
+        $data = [
+            'iphones_prices' => $iPhones,
+        ];
+
+        $template = 'AppBundle:Blog:Articles/applecare-vs-phone-insurance.html.twig';
 
         return $this->render($template, $data);
     }
