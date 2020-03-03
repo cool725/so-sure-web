@@ -1,0 +1,32 @@
+✅ Policy Upgrade Successful 📱
+
+Dear {{ policy.user.firstName }},
+
+Congratulations, you have successfully upgraded your policy and your <strong>{{ policy.phone }}</strong> is now insured.
+
+Attached are your policy documents and schedule, or you can log in to your account to view them online:
+
+{{ url('user_policy_list_policy', {'id': policy.id }) }}
+
+In order to reduce your excess with us, you will need to use our app to verify this phone is in great working order:
+
+{% if policy.phone.isITunes %}
+Download our iOS App, login, and complete the validation process.
+{{ url('download_apple', {'medium': 'pic-sure-upgrade-email'}) }}
+{% elseif policy.phone.isGooglePlay %}
+Download our Android App</a>, login, and complete the validation process.
+{{ url('download_google', {'medium': 'pic-sure-upgrade-email'}) }}
+{% else %}
+Just email a picture of your phone's screen in the mirror to support@wearesosure.com and we'll get started on that process.
+{% endif %}
+
+Please note: verification and excess reduction completed on your last phone will not be carried forward to this upgraded policy!
+
+Don't forget to tell your friends about so-sure 🙂
+
+Every time you share your referral code, you'll get an entry into our competition!
+
+Thank you!
+
+Susan @so-sure
+

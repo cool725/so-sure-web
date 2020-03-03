@@ -9,9 +9,16 @@
 {% block title %}Next Steps | so-sure{% endblock %}
 
 {# Set Meta #}
-{% set og_title = 'Sign up and save' %}
-{% set og_description = 'Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance.' %}
-{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% if feature_enabled('invite-competition') %}
+    {% set og_title = 'We can both win £20, it’s super easy, check it out' %}
+    {% set og_description = "Check out so-sure to win £20 and benefit from their excellent perks: one month free, up to 80% cash back, etc. It’s super easy to enter!" %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
+{% else %}
+    {% set og_title = 'Sign up and save' %}
+    {% set og_description = 'Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance.' %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% endif %}
+
 {% if policy.standardSCode %}
     {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
 {% endif %}

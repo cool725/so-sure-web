@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\Policy\Policy;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Classes\Helvetia;
 use AppBundle\Classes\NoOp;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -17,6 +18,33 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class HelvetiaPhonePolicy extends PhonePolicy
 {
+    /**
+     * The previous iterations of this policy.
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePolicyIteration")
+     */
+    protected $previousIterations = [];
+
+    /**
+     * Gives you the previous iterations that this policy has has.
+     * @return array containing the previous iterations.
+     */
+    public function getPreviousIterations()
+    {
+        if (is_array($this->previousIterations)) {
+            return $this->previousIterations;
+        }
+        return $this->previousIterations->toArray();
+    }
+
+    /**
+     * Add a previous iteration to the list of previous iterations.
+     * @param PhonePolicyIteration $previousIteration is the iteration of the policy to add.
+     */
+    public function addPreviousIteration($previousIteration)
+    {
+        $this->previousIterations[] = $previousIteration;
+    }
+
     /**
      * @inheritDoc
      */
@@ -42,6 +70,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         $payment->setCoverholderCommission($payment->getGwp() * Helvetia::COMMISSION_PROPORTION);
         $n = $this->getPremium()->getNumberOfMonthlyPayments($payment->getAmount());
         $payment->setBrokerCommission(Helvetia::MONTHLY_BROKER_COMMISSION * $n);
+        $payment->setTotalCommission($payment->getCoverholderCommission() + $payment->getBrokerCommission());
     }
 
     /**
@@ -123,12 +152,286 @@ class HelvetiaPhonePolicy extends PhonePolicy
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTotalExpectedPaidToDate(\DateTime $date = null, $firstDayIsUnpaid = false)
+    {
+        NoOp::ignore($firstDayIsUnpaid);
+        if (!$this->isPolicy() || !$this->getStart()) {
+            return null;
+        }
+        $date = DateTrait::adjustDayForBilling($date ?: new \DateTime(), true);
+        if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+            return $this->getYearlyPremiumPrice();
+        } else {
+            $futurePayments = count($this->getInvoiceSchedule($date));
+            $upgradePrice = $this->getUpgradedStandardMonthlyPrice();
+            return $this->getYearlyPremiumPrice() - $futurePayments * $upgradePrice;
+        }
+
+    }
+
+    /**
+     * Says how much this policy would pay per month for the rest of the policy if upgraded onto the given premium.
+     * @param PhonePremium $premium is the premium.
+     * @param \DateTime    $date    is the day of upgrade.
+     * @return float the amount they will pay per month.
+     */
+    public function getPremiumUpgradeCostMonthly($premium, \DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        $remainingPayments = count($this->getInvoiceSchedule($date)) - $this->countPendingScheduledPayments();
+        if ($remainingPayments == 0) {
+            return 0;
+        }
+        $outstanding = 0 - $this->getPremiumPaid();
+        foreach ($this->getPreviousIterations() as $iteration) {
+            $outstanding += $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }
+        $current = $this->getCurrentIteration();
+        $future = clone $current;
+        $current->setEnd(DateTrait::startOfDay($date));
+        $future->setStart(DateTrait::startOfDay($date));
+        $future->setEnd($this->getEnd());
+        $future->setPremium($premium);
+        $outstanding += $current->getProRataPremium($this->getDaysInPolicyYear());
+        $outstanding += $future->getProRataPremium($this->getDaysInPolicyYear());
+        return CurrencyTrait::toTwoDp($outstanding / $remainingPayments);
+    }
+
+    /**
+     * Gives you the different price that the user must pay in the final month of their policy if they upgrade to the
+     * given premium at the given date.
+     * @param PhonePremium   $premium is the premium they are upgrading to.
+     * @param \DateTime|null $date    is the date at which they are upgrading or null for right now.
+     * @return float|null the different price or null if there is no difference in price.
+     */
+    public function getUpgradeFinalMonthDifference($premium, \DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        $remainingPayments = count($this->getInvoiceSchedule($date)) - $this->countPendingScheduledPayments();
+        if ($remainingPayments == 0) {
+            return 0;
+        }
+        $outstanding = 0 - $this->getPremiumPaid();
+        foreach ($this->getPreviousIterations() as $iteration) {
+            $outstanding += $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }
+        $current = $this->getCurrentIteration();
+        $future = clone $current;
+        $current->setEnd(DateTrait::startOfDay($date));
+        $future->setStart(DateTrait::startOfDay($date));
+        $future->setEnd($this->getEnd());
+        $future->setPremium($premium);
+        $outstanding += $current->getProRataPremium($this->getDaysInPolicyYear());
+        $outstanding += $future->getProRataPremium($this->getDaysInPolicyYear());
+        $normalPrice = $this->getPremiumUpgradeCostMonthly($premium, $date);
+        $delta = $outstanding - $normalPrice * $remainingPayments;
+        if ($delta == 0) {
+            return null;
+        }
+        return CurrencyTrait::toTwoDp($normalPrice + $delta);
+    }
+
+    /**
+     * Tells you how much this policy would pay in a lump if upgraded onto the given premium.
+     * @param PhonePremium $premium is the premium.
+     * @param \DateTime    $date    is the day of upgrade.
+     * @return float the amount they will pay per month.
+     */
+    public function getPremiumUpgradeCostYearly($premium, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $outstanding = 0;
+        foreach ($this->getPreviousIterations() as $iteration) {
+            $outstanding += $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }
+        $current = $this->getCurrentIteration();
+        $future = clone $current;
+        $current->setEnd(DateTrait::startOfDay($date));
+        $future->setStart(DateTrait::startOfDay($date));
+        $future->setEnd($this->getEnd());
+        $future->setPremium($premium);
+        $outstanding += $current->getProRataPremium($this->getDaysInPolicyYear());
+        $outstanding += $future->getProRataPremium($this->getDaysInPolicyYear());
+        return CurrencyTrait::toTwoDp($outstanding - $this->getPremiumPaid());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUpgradedStandardMonthlyPrice()
+    {
+        if (!$this->getPreviousIterations()) {
+            return $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+        }
+        $iterations = $this->getAllIterations();
+        if (count($iterations) == 1) {
+            return $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+        }
+        $remainingPayments = $this->countFutureInvoiceSchedule($this->getCurrentIterationStart());
+        if ($remainingPayments == 0) {
+            return 0;
+        }
+        $outstanding = 0;
+        foreach ($iterations as $iteration) {
+            $outstanding += $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }
+        return CurrencyTrait::toTwoDp(
+            ($outstanding - $this->getPremiumPaidPrior($this->getCurrentIterationStart())) / $remainingPayments
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUpgradedFinalMonthlyPrice()
+    {
+        if (!$this->getPreviousIterations()) {
+            return $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice();
+        }
+        $iterations = $this->getAllIterations();
+        if (count($iterations) == 1) {
+            return $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice();
+        }
+        $remainingPayments = $this->countFutureInvoiceSchedule($this->getCurrentIterationStart());
+        if ($remainingPayments == 0) {
+            return 0;
+        }
+        $price = $this->getUpgradedStandardMonthlyPrice();
+        $overall = $this->getUpgradedYearlyPrice();
+        $delta = $overall - $price * $remainingPayments;
+        return CurrencyTrait::toTwoDp($price + $delta);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUpgradedYearlyPrice()
+    {
+        if (!$this->getPreviousIterations()) {
+            return $this->getPremium()->getAdjustedYearlyPremiumPrice();
+        }
+        $outstanding = 0;
+        foreach ($this->getAllIterations() as $iteration) {
+            $outstanding += $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }
+        return CurrencyTrait::toTwoDp($outstanding - $this->getPremiumPaidPrior($this->getCurrentIterationStart()));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getYearlyPremiumPrice()
+    {
+        if (!$this->getPreviousIterations()) {
+            return $this->getPremium()->getYearlyPremiumPrice();
+        }
+        return array_reduce($this->getAllIterations(), function ($carry, $iteration) {
+            return $carry + $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }, 0);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getYearlyIpt()
+    {
+        $iterations = $this->getAllIterations();
+        if (count($iterations) == 1) {
+            return $this->getPremium()->getYearlyIpt();
+        }
+        return array_reduce($iterations, function ($carry, $iteration) {
+            return $carry + $iteration->getProRataIpt($this->getDaysInPolicyYear());
+        }, 0);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isUpgraded()
+    {
+        foreach ($this->getPreviousIterations() as $previousIteration) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentIteration()
+    {
+        $current = parent::getCurrentIteration();
+        $current->setStart(array_reduce($this->getPreviousIterations(), function ($carry, $iteration) {
+            $date = $iteration->getEnd();
+            if ($date > $carry) {
+                return $date;
+            }
+            return $carry;
+        }, DateTrait::startOfDay($this->getStart())));
+        return $current;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentIterationStart()
+    {
+        return array_reduce($this->getPreviousIterations(), function ($carry, $iteration) {
+            $date = $iteration->getRealEnd();
+            return ($date > $carry) ? $date : $carry;
+        }, $this->getStart());
+    }
+
+    /**
+     * Gives you all of the iterations of the policy including the current status of the policy continuing to the
+     * static end of the policy as an iteration.
+     * @return array containing the iterations in ascending order.
+     */
+    public function getAllIterations()
+    {
+        $iterations = $this->getPreviousIterations();
+        $iterations[] = $this->getCurrentIteration();
+        return $iterations;
+    }
+
+    /**
      * Gives you the amount of money helvetia should have gotten out of this policy currently.
      * @return float the amount of cash.
      */
     public function getHelvetiaCash()
     {
         return $this->getPremiumPaid() - $this->getCoverholderCommissionPaid() - $this->getBrokerCommissionPaid();
+
+    }
+
+    /**
+     * Gives you all of the iterations of the policy including the current status of the policy continuing to the
+     * non-static end of the policy as an iteration.
+     * @return array containing the iterations in ascending order.
+     */
+    public function getAllIterationsShort()
+    {
+        $iterations = $this->getPreviousIterations();
+        $current = $this->getCurrentIteration();
+        $current->setEnd($this->getEnd());
+        $iterations[] = $current;
+        return $iterations;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getProratedPremium(\DateTime $date = null)
+    {
+        NoOp::ignore($date);
+        return array_reduce($this->getAllIterationsShort(), function ($carry, $iteration) {
+            return $carry + $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }, 0);
     }
 
     /**
@@ -140,7 +443,9 @@ class HelvetiaPhonePolicy extends PhonePolicy
         if ($this->isRefundAllowed() && $this->isCooloffCancelled()) {
             return 0;
         }
-        return $this->getPremium()->getYearlyPremiumPrice() * $this->proRataMultiplier();
+        return array_reduce($this->getAllIterationsShort(), function ($carry, $iteration) {
+            return $carry + $iteration->getProRataPremium($this->getDaysInPolicyYear());
+        }, 0);
     }
 
     /**
@@ -156,7 +461,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
     }
 
     /**
-     * Gives you the proportionat4e amount of broker fee owed given the policy start and end.
+     * Gives you the proportionate amount of broker fee owed given the policy start and end.
      * @return float the amount of broker fee due on this policy.
      */
     public function getProRataBrokerFee()

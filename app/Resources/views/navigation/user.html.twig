@@ -15,7 +15,7 @@
     </li>
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
         <a href="{{ path('user_claim_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_claim' or app.request.get('_route') == 'user_claim_policy' or app.request.get('_route') == 'claimed_submitted_policy' or app.request.get('_route') == 'claimed_damage_policy' or app.request.get('_route') == 'claimed_theftloss_policy' %}active{% endif %}">
-            <i class="fal fa-mobile-android fa-fw mr-2"></i> Claims</a>
+            <i class="fal fa-exclamation-square fa-fw mr-2"></i> Claims</a>
     </li>
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
         <a href="{{ path('user_payment_details_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_payment_details' or app.request.get('_route') == 'user_payment_details_policy' %}nav-active{% endif %}">
@@ -23,7 +23,7 @@
     </li>
     <li class="nav-item d-none {{ menu_breakpoint }}">
         <a href="{{ path('user_policy_list_policy', {'policyId': policy.id}) }}" class="nav-link {% if app.request.get('_route') == 'user_policy_list' or app.request.get('_route') == 'user_policy_list_policy' %}nav-active{% endif %}">
-            <i class="fal fa-file-certificate fa-fw mr-2"></i> Policies</a>
+            <i class="fal fa-mobile-android fa-fw mr-2"></i> My Phones</a>
     </li>
 {% else %}
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
@@ -36,7 +36,7 @@
     </li>
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
         <a href="{{ path('user_claim') }}" class="nav-link {% if app.request.get('_route') == 'user_claim' or app.request.get('_route') == 'user_claim_policy' or app.request.get('_route') == 'claimed_submitted_policy' or app.request.get('_route') == 'claimed_damage_policy' or app.request.get('_route') == 'claimed_theftloss_policy' %}active{% endif %}">
-            <i class="fal fa-mobile-android fa-fw mr-2"></i> Claims</a>
+            <i class="fal fa-exclamation-square fa-fw mr-2"></i> Claims</a>
     </li>
     <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-5">
         <a href="{{ path('user_payment_details') }}" class="nav-link {% if app.request.get('_route') == 'user_payment_details' or app.request.get('_route') == 'user_payment_details_policy' %}active{% endif %}">
@@ -44,7 +44,7 @@
     </li>
     <li class="nav-item d-none {{ menu_breakpoint }}">
         <a href="{{ path('user_policy_list') }}" class="nav-link {% if app.request.get('_route') == 'user_policy_list' or app.request.get('_route') == 'user_policy_list_policy' %}active{% endif %}">
-            <i class="fal fa-file-certificate fa-fw mr-2"></i> Policies</a>
+            <i class="fal fa-mobile-android fa-fw mr-2"></i> My Phones</a>
     </li>
 {% endif %}
 {# Mobile Login - this shows inside the navigation only #}

@@ -84,6 +84,15 @@ class MixpanelListener
         ]);
     }
 
+    public function onPolicyUpgradedEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_UPGRADE_POLICY, [
+            'Policy Id' => $policy->getId(),
+            'New Device' => $policy->getPhone()->getModel(),
+        ]);
+    }
+
     public function onPolicyDeclineRenewedEvent(PolicyEvent $event)
     {
         $policy = $event->getPolicy();

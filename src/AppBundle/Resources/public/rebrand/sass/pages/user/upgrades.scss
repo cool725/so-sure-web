@@ -1,0 +1,53 @@
+// upgrade.scss
+
+@import "../../vendor/bs4/functions";
+@import "../../vendor/bs4/variables";
+@import "../../vendor/bs4/mixins/breakpoints";
+@import "../../abstracts/mixins";
+@import "../../abstracts/palette";
+@import "../../abstracts/variables";
+
+body {
+    background-color: $dodger-blue;
+    @include blue-gradient-45;
+}
+
+main {
+    margin: 6rem 0;
+    display: flex;
+    align-items: stretch;
+
+    > div {
+        display: flex;
+        align-items: stretch;
+
+        > div {
+            align-items: stretch;
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        // margin: rem 0;
+    }
+}
+
+.phone-search-dropdown-upgrade {
+
+    @include media-breakpoint-up(lg) {
+        width: 80%;
+    }
+}
+
+.upgrade-container {
+
+    h1 {
+        line-height: 1.75;
+    }
+}
+
+.excess-table {
+
+    @include media-breakpoint-up(lg) {
+        width: 70%;
+    }
+}

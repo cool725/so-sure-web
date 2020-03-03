@@ -933,6 +933,34 @@ abstract class PhonePolicy extends Policy
     }
 
     /**
+     * Gives you the current state of the policy in the form of an phone policy iteration object. Because upgrades only
+     * happen to Helvetia phone policies, this should be the whole policy for any other kind of policy but it is still
+     * convenient to be able to treat them in this way.
+     * @return PhonePolicyIteration containing the current state of the policy.
+     */
+    public function getCurrentIteration()
+    {
+        $current = new PhonePolicyIteration();
+        $current->setStart($this->getStart());
+        $current->setEnd($this->getStaticEnd());
+        $current->setPhone($this->getPhone());
+        $current->setImei($this->getImei());
+        $current->setSerialNumber($this->getSerialNumber());
+        $current->setPremium($this->getPremium());
+        $current->setPhoneData($this->getPhoneData());
+        return $current;
+    }
+
+    /**
+     * Gives you the start date of the current iteration.
+     * @return \DateTime the start of the current iteration of the policy.
+     */
+    public function getCurrentIterationStart()
+    {
+        return $this->getStart();
+    }
+
+    /**
      * Can renew is for this specific policy
      * This is different than if a user is allowed to purchase an additional policy
      * although lines get blurred if a policy expires and then user wants to re-purchase

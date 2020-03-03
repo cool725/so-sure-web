@@ -93,6 +93,11 @@ Encore
     .addEntry('user-cancel', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-cancel.js')
     .addEntry('user-competition', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-competition.js')
 
+    // Upgrades
+    .addEntry('upgrades', './src/AppBundle/Resources/public/rebrand/js/pages/user/upgrades.js')
+    .addEntry('upgrades-imei', './src/AppBundle/Resources/public/rebrand/js/pages/user/upgrades-imei.js')
+    .addEntry('upgrades-pledge', './src/AppBundle/Resources/public/rebrand/js/pages/user/upgrades-pledge.js')
+
     // Claim
      .addEntry('make-a-claim', './src/AppBundle/Resources/public/rebrand/js/pages/make-a-claim.js')
 

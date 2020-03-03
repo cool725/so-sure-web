@@ -212,28 +212,6 @@ class BacsListenerTest extends WebTestCase
         $this->assertEquals(1, self::$redis->llen(BacsService::KEY_BACS_QUEUE));
     }
 
-    public function testPolicyUpdatedPremiumPolicy()
-    {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyUpdatedPremiumPolicy', $this),
-            'bar',
-            null,
-            static::$dm
-        );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm)
-        );
-        $bacs = new BacsPaymentMethod();
-        $policy->setPaymentMethod($bacs);
-
-        self::$bacsListener->onPolicyUpdatedPremium(new PolicyEvent($policy));
-        // TODO: check logger
-        $this->assertTrue(true);
-    }
-
     public function testPolicyUpdatedBilling()
     {
         $user = static::createUser(

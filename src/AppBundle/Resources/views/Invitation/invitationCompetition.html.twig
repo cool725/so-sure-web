@@ -5,12 +5,12 @@
 {% set robots_noindex = true %}
 {% set small_footer = true %}
 
-{% block title %}Win a &pound;200 amazon voucher! | so-sure{% endblock %}
+{% block title %}Win a &pound;20 amazon voucher! | so-sure{% endblock %}
 
 {# Set Meta #}
-{% set og_title = 'Win and save with so-sure!' %}
-{% set og_description = "Hey, we could win £200 with mobile phone insurer so-sure. It’s super easy to enter!" %}
-{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% set og_title = 'We can both win £20, it’s super easy, check it out' %}
+{% set og_description = "Check out so-sure to win £20 and benefit from their excellent perks: one month free, up to 80% cash back, etc. It’s super easy to enter!" %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/invite-competition.css') }}">
@@ -19,24 +19,37 @@
 {% block body %}
 
     <section class="hero">
-        <div class="hero__illustration-desktop d-none d-xl-block">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_large.png" alt="Hand holding amazon voucher" class="lozad">
-        </div>
         <div class="container-large">
             <div class="row">
-                <div class="col-xl-6 offset-xl-6 text-center text-xl-left">
-                    <h1 class="text-white fit mb-4">Win a &pound;200 amazon voucher</h1>
+                <div class="col-xl-6 d-none d-xl-block">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_large_540x540.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
+                </div>
+                <div class="col-xl-6">
                     {% if invitation.inviter is defined %}
-                        <p class="text-white lead"><strong>{{ invitation.inviter.firstname }}</strong> handpicked you for a chance to win a &pound;200 amazon voucher from <span class="text-nowrap">so-sure</span>. Don’t need mobile insurance right now? No problem, enter the draw anyway for a limited time only.</p>
+                        <h1 class="h2 text-white fit mb-4">Get so-sure perks with {{ invitation.inviter.firstname }}!</h1>
+                        <ul class="list-unstyled icn-fa-list mb-4">
+                            <li class="mb-3 text-white h6"> <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>Free competition entry - no need to purchase to enter!</li>
+                            <li class="mb-3 text-white h6"> <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>Cashback on your premium when you connect with {{ invitation.inviter.firstname }}</li>
+                            <li class="text-white h6"> <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>A full free month cover if you pay annually</li>
+                        </ul>
+                        <p class="text-white">And that’s on top of the game changing low price, easy as pie cover and lighting fast claims we offer!</p>
+                        <p class="text-white">Yes, we’re cheap, fast and easy. Don’t tell your parents 😉</p>
                     {% else %}
-                        <p class="text-white lead"><strong>so-sure</strong> handpicked you for a chance to win a &pound;200 amazon voucher. Don’t need mobile insurance right now? No problem, enter the draw anyway for a limited time only.</p>
+                        <h1 class="h2 text-white fit mb-4">Get so-sure perks!</h1>
+                        <ul class="list-unstyled icn-fa-list mb-4">
+                            <li class="mb-3 text-white h6"> <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>Free competition entry - no need to purchase to enter!</li>
+                            <li class="mb-3 text-white h6"> <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>Cashback on your premium when you connect with others</li>
+                            <li class="text-white h6"> <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>A full free month cover if you pay annually</li>
+                        </ul>
+                        <p class="text-white">And that’s on top of the game changing low price, easy as pie cover and lighting fast claims we offer!</p>
+                        <p class="text-white">Yes, we’re cheap, fast and easy. Don’t tell your parents 😉</p>
                     {% endif %}
                     <p class="mb-5"><a href="#"
                           class="text-white"
                           data-toggle="modal"
                           data-target="#page_terms"
-                          role="button"><small><u>Terms &amp; Conditions</u></small></a></p>
-                    <div class="d-md-flex justify-content-md-center justify-content-xl-start flex-nowrap">
+                          role="button"><small><u>Competition Terms &amp; Conditions</u></small></a></p>
+                    <div class="d-md-flex justify-content-md-center justify-content-xl-start flex-nowrap mb-4">
                         <a href="#"
                            class="btn btn-success btn-block-xs track-data get-a-quote disabled order-md-2"
                            data-event="email-invite-hero-quote-btn">
@@ -46,6 +59,7 @@
                             Enter Draw
                         </a>
                     </div>
+                    <p class="text-white">Is your phone already covered with so-sure? <a href="{{ path('fos_user_security_login') }}" class="text-white"><u>Login</u></a> to connect with {% if invitation.inviter is defined %}{{ invitation.inviter.firstname }}{% else %}others{% endif %} and claim your connection bonus.</p>
                 </div>
             </div>
             <div class="hero__illustration-mobile d-block d-xl-none pt-5">
@@ -58,15 +72,15 @@
         <div class="container-large py-5">
             <h2 class="h3 mb-3 text-primary">How it works</h2>
             {% if invitation.inviter is defined %}
-                <p class="mb-5 lead">As a friend of {{ invitation.inviter.firstname }} you have the chance to win a &pound;200 Amazon Voucher. <br class="d-none d-lg-inline"><strong>And</strong> we’re offering you a month free on your mobile insurance when you pay yearly.</p>
+                <p class="mb-5 lead">As a friend of {{ invitation.inviter.firstname }} you have the chance to win a &pound;20 Amazon Voucher. <br class="d-none d-lg-inline"><strong>And</strong> we're offering you a month free on your mobile insurance when you pay yearly.</p>
             {% else %}
-                <p class="mb-5 lead">With so-sure you have the chance to win a &pound;200 Amazon Voucher. <br class="d-none d-lg-inline"><strong>And</strong> we’re offering you a month free on your mobile insurance when you pay yearly.</p>
+                <p class="mb-5 lead">With so-sure you have the chance to win a &pound;20 Amazon Voucher. <br class="d-none d-lg-inline"><strong>And</strong> we're offering you a month free on your mobile insurance when you pay yearly.</p>
             {% endif %}
             <div class="timeline d-lg-none mb-3">
                 <div class="timeline-block timeline-block-complete">
                     <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
                     <div class="timeline-content">
-                        <h3 class="h5 text-primary">Sign up with so-sure or take our quiz for a chance to win &pound;200</h3>
+                        <h3 class="h5 text-primary">Sign up with so-sure or take our quiz for a chance to win &pound;20</h3>
                     </div>
                 </div>
                 <div class="timeline-block timeline-block-complete">
@@ -86,7 +100,7 @@
                 <div class="row">
                     <div class="col-4 step">
                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_amazon-voucher.png" alt="Hand holding amazon voucher" width="180px" class="lozad mb-3">
-                        <h3 class="h5 text-primary mb-2">Sign up with so-sure or take our quiz for a chance to win &pound;200</h3>
+                        <h3 class="h5 text-primary mb-2">Sign up with so-sure or take our quiz for a chance to win &pound;20</h3>
                     </div>
                     <div class="col-4 step">
                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="Happy Mobile Phone" width="180px" class="lozad mb-3">
@@ -160,7 +174,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        Win a &pound;200 amazon voucher
+                        Win a &pound;20 amazon voucher
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <i class="fal fa-times text-white"></i>
@@ -168,12 +182,12 @@
                 </div>
                 <div class="modal-body">
                     <h5>Terms and conditions</h5>
-                    <p>Anyone with an active policy who shares their referral code and who hasn't made a claim in the first 15 days of taking out the policy will be automatically entered into the draw to win a &pound;200 Amazon voucher. Additional entries can be gained with each additional share of the code.</p>
+                    <p>Anyone with an active policy who shares their referral code and who hasn't made a claim in the first 15 days of taking out the policy will be automatically entered into the draw to win a &pound;20 Amazon voucher. Additional entries can be gained with each additional share of the code.</p>
                     <p>Participants without a so-sure policy are allowed to enter the draw by sharing their personal sharing link. The share page is linked to the email address provided to so-sure by each participant. Additional entries can be gained with each additional share of the code.</p>
                     <p>The number of entries each participant gets into the draw is equal to the number of unique views their share page receives.</p>
                     <p>The winner will be picked at random from the entries and will be contacted personally. The draw will take place within 14 days of the competition closing and the winner's name will be made available on request.</p>
                     <p>There is no cash or other alternative to the publicised prize.</p>
-                    <p>The promotion is valid from 31 January 2020 until 29 February 2020. After this date, no further entries will be permitted. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time. The promotion cannot be used in conjunction with any other promotional offer.</p>
+                    <p>The promotion is valid from 1st March 2020 until 31 March 2020. After this date, no further entries will be permitted. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time. The promotion cannot be used in conjunction with any other promotional offer.</p>
                     <p>so-sure reserves the right to disqualify any users suspected of manipulating the outcome of the draw. so-sure's decision in all matters to do with the competition are final and no correspondence will be entered into.</p>
                     <p>This promotion is open to UK residents over the age of 18 only. so-sure employees and their close friends or relatives may not enter.</p>
                     <p>By sharing your referral code, you agree to these terms and conditions.</p>

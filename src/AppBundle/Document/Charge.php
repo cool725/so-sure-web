@@ -27,6 +27,7 @@ class Charge
     const TYPE_SMS_VERIFICATION = 'sms-verification';
     const TYPE_SMS_DOWNLOAD = 'sms-download';
     const TYPE_SMS_PAYMENT = 'sms-payment';
+    const TYPE_SMS_GENERAL = 'sms-general';
 
     public static $prices = [
         self::TYPE_ADDRESS => 0.037, // ex vat
@@ -39,6 +40,7 @@ class Charge
         self::TYPE_SMS_VERIFICATION => 0.03, // ex vat
         self::TYPE_SMS_DOWNLOAD => 0.03, // ex vat
         self::TYPE_SMS_PAYMENT => 0.03, // ex vat
+        self::TYPE_SMS_GENERAL => 0.03, // ex vat
     ];
 
     /**
@@ -55,7 +57,7 @@ class Charge
 
     /**
      * @Assert\Choice({"address", "gsma", "makemodel", "claimscheck", "claimsdamage", "bank-account", "affiliate",
-     *    "sms-invitation", "sms-verification", "sms-download", "sms-payment"}, strict=true)
+     *    "sms-invitation", "sms-verification", "sms-download", "sms-payment", "sms-general"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

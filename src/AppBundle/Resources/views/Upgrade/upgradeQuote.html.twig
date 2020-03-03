@@ -1,0 +1,82 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set robots_noindex = true %}
+{% set user_mode = true %}
+{% set small_footer = true %}
+
+{% block title %}Upgrade Phone Quote | so-sure{% endblock %}
+
+{# Set Meta #}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/upgrades.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="upgrade-container container-large">
+        <div class="cardbox cardbox-100">
+            <div class="cardbox__body d-flex align-items-center justify-content-center flex-column text-center">
+                {% if policy.phone.iTunes %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_apple.png" width="140px" alt="Apple iPhone" class="lozad">
+                {% elseif policy.phone.googlePlay %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_android.png" width="140px" alt="Android Phone" class="lozad">
+                {% else %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_half-phone.png" width="140px" alt="Phone" class="lozad">
+                {% endif %}
+                <h1 class="h4 mb-4">
+                    <span class="sub">Let's upgrade your policy to your new </span>
+                    <span class="text-primary">{{ new_phone.make }} {{ new_phone.model }} ({{ new_phone.memory }}GB)</span><br>
+                    {% if stream == 'yearly' and upgraded_premium > 0 %}
+                        <span class="sub">for only</span> &pound;{{ upgraded_premium|number_format(2, '.', ',') }} <span class="sub">extra a year</span>
+                    {% elseif upgraded_premium < 0 %}
+                        <span class="sub">you will get a refund of</span> &pound;{{ upgraded_premium|abs|number_format(2, '.', ',') }}
+                    {% elseif upgraded_premium == 0 %}
+                        <span class="sub">at no additional cost</span>
+                    {% elseif stream == 'monthly' %}
+                        <span class="sub">for only</span>
+                        &pound;{{ upgraded_premium|number_format(2, '.', ',') }} a month
+                    {% endif %}
+                </h1>
+                <div class="excess-table mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th align="left" class="h6 text-left" width="25%">Your Excess:</th>
+                                <th align="center" width="25%">Damage</th>
+                                <th align="center" width="25%">Loss</th>
+                                <th align="center" width="25%">Theft</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td align="left">Validated</td>
+                                <td>&pound;{{ new_phone_premium.picsureexcess.damage }}</td>
+                                <td>&pound;{{ new_phone_premium.picsureexcess.loss }}</td>
+                                <td>&pound;{{ new_phone_premium.picsureexcess.theft }}</td>
+                            </tr>
+                            <tr>
+                                <td align="left">Not validated</td>
+                                <td>&pound;{{ new_phone_premium.excess.damage }}</td>
+                                <td>&pound;{{ new_phone_premium.excess.loss }}</td>
+                                <td>&pound;{{ new_phone_premium.excess.theft }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group">
+                    <a href="{{ path('user_upgrade_imei') }}" class="btn btn-success btn-block-xs mb-4">Continue</a><br>
+                    <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="btn-simple-link">Decline</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/upgrades.js') }}"></script>
+{% endblock %}

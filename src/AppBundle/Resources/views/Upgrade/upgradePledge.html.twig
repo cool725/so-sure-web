@@ -1,0 +1,84 @@
+{% extends 'base_rebrand.html.twig' %}
+{% form_theme upgrade_pledge_form with ['AppBundle:Form:fields.html.twig', 'AppBundle:Form:submit.html.twig'] %}
+
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set robots_noindex = true %}
+{% set user_mode = true %}
+{% set small_footer = true %}
+
+{% block title %}Upgrade Phone Pledge | so-sure{% endblock %}
+
+{# Set Meta #}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/upgrades.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="upgrade-container container-large">
+        <div class="cardbox cardbox-100">
+            <div class="cardbox__body d-flex align-items-center justify-content-center flex-column text-center">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_contract.png" width="140px" alt="Contract" class="lozad">
+                <h1 class="h4 mb-4"><span class="sub">Complete your policy upgrade to cover your</span> <span class="text-primary">{{ new_phone.make }} {{ new_phone.model }} ({{ new_phone.memory }}GB)</span><br><span class="sub">please confirm the information below</span></h1>
+                {% set excessText = 'I understand the standard excess is only reduced when validated with the so-sure app' %}
+                {% if validation_required %}
+                    {% set excessText = 'I understand my policy will NOT commence until I have verified the condition of phone with your app' %}
+                {% endif %}
+                {{ form_start(upgrade_pledge_form, {'attr': {
+                    'data-toggle': 'validator',
+                    'class': 'validate-form-pledge',
+                    'data-client-validation': form_client_validation,
+                    'autocomplete': 'off'
+                }}) }}
+                    <div class="pledge-items">
+                        <div class="form-group">
+                            {{ form_widget(upgrade_pledge_form.agreedDamage, {
+                                'label': 'My phone is in working condition & the screen is not cracked',
+                                'attr': {'class':'custom-control-input'}}
+                            ) }}
+                            <div class="with-errors">{{ form_errors(upgrade_pledge_form.agreedDamage) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(upgrade_pledge_form.agreedAgeLocation, {
+                                'label': 'I am a resident of the United Kingdom and over the age of 18',
+                                'attr': {'class':'custom-control-input'}}
+                            ) }}
+                            <div class="with-errors">{{ form_errors(upgrade_pledge_form.agreedAgeLocation) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(upgrade_pledge_form.agreedExcess, {
+                                'label': excessText,
+                                'attr': {'class':'custom-control-input'}}
+                            ) }}
+                            <div class="with-errors">{{ form_errors(upgrade_pledge_form.agreedAgeLocation) }}</div>
+                        </div>
+                        <div class="form-group">
+                            {{ form_widget(upgrade_pledge_form.agreedTerms, {
+                                'label': 'I have read & understood the so-sure policy document',
+                                'attr': {'class':'custom-control-input'}}
+                            ) }}
+                            <div class="with-errors">{{ form_errors(upgrade_pledge_form.agreedTerms) }}</div>
+                        </div>
+                    </div>
+                    <div class="form-group text-center mt-5">
+                        {{ form_widget(upgrade_pledge_form.next, {
+                            'label': 'Continue',
+                            'attr': {
+                                'class': 'btn btn-success btn-block-xs mb-4'
+                        }}) }}<br>
+                        <a href="{{ path('user_policy') }}" class="btn-simple-link">Decline</a>
+                    </div>
+                {{ form_end(upgrade_pledge_form) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/upgrades.js') }}"></script>
+    <script src="{{ asset('css-js/upgrades-pledge.js') }}"></script>
+{% endblock %}

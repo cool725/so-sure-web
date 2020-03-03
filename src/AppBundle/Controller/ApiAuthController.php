@@ -38,6 +38,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Sns;
@@ -2695,5 +2696,194 @@ class ApiAuthController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
+    }
+
+    /**
+     * @Route("/policy/{id}/upgrade", name="upgrade_policy_get_quote")
+     * @Method({"GET"})
+     */
+    public function upgradePolicyGetAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $policyRepo = $dm->getRepository(Policy::class);
+            /** @var HelvetiaPhonePolicy $policy */
+            $policy = $policyRepo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+            if (!$this->validateQueryFields($request, ['make', 'device', 'memory'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $make = $this->getRequestString($request, 'make');
+            $device = $this->getRequestString($request, 'device');
+            $memory = (float) $this->getRequestString($request, 'memory');
+            $rooted = $this->getRequestBool($request, 'rooted');
+
+            if ($rooted) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
+            }
+
+            $newPhone = $this->getPhone(
+                $make,
+                $device,
+                $memory,
+                $rooted
+            );
+
+            if (!$newPhone) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_PHONE_UNKNOWN, 'Unknown phone', 422);
+            }
+
+            if (!$newPhone->getActive()) {
+                if ($newPhone->shouldBeRetired()) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_EXPIRED, 'Phone(s) are retired', 422);
+                } elseif ($newPhone->getCurrentMonthlyPhonePrice() || $newPhone->getCurrentYearlyPhonePrice()) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_COMING_SOON, 'Coming soon', 422);
+                }
+            }
+
+            $oldPhone = $policy->getPhone();
+
+            $premiumInstallments = $policy->getPremiumInstallments();
+
+            $now = new \DateTime();
+            $priceService = $this->get("app.price");
+
+            $stream = PhonePrice::installmentsStream($policy->getPremiumInstallments());
+            $futurePayments = $policy->countFutureInvoiceSchedule();
+            if ($futurePayments == 0) {
+                $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+                $upgradePremium = $policy->getPremiumUpgradeCostYearly($newPhonePremium, $now);
+            } else {
+                $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+                $upgradePremium = $policy->getPremiumUpgradeCostMonthly($newPhonePremium, $now);
+            }
+
+            $oldPhonePremium = $priceService->getPhonePolicyPremium($policy, $stream, null, $now);
+
+            $quote = [];
+            $quote['stream'] = $stream;
+            $quote['old_premium'] = $oldPhonePremium->getAdjustedStandardMonthlyPremiumPrice();
+            $quote['new_premium'] = $newPhonePremium->getAdjustedStandardMonthlyPremiumPrice();
+            $quote['new_excess'] = [
+              'standard' => $newPhonePremium->getExcess()->toApiArray(),
+              'picsure' => $newPhonePremium->getPicSureExcess()->toApiArray()
+              ];
+            $quote['upgrade_premium'] = $upgradePremium;
+            $quote['phone_id'] = $newPhone->getId();
+
+            return new JsonResponse($quote);
+        } catch (AccessDeniedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('An error occured during the upgrade quoting process:', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/upgrade", name="upgrade_policy_process")
+     * @Method({"POST"})
+     */
+    public function upgradePolicyPostAction(Request $request, $id)
+    {
+        try {
+            $dm = $this->getManager();
+            $policyRepo = $dm->getRepository(Policy::class);
+            /** @var PhonePolicy $policy */
+            $policy = $policyRepo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+            $data = json_decode($request->getContent(), true)['body'];
+
+            if (!$this->validateFields($data, ['phone_id', 'imei'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $phoneRepo = $dm->getRepository(Phone::class);
+            /** @var Phone $phone */
+            $phone = $phoneRepo->find($this->getDataString($data, 'phone_id'));
+            $imei = $this->normalizeImei($this->getDataString($data, 'imei'));
+            $serial = $this->getDataString($data, 'serial');
+
+            if (!$phone) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_PHONE_UNKNOWN, 'Unknown phone', 422);
+            }
+
+            if (!$phone->getActive()) {
+                if ($phone->shouldBeRetired()) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_EXPIRED, 'Phone(s) are retired', 422);
+                } elseif ($phone->getCurrentMonthlyPhonePrice() || $phone->getCurrentYearlyPhonePrice()) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_COMING_SOON, 'Coming soon', 422);
+                }
+            }
+
+            $premiumInstallments = $policy->getPremiumInstallments();
+
+            $now = new \DateTime();
+            $priceService = $this->get("app.price");
+
+            $stream = PhonePrice::installmentsStream($policy->getPremiumInstallments());
+            $futurePayments = $policy->countFutureInvoiceSchedule();
+            if ($futurePayments == 0) {
+                $premium = $priceService->getPhonePremium($policy, $phone, $stream, null, $now);
+            } else {
+                $premium = $priceService->getPhonePremium($policy, $phone, $stream, null, $now);
+            }
+
+            $phoneData = json_encode([
+                'make' => $phone->getMake(),
+                'device' => $phone->getModel(),
+                'memory' => $phone->getMemory()
+            ]);
+
+            $upgradeService = $this->get("app.upgrade");
+            $upgradeService->upgrade($policy, $phone, $imei, $serial, $now, $premium, $phoneData);
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $e) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $e]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $e->getMessage(), 422);
+        } catch (\RuntimeException $e) {
+            $this->get('logger')->warning('Error during upgrade process', ['exception' => $e]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_UNABLE_TO_UPGRADE, $e->getMessage(), 422);
+        } catch (DuplicateImeiException $e) {
+            $this->get('logger')->warning('Duplicate imei provided during upgrade', ['exception' => $e]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI, $e->getMessage(), 422);
+        } catch (InvalidImeiException $e) {
+            $this->get('logger')->warning('Invalid imei provided during upgrade', ['exception' => $e]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_IMEI_INVALID, $e->getMessage(), 422);
+        } catch (LostStolenImeiException $e) {
+            $this->get('logger')->warning('Lost/Stolen imei provided during upgrade', ['exception' => $e]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_IMEI_LOSTSTOLEN, $e->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('An error occured during the upgrade process:', ['exception' => $e]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+
     }
 }

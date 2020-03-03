@@ -36,6 +36,7 @@ class PhonePolicyTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($price);
         $policy->setPremium($price->createPremium());
         $policy->setStart(new \DateTime("2019-05-19"));
+        $policy->setStaticEnd(new \DateTime("2020-05-19"));
         // check some dates.
         $requiredVeryEarly = $policy->fullPremiumToBePaidForClaim(new \DateTime("2018-02-12"), Claim::TYPE_LOSS);
         $requiredEarly = $policy->fullPremiumToBePaidForClaim(new \DateTime("2019-05-20"), Claim::TYPE_THEFT);
@@ -70,6 +71,7 @@ class PhonePolicyTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($price);
         $policy->setPremium($price->createPremium());
         $policy->setStart(new \DateTime("2019-05-19"));
+        $policy->setStaticEnd(new \DateTime("2020-05-19"));
         // check some dates.
         $requiredVeryEarly = $policy->fullPremiumToBePaidForClaim(new \DateTime("2018-02-12"), Claim::TYPE_LOSS);
         $requiredEarly = $policy->fullPremiumToBePaidForClaim(new \DateTime("2019-05-20"), Claim::TYPE_THEFT);

@@ -8,6 +8,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Offer;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Exception\IncorrectPriceException;
@@ -119,15 +120,30 @@ class PriceService
     }
 
     /**
-     * Gives the passed policy the appropriate premium.
-     * @param PhonePolicy $policy            is the policy to give a premium to.
-     * @param string      $stream            is the price stream that they need.
-     * @param float|null  $additionalPremium is an additional amount of cost to add to the overall price.
-     * @param \DateTime   $date              is the date at which the price should be correct.
+     * Gives you the premium that the given policy could pay in the given stream.
+     * @param PhonePolicy $policy            is the policy we are looking at.
+     * @param string      $stream            is the stream that they will be paying in.
+     * @param float       $additionalPremium is some additional cost to add to the premium for some reason.
+     * @param \DateTime   $date              is the date at which this premium is being calculated.
+     * @return PhonePremium the premium for them.
      */
-    public function setPhonePolicyPremium($policy, $stream, $additionalPremium, $date)
+    public function getPhonePolicyPremium($policy, $stream, $additionalPremium, $date)
     {
-        $priceSource = $this->userPhonePriceSource($policy->getUser(), $policy->getPhone(), $stream, $date);
+        return $this->getPhonePremium($policy, $policy->getPhone(), $stream, $additionalPremium, $date);
+    }
+
+    /**
+     * Gives you the premium for a phone
+     * @param PhonePolicy $policy            is the policy we are looking at.
+     * @param Phone       $phone             is the phone we want the premium for
+     * @param string      $stream            is the stream that they will be paying in.
+     * @param float       $additionalPremium is some additional cost to add to the premium for some reason.
+     * @param \DateTime   $date              is the date at which this premium is being calculated.
+     * @return PhonePremium the premium for them.
+     */
+    public function getPhonePremium($policy, $phone, $stream, $additionalPremium, $date)
+    {
+        $priceSource = $this->userPhonePriceSource($policy->getUser(), $phone, $stream, $date);
         $premium = $priceSource["price"]->createPremium($additionalPremium);
         $premium->setSource($priceSource["source"]);
         $premium->setStream($priceSource["price"]->getStream());
@@ -137,6 +153,19 @@ class PriceService
         } elseif ($priceSource["source"] instanceof Phone) {
             $premium->setSource(Premium::SOURCE_PHONE);
         }
+        return $premium;
+    }
+
+    /**
+     * Gives the passed policy the appropriate premium.
+     * @param PhonePolicy $policy            is the policy to give a premium to.
+     * @param string      $stream            is the price stream that they need.
+     * @param float|null  $additionalPremium is an additional amount of cost to add to the overall price.
+     * @param \DateTime   $date              is the date at which the price should be correct.
+     */
+    public function setPhonePolicyPremium($policy, $stream, $additionalPremium, $date)
+    {
+        $premium = $this->getPhonePolicyPremium($policy, $stream, $additionalPremium, $date);
         $policy->setPremium($premium);
         $this->dm->persist($policy);
         $this->dm->flush();

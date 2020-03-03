@@ -32,13 +32,54 @@
     <ul>
         <li>Policy Number: {{ policy.policyNumber }}</li>
         <li>Date of subscription: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
-        <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }} [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]</li>
-        <li>Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
-        {% if policy.premiumPlan == 'monthly' %}
-        <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.</li>
-        {% else %}
-        <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.</li>
-        {% endif %}
+        <li>
+            Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }}
+            [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]
+            {% if policy.isUpgraded %}
+                <li>
+                    Phones previously covered by this policy:
+                    <ul>
+                        {% for iteration in policy.previousIterations %}
+                            <li>
+                                {{ iteration.phone.make }} {{ iteration.phone.model}}
+                                [IMEI: {{ iteration.imei }}{% if iteration.serialNumber %} / Serial Number: {{ iteration.serialNumber }}{% endif %}]
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        </li>
+        <li>
+            {% if policy.isUpgraded %}
+                Overall period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to
+                {{ policy.end|date('d M Y H:i', 'Europe/London') }}, updated portion starting at
+                {{ policy.getCurrentIteration.realStart | date('d M Y H:i', 'Europe/London') }}.
+            {% else %}
+                Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to
+                {{ policy.end|date('d M Y H:i', 'Europe/London') }}
+            {% endif %}
+        </li>
+        <li>
+            {% set upgradedYearly = policy.getUpgradedYearlyPrice() %}
+            {% set futurePayments = policy.countFutureInvoiceSchedule(policy.getCurrentIterationStart) %}
+            Cost of policy: £{{ policy.yearlyPremiumPrice|number_format(2, '.', ',') }},
+            inclusive of £{{ policy.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
+            {% if policy.isUpgraded %}
+                the post upgrade remainder being
+            {% endif %}
+            {% if upgradedYearly > 0 %}
+                {% if futurePayments > 1 %}
+                    £{{ policy.getUpgradedYearlyPrice }} payable as {{ futurePayments }}{% if policy.premiumInstallments != 1 %} monthly{% endif %}
+                    installments of {{ policy.getUpgradedStandardMonthlyPrice }}.
+                {% else %}
+                    payable as 1 installment of £{{ policy.getUpgradedYearlyPrice }}.
+                {% endif %}
+            {% elseif upgradedYearly < 0 %}
+                £{{ policy.getUpgradedYearlyPrice }} to be reimbursed.
+            {% else %}
+                fully paid.
+            {% endif %}
+        </li>
     </ul>
     <p>Once you have validated your phone through the so-sure App your excess will be:</p>
     <ul>

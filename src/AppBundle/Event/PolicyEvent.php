@@ -22,6 +22,7 @@ class PolicyEvent extends Event
     const EVENT_BACS_CREATED = 'event.policy.bacs-created';
     const EVENT_UPDATED_PREMIUM = 'event.policy.updated-premium';
     const EVENT_UPDATED_BILLING = 'event.policy.updated-billing';
+    const EVENT_UPGRADED = 'event.policy.upgraded';
 
     const EVENT_UPDATED_STATUS = 'event.policy.updated-status';
 

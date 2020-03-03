@@ -68,7 +68,7 @@ trait CurrencyTrait
         return number_format(round($float, 0), 0, ".", "");
     }
 
-    public function toTwoDp($float)
+    public static function toTwoDp($float)
     {
         return number_format(round($float, 2), 2, ".", "");
     }

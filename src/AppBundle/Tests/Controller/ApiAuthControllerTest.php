@@ -31,11 +31,13 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\Reward;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Event\UserEmailEvent;
 use AppBundle\Listener\UserListener;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\ReceperioService;
+use AppBundle\Tests\Create;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
@@ -6097,6 +6099,88 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'code' => '123456',
         ]);
         $data = $this->verifyResponse(403);
+    }
+
+    public function testupgradePolicyGetAction()
+    {
+        $user = Create::user();
+        $start = new \DateTime("-34 days");
+        $policy = Create::policy($user, $start->format('Y-m-d'), Policy::STATUS_ACTIVE, 12);
+        Create::save(static::$dm, $user, $policy);
+        $policy->setPhone(static::getRandomPhone(self::$dm));
+        $newPhone = static::getRandomPhone(self::$dm);
+        $payment = Create::standardPayment($policy, $policy->getStart(), true);
+        static::$policyService->generateScheduledPayments($policy);
+        $i = 0;
+        foreach ($policy->getScheduledPayments() as $scheduledPayment) {
+            if ($i < 1) {
+                $i++;
+            } else {
+                break;
+            }
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            $payment = Create::standardPayment($policy, $scheduledPayment->getScheduled(), true);
+            static::$dm->persist($scheduledPayment);
+            static::$dm->persist($payment);
+        }
+        static::$dm->flush();
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = sprintf(
+            '/api/v1/auth/policy/%s/upgrade?make=%s&device=%s&memory=%s&_method=GET',
+            $policy->getId(),
+            $newPhone->getMake(),
+            $newPhone->getDevices()[0],
+            $newPhone->getMemory()
+        );
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+
+        $policyData = $this->verifyResponse(200);
+
+    }
+
+    public function testupgradePolicyPostAction()
+    {
+        $user = Create::user();
+        $start = new \DateTime("-34 days");
+        $policy = Create::policy($user, $start->format('Y-m-d'), Policy::STATUS_ACTIVE, 12);
+        $policyTerms = new PolicyTerms();
+        $policyTerms->setVersion(PolicyTerms::VERSION_10);
+        $policy->setPolicyTerms($policyTerms);
+        Create::save(static::$dm, $user, $policyTerms, $policy);
+        $policy->setPhone(static::getRandomPhone(self::$dm));
+        $newPhone = static::getRandomPhone(self::$dm);
+        $payment = Create::standardPayment($policy, $policy->getStart(), true);
+        static::$policyService->generateScheduledPayments($policy);
+        $i = 0;
+        foreach ($policy->getScheduledPayments() as $scheduledPayment) {
+            if ($i < 1) {
+                $i++;
+            } else {
+                break;
+            }
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            $payment = Create::standardPayment($policy, $scheduledPayment->getScheduled(), true);
+            static::$dm->persist($scheduledPayment);
+            static::$dm->persist($payment);
+        }
+        static::$dm->flush();
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $imei = self::generateRandomImei();
+
+        $url = sprintf('/api/v1/auth/policy/%s/upgrade', $policy->getId());
+
+        $data = [
+            'phone_id' => $newPhone->getId(),
+            'imei' => $imei
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+
+        $policyData = $this->verifyResponse(200);
     }
 
     /**

@@ -63,6 +63,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/most-instagrammed-dog-breeds' => 'Most Instagrammed Dog Breeds',
             '/blog/why-does-my-phone-keep-crashing' => 'Why Does My Phone Keep Crashing',
             '/blog/best-screen-protectors' => 'Best Screen Protectors',
+            '/blog/applecare-vs-phone-insurance' => 'AppleCare+ vs iPhone Insurance',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

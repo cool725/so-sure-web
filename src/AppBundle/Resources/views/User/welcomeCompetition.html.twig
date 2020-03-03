@@ -9,10 +9,9 @@
 {% block title %}Welcome to so-sure, {{ policy.user.firstname }} 🎉{% endblock %}
 
 {# Set Meta #}
-{# TODO: Win copy and new image #}
-{% set og_title = 'Win a £200 Amazon voucher' %}
-{% set og_description = 'Hey, you can win a £200 Amazon voucher and get a month free phone insurance, check it out! It\'s free to enter the competition' %}
-{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+{% set og_title = 'We can both win £20, it’s super easy, check it out' %}
+{% set og_description = "Check out so-sure to win £20 and benefit from their excellent perks: one month free, up to 80% cash back, etc. It’s super easy to enter!" %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
 {% if policy.standardSCode %}
     {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
 {% endif %}
@@ -65,8 +64,8 @@
         <div class="container-large">
             <div class="row">
                 <div class="col-xl-6 offset-xl-6 text-center text-xl-left">
-                    <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Invite friends to<br class="d-md-none"> so-sure and</span><br> win a &pound;200 amazon voucher</h1>
-                    <p class="text-white mb-4"><strong>{{ policy.user.firstname }}, you're all covered!</strong> Shortly you will receive a confirmation email and a link to download our app to validate your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong>. You can now invite friends to join <span class="text-nowrap">so-sure</span> and for every invite we add another entry in this months draw.</p>
+                    <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Invite friends to<br class="d-md-none"> so-sure and</span><br> win a &pound;20 amazon voucher</h1>
+                    <p class="text-white mb-4"><strong>{{ policy.user.firstname }}, you're all covered!</strong> Shortly you will receive a confirmation email and a link to download our app to validate your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong>. You can now invite friends to join <span class="text-nowrap">so-sure</span> and for every invite we add another entry in this months draw. Each month we pick 10 customers to win &pound;20!</p>
                     <a href="#"
                        class="btn btn-success btn-block-xs native-share track-data d-md-none"
                        data-native-title="{{ og_title }}"
@@ -124,7 +123,7 @@
                 <div class="timeline-block timeline-block-complete-green">
                     <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
                     <div class="timeline-content">
-                        <h3 class="h5 text-primary">Winners announced on 29th of February</h3>
+                        <h3 class="h5 text-primary">Winners announced each month</h3>
                     </div>
                 </div>
             </div>
@@ -140,7 +139,7 @@
                     </div>
                     <div class="col-4 step">
                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_amazon-voucher.png" alt="Hand holding amazon voucher" width="180px" class="lozad mb-3">
-                        <h3 class="h5 text-primary mb-2">Winners announced <br> on 29th of February</h3>
+                        <h3 class="h5 text-primary mb-2">Winners announced <br> each month</h3>
                     </div>
                 </div>
             </div>

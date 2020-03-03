@@ -122,6 +122,20 @@ services:
             - "@app.sms"
             - "@app.feature"
 
+    app.upgrade:
+        alias: AppBundle\Service\UpgradeService
+        public: true
+
+    AppBundle\Service\UpgradeService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.bacs"
+            - "@app.checkout"
+            - "@app.policy"
+            - "@app.imei"
+            - "@event_dispatcher"
+            - "@logger"
+
     app.checkout:
         alias: AppBundle\Service\CheckoutService
         public: true
@@ -1135,12 +1149,19 @@ services:
         class:   AppBundle\Listener\PolicyListener
         arguments:
             - "@app.policy"
+            - "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
+
+    app.listener.sms:
+        class:   AppBundle\Listener\SmsListener
+        arguments:
             - "@app.sms"
             - "@app.branch"
             - "@logger"
         tags:
-            -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
             -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyCreatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.upgraded, method: onPolicyUpgradedEvent }
 
     app.listener.user:
         class:   AppBundle\Listener\UserListener
@@ -1174,7 +1195,6 @@ services:
             -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserNameChangedEvent }
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBankAccountChangedEvent }
             -  { name: kernel.event_listener, event: event.policy.bacs-created, method: onPolicyBacsCreated }
-            -  { name: kernel.event_listener, event: event.policy.updated-premium, method: onPolicyUpdatedPremium }
             -  { name: kernel.event_listener, event: event.policy.updated-billing, method: onPolicyUpdatedBilling }
 
     app.listener.debtCollection:
@@ -1211,6 +1231,7 @@ services:
             -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyStartEvent }
             -  { name: kernel.event_listener, event: event.policy.unpaid, method: onPolicyUnpaidEvent }
             -  { name: kernel.event_listener, event: event.policy.reactivated, method: onPolicyReactivatedEvent }
+            -  { name: kernel.event_listener, event: event.policy.upgraded, method: onPolicyUpgradedEvent }
             -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
             -  { name: kernel.event_listener, event: event.connection.connected, method: onConnectionConnectedEvent }
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
@@ -1258,6 +1279,7 @@ services:
             -  { name: kernel.event_listener, event: event.card.updated, method: onCardUpdatedEvent }
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBacsUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.payment-method.changed, method: onPolicyPaymentMethodChangedEvent }
+            -  { name: kernel.event_listener, event: event.policy.upgraded, method: onPolicyUpgradedEvent }
 
     app.listener.sixpack:
         class:   AppBundle\Listener\SixpackListener

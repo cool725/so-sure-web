@@ -1279,7 +1279,10 @@ class CheckoutService
         }
         if (!$premium->isEvenlyDivisible($payment->getAmount()) &&
             !$premium->isEvenlyDivisible($payment->getAmount(), true) &&
-            !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getOutstandingPremium())) {
+            !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getOutstandingPremium()) &&
+            !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getUpgradedStandardMonthlyPrice()) &&
+            !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getUpgradedFinalMonthlyPrice())
+        ) {
             $errMsg = sprintf(
                 'ADJUSTMENT NEEDED!! Expected %f or %f (or maybe %f), not %f for payment id: %s',
                 $premium->getMonthlyPremiumPrice(),
@@ -1624,7 +1627,7 @@ class CheckoutService
         return $chargeResponse;
     }
 
-    protected function tokenPay(
+    public function tokenPay(
         Policy $policy,
         $amount = null,
         $notes = null,
