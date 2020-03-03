@@ -4254,12 +4254,10 @@ abstract class Policy
         }
 
         $billingDate = clone $this->getBilling();
-        $successes = $this->getPremium()->getNumberOfMonthlyPayments(
+        $successes = floor($this->getPremium()->fractionOfMonthlyPayments(
             $this->getTotalSuccessfulPayments($date, true)
-        ) ?: 0;
-        if ($successes < 0) {
-            $successes = 0;
-        }
+        ));
+        $successes = $successes > 0 ? $successes : 0;
         $billingDate->add(new \DateInterval("P{$successes}M30D"));
         $billingDate = $this->startOfDay($billingDate);
 
