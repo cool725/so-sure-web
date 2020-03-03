@@ -12,6 +12,9 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Document\Note\StandardNote;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
@@ -23,6 +26,7 @@ use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\SequenceService;
 use AppBundle\Service\RouterService;
+use AppBundle\Service\PriceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -34,6 +38,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Cashback;
@@ -43,6 +49,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Claim;
+use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Form\Type\UserCancelType;
@@ -51,6 +58,9 @@ use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\Form\ClaimFnolDamage;
 use AppBundle\Document\Form\ClaimFnolTheftLoss;
 use AppBundle\Document\Form\ClaimFnolUpdate;
+use AppBundle\Document\Form\PhoneMake;
+use AppBundle\Document\Form\PurchaseStepPhone;
+use AppBundle\Document\Form\PurchaseStepPledge;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\EmailInvitationType;
@@ -63,6 +73,9 @@ use AppBundle\Form\Type\CashbackType;
 use AppBundle\Form\Type\SentInvitationType;
 use AppBundle\Form\Type\UnconnectedUserPolicyType;
 use AppBundle\Form\Type\RenewConnectionsType;
+use AppBundle\Form\Type\PhoneMakeType;
+use AppBundle\Form\Type\PurchaseStepPhoneType;
+use AppBundle\Form\Type\PurchaseStepPledgeType;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Form\Type\BillingDayType;
@@ -648,7 +661,7 @@ class UserController extends BaseController
     /**
      * @Route("/data-portability", name="user_data_portability")
      */
-    public function dataPortabliityAction()
+    public function dataPortabilityAction()
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -667,18 +680,47 @@ class UserController extends BaseController
         ];
 
         foreach ($user->getPolicies() as $policy) {
-            /** @var PhonePolicy $policy */
-            $lines[] = [
-                sprintf('"%s"', $user->getName()),
-                sprintf('"%s"', $user->getBirthday() ? $user->getBirthday()->format('d/m/Y') : null),
-                sprintf('"%s"', $user->getBillingAddress()),
-                sprintf('"%s"', $user->getMobileNumber()),
-                sprintf('"%s"', $policy->getPolicyNumber()),
-                sprintf('"%s"', $policy->getStart() ? $policy->getStart()->format('d/m/Y') : null),
-                sprintf('"%s"', $policy->getEnd() ? $policy->getEnd()->format('d/m/Y') : null),
-                sprintf('"%s"', $policy->getPhone() ? $policy->getPhone()->__toString() : null),
-                sprintf('"%s"', $policy->getImei()),
-            ];
+            if ($policy instanceof SalvaPhonePolicy) {
+                $lines[] = [
+                    sprintf('"%s"', $user->getName()),
+                    sprintf('"%s"', $user->getBirthday() ? $user->getBirthday()->format('d/m/Y') : null),
+                    sprintf('"%s"', $user->getBillingAddress()),
+                    sprintf('"%s"', $user->getMobileNumber()),
+                    sprintf('"%s"', $policy->getPolicyNumber()),
+                    sprintf('"%s"', $policy->getStart() ? $policy->getStart()->format('d/m/Y') : null),
+                    sprintf('"%s"', $policy->getEnd() ? $policy->getEnd()->format('d/m/Y') : null),
+                    sprintf('"%s"', $policy->getPhone() ? $policy->getPhone()->__toString() : null),
+                    sprintf('"%s"', $policy->getImei()),
+                ];
+            } else {
+                if ($iterations = $policy->getPreviousIterations()) {
+                    foreach ($iterations as $iteration) {
+                        $lines[] = [
+                            sprintf('"%s"', $user->getName()),
+                            sprintf('"%s"', $user->getBirthday() ? $user->getBirthday()->format('d/m/Y') : null),
+                            sprintf('"%s"', $user->getBillingAddress()),
+                            sprintf('"%s"', $user->getMobileNumber()),
+                            sprintf('"%s"', $policy->getPolicyNumber()),
+                            sprintf('"%s"', $iteration->getStart() ? $iteration->getStart()->format('d/m/Y') : null),
+                            sprintf('"%s"', $iteration->getEnd() ? $iteration->getEnd()->format('d/m/Y') : null),
+                            sprintf('"%s"', $iteration->getPhone() ? $iteration->getPhone()->__toString() : null),
+                            sprintf('"%s"', $iteration->getImei()),
+                        ];
+                    }
+                }
+                $iteration = $policy->getCurrentIteration();
+                $lines[] = [
+                    sprintf('"%s"', $user->getName()),
+                    sprintf('"%s"', $user->getBirthday() ? $user->getBirthday()->format('d/m/Y') : null),
+                    sprintf('"%s"', $user->getBillingAddress()),
+                    sprintf('"%s"', $user->getMobileNumber()),
+                    sprintf('"%s"', $policy->getPolicyNumber()),
+                    sprintf('"%s"', $iteration->getStart() ? $iteration->getStart()->format('d/m/Y') : null),
+                    sprintf('"%s"', $iteration->getEnd() ? $iteration->getEnd()->format('d/m/Y') : null),
+                    sprintf('"%s"', $iteration->getPhone() ? $iteration->getPhone()->__toString() : null),
+                    sprintf('"%s"', $iteration->getImei()),
+                ];
+            }
         }
 
         $response = new StreamedResponse();
@@ -2122,6 +2164,407 @@ class UserController extends BaseController
         }
 
         throw new \Exception(sprintf('Unknown claim type %s', $claim->getType()));
+    }
+
+    /**
+     * @Route("/upgrade/policy/{policyId}", name="user_upgrade")
+     * @Method({"GET","POST"})
+     * @template
+     */
+    public function upgradePolicyAction(Request $request, $policyId)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $policyRepo->find($policyId);
+
+        // Check if the policy belongs to the user and is elligible for update
+        if ($policy) {
+            $this->denyAccessUnlessGranted(PolicyVoter::UPGRADE, $policy);
+        }
+
+        //Build the phone selection dropdown
+        $phoneSpecs = new PhoneMake();
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('form_upgrade_phone', PhoneMakeType::class, $phoneSpecs, [
+                'action' => $this->generateUrl('user_upgrade', ['policyId' => $policyId])
+            ])
+            ->getForm();
+
+        //Handle the upgrade quote request
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('form_upgrade_phone')) {
+                $formPhone->handleRequest($request);
+                /** @var PhoneRepository $phoneRepo */
+                $phoneRepo = $dm->getRepository(Phone::class);
+                $phoneId = $this->getDataString($request->get('form_upgrade_phone'), 'memory');
+                /** @var Phone $phone */
+                $phone = $phoneRepo->find($phoneId);
+
+                if (!$phone) {
+                    $this->get('logger')->error(sprintf('Phone not found: %s.', $phoneId));
+                    $this->addFlash('error', 'Phone not found, please contact support');
+                    return $this->redirectToRoute('user_upgrade', ['policyId' => $policyId]);
+                } else {
+                    // Save the policy to upgrade and the new phone in the session
+                    $session = $request->getSession();
+                    $session->set('upgrade-phone', $phone->getId());
+                    $session->set('upgrade-policy', $policy->getId());
+
+                    return $this->redirectToRoute('user_upgrade_quote');
+                }
+            }
+        }
+
+        $template = 'AppBundle:Upgrade:upgradePhone.html.twig';
+
+        $data = [
+            'policy' => $policy,
+            'upgrade_quote_form' => $formPhone->createView(),
+            'phones' => $this->getPhonesArray()
+        ];
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/upgrade/quote", name="user_upgrade_quote")
+     * @Method({"GET"})
+     * @template
+     */
+    public function upgradePolicyQuote(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $session = $request->getSession();
+
+        /** @var HelvetiaPhonePolicy $policy */
+        $policy = $policyRepo->find($session->get('upgrade-policy'));
+        $newPhone = $phoneRepo->find($session->get('upgrade-phone'));
+
+        if (!$policy) {
+            $this->addFlash('warning', 'No policy Found : Please select a phone to upgrade');
+            return $this->redirectToRoute('user_policy_list');
+        } elseif (!$newPhone) {
+            $this->addFlash('warning', 'No new phone found : Please use the dropdowns to search for your new phone');
+            return $this->redirectToRoute('user_upgrade', ['policyId' => $policy->getId()]);
+        }
+
+        $oldPhone = $policy->getPhone();
+
+
+        $now = new \DateTime();
+        $priceService = $this->get("app.price");
+
+        $stream = PhonePrice::installmentsStream($policy->getPremiumInstallments());
+        $futurePayments = $policy->countFutureInvoiceSchedule();
+        if ($futurePayments <= 1) {
+            $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+            $upgradePremium = $policy->getPremiumUpgradeCostYearly($newPhonePremium, $now);
+        } else {
+            $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+            $upgradePremium = $policy->getPremiumUpgradeCostMonthly($newPhonePremium, $now);
+        }
+
+        $oldPhonePremium = $priceService->getPhonePolicyPremium($policy, $stream, null, $now);
+
+        $session->set('upgrade-premium', $upgradePremium);
+        $session->set('upgrade-stream', $stream);
+        $session->set('new-phone-premium', $newPhonePremium);
+
+        $template = 'AppBundle:Upgrade:upgradeQuote.html.twig';
+
+        $data = [
+            'policy' => $policy,
+            'new_phone_premium' => $newPhonePremium,
+            'old_phone_premium' => $oldPhonePremium,
+            'upgraded_premium' => $upgradePremium,
+            'stream' => $stream,
+            'new_phone' => $newPhone,
+            'old_phone' => $oldPhone
+
+        ];
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/upgrade/imei", name="user_upgrade_imei")
+     * @Method({"GET", "POST"})
+     * @template
+     */
+    public function upgradePolicyImei(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $session = $request->getSession();
+        /** @var HelvetiaPhonePolicy $policy */
+        $policy = $policyRepo->find($session->get('upgrade-policy'));
+        /** @var Phone $newPhone */
+        $newPhone = $phoneRepo->find($session->get('upgrade-phone'));
+
+        if (!$policy) {
+            $this->addFlash('warning', 'No policy Found : Please select a phone to upgrade');
+            return $this->redirectToRoute('user_policy_list');
+        } elseif (!$newPhone) {
+            $this->addFlash('warning', 'No new phone found : Please use the dropdowns to search for your new phone');
+            return $this->redirectToRoute('user_upgrade', ['policyId' => $policy->getId()]);
+        }
+
+        $phoneImei = new PurchaseStepPhone();
+
+        $phoneImei->setPhone($newPhone);
+
+        /** @var Form $purchaseForm */
+        $imeiForm = $this->get('form.factory')
+            ->createNamedBuilder('form_upgrade_imei', PurchaseStepPhoneType::class, $phoneImei)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('form_upgrade_imei')) {
+                $user = $this->getUser();
+                $imeiForm->handleRequest($request);
+                if ($imeiForm->isValid()) {
+                    $allowContinue = true;
+                    $imei = $phoneImei->getImei();
+                    $serialNumber = $phoneImei->getSerialNumber();
+                    $policyService = $this->get('app.policy');
+                    try {
+                        $checkmend = $policyService->validateUpgradeImei($user, $newPhone, $imei, $serialNumber);
+                        $session->set('upgrade-checkmend', $checkmend);
+                    } catch (DuplicateImeiException $e) {
+                        $this->addFlash(
+                            'error',
+                            "Sorry, your phone is already in our system. Perhaps it's already insured?"
+                        );
+                        $allowContinue = false;
+                    } catch (LostStolenImeiException $e) {
+                        $this->addFlash(
+                            'error',
+                            "Sorry, it looks this phone is already insured"
+                        );
+                        $allowContinue = false;
+                    } catch (ImeiBlacklistedException $e) {
+                        $this->addFlash(
+                            'error',
+                            "Sorry, we are unable to insure you."
+                        );
+                        $allowContinue = false;
+                    } catch (InvalidImeiException $e) {
+                        $this->addFlash(
+                            'error',
+                            "Looks like the IMEI you provided isn't quite right.  Please check the number again."
+                        );
+                        $allowContinue = false;
+                    } catch (ImeiPhoneMismatchException $e) {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'error',
+                            "Looks like phone model you selected isn't quite right. Please check that you selected the correct model."
+                        );
+                        // @codingStandardsIgnoreEnd
+                        $allowContinue = false;
+                    } catch (RateLimitException $e) {
+                        $this->addFlash(
+                            'error',
+                            "Sorry, we are unable to insure you."
+                        );
+                        $allowContinue = false;
+                    }
+                    if ($allowContinue) {
+                        $session->set('upgrade-imei', $imei);
+                        $session->set('upgrade-serialNumber', $serialNumber);
+                        return $this->redirectToRoute('user_upgrade_pledge');
+                    }
+                }
+            }
+        }
+
+        $template = 'AppBundle:Upgrade:upgradeImei.html.twig';
+
+        $data = [
+            'upgrade_imei_form' => $imeiForm->createView(),
+            'new_phone' => $newPhone
+        ];
+
+        return $this->render($template, $data);
+
+
+    }
+
+    /**
+     * @Route("/upgrade/pledge", name="user_upgrade_pledge")
+     * @template
+     */
+    public function upgradePolicyPledge(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $session = $request->getSession();
+
+        /** @var HelvetiaPhonePolicy $policy */
+        $policy = $policyRepo->find($session->get('upgrade-policy'));
+        /** @var Phone $newPhone */
+        $newPhone = $phoneRepo->find($session->get('upgrade-phone'));
+        $imei = $session->get('upgrade-imei');
+
+        if (!$policy) {
+            $this->addFlash('warning', 'No policy Found : Please select a phone to upgrade');
+            return $this->redirectToRoute('user_policy_list');
+        } elseif (!$newPhone) {
+            $this->addFlash('warning', 'No new phone found : Please use the dropdowns to search for your new phone');
+            return $this->redirectToRoute('user_upgrade', ['policyId' => $policy->getId()]);
+        } elseif (!$imei) {
+            $this->addFlash('warning', 'No imei found : Please provide your new phone\'s imei information');
+            return $this->redirectToRoute('user_upgrade_imei');
+        }
+
+        $validationRequired = $policy->getPolicyTerms()->isPicSureRequired();
+
+        $pledge = new PurchaseStepPledge();
+
+        /** @var FormInterface $pledgeForm */
+        $pledgeForm = $this->get('form.factory')
+            ->createNamedBuilder('form_upgrade_pledge', PurchaseStepPledgeType::class, $pledge)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('form_upgrade_pledge')) {
+                $pledgeForm->handleRequest($request);
+
+                if ($pledgeForm->isValid() && $pledge->areAllAgreed()) {
+                    $session->set('upgrade-pledge', true);
+                    return new RedirectResponse(
+                        $this->generateUrl('user_upgrade_payment')
+                    );
+                }
+            }
+        }
+
+        $template = 'AppBundle:Upgrade:upgradePledge.html.twig';
+
+        $data = [
+            'upgrade_pledge_form' => $pledgeForm->createView(),
+            'policy' => $policy,
+            'new_phone' => $newPhone,
+            'validation_required' => $validationRequired
+        ];
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/upgrade/payment", name="user_upgrade_payment")
+     * @template
+     */
+    public function upgradePolicyPayment(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $session = $request->getSession();
+        /** @var HelvetiaPhonePolicy $policy */
+        $policy = $policyRepo->find($session->get('upgrade-policy'));
+        $newPhone = $phoneRepo->find($session->get('upgrade-phone'));
+        $premium = $session->get('upgrade-premium');
+        $stream = $session->get('upgrade-stream');
+        $imei = $session->get('upgrade-imei');
+        $pledge = $session->get('upgrade-pledge');
+
+        if (!$policy) {
+            $this->addFlash('warning', 'No policy Found : Please select a phone to upgrade');
+            return $this->redirectToRoute('user_policy_list');
+        } elseif (!$newPhone || !$premium) {
+            $this->addFlash('warning', 'No new phone found : Please use the dropdowns to search for your new phone');
+            return $this->redirectToRoute('user_upgrade', ['policyId' => $policy->getId()]);
+        } elseif (!$imei) {
+            $this->addFlash('warning', 'No imei found : Please provide your new phone\'s imei information');
+            return $this->redirectToRoute('user_upgrade_imei');
+        } elseif (!$pledge) {
+            $this->addFlash('warning', 'Please complete the pledge  of honesty');
+            return $this->redirectToRoute('user_upgrade_pledge');
+        }
+
+        $template = 'AppBundle:Upgrade:upgradePayment.html.twig';
+
+        $data = [
+            'policy' => $policy,
+            'premium' => $premium,
+            'stream' => $stream,
+            'new_phone' => $newPhone
+
+        ];
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/upgrade/confirmation", name="user_upgrade_confirmation")
+     * @template
+     */
+    public function upgradePolicyConfirmation(Request $request)
+    {
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $session = $request->getSession();
+        /** @var HelvetiaPhonePolicy $policy */
+        $policy = $policyRepo->find($session->get('upgrade-policy'));
+        /** @var Phone $newPhone */
+        $newPhone = $phoneRepo->find($session->get('upgrade-phone'));
+        $premium = $session->get('new-phone-premium');
+        $stream = $session->get('upgrade-stream');
+        $imei = $session->get('upgrade-imei');
+        $serial  = $session->get('upgrade-serialNumber');
+        $pledge = $session->get('upgrade-pledge');
+
+        if (!$policy) {
+            $this->addFlash('warning', 'No policy Found : Please select a phone to upgrade');
+            return $this->redirectToRoute('user_policy_list');
+        } elseif (!$newPhone) {
+            $this->addFlash('warning', 'No new phone found : Please use the dropdowns to search for your new phone');
+            return $this->redirectToRoute('user_upgrade', ['policyId' => $policy->getId()]);
+        } elseif (!$imei) {
+            $this->addFlash('warning', 'No imei found : Please provide your new phone\'s imei information');
+            return $this->redirectToRoute('user_upgrade_imei');
+        } elseif (!$pledge) {
+            $this->addFlash('warning', 'Please complete the pledge  of honesty');
+            return $this->redirectToRoute('user_upgrade_pledge');
+        }
+
+        $upgradeService = $this->get("app.upgrade");
+        $upgradeSuccess = true;
+        try {
+            $upgradeService->upgrade($policy, $newPhone, $imei, $serial, new \DateTime(), $premium);
+        } catch (\Exception $e) {
+            $upgradeSuccess = false;
+            $this->get('logger')->error(sprintf('Error while upgrading the policy %s.', $e));
+            $this->addFlash('error', 'Error while upgrading the policy, please contact the support');
+            return $this->redirectToRoute('user_home');
+        }
+        $this->addFlash(
+            'success',
+            sprintf('Your policy was successfuly upgraded to cover your %s', $newPhone->getModel())
+        );
+
+        return new RedirectResponse(
+            $this->generateUrl('user_policy_list')
+        );
     }
 
     /**

@@ -767,19 +767,58 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
-    public function getDisplayablePoliciesSorted()
+    public function getDisplayableOtherActivePolicies($selected)
     {
         $policies = [];
         foreach ($this->policies as $policy) {
             if (in_array($policy->getStatus(), [
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_PICSURE_REQUIRED,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_RENEWAL,
+            ]) && $policy->getId() !== $selected->getId()) {
+                $policies[] = $policy;
+            }
+        }
+
+        // sort recent to older
+        usort($policies, function ($a, $b) {
+            return $a->getStart() < $b->getStart();
+        });
+
+        return $policies;
+    }
+
+    public function getOtherActivePoliciesCount($selected)
+    {
+        $policies = [];
+        foreach ($this->policies as $policy) {
+            if (in_array($policy->getStatus(), [
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_PICSURE_REQUIRED,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_RENEWAL,
+            ]) && $policy->getId() !== $selected->getId()) {
+                $policies[] = $policy;
+            }
+        }
+
+        // Length
+        $policiesCount = count($policies);
+
+        return $policiesCount;
+    }
+
+    public function getDisplayableInactivePolicies()
+    {
+        $policies = [];
+        foreach ($this->policies as $policy) {
+            if (in_array($policy->getStatus(), [
+
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
-                Policy::STATUS_UNPAID,
-                Policy::STATUS_RENEWAL,
             ])) {
                 $policies[] = $policy;
             }
@@ -791,6 +830,27 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         });
 
         return $policies;
+    }
+
+    public function getInactivePoliciesCount()
+    {
+        $policies = [];
+        foreach ($this->policies as $policy) {
+            if (in_array($policy->getStatus(), [
+
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
+            ])) {
+                $policies[] = $policy;
+            }
+        }
+
+        // Length
+        $policiesCount = count($policies);
+
+        return $policiesCount;
     }
 
     public function getDisplayableCashbackSorted()

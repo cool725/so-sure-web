@@ -65,6 +65,7 @@ class IntercomService
     const QUEUE_EVENT_POLICY_PENDING_RENEWAL = 'policy-renewal-ready';
     const QUEUE_EVENT_POLICY_RENEWED = 'policy-renewed';
     const QUEUE_EVENT_POLICY_START = 'policy-start';
+    const QUEUE_EVENT_POLICY_UPGRADED = 'policy-upgraded';
 
     const QUEUE_EVENT_PAYMENT_SUCCESS = 'payment-succeed';
     const QUEUE_EVENT_PAYMENT_FAILED = 'payment-failed';
@@ -416,6 +417,7 @@ class IntercomService
                     self::QUEUE_EVENT_POLICY_PENDING_RENEWAL,
                     self::QUEUE_EVENT_POLICY_RENEWED,
                     self::QUEUE_EVENT_POLICY_START,
+                    self::QUEUE_EVENT_POLICY_UPGRADED,
                 ])) {
                     if (!isset($data['policyId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));

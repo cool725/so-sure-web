@@ -82,6 +82,12 @@ class IntercomListener
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_PENDING_RENEWAL);
     }
 
+    public function onPolicyUpgradedEvent(PolicyEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_UPGRADED);
+    }
+
     public function onPolicyRenewedEvent(PolicyEvent $event)
     {
         $this->intercom->queue($event->getPolicy()->getUser());

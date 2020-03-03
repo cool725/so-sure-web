@@ -1,0 +1,134 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set robots_noindex = true %}
+{% set user_mode = true %}
+{% set small_footer = true %}
+
+{% block title %}Upgrade Phone IMEI | so-sure{% endblock %}
+
+{# Set Meta #}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/upgrades.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="upgrade-container container-large">
+        <div class="cardbox cardbox-100">
+            <div class="cardbox__body d-flex align-items-center justify-content-center flex-column text-center">
+                {% if new_phone.os == 'iOS' %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_apple.png" width="140px" alt="Apple iPhone" class="lozad">
+                {% elseif new_phone.os == 'Android' %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_android.png" width="140px" alt="Android Phone" class="lozad">
+                {% else %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_half-phone.png" width="140px" alt="Phone" class="lozad">
+                {% endif %}
+                <h1 class="h4 mb-4"><span class="sub">To cover your new your new </span> <span class="text-primary">{{ new_phone.make }} {{ new_phone.model }} ({{ new_phone.memory }}GB)</span><br><span class="sub">we need the information below to continue</span></h1>
+                {{ form_start(upgrade_imei_form, {'attr': {
+                    'data-toggle': 'validator',
+                    'class': 'validate-form-imei',
+                    'data-client-validation': form_client_validation,
+                    'autocomplete': 'off'
+                }}) }}
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="form-group {% if form_errors(upgrade_imei_form.imei) %}has-error{% endif %} text-left">
+                                {{ form_label(upgrade_imei_form.imei, 'IMEI Number', { 'label_attr': {'class': 'sr-only'} }) }}
+                                <label for="upgrade_imei_form[imei]">
+                                    IMEI Number
+                                    <span class="ml-2 text-dodger-blue">
+                                        <a href="#"
+                                           data-toggle="modal"
+                                           data-target="#policy_imei_number"
+                                           data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                                           role="button">
+                                            <i class="fal fa-info-circle"></i>
+                                        </a>
+                                    </span>
+                                </label>
+                                {{ form_widget(upgrade_imei_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : '', 'data-make': new_phone.make}}) }}
+                                {% if new_phone.make == 'Apple' %}
+                                    <small class="form-text">
+                                        <strong class="d-inline-block mb-1">How to get your IMEI number:</strong>
+                                        <ul class="pl-4">
+                                            <li class="mb-1">From your iPhone's settings: General &gt; About.</li>
+                                            <li class="mb-1">Or dial <strong>*#06#</strong> on your phone to display your IMEI number.</li>
+                                            {% if device_category() == 'Desktop' %}<li class="mb-1">Or go to iTunes/iCloud: copy and paste.</li>{% endif %}
+                                        </ul>
+                                    </small>
+                                {% else %}
+                                    <small class="form-text">
+                                        <strong class="d-inline-block mb-1">How to get your IMEI number:</strong>
+                                        <ul class="pl-4">
+                                            <li class="mb-1">From your phone's settings.</li>
+                                            <li class="mb-1">or dial <strong>*#06#</strong> on your phone to display your IMEI number.</li>
+                                        </ul>
+                                    </small>
+                                    {% if new_phone.make == 'Samsung' %}
+                                        <strong class="form-text samsung-imei">Numbers only please (no / required)</strong>
+                                    {% endif %}
+                                {% endif %}
+                                <div class="with-errors">{{ form_errors(upgrade_imei_form.imei) }}</div>
+                            </div>
+                        </div>
+                        {% if upgrade_imei_form.serialNumber is defined %}
+                            <div class="col-md">
+                                <div class="form-group {% if form_errors(upgrade_imei_form.serialNumber) %}has-error{% endif %} text-left">
+                                    {{ form_label(upgrade_imei_form.serialNumber, 'Serial Number', { 'label_attr': {'class': 'sr-only'} }) }}
+                                    <label for="upgrade_imei_form[serialNumber]">
+                                        Serial Number
+                                        <span class="ml-2 text-dodger-blue">
+                                            <a href="#"
+                                               data-toggle="modal"
+                                               data-target="#policy_serial_number"
+                                               data-img="{{ cdn_url }}/images/rebrand/icns/so-sure_happy-icn-min.svg"
+                                               role="button">
+                                                <i class="fal fa-info-circle"></i>
+                                            </a>
+                                        </span>
+                                    </label>
+                                    {{ form_widget(upgrade_imei_form.serialNumber, {'attr':{
+                                        'class':'form-control',
+                                        'pattern': '[a-zA-Z0-9]{5,32}',
+                                        'title': 'Enter a valid serial number',
+                                        'placeholder':'Serial Number',
+                                        'data-hj-suppress' : ''
+                                    }}) }}
+                                    <small class="form-text">
+                                        <strong class="d-inline-block mb-1">How to get your iPhone's serial number:</strong>
+                                        <ul class="pl-4">
+                                            <li class="mb-1">From your iPhone's settings: General &gt; About.</li>
+                                            {% if device_category() == 'Desktop' %}<li class="mb-1">Or go to iTunes/iCloud: copy and paste.</li>{% endif %}
+                                        </ul>
+                                    </small>
+                                    <div class="with-errors">{{ form_errors(upgrade_imei_form.serialNumber) }}</div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group mt-4">
+                        {{ form_widget(upgrade_imei_form.next, {
+                            'label': 'Continue',
+                            'attr': {
+                                'class': 'btn btn-success btn-block-xs mb-4'
+                        }}) }}<br>
+                        <a href="{{ path('user_policy') }}" class="btn-simple-link">Decline</a>
+                    </div>
+                {{ form_end(upgrade_imei_form) }}
+            </div>
+        </div>
+    </div>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/upgrades.js') }}"></script>
+    <script src="{{ asset('css-js/upgrades-imei.js') }}"></script>
+{% endblock %}

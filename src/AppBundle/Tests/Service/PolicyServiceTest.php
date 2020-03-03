@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Document\Phone;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CustomerCompany;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
@@ -6247,6 +6248,8 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($priceD->getGwp(), $newC->getPremium()->getGwp());
         $this->assertEquals($priceC->getGwp(), $newD->getPremium()->getGwp());
     }
+
+
 
     private function getFormattedWeekendsForOneYear($fromDate = null)
     {

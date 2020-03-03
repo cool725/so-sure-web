@@ -685,6 +685,34 @@ abstract class Policy
         return $payments;
     }
 
+    /**
+     * Gives you the number of paid scheduled payments for the purposes of scheduling.
+     * @return int the number of scheduled payments that are done.
+     */
+    public function countSchedulePayments()
+    {
+        $payments = $this->getPayments();
+        if (!is_array($payments)) {
+            $payments = $payments->toArray();
+        }
+        return array_reduce($payments, function ($total, $payment) {
+            $pendingBacs = $payment->getType() == 'bacs' && in_array($payment->getStatus(), [
+                BacsPayment::STATUS_PENDING,
+                BacsPayment::STATUS_SUBMITTED,
+                BacsPayment::STATUS_GENERATED
+            ]);
+            if ($payment->isSuccess() || $pendingBacs) {
+                $amount = $payment->getAmount();
+                if ($amount > 0) {
+                    $total++;
+                } elseif ($amount < 0) {
+                    $total--;
+                }
+            }
+            return $total;
+        }, 0);
+    }
+
     public function getSortedPayments($mostRecent = true, \DateTime $date = null)
     {
         $payments = $this->getPayments($date);
@@ -903,22 +931,45 @@ abstract class Policy
 
     /**
      * Gives the set of dates that the policy's premium schedule should consist of.
-     * @return array|null of the dates, and null if there is simply no schedule at all because the policy is not valid.
+     * @param \DateTime|null $date is the minimum date if you only want ones in the future, but pass null to avoid.
+     * @return array of the dates, which is empty if invalid.
      */
-    public function getInvoiceSchedule()
+    public function getInvoiceSchedule($date = null)
     {
         if (!$this->isPolicy()) {
-            return null;
+            return [];
         }
-        $invoiceDates = [];
-        $invoiceDate = clone $this->billing;
-        for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
-            if ($invoiceDate <= $this->getEnd()) {
-                $invoiceDates[] = clone $invoiceDate;
-                $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
+        // Yearly.
+        if ($this->getPremiumInstallments() == 1) {
+            $billing = $this->getBilling();
+            if (!$date || $billing <= $date) {
+                return [];
             }
+            return [$this->getBilling()];
+        }
+        // Monthly.
+        $invoiceDates = [];
+        $invoiceDate = clone $this->getBilling();
+        for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
+            if ($invoiceDate <= $this->getEnd() && (!$date || $invoiceDate >= $date)) {
+                $invoiceDates[] = clone $invoiceDate;
+            }
+            $invoiceDate = $invoiceDate->add(new \DateInterval('P1M'));
         }
         return $invoiceDates;
+    }
+
+    /**
+     * Gives you the number of scheduled payments that are supposed to happen after today.
+     * @param \DateTime|null $date is the date whose end of day to count from, or null to mean right now.
+     * @return int the number of future scheduled payments.
+     */
+    public function countFutureInvoiceSchedule($date = null)
+    {
+        if ($date === $this->getStart()) {
+            return $this->getPremiumInstallments();
+        }
+        return count($this->getInvoiceSchedule(DateTrait::endOfDay($date))) - $this->countPendingScheduledPayments();
     }
 
     public function getInvoiceAmountToDate(\DateTime $date = null)
@@ -986,6 +1037,27 @@ abstract class Policy
         $payment = $this->getLastSuccessfulUserPaymentCredit();
         $method = $this->getPolicyOrUserPaymentMethod();
         return $payment ? $payment->getType() : ($method ? $method->getType() : null);
+    }
+
+    /**
+     * Finds a positive payment that had a large enough amount to be refunded by the given amount.
+     * @param float $amount is the amount that you want to refund as an either negative or positive number.
+     * @return Payment|null the found payment or null if there is no found payment.
+     */
+    public function findPaymentForRefund($amount)
+    {
+        $amount = abs($amount);
+        return array_reduce(
+            $this->getSuccessfulUserPaymentCredits(),
+            function ($carry, $payment) use ($amount) {
+                if ($payment && $payment->getAmount() >= $amount &&
+                    (!$carry || $payment->getAmount() > $carry->getAmount())
+                ) {
+                    return $payment;
+                }
+                return null;
+            }
+        );
     }
 
     /**
@@ -3068,12 +3140,21 @@ abstract class Policy
     }
 
     /**
-     * TODO: Should remove this
+     * Gives you the whole price of the policy.
+     * @return float the total price inclusive of IPT.
      */
     public function getYearlyPremiumPrice()
     {
         return $this->getPremium()->getYearlyPremiumPrice();
-        //return $this->getPremiumInstallmentCount() * $this->getPremiumInstallmentPrice();
+    }
+
+    /**
+     * Gives you the whole ipt to be paid for the policy.
+     * @return float the whole ipt.
+     */
+    public function getYearlyIpt()
+    {
+        return $this->getPremium()->getYearlyIpt();
     }
 
     public function getPremiumPlan()
@@ -3339,15 +3420,13 @@ abstract class Policy
 
     public function getDaysInPolicyYear()
     {
-        if (!$this->isPolicy() || !$this->getStart()) {
-            throw new \Exception('Unable to determine days in policy as policy is not valid');
+        if (!$this->getStart()) {
+            throw new \Exception('Unable to determine days in policy as policy has no start date');
         }
-
         $leapYear = $this->getStart()->format('L');
         if ($this->getStart()->format('m') > 2) {
             $leapYear = $this->getStaticEnd()->format('L');
         }
-
         if ($leapYear === '1') {
             return 366;
         } else {
@@ -3362,22 +3441,19 @@ abstract class Policy
 
     public function getDaysInPolicy($date)
     {
-        if (!$this->isPolicy() || !$this->getStart()) {
-            throw new \Exception('Unable to determine days in policy as policy is not valid');
+        if (!$this->getStart()) {
+            throw new \Exception('Unable to determine days in policy as policy has no start');
         }
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
         $date = $this->endOfDay($date);
-
         $start = $this->startOfDay($this->getStart());
         $diff = $start->diff($date);
         $days = $diff->days;
-
         if ($days > $this->getDaysInPolicyYear()) {
             $days = $this->getDaysInPolicyYear();
         }
-
         return $days;
     }
 
@@ -3405,6 +3481,30 @@ abstract class Policy
         }
 
         return $paid;
+    }
+
+    /**
+     * Gives you the amount of premium that was paid prior to the given date. For normal payments their date of being
+     * taken must be before the cutoff date, but for bacs payments, the date that they were created must be before this
+     * cutoff date. You might think this will not work because you will not know what the status was of the payment
+     * back at that date, but remember all bacs payments succeed, they just get reversed, and the reversal will also be
+     * factored into this if it fits into the time so it will even out.
+     * @param \DateTime|null $date is the date that the payments must be before or null for now.
+     * @return float the amount paid before this date.
+     */
+    public function getPremiumPaidPrior(\DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        return array_reduce($this->getPayments(), function ($total, $payment) use ($date) {
+            if ($payment->getType() == 'bacs') {
+                if ($payment->getSubmittedDate() > $date) {
+                    return $total;
+                }
+            } elseif ($payment->getDate() > $date) {
+                return $total;
+            }
+            return $total + $payment->getAmount();
+        }, 0);
     }
 
     public function getGwpPaid($payments = null)
@@ -3504,7 +3604,26 @@ abstract class Policy
 
     public function getOutstandingPremium()
     {
-        return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());
+        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->getPremiumPaid());
+    }
+
+    /**
+     * Tells you how many pending scheduled payments there are.
+     * @return int the number of them.
+     */
+    public function countPendingScheduledPayments()
+    {
+        $scheduledPayments = $this->getScheduledPayments();
+        if (!is_array($scheduledPayments)) {
+            $scheduledPayments = $scheduledPayments->toArray();
+        }
+        return array_reduce($scheduledPayments, function ($total, $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_PENDING) {
+                return $total + 1;
+            } else {
+                return $total;
+            }
+        }, 0);
     }
 
     public function getPendingBacsPayments($includePending = false)
@@ -4991,6 +5110,43 @@ abstract class Policy
         }
     }
 
+    /**
+     * Gives you the monthly price that this policy should have going forward taking into account any upgrades that the
+     * policy has had. No date is passed so it is assumed that this price is correct at the time that the most recent
+     * upgrade or the start of the policy occured.
+     * @return float the amount they should pay per month.
+     */
+    public function getUpgradedStandardMonthlyPrice()
+    {
+        return $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+    }
+
+    /**
+     * Gives you the monthly price that this policy should pay on the last month of it's existence.
+     * @return float the amount that they should pay in the last month.
+     */
+    public function getUpgradedFinalMonthlyPrice()
+    {
+        return $this->getPremium()->getAdjustedFinalMonthlyPremiumPrice();
+    }
+
+    /**
+     * Gives you the amount of money that the user should pay in order to reconcile with their current upgrades and
+     * stuff.
+     */
+    public function getUpgradedYearlyPrice()
+    {
+        return $this->getPremium()->getAdjustedYearlyPremiumPrice();
+    }
+
+    /**
+     * Tells you if this policy has been upgraded.
+     * @return boolean true if so and false otherwise.
+     */
+    public function isUpgraded()
+    {
+        return false;
+    }
 
     /**
      * Gives you this policy's underwriter's timezone.
@@ -5974,6 +6130,15 @@ abstract class Policy
      * @return float the expected amount.
      */
     abstract public function getExpectedCommission(\DateTime $date = null);
+
+    /**
+     * Gives you the period of time that the policy exists over in seconds.
+     * @return int the number of seconds.
+     */
+    public function getPeriod()
+    {
+        return $this->getStaticEnd()->getTimestamp() - $this->getStart()->getTimestamp();
+    }
 
     public function hasCorrectCommissionPayments(
         \DateTime $date = null,

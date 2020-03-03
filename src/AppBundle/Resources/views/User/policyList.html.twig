@@ -10,9 +10,7 @@
     {% set pic_width = '150px' %}
 {% endif %}
 
-
-{% block title %}Policies | so-sure{% endblock %}
-
+{% block title %}My Phones | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
@@ -23,15 +21,156 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="h2 text-white mb-5 mb-lg-4">My Policies</h1>
+            <h1 class="h2 text-white mb-5 mb-lg-4">My Phones</h1>
         </div>
     </section>
 
     <section class="policies pb-lg-5">
         <div class="container-large pb-5">
-            {% for policyItem in user.getDisplayablePoliciesSorted %}
+            {# Current Policy #}
+            <div class="cardbox cardbox-100 cardbox-no-smallscreen-border mb-5">
+                <div class="cardbox__body cardbox-divider d-flex align-items-center justify-content-start justify-content-lg-between py-lg-2">
+                    {% if policy.phone.iTunes %}
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_apple.png" width="{{ pic_width }}" alt="Apple iPhone" class="lozad">
+                    {% elseif policy.phone.googlePlay %}
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_android.png" width="{{ pic_width }}" alt="Android Phone" class="lozad">
+                    {% else %}
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_half-phone.png" width="{{ pic_width }}" alt="Phone" class="lozad">
+                    {% endif %}
+                    <div class="ml-2 ml-lg-4 flex-grow-1 d-lg-flex align-items-lg-start">
+                        <div class="h5">{{ policy.phone.make }} {{ policy.phone.model }}<br><small class="sub">{{ policy.policyNumber }}</small></div>
+                        <span class="badge badge-pill {% if policy.status == 'active' %}badge-success{% else %}badge-danger{% endif %} ml-lg-2">{{ policy.status|capitalize }}</span>
+                        {% if policy.isPicSurePolicy %}
+                            <span class="badge badge-pill {% if policy.isPicSureValidated %}badge-success{% else %}badge-danger{% endif %} ml-lg-2"><i class="far {% if policy.isPicSureValidated %}fa-check{% else %}fa-times{% endif %} fa-fw"></i> Validated</span>
+                        {% endif %}
+                    </div>
+                    <div class="d-none d-lg-block text-right">
+                        <div class="h5 mb-3"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }}</div>
+                        {% if (policy.hasOpenClaim or policy.hasMonetaryClaimed(true)) or policy.getUnderwriterName == 'Salva' %}
+                            <a href="#"
+                               class="btn btn-outline-primary btn-sm track-data"
+                               data-toggle="modal"
+                               data-target="#upgrade_salva_modal"
+                               data-event="upgrade-current-policy-salva-dt">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                        {% elseif policy.getUnderwriterName == 'Helvetia' %}
+                            <a href="{{ path('user_upgrade', {'policyId': policy.id}) }}"
+                               class="btn btn-outline-primary btn-sm track-data"
+                               data-event="upgrade-current-policy-helvetia-dt"
+                               data-event-url="{{ path('user_upgrade', {'policyId': policy.id}) }}">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="cardbox-divider d-none d-lg-flex excess">
+                    <div class="excess-item text-left flex-fill">
+                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                            <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                        {% elseif not policy.isPicSureValidated %}
+                            <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                        {% elseif policy.isPicSureValidated %}
+                            <p>Your phone has been validated 🥳</p>
+                        {% endif %}
+                        {% if policy.displayRepurchase %}
+                            <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-success ">Repurchase Policy</a>
+                        {% else %}
+                            {% if policy.getPolicyTermsFiles|length > 0 %}
+                                <a href="{{ s3DownloadLink(policy.getPolicyTermsFiles[0].bucket, policy.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary mr-2"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Terms</a>
+                            {% endif %}
+                            {% if policy.getPolicyScheduleFiles|length > 0 %}
+                                <a href="{{ s3DownloadLink(policy.getPolicyScheduleFiles[0].bucket, policy.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Schedule</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="excess-item flex-fill">
+                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                            <div class="h2 text-primary">&pound;{{ policy.premium.picsureExcess.damage|number_format(0, '.', ',') }}</div>
+                        {% else %}
+                            <div class="h2 text-primary">&pound;{{ policy.getCurrentExcess.damage|number_format(0, '.', ',') }}</div>
+                        {% endif %}
+                        Excess for Accidental <br> Damage/Breakdown
+                    </div>
+                    <div class="excess-item flex-fill">
+                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                            <div class="h2 text-primary">&pound;{{ policy.premium.picsureExcess.loss|number_format(0, '.', ',') }}</div>
+                        {% else %}
+                            <div class="h2 text-primary">&pound;{{ policy.getCurrentExcess.loss|number_format(0, '.', ',') }}</div>
+                        {% endif %}
+                        Excess for <br> Loss
+                    </div>
+                    <div class="excess-item flex-fill">
+                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                            <div class="h2 text-primary">&pound;{{ policy.premium.picsureExcess.theft|number_format(0, '.', ',') }}</div>
+                        {% else %}
+                            <div class="h2 text-primary">&pound;{{ policy.getCurrentExcess.theft|number_format(0, '.', ',') }}</div>
+                        {% endif %}
+                        Excess for <br> Theft
+                    </div>
+                </div>
+                <div class="cardbox__body cardbox-divider d-lg-none">
+                    <span class="h6 mb-0"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }}</span>
+                </div>
+                <div class="cardbox__body cardbox-divider d-lg-none bg-athens-gray">
+                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                    {% elseif not policy.isPicSureValidated %}
+                        <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                    {% endif %}
+                    {% if policy.getPolicyTermsFiles|length > 0 %}
+                        <a href="{{ s3DownloadLink(policy.getPolicyTermsFiles[0].bucket, policy.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Terms</a>
+                    {% endif %}
+                    {% if policy.getPolicyScheduleFiles|length > 0 %}
+                        <a href="{{ s3DownloadLink(policy.getPolicyScheduleFiles[0].bucket, policy.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Schedule</a>
+                    {% endif %}
+                </div>
+                {% if policy.displayRepurchase %}
+                    <div class="cardbox__body cardbox-divider d-lg-none">
+                        <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-success  btn-block">Repurchase Policy</a>
+                    </div>
+                {% endif %}
+                <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
+                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        Excess for Accidental Damage/Breakdown <strong>&pound;{{ policy.premium.picsureExcess.damage|number_format(0, '.', ',') }}</strong>
+                    {% else %}
+                        Excess for Accidental Damage/Breakdown <strong>&pound;{{ policy.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
+                    {% endif %}
+                </div>
+                <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
+                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        Excess for Loss <strong>&pound;{{ policy.premium.picsureExcess.loss|number_format(0, '.', ',') }}</strong>
+                    {% else %}
+                        Excess for Loss <strong>&pound;{{ policy.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
+                    {% endif %}
+                </div>
+                <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
+                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        Excess for Theft <strong>&pound;{{ policy.premium.picsureExcess.theft|number_format(0, '.', ',') }}</strong>
+                    {% else %}
+                        Excess for Theft <strong>&pound;{{ policy.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
+                    {% endif %}
+                </div>
+                <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
+                    {% if (policy.hasOpenClaim or policy.hasMonetaryClaimed(true)) or policy.getUnderwriterName == 'Salva' %}
+                        <a href="#"
+                           class="btn btn-outline-primary btn-block-xs track-data"
+                           data-toggle="modal"
+                           data-target="#upgrade_salva_modal"
+                           data-event="upgrade-current-policy-salva-mb">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                    {% elseif policy.getUnderwriterName == 'Helvetia' %}
+                        <a href="{{ path('user_upgrade', {'policyId': policy.id}) }}"
+                           class="btn btn-outline-primary btn-block-xs track-data"
+                           data-event="upgrade-current-policy-helvetia-mb"
+                           data-event-url="{{ path('user_upgrade', {'policyId': policy.id}) }}">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+            {# End Current Policy #}
+            {# Other Policies #}
+            <h2 class="h4 text-gun-powder mb-4">Other Active Policies <span class="sub">({{ user.getOtherActivePoliciesCount(policy) }})</span></h2>
+            {% if user.getOtherActivePoliciesCount(policy) < 1 %}
+                <p class="mb-4">Other Active Policies</p>
+            {% endif %}
+            {% for policyItem in user.getDisplayableOtherActivePolicies(policy) %}
                 <div class="cardbox cardbox-100 cardbox-no-smallscreen-border mb-5">
-                    <div class="cardbox__body cardbox-divider d-flex align-items-center justify-content-start justify-content-lg-between py-lg-1">
+                    <div class="cardbox__body cardbox-divider d-flex align-items-center justify-content-start justify-content-lg-between py-lg-2">
                         {% if policyItem.phone.iTunes %}
                             <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_apple.png" width="{{ pic_width }}" alt="Apple iPhone" class="lozad">
                         {% elseif policyItem.phone.googlePlay %}
@@ -46,12 +185,27 @@
                                     {{ policyItem.phone.make }} {{ policyItem.phone.model }}<br><small class="sub">{{ policyItem.policyNumber }}</small>
                                 </a>
                             </div>
-                            <span class="badge badge-pill {% if policyItem.status == 'active' %}badge-success{% else %}badge-danger{% endif %} ml-lg-2">{{ policyItem.status }}</span>
+                            <span class="badge badge-pill {% if policyItem.status == 'active' %}badge-success{% else %}badge-danger{% endif %} ml-lg-2">{{ policyItem.status|capitalize }}</span>
                             {% if policyItem.isPicSurePolicy %}
                                 <span class="badge badge-pill {% if policyItem.isPicSureValidated %}badge-success{% else %}badge-danger{% endif %} ml-lg-2"><i class="far {% if policyItem.isPicSureValidated %}fa-check{% else %}fa-times{% endif %} fa-fw"></i> Validated</span>
                             {% endif %}
                         </div>
-                        <div class="h5 d-none d-lg-block mb-0"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</div>
+                        <div class="d-none d-lg-block text-right">
+                            <div class="h5 mb-3"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</div>
+                            {% if (policyItem.hasOpenClaim or policyItem.hasMonetaryClaimed(true)) or policyItem.getUnderwriterName == 'Salva' %}
+                                <a href="#"
+                                   class="btn btn-outline-primary btn-sm mr-md-2 track-data"
+                                   data-toggle="modal"
+                                   data-target="#upgrade_salva_modal"
+                                   data-event="upgrade-other-policy-salva-dt">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                            {% elseif policyItem.getUnderwriterName == 'Helvetia' %}
+                                <a href="{{ path('user_upgrade', {'policyId': policyItem.id}) }}"
+                                   class="btn btn-outline-primary btn-block-xs btn-sm mr-md-2 track-data"
+                                   data-event="upgrade-other-policy-helvetia-dt"
+                                   data-event-url="{{ path('user_upgrade', {'policyId': policyItem.id}) }}">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                            {% endif %}
+                            <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="btn btn-success btn-sm btn-block-xs">Go to Dashboard</a>
+                        </div>
                     </div>
                     <div class="cardbox-divider d-none d-lg-flex excess">
                         <div class="excess-item text-left flex-fill">
@@ -59,18 +213,12 @@
                                 <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                             {% elseif not policyItem.isPicSureValidated %}
                                 <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
-                            {% elseif policyItem.isPicSureValidated %}
-                                <p>Your phone has been validated 🥳</p>
                             {% endif %}
-                            {% if policyItem.displayRepurchase %}
-                                <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-success ">Repurchase Policy</a>
-                            {% else %}
-                                {% if policyItem.getPolicyTermsFiles|length > 0 %}
-                                    <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary mr-2"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Terms</a>
-                                {% endif %}
-                                {% if policyItem.getPolicyScheduleFiles|length > 0 %}
-                                    <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Schedule</a>
-                                {% endif %}
+                            {% if policyItem.getPolicyTermsFiles|length > 0 %}
+                                <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary mr-2"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Terms</a>
+                            {% endif %}
+                            {% if policyItem.getPolicyScheduleFiles|length > 0 %}
+                                <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Schedule</a>
                             {% endif %}
                         </div>
                         <div class="excess-item flex-fill">
@@ -101,24 +249,18 @@
                     <div class="cardbox__body cardbox-divider d-lg-none">
                         <span class="h6 mb-0"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</span>
                     </div>
-                    <div class="cardbox__body cardbox-divider d-lg-none">
+                    <div class="cardbox__body cardbox-divider d-lg-none bg-athens-gray">
                         {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
                             <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                         {% elseif not policyItem.isPicSureValidated %}
                             <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                         {% endif %}
-                        <div class="row">
-                            {% if policyItem.getPolicyTermsFiles|length > 0 %}
-                                <div class="col">
-                                    <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Terms</a>
-                                </div>
-                            {% endif %}
-                            {% if policyItem.getPolicyScheduleFiles|length > 0 %}
-                                <div class="col">
-                                    <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Schedule</a>
-                                </div>
-                            {% endif %}
-                        </div>
+                        {% if policyItem.getPolicyTermsFiles|length > 0 %}
+                            <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Terms</a>
+                        {% endif %}
+                        {% if policyItem.getPolicyScheduleFiles|length > 0 %}
+                            <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Schedule</a>
+                        {% endif %}
                     </div>
                     {% if policyItem.displayRepurchase %}
                         <div class="cardbox__body cardbox-divider d-lg-none">
@@ -146,12 +288,80 @@
                             Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
                         {% endif %}
                     </div>
+                    <div class="cardbox__body cardbox-divider d-lg-none">
+                        {% if (policyItem.hasOpenClaim or policyItem.hasMonetaryClaimed(true)) or policyItem.getUnderwriterName == 'Salva' %}
+                            <a href="#"
+                               class="btn btn-outline-primary btn-block-xs track-data"
+                               data-toggle="modal"
+                               data-target="#upgrade_salva_modal"
+                               data-event="upgrade-other-policy-salva-mb">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                        {% elseif policyItem.getUnderwriterName == 'Helvetia' %}
+                            <a href="{{ path('user_upgrade', {'policyId': policyItem.id}) }}"
+                               class="btn btn-outline-primary btn-block-xs track-data"
+                               data-event="upgrade-other-policy-helvetia-mb">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
+                        {% endif %}
+                        <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="btn btn-success btn-block-xs">Go to Dashboard</a>
+                    </div>
                 </div>
             {% endfor %}
+            {# End Other Policies #}
+            {# Inactive Policies #}
+            <h2 class="h4 text-gun-powder mb-4">Inactive Policies <span class="sub">({{ user.getInactivePoliciesCount }})</span></h2>
+            {% if user.getInactivePoliciesCount < 1 %}
+                <p class="mb-4">No Inactive Policies</p>
+            {% endif %}
+            {% for policyItem in user.getDisplayableInactivePolicies %}
+                <div class="cardbox cardbox-100 cardbox-no-smallscreen-border mb-5">
+                    <div class="cardbox__body cardbox-divider d-flex align-items-center justify-content-start justify-content-lg-between py-lg-1">
+                        {% if policyItem.phone.iTunes %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_apple.png" width="{{ pic_width }}" alt="Apple iPhone" class="lozad">
+                        {% elseif policyItem.phone.googlePlay %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_android.png" width="{{ pic_width }}" alt="Android Phone" class="lozad">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_half-phone.png" width="{{ pic_width }}" alt="Phone" class="lozad">
+                        {% endif %}
+                        <div class="ml-2 ml-lg-4 flex-grow-1 d-lg-flex align-items-lg-start">
+                            <div class="h5">
+                                <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}"
+                                   title="{{ policyItem.phone }}">
+                                    {{ policyItem.phone.make }} {{ policyItem.phone.model }}<br><small class="sub">{{ policyItem.policyNumber }}</small>
+                                </a>
+                            </div>
+                            <span class="badge badge-pill {% if policyItem.status == 'active' %}badge-success{% else %}badge-danger{% endif %} ml-lg-2">{{ policyItem.status|capitalize }}</span>
+                        </div>
+                        <div class="h5 text-link-water d-none d-lg-block mb-0"><i class="fal fa-calendar fa-lg fa-fw mr-2"></i> {{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</div>
+                    </div>
+                    <div class="cardbox__body cardbox-divider d-lg-none">
+                        <span class="h6 text-link-water mb-0"><i class="fal fa-calendar fa-lg fa-fw mr-2"></i> {{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</span>
+                    </div>
+                    {% if policyItem.displayRepurchase %}
+                        <div class="cardbox__body cardbox-divider bg-athens-gray">
+                            <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}" class="btn btn-outline-primary btn-block-xs">Repurchase Policy</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            {# End Inactive Policies #}
         </div>
     </section>
 
     {# Page Modal #}
+    <div class="modal fade"
+         id="upgrade_salva_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="upgrade_salva_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_claims-team.png" alt="so-sure - Review claim" width="140px" class="lozad">
+                    <h3 class="text-primary mb-4">We need to talk 🙂</h3>
+                    <p class="lead mb-4">To upgrade this policy please get in touch with our customer support team.</p>
+                    <a href="#" class="btn btn-success open-intercom"><i class="fab fa-intercom fa-fw mr-1"></i> Open Chat</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 

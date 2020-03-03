@@ -150,7 +150,7 @@ trait DateTrait
         return $nextMonth;
     }
 
-    public function startOfDay(\DateTime $date = null)
+    public static function startOfDay(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime("now", SoSure::getSoSureTimezone());
@@ -163,15 +163,14 @@ trait DateTrait
         return $startMonth;
     }
 
-    public function endOfDay(\DateTime $date = null)
+    public static function endOfDay(\DateTime $date = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
-        $startDay = $this->startOfDay($date);
+        $startDay = static::startOfDay($date);
         $nextDay = clone $startDay;
         $nextDay->add(new \DateInterval('P1D'));
-
         return $nextDay;
     }
 
@@ -321,7 +320,7 @@ trait DateTrait
         return $months;
     }
 
-    public function adjustDayForBilling($date, $adjustTimeIfAdjusted = false)
+    public static function adjustDayForBilling($date, $adjustTimeIfAdjusted = false)
     {
         /**
          * We want to make sure that if we adjust the day, we make sure the time is

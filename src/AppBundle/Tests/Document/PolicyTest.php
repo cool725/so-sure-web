@@ -416,4 +416,25 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($c->getRefundCoverholderCommissionAmount() < 0);
         $this->assertTrue($c->getRefundBrokerCommissionAmount() < 0);
     }
+
+    /**
+     * Makes sure that find payment for refund finds appropriate payments when it is possible and when it is not
+     * possible it does not find anything.
+     */
+    public function testFindPaymentForRefund()
+    {
+        $user = Create::user();
+        $policy = Create::policy($user, '2020-02-17', Policy::STATUS_ACTIVE, 1);
+        $a = Create::payment($policy, '2020-02-17', 100, true);
+        $this->assertEquals($a, $policy->findPaymentForRefund(50));
+        $this->assertEquals($a, $policy->findPaymentForRefund(-99));
+        $this->assertNull($policy->findPaymentForRefund(101));
+        $b = Create::payment($policy, '2020-02-17', 200, true);
+        $this->assertNotNull($policy->findPaymentForRefund(50));
+        $this->assertNotNull($policy->findPaymentForRefund(-99));
+        $this->assertNotNull($policy->findPaymentForRefund(-150));
+        $this->assertNotNull($policy->findPaymentForRefund(200));
+        $this->assertNull($policy->findPaymentForRefund(400));
+        $this->assertNull($policy->findPaymentForRefund(-201));
+    }
 }

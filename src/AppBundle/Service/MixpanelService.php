@@ -100,6 +100,7 @@ class MixpanelService
     const EVENT_POLICY_STATUS = 'Policy Status Change';
     const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
     const EVENT_PROMO_PAGE = 'Promo Page';
+    const EVENT_UPGRADE_POLICY = ' Policy Upgraded';
 
     const EVENT_EMAIL = 'Email Sent';
     const EVENT_SMS = 'Sms Sent';
@@ -181,7 +182,8 @@ class MixpanelService
         self::EVENT_PAYMENT_METHOD_CHANGED,
         self::EVENT_EMAIL,
         self::EVENT_SMS,
-        self::EVENT_PROMO_PAGE
+        self::EVENT_PROMO_PAGE,
+        self::EVENT_UPGRADE_POLICY
     ];
 
     public static function getCampaignSources($event)

@@ -8,7 +8,9 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\Premium;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePremium;
@@ -16,7 +18,11 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\LogEntry;
+use AppBundle\Document\PhonePolicyIteration;
+use AppBundle\Document\ImeiTrait;
+use AppBundle\Document\DateTrait;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\Helvetia;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -86,6 +92,7 @@ class Create
         } else {
             $policy = self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
         }
+        $policy->setImei(ImeiTrait::generateRandomImei());
         return $policy;
     }
 
@@ -114,6 +121,8 @@ class Create
         $policy->setStatus($status);
         $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
         $policy->setPremiumInstallments($installments);
+        $paymentMethod = new CheckoutPaymentMethod();
+        $policy->setPaymentMethod($paymentMethod);
         return $policy;
     }
 
@@ -142,6 +151,8 @@ class Create
         $policy->setStatus($status);
         $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
         $policy->setPremiumInstallments($installments);
+        $paymentMethod = new CheckoutPaymentMethod();
+        $policy->setPaymentMethod($paymentMethod);
         return $policy;
     }
 
@@ -163,6 +174,11 @@ class Create
         return $policy;
     }
 
+    /**
+     * Creates a phone price.
+     * @param \DateTime|string $validFrom is the date that the price is valid from as a string or a date.
+     * @param string           $stream    is the stream that the price is in.
+     */
     public static function phonePrice($validFrom, $stream)
     {
         $date = is_string($validFrom) ? new \DateTime($validFrom) : $validFrom;
@@ -192,24 +208,56 @@ class Create
     }
 
     /**
-     * Create a payment of one month's premium and put it on the given policy.
-     * @param Policy           $policy  is the policy to add the payment to.
-     * @param \DateTime|string $date    is the date of the payment.
-     * @param boolean          $success is the success of the payment.
+     * Creates a payment at whatever time you want with whatever amount you want.
+     * @param Policy           $policy  is the policy to put the payment on.
+     * @param \DateTime|string $date    is the date of the payment as either a date or a string.
+     * @param float            $amount  is the amount of the payment.
+     * @param null|boolean     $success is whether the payment is successful, and null means it is pending.
      * @return Payment the created payment.
      */
-    public static function standardPayment($policy, $date, $success)
+    public static function payment($policy, $date, $amount, $success)
     {
         $properDate = is_string($date) ? new \DateTime($date) : $date;
-        $payment = new CheckoutPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setSuccess($success);
+        $payment = null;
+        if ($policy->getPaymentMethod()->getType() == PaymentMethod::TYPE_BACS) {
+            $payment = new BacsPayment();
+        } elseif ($policy->getPaymentMethod()->getType() == PaymentMethod::TYPE_CHECKOUT) {
+            $payment = new CheckoutPayment();
+        } else {
+            throw new \InvalidArgumentException("can only do checkout or bacs payments");
+        }
+        $payment->setAmount($amount);
+        if ($success !== null) {
+            $payment->setSuccess($success);
+        } elseif ($payment->getType() == 'bacs') {
+            /** @var BacsPayment $payment */
+            $payment = $payment;
+            $payment->setStatus(BacsPayment::STATUS_PENDING);
+        }
         $payment->setDate($properDate);
         $policy->addPayment($payment);
         if ($success) {
             $policy->setCommission($payment, false, $properDate);
         }
         return $payment;
+    }
+
+    /**
+     * Create a payment of one month's premium and put it on the given policy.
+     * @param Policy           $policy  is the policy to add the payment to.
+     * @param \DateTime|string $date    is the date of the payment.
+     * @param null|boolean     $success is the success of the payment and null means it's pending.
+     * @return Payment the created payment.
+     */
+    public static function standardPayment($policy, $date, $success)
+    {
+        $amount = 0;
+        if ($policy->getPremiumInstallments() == 12) {
+            $amount = $policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+        } else {
+            $amount = $policy->getPremium()->getAdjustedYearlyPremiumPrice();
+        }
+        return Create::payment($policy, $date, $amount, $success);
     }
 
     /**
@@ -229,5 +277,42 @@ class Create
         $scheduledPayment->setType($type);
         $policy->addScheduledPayment($scheduledPayment);
         return $scheduledPayment;
+    }
+
+    /**
+     * Creates a very sparse phone policy iteration.
+     * @param \DateTime|string $start is the start date as either a string or a datetime.
+     * @param \DateTime|string $end   is the end date as either a string or a datetime.
+     * @param float            $gwp   is the gwp of the premium that this iteration should have.
+     * @param float            $ipt   is the ipt of the premium that this iteration should have.
+     * @return PhonePolicyIteration that which was just created.
+     */
+    public static function phonePolicyIteration($start, $end, $gwp, $ipt)
+    {
+        $start = is_string($start) ? new \DateTime($start) : $start;
+        $end = is_string($end) ? new \DateTime($end) : $end;
+        $premium = new PhonePremium();
+        $premium->setGwp($gwp);
+        $premium->setIpt($ipt);
+        $iteration = new PhonePolicyIteration();
+        $iteration->setStart($start);
+        $iteration->setEnd($end);
+        $iteration->setPremium($premium);
+        return $iteration;
+    }
+
+    /**
+     * Creates a phone with a price that will JustWork™.
+     * @return Phone the new phone.
+     */
+    public static function phone()
+    {
+        $price = new PhonePrice();
+        $price->setValidFrom(new \DateTime('2016-01-01'));
+        $price->setGwp(rand() % 20);
+        $price->setStream(PhonePrice::STREAM_ALL);
+        $phone = new Phone();
+        $phone->addPhonePrice($price);
+        return $phone;
     }
 }

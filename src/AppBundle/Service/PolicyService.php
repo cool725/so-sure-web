@@ -7,6 +7,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Feature;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\Reward;
 use AppBundle\Exception\ValidationException;
@@ -476,6 +477,12 @@ class PolicyService
         }
     }
 
+    public function validateUpgradeImei(User $user, Phone $phone, $imei = null, $serialNumber = null)
+    {
+        $this->validateImei($imei);
+        return $this->checkImeiSerial($user, $phone, $imei, $serialNumber);
+    }
+
     private function dispatchEvent($eventType, $event)
     {
         if ($this->dispatcher) {
@@ -663,7 +670,7 @@ class PolicyService
         $policy->setPromoCode($promoCode);
     }
 
-    private function queueMessage($policy)
+    public function queueMessage($policy)
     {
         $data = ['policyId' => $policy->getId()];
         $this->redis->rpush(self::KEY_POLICY_QUEUE, serialize($data));
@@ -736,7 +743,11 @@ class PolicyService
         $this->statsd->endTiming("policy.schedule+terms");
 
         if ($email) {
-            $this->newPolicyEmail($policy, [$policySchedule, $policyTerms], $bcc);
+            if ($policy->isUpgraded()) {
+                $this->upgradedPolicyEmail($policy, [$policySchedule, $policyTerms], $bcc);
+            } else {
+                $this->newPolicyEmail($policy, [$policySchedule, $policyTerms], $bcc);
+            }
         }
     }
 
@@ -1004,10 +1015,7 @@ class PolicyService
         if (!$now) {
             $now = new \DateTime();
         }
-        if (!$date) {
-            if (!$policy->getBilling()) {
-                throw new \Exception('Unable to generate payments if policy does not have a start date');
-            }
+        if ($policy->getBilling()) {
             $date = clone $policy->getBilling();
         }
 
@@ -1041,7 +1049,7 @@ class PolicyService
         if ($billingOffset) {
             $paid += $billingOffset;
         }
-        $numPaidPayments = count($policy->getPayments());
+        $numPaidPayments = $policy->countSchedulePayments();
         if (!$numPaidPayments) {
             if ($paid > 0) {
                 // There were some payments applied to the policy, but amounts don't split
@@ -1055,8 +1063,8 @@ class PolicyService
             $numPaidPayments = 0;
         }
         $isBacs = $policy->getPaymentMethod() instanceof BacsPaymentMethod;
-        $numScheduledPayments = $numPayments - $numPaidPayments;
-        for ($i = 1; $i <= $numScheduledPayments; $i++) {
+        $numScheduledPayments = $numPayments;
+        for ($i = $numPaidPayments; $i < $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
             $pendingPayments = $policy->getAllScheduledPayments('pending');
             $pendingDates = [];
@@ -1071,20 +1079,19 @@ class PolicyService
              * regardless of the billing date the customer has set.
              * Unless it is a renewal policy
              */
-            if ($numPaidPayments < 1 && $isBacs && $i === 1 && !$renewal) {
+            if ($numPaidPayments == 0 && $isBacs && $i == 0 && !$renewal) {
                 $scheduledDate = (clone $now)->add(new \DateInterval("P7D"));
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
                 }
-            } elseif ($renewal && $i == 1) {
+            } elseif ($renewal && $i == 0) {
                 $scheduledDate = $this->adjustDayForBilling($policy->getStart(), true);
             } else {
                 $scheduledDate = $this->adjustDayForBilling($scheduledDate, true);
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates) && $isBacs) {
                     continue;
                 }
-                // initial purchase should start at 1 month from initial purchase
-                $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
+                $scheduledDate->add(new \DateInterval(sprintf('P%dM', $i)));
             }
             if ($isBacs) {
                 try {
@@ -1103,12 +1110,12 @@ class PolicyService
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setScheduled($scheduledDate);
-            if ($i == 1 && $numPayments == 1) {
-                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedYearlyPremiumPrice());
-            } elseif ($i < $numScheduledPayments) {
-                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+            if ($i == 0 && $numPayments == 1) {
+                $scheduledPayment->setAmount($policy->getUpgradedYearlyPrice());
+            } elseif ($i < $numScheduledPayments - 1) {
+                $scheduledPayment->setAmount($policy->getUpgradedStandardMonthlyPrice());
             } else {
-                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
+                $scheduledPayment->setAmount($policy->getUpgradedFinalMonthlyPrice());
             }
             $policy->addScheduledPayment($scheduledPayment);
         }
@@ -1312,7 +1319,40 @@ class PolicyService
     }
 
     /**
+     * Sends out the emails for a policy that has been upgraded.
+     * @param Policy $policy is the policy that has been upgraded.
+     */
+    public function upgradedPolicyEmail($policy, $attachmentFiles = null, $bcc = null)
+    {
+        if (!$this->mailer) {
+            return;
+        }
+        $baseTemplate = 'AppBundle:Email:upgrades/upgradePhone';
+        try {
+            $this->mailer->sendTemplateToUser(
+                sprintf('Your so-sure policy %s has been upgraded', $policy->getPolicyNumber()),
+                $policy->getUser(),
+                'AppBundle:Email:upgrades/upgradePhone.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:upgrades/upgradePhone.txt.twig',
+                ['policy' => $policy],
+                $attachmentFiles,
+                $bcc
+            );
+            $policy->setLastEmailed(new \DateTime());
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()),
+                ['exception' => $e]
+            );
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @param Policy $policy
+     * @return boolean|null the success of the emailing unless there is no mailer in which case it returns nothing.
      */
     public function newPolicyEmail(Policy $policy, $attachmentFiles = null, $bcc = null)
     {
@@ -2178,7 +2218,6 @@ class PolicyService
 
         $this->dispatchEvent(PolicyEvent::EVENT_CASHBACK, new PolicyEvent($policy));
     }
-
 
     /**
      * @param Policy         $policy

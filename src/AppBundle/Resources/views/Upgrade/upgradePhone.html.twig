@@ -1,0 +1,79 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user' %}
+{% set robots_noindex = true %}
+{% set user_mode = true %}
+{% set small_footer = true %}
+
+{% block title %}Upgrade Phone | so-sure{% endblock %}
+
+{# Set Meta #}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/upgrades.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <div class="upgrade-container container-large">
+        <div class="cardbox cardbox-100">
+            <div class="cardbox__body d-flex align-items-center justify-content-center flex-column text-center">
+                <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="140px" class="lozad">
+                <h1 class="h4 text-primary mb-4">Tell us about your new phone <br><span class="sub text-zaffre">You're upgrading your {{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB) policy</span></h1>
+                {{ form_start(upgrade_quote_form, { 'attr': {
+                    'class': 'phone-search-dropdown-upgrade',
+                    'data-phones': phones|json_encode|raw,
+                    'autocomplete': 'off'
+                }}) }}
+                    <div class="row">
+                        <div class="col-md">
+                            <div class="form-group">
+                                {{ form_widget(upgrade_quote_form.make, {
+                                  'attr': {
+                                    'class': 'form-control phone-search-option-make',
+                                    'placeholder': 'Select Make'
+                                }}) }}
+                                <div class="with-errors">{{ form_errors(upgrade_quote_form.make) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="form-group">
+                                {{ form_widget(upgrade_quote_form.model, {
+                                  'attr': {
+                                    'class': 'form-control phone-search-option-model',
+                                    'disabled': 'disabled'
+                                }}) }}
+                                <div class="with-errors">{{ form_errors(upgrade_quote_form.model) }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md">
+                            <div class="form-group">
+                                {{ form_widget(upgrade_quote_form.memory, {
+                                  'attr': {
+                                    'class': 'form-control phone-search-option-memory',
+                                    'disabled': 'disabled'
+                                }}) }}
+                                <div class="with-errors">{{ form_errors(upgrade_quote_form.memory) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-4">
+                        {{ form_widget(upgrade_quote_form.next, {
+                          'label': 'Continue',
+                          'attr': {
+                            'class': 'btn btn-success btn-block-xs phone-search-button',
+                            'disabled': 'disabled'
+                        }}) }}
+                    </div>
+                {{ form_end(upgrade_quote_form) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/upgrades.js') }}"></script>
+{% endblock %}
