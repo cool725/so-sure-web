@@ -65,6 +65,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/best-screen-protectors' => 'Best Screen Protectors',
             '/blog/applecare-vs-phone-insurance' => 'AppleCare+ vs iPhone Insurance',
             '/blog/best-phone-security-apps' => 'Best Phone Security Apps',
+            '/blog/new-iphone-se2-rumour-hub' => 'New iPhone SE2 Rumour Hub',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

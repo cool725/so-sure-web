@@ -548,4 +548,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/new-iphone-se2-rumour-hub", name="new_iphone_se2_rumour_hub", options={"sitemap" = true})
+     * @Template
+     */
+    public function newiPhoneSe2RumourHubAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/new-iphone-se2-rumour-hub.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
