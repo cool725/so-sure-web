@@ -35,106 +35,102 @@
         <div class="login__card">
             <div class="login__card__body">
 
-                {# Account Kit #}
-                <div id="login-account-kit"
-                     {% if default_login_method == 'email' %}style="display: none;"{% endif %}
-                     class="login__account-kit"
-                     data-key="{{ fb_appid }}"
-                     data-csrf="{{ csrf_token('account-kit') }}"
-                     data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
-                    <form id="login-account-kit-form"
-                          method="post"
-                          action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off"
-                          data-client-validation="{{ form_client_validation }}">
-                        <input type="hidden" value="+44" id="country_code" class="form-control" />
-                        <input type="hidden" name="app_id" value="{{ fb_appid }}">
-                        <input type="hidden" name="redirect" value="{{ app.request.schemeAndHttpHost }}/login/check-accountkit">
-                        <input type="hidden" name="state" value="{{ accountkit_state() }}">
-                        <input type="hidden" name="fbAppEventsEnabled" value=true>
-                        <input type="hidden" name="debug" value=false>
-                        <div class="form-group mb-4">
-                            <label for="phone_number">Mobile Number</label>
-                            <div class="input-group" id="phone-number-holder">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text"><i class="fal fa-mobile-android fa-lg"></i></div>
+                <form id="login_email_form"
+                      action="{{ path("fos_user_security_check") }}#email"
+                      method="post"
+                      autocomplete="off"
+                      class="validate-form"
+                      data-client-validation="{{ form_client_validation }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+                    <div class="form-group">
+                        <label for="_username">Email Address</label>
+                        <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Enter Email Address" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="_password">Password</label>
+                        <input type="password" id="password" name="_password" required="required" placeholder="Enter Password" class="form-control" />
+                        {% if error %}
+                            <label class="error mt-1">
+                                {% if app.request.clientIp == davies_ip or app.request.clientIp in sosure_ips %}
+                                    Looks like the email address or password you’ve entered is incorrect, or <strong>your password has expired</strong>. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
+                                {% else %}
+                                    Looks like the email address or password you’ve entered is incorrect. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
+                                {% endif %}
+                            </label>
+                        {% endif %}
+                    </div>
+                    <div class="form-group mb-4">
+                        <div class="row">
+                            <div class="col">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} class="custom-control-input" />
+                                    <label class="custom-control-label" for="remember_me"><small>Remember me</small></label>
                                 </div>
-                                <input placeholder="Enter Mobile Number" id="phone_number" name="phone_number" class="form-control" type="tel" />
                             </div>
-                            {% if error %}
-                                <label class="error mt-1">Sorry, we were unable to log you in. You can try again, or <a href="{{ path('about_how_to_contact_so_sure') }}">contact us</a> for help.</label>
-                            {% endif %}
+                            <div class="col text-right">
+                                <a href="{{ path('fos_user_resetting_request') }}"><small>Forgot password?</small></a>
+                            </div>
                         </div>
-                        <div class="form-group  col-md-8 offset-md-2">
-                            <button id="sms-login-btn" class="btn btn-success  btn-block">Send Login Code</button>
-                        </div>
-                    </form>
-                    <form id="accountkit-form"
-                          method="post"
-                          action="{{ path('accountkit_login') }}"
-                          autocomplete="off">
-                        <input type="hidden" id="accountkit-code" name="code">
-                        <input type="hidden" id="accountkit-csrf" name="csrf">
-                    </form>
-                </div>
+                    </div>
+                    <div class="form-group col-md-8 offset-md-2">
+                        <button type="submit" id="_submit" name="_submit" class="btn btn-success  btn-block">Login</button>
+                    </div>
+                </form>
 
-                {# Email Login #}
-                <div id="login-email"
-                     class="login__email"
-                     {% if default_login_method == 'accountkit' %}style="display: none;"{% endif %}>
-                    <form id="login-email-form"
-                          action="{{ path("fos_user_security_check") }}#email"
-                          method="post"
-                          autocomplete="off"
-                          class="validate-form"
-                          data-client-validation="{{ form_client_validation }}">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-                        <div class="form-group">
-                            <label for="_username">Email Address</label>
-                            <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Enter Email Address" class="form-control" />
-                        </div>
-                        <div class="form-group">
-                            <label for="_password">Password</label>
-                            <input type="password" id="password" name="_password" required="required" placeholder="Enter Password" class="form-control" />
-                            {% if error %}
-                                <label class="error mt-1">
-                                    {% if app.request.clientIp == davies_ip or app.request.clientIp in sosure_ips %}
-                                        Looks like the email address or password you’ve entered is incorrect, or <strong>your password has expired</strong>. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
-                                    {% else %}
-                                        Looks like the email address or password you’ve entered is incorrect. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
-                                    {% endif %}
-                                </label>
-                            {% endif %}
-                        </div>
-                        <div class="form-group mb-4">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} class="custom-control-input" />
-                                        <label class="custom-control-label" for="remember_me"><small>Remember me</small></label>
-                                    </div>
-                                </div>
-                                <div class="col text-right">
-                                    <a href="{{ path('fos_user_resetting_request') }}"><small>Forgot password?</small></a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-8 offset-md-2">
-                            <button type="submit" id="_submit" name="_submit" class="btn btn-success  btn-block">Login</button>
-                        </div>
-                    </form>
-                </div>
+                <form id="login_sms_form"
+                      class="validate-form"
+                      style="display:none;"
+                      data-token="{{ csrf_token('mobile') }}"
+                      data-url="{{ path('mobile_otp_web') }}">
+                    <div class="form-group mb-4">
+                        <label for="phone_number">Mobile Number</label>
+                        <input placeholder="Enter Mobile Number" id="phone_number" name="phone_number" class="form-control" type="tel" />
+                        <label id="sms_error" class="error"></label>
+                    </div>
+                    <div class="form-group col-md-8 offset-md-2">
+                        <button type="submit"  id="sms_login_btn" class="btn btn-success btn-block">Send Login Code</button>
+                    </div>
+                </form>
 
                 <div class="login__divider"><span class="h6 text-grey">or login with</span></div>
 
-                {# Login with #}
-                {# <div class="row"> #}
-                    <div class="form-group col-md-8 offset-md-2">
-                        <a href="#" id="swap-login" class="btn btn-outline-primary btn-block"><span>Email</span></a>
-                    </div>
-                {# </div> #}
+                <div class="col-md-8 offset-md-2">
+                    <a href="#" id="swap_login" class="btn btn-outline-primary btn-block"><span>Mobile Number</span></a>
+                </div>
+
             </div>
         </div>
 
     {% endif %}
 
 {% endblock fos_user_content %}
+
+{% block login_modal %}
+    {# Page Modal #}
+    <div class="modal fade"
+         id="sms_code_modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby=""
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form id="verify_code_form"
+                          action="{{ path('mobile_login_web') }}"
+                          method="post">
+                        <div class="form-group mb-4">
+                            <label for="sms_code">Verification Code</label>
+                            <input placeholder="Enter Verification Code" id="verify_code" name="code" class="form-control" type="tel" maxlength="6" minlength="6" />
+                            <input type="hidden" name="mobileNumber" id="mobile_number" value="">
+                            <input type="hidden" name="csrf" value="{{ csrf_token('mobile') }}">
+                        </div>
+                        <div class="form-group col-md-8 offset-md-2">
+                            <button type="submit"  id="verify_code_btn" class="btn btn-success btn-block">Verify</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

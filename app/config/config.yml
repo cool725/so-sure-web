@@ -78,8 +78,6 @@ twig:
         drift_key: "%drift_key%"
         use_cdn: "%online%"
         use_fa_cdn: "%online%"
-        #default_login_method: "accountkit"
-        default_login_method: "accountkit"
         branch_pot_url: "%branch_pot_url%"
         branch_share_url: "%branch_share_url%"
         branch_policy_url: "%branch_policy_url%"
@@ -203,7 +201,6 @@ hwi_oauth:
             facebook: facebook_id
             google: google_id
             starling: starlingId
-            accountkit: accountkitId
     resource_owners:
         facebook:
             type:                facebook
@@ -858,7 +855,6 @@ nelmio_security:
                 - https://*.maxcdn.com
                 - https://*.licdn.com # linkedin
                 - https://*.linkedin.com
-                - https://sdk.accountkit.com
                 - https://angel.co
                 # unbounce conversion
                 - https://d3pkntwtp2ukl5.cloudfront.net
@@ -892,6 +888,7 @@ nelmio_security:
                 - http://*.oribi.io
                 - https://js.smct.io
                 - http://www.instagram.com/embed.js
+                - http://track.omguk.com/
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1157,7 +1154,6 @@ nelmio_security:
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com
-                - https://www.accountkit.com
                 - https://www.glassdoor.co.uk
                 - http://via.placeholder.com
                 - https://developer.starlingbank.com

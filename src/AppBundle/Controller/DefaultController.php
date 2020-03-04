@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Form\Type\CompanyLeadType;
 use AppBundle\Form\Type\EmailOptInType;
@@ -60,9 +61,12 @@ use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\Charge;
 
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
+
+use AppBundle\Validator\Constraints\UkMobileValidator;
 
 class DefaultController extends BaseController
 {
@@ -1197,22 +1201,86 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/accountkit-login", name="accountkit_login")
+     * @Route("/mobile-otp", name="mobile_otp_web")
      */
-    public function accountKitLoginAction(Request $request)
+    public function mobileOtp(Request $request)
     {
-        $facebook = $this->get('app.facebook');
+        $data = json_decode($request->getContent(), true);
+        if (!$this->validateFields(
+            $data,
+            ['mobileNumber', 'csrf']
+        )) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+        }
+
+        if (!$this->isCsrfTokenValid('mobile', $data['csrf'])) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid csrf', 422);
+        }
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
+        $validator = new UkMobileValidator();
+        $mobileNumber = $this->normalizeUkMobile($data['mobileNumber']);
+        $user = $repo->findOneBy(["mobileNumber" => $mobileNumber]);
 
-        $csrf = $request->get('csrf');
-        $authorizationCode = $request->get('code');
+        if (!$user) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 404);
+        }
 
-        if (!$this->isCsrfTokenValid('account-kit', $request->get('csrf'))) {
+        if (!$user->isEnabled()) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_USER_RESET_PASSWORD,
+                'User account is temporarily disabled - reset password',
+                422
+            );
+        } elseif ($user->isLocked()) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_USER_SUSPENDED,
+                'User account is suspended - contact us',
+                422
+            );
+        }
+
+        $sms = $this->get('app.sms');
+        $code = $sms->setValidationCodeForUser($user);
+        $status = $sms->sendTemplate(
+            $mobileNumber,
+            'AppBundle:Sms:login-code.txt.twig',
+            ['code' => $code],
+            $user->getLatestPolicy(),
+            Charge::TYPE_SMS_VERIFICATION
+        );
+
+        if ($status) {
+            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+        } else {
+            $this->get('logger')->error('Error sending SMS.', ['mobile' => $mobileNumber]);
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_SEND_SMS, 'Error sending SMS', 422);
+        }
+    }
+
+    /**
+     * @Route("/mobile-login", name="mobile_login_web")
+     */
+    public function mobileLoginAction(Request $request)
+    {
+        $data = $request->request->all();
+        if (!$this->validateFields(
+            $data,
+            ['mobileNumber', 'code', 'csrf']
+        )) {
+            throw new \InvalidArgumentException('Missing Parameters');
+        }
+
+        if (!$this->isCsrfTokenValid('mobile', $data['csrf'])) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
 
-        $mobileNumber = $facebook->getAccountKitMobileNumber($authorizationCode);
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $validator = new UkMobileValidator();
+        $mobileNumber = $this->normalizeUkMobile($data['mobileNumber']);
+
         $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
         if (!$user) {
             $this->addFlash(
@@ -1220,6 +1288,19 @@ class DefaultController extends BaseController
                 "Sorry, we can't seem to find your user account. Please contact us if you need help."
             );
 
+            return new RedirectResponse($this->generateUrl('fos_user_security_login'));
+        }
+
+        $code = $data['code'];
+        $sms = $this->get('app.sms');
+        if ($sms->checkValidationCodeForUser($user, $code)) {
+            $user->setMobileNumberVerified(true);
+            $dm->flush();
+        } else {
+            $this->addFlash(
+                'error',
+                "Sorry, your code is invalid or has expired, please try again or use the email login"
+            );
             return new RedirectResponse($this->generateUrl('fos_user_security_login'));
         }
 

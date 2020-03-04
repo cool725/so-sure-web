@@ -497,15 +497,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    app.twig.accountkit:
-        class: AppBundle\Service\AccountkitTwigExtension
-        arguments:
-            - "@hwi_oauth.resource_owner.accountkit"
-            - "@logger"
-        public: true
-        tags:
-            - { name: twig.extension }
-
     app.twig.s3:
         class: AppBundle\Service\S3TwigExtension
         arguments:
