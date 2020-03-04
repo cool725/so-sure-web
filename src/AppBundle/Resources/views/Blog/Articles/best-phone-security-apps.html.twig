@@ -1,0 +1,224 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %} Best Phone Security Apps | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="While Apple and Google have improved their security services recently, they're still not 100% effective. To protect your data and privacy on your smartphone, check out our guide to the best third-party security apps."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = ' Best Phone Security Apps | so-sure' %}
+{% set og_description = "While Apple and Google have improved their security services recently, they're still not 100% effective. To protect your data and privacy on your smartphone, check out our guide to the best third-party security apps." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/best-phone-security-apps-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Best Phone Security Apps</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Best Phone Security Apps</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Mar 4, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/best-phone-security-apps-1.jpg"
+                                     alt="Phone Security Apps"
+                                     class="img-fluid lozad mb-5">
+                                <p>Whether you're checking train times, buying a new outfit or connecting with friends, chances are you're doing it on your smartphone. Just like a desktop computer, however, your mobile device can be susceptible to harmful viruses and malware.</p>
+                                <p>While Apple and Google have improved their security features in recent years, they're not always 100% effective. Therefore, it's wise to install a third-party security app to reinforce your protection and safeguard your data.</p>
+                                <h2>Do phones have security built in?</h2>
+                                <h3>Android</h3>
+                                <p>Used on millions of smartphones worldwide, Google's Android OS is pretty watertight when it comes to security, with most Androids equipped with <a href="https://www.android.com/intl/en_uk/play-protect/" target="_blank" rel="noopener noreferrer">Google Play Protect</a> (GPP), Google's built-in malware protection. But despite its machine-learning algorithms, reports in 2017 revealed that GPP struggles to detect certain forms of malware, so it's best to install a reputable security app to supplement Android's free offering.</p>
+                                <h3>Apple iOS</h3>
+                                <p>Arguably more impervious to security threats than Android devices, iPhones generally function well with Apple's built-in security features. Plus, all apps for iOS are pre-screened for security measures before entering Apple's App Store. Nevertheless, while the need for additional security is less important for iPhones than Androids, it's essential to keep your apps and software up to date to maintain your phone's overall health.</p>
+                                <h2>What do phone security apps do?</h2>
+                                <p>While individual packages vary, paid security apps typically include most of the following features.</p>
+                                <h3>Anti-phishing</h3>
+                                <p>Eradicates questionable links and bars users from dangerous websites designed to infect devices or steal data.</p>
+                                <h3>Backup</h3>
+                                <p>Preserves personal information by saving it on the cloud. Backups can then be restored to any compatible device.</p>
+                                <h3>Remote photo</h3>
+                                <p>Identifies unauthorised users, photographs them and emails you their picture. This feature activates automatically when security passwords are entered incorrectly.</p>
+                                <h3>Safe browsing mode</h3>
+                                <p>Checks webpages in real time, keeping you protected when you click on links.</p>
+                                <h3>Uninstall protection</h3>
+                                <p>Prevents thieves from bypassing your security app and tampering with any device data and apps. A password is required to delete the app.</p>
+                                <h2>Best free phone security apps</h2>
+                                <h3><a href="https://my.norton.com/mobile/home" target="_blank" rel="noopener noreferrer">Norton Mobile Security</a></h3>
+                                <p>Norton Mobile Security offers flawless malware protection alongside anti-theft features and malicious website blocking technology. You can test its great features for 30 days for free, and if you decide to keep it beyond the trial period, you'll access the unique App Advisor feature, which security scans apps in the Google Play Store before you install them.</p>
+                                <table class="table mt-3 mb-5">
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Industry leading malware detection</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Clean intuitive design</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> App Advisor ranks high among competition</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-minus fa-fw mr-2 text-danger"></i> Premium plan can be expensive</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-minus fa-fw mr-2 text-danger"></i> Ads in Safe Search can irritate</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <h3><a href="https://www.avast.com/en-gb/free-mobile-security" target="_blank" rel="noopener noreferrer">Avast Mobile Security</a></h3>
+                                <p>Avast goes above and beyond a mundane scanner; packing its free version with impressive features like a call blocker, malware detection and a firewall. But while the app used to be free, it's now supported by ads, which can irritate at times. A small monthly or annual fee will remove these, however, while giving you access to the handy ‘in-app locking' feature, which prompts you for a password before opening certain apps, thus preventing malware.</p>
+                                <table class="table mt-3 mb-5">
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Affordable premium version</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Many useful free features</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Impressive anti-malware performance</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Call blocking and anti-theft features</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-minus fa-fw mr-2 text-danger"></i> Ad saturation in free version</td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-minus fa-fw mr-2 text-danger"></i> Call blocking and anti-theft features can be unreliable</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <h3><a href="https://www.sophos.com/en-us/products/free-tools/sophos-mobile-security-free-edition.aspx" target="_blank" rel="noopener noreferrer">Sophos Mobile Security </a></h3>
+                                <p>Sophos' award-winning security app blocks potentially dangerous websites, scans apps for malware and includes a handy QR code scanner to set up secure Wi-Fi connections – all for free. What's more, the antivirus scanner can be scheduled to scan files periodically, while the malware database updates daily, making this a viable alternative to our top picks.</p>
+                                <table class="table mt-3 mb-5">
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Award-winning protection </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> No adverts </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <h3><a href="https://www.avira.com/en/free-antivirus-android" target="_blank" rel="noopener noreferrer">Avira Antivirus Security</a></h3>
+                                <p>As well as scanning downloaded content on your phone's memory, Avira's offering can also scan external storage, like an SD card. Apps are rated using a privacy scale so you can make informed decisions regarding your data, while the ‘Identity Safeguard' feature periodically scans your device to check for potential data breaches. One disadvantage is the lack of malware detection on the free version, but this can be purchased for a small fee, and will bring with it more frequent updates and round the clock technical support.</p>
+                                <table class="table mt-3 mb-5">
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Scans external storage </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Identify Safeguard determines the trust rating of a website </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-minus fa-fw mr-2 text-danger"></i> No malware detection on free version </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <h2>Best paid phone security app</h2>
+                                <h3><a href="https://www.bitdefender.co.uk/" target="_blank" rel="noopener noreferrer">Bitdefender Mobile Security</a></h3>
+                                <p>Bitdefender's comprehensive Android security app has it all; high level malware protection, a VPN client, Android Wear watch integration, plus a host of robust privacy protection tools. The only downside is the lack of a freemium option, as the separate Bitdefender Antivirus Free app only scans for malware. But at just &pound;16 for a year, you'll be hard pressed to find better protection in this price bracket.</p>
+                                <table class="table mt-3 mb-5">
+                                    <tbody>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Excellent malware </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Low price premium version </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Numerous useful features </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-plus fa-fw mr-2 text-success"></i> Light system impact </td>
+                                        </tr>
+                                        <tr>
+                                            <td><i class="far fa-minus fa-fw mr-2 text-danger"></i> Expensive unlimited VPN </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <h2>Should I buy mobile security software?</h2>
+                                <p>Both free and paid apps regularly receive <a href="https://www.which.co.uk/about-which/get-involved/3955/which-awards" target="_blank" rel="noopener noreferrer">Which Best Buy Awards</a>, indicating that paid apps are not necessarily superior. Free apps, like those available from Norton, Sophos and Avira are popular due to their capacity to handle security basics. So, if your main concern is malware, a free app ticks all the boxes.</p>
+                                <p>Free apps, however, don't tend to include the supplementary features found on paid security apps. Moreover, free apps often limit full functionality to a matter of days or weeks, so when the trial period ends, so do the app's premium features.</p>
+                                <p>Therefore, if you have an expensive Android device, it may be worth investing in a robust paid-for app with premium features. In addition to malware protection and anti-spam tools, they typically include many additional features like cloud-based backup and more.</p>
+                                <p>Of course, it's not just your phone's software that needs protecting. It's also worth considering whether <a href="{{ path('phone_insurance') }}">phone insurance</a> is worth investing in, covering your hardware itself against damage and theft</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

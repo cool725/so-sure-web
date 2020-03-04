@@ -535,4 +535,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/best-phone-security-apps", name="best_phone_security_apps", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestPhoneSecurityAppsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/best-phone-security-apps.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
