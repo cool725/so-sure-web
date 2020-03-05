@@ -80,6 +80,7 @@
                 <form id="login_sms_form"
                       class="validate-form"
                       style="display:none;"
+                      method="post"
                       data-token="{{ csrf_token('mobile') }}"
                       data-url="{{ path('mobile_otp_web') }}">
                     <div class="form-group mb-4">
