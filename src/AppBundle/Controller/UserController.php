@@ -650,7 +650,7 @@ class UserController extends BaseController
             'user' => $user,
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
-            // 'invitation_form' => $invitationForm->createView(),
+            'invitation_form' => $invitationForm->createView(),
             'sent_invitation_form' => $sentInvitationForm->createView(),
             'scode_form' => $scodeForm->createView(),
             'scode' => $scode,
