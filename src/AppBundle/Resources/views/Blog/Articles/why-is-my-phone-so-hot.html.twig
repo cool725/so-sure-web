@@ -1,0 +1,156 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Why Is My Phone So Hot? | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Why is your phone so hot? In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Why Is My Phone So Hot? | so-sure' %}
+{% set og_description = "Why is your phone so hot? In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/why-is-my-phone-so-hot-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Why Is My Phone So Hot?</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Why Is My Phone So Hot?</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Mar 10, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/why-is-my-phone-so-hot-1.jpg"
+                                     alt="Hot Phone"
+                                     class="img-fluid lozad mb-5">
+                                <p>There are a wide range of possible causes for smartphones overheating. In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again.</p>
+                                <p>Firstly, we'll tackle the more innocuous causes that can be easily fixed, before focusing on more serious issues and offering our top tips to combat them.</p>
+                                <h2>Reasons smartphones overheat</h2>
+                                <h3>Gaming for long periods of time</h3>
+                                <p>Gaming apps use your phone's CPU in addition to the graphics processing unit, which can cause your phone to overheat when used for prolonged periods.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/why-is-my-phone-so-hot-2.jpg"
+                                     alt="Phones Gaming"
+                                     class="img-fluid lozad mb-5">
+                                <h3>Streaming content</h3>
+                                <p>Similar to gaming apps, streaming services like YouTube and Netflix overwork your phone's processor, as it has to load the video data and keep the display active for an extended period.</p>
+                                <h3>Phone settings</h3>
+                                <p>Your phone's settings – from screen brightness levels to active home screen widgets – can impact its energy usage. Consider deactivating any battery-sapping apps running in the background and ensure your screen brightness is set to a comfortable level. Taking such precautions will lighten the load on your phone's CPU – and your wallet.</p>
+                                <h3>Environmental factors</h3>
+                                <p>Excessively high temperatures during summer can cause your phone to overheat when paired with heavy usage, while water damage from heavy rainfall can also result in similar symptoms.</p>
+                                <h3>Out of date apps</h3>
+                                <p>If you have apps that are old and haven't been updated in a long time, they could be severely under-optimised, meaning they could place strain on your processor, leading to overheating. Keeping your apps up to date should be an essential part of your phone care regime as updated apps usually include bug fixes and security.</p>
+                                <h3>Malware</h3>
+                                <p>A phone that's literally too hot to handle may have been infected with <a href="https://www.avg.com/en/signal/what-is-malware" target="_blank" rel="noopener noreferrer">malware</a>, which can take up a large portion of your phone's RAM usage and CPU power. Use a trusted mobile antivirus programme like <a href="https://www.avg.com/en-gb/avg-memory-cleaner" target="_blank" rel="noopener noreferrer">AVG Cleaner</a> to resolve this problem.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/why-is-my-phone-so-hot-3.jpg"
+                                     alt="Phones Malware"
+                                     class="img-fluid lozad mb-5">
+                                <h2>What causes my phone to get hot?</h2>
+                                <p>It's completely normal for your phone to warm up from time to time; electricity generates heat after all. However, if it overheats regularly and none of the above software or usage reasons seem to be to blame, there could be a more serious hardware problem to contend with. Below are the most probable hardware causes for your phone getting hot.</p>
+                                <h3>Battery, processor and screen</h3>
+                                <p>Your smartphone's battery, processor and screen are all components that generate electricity, while producing heat as a by-product. The battery, for instance, houses chemicals that generate electricity, while the processor transfers information at rapid speeds. And depending on your brightness settings, the screen emits light which can cause your phone to quickly heat.</p>
+                                <h3>Back of phone</h3>
+                                <p>If the back of your phone is getting overly hot, it's likely to be an issue with the battery. While lithium ion batteries (the type found in your phone) are usually safe, <a href="https://www.bbc.co.uk/news/business-3871446" target="_blank" rel="noopener noreferrer">accidents do happen</a>. A battery that overheats frequently will need to be replaced as soon as possible.</p>
+                                <h3>Bottom of phone</h3>
+                                <p>If there's heat coming from the bottom of your phone, it's likely to be an issue with the charger or charging port. Remedy this by purchasing the official charger from your phone's manufacturer, or one from a reputable electronic brand.</p>
+                                <h3>Top of phone</h3>
+                                <p>It's trickier to identify the issue when heat is being generated above the battery, or by the speaker. In these instances, it's best to exhaust all possible causes related to both the handset and external factors. But if all else fails, take your device to a respected repair expert.</p>
+                                <h2>How hot is too hot?</h2>
+                                <p>Generally, a phone's internal temperature can reach anywhere between 37-43&deg;C and still be considered normal. For Androids, you can install the smart <a href="https://www.aida64.com/" target="_blank" rel="noopener noreferrer">AIDA64 app</a>, which provides a wealth of useful information about your phone – including a handy temperature report.</p>
+                                <p>Apple includes a Battery Health menu, but it doesn't provide temperature reports. Therefore, it's down to you to notice if your handset is getting hot several times a day, or for seemingly no reason.</p>
+                                <h2>How to cool your phone down</h2>
+                                <p>While your phone case won't directly cause your device to overheat, it may, in fact, trap heat. Removing the case will therefore allow your phone's temperature to drop to a sensible level. If this doesn't resolve the issue, try activating airplane mode to rapidly deactivate battery-sapping features like Bluetooth, Wi-Fi signal search etc. In some cases, though, simply restarting your device will allow your phone to cool down and recalibrate.</p>
+                                <h3>Use less power</h3>
+                                <p>For iPhones, activate Low Power Mode. For Androids, try using Battery Saver Mode. These settings reduce the amount of power you phone uses, and therefore preserve battery life. If possible, disable Wi-Fi, GPS and Bluetooth to allow your phone to cool, while maintaining a low-medium screen brightness to prevent your battery from draining.</p>
+                                <h3>Install phone cleaning software</h3>
+                                <p>Cleaner apps, like AVG Cleaner, handily remove junk files and identify apps that are impairing your phone's performance.</p>
+                                <h2>How to prevent your phone from overheating again</h2>
+                                <p>Developing a few basic phone-care habits can make all the difference when it comes to extending your phone's life. The tips below will enable you to prevent problems before they occur; think prevention before cure.</p>
+                                <h3>Charge your phone correctly</h3>
+                                <p>As well as purchasing a charger from a reputable brand, the location where you charge it is also important. It's best to place it on a hard surface that doesn't conduct heat – places like the sofa or bed will retain the heat from charging.</p>
+                                <h3>Update your apps</h3>
+                                <p>If your phone heats up for no apparent reason, try to identify the problem from your recently installed apps. Updating your apps usually resolve these issues, but if not, simply uninstall the app to determine whether it's the culprit.</p>
+                                <h3>Use an antivirus (Android)</h3>
+                                <p>As well as resolving overheating issues, antivirus programmes also neutralise malicious malware that can end up on your phone.</p>
+                                <p>If nothing you try stops your phone from overheating, it may be a serious hardware issue that might be covered under comprehensive <a href="https://wearesosure.com/phone-insurance" target="_blank" rel="noopener noreferrer">phone insurance</a>.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

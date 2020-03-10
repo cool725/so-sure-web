@@ -561,4 +561,17 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/why-is-my-phone-so-hot", name="why_is_my_phone_so_hot", options={"sitemap" = true})
+     * @Template
+     */
+    public function whyIsMyPhoneSoHotAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/why-is-my-phone-so-hot.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
