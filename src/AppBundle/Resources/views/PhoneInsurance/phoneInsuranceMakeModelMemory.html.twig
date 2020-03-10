@@ -193,50 +193,57 @@
                                 </div>
                             {{ form_end(lead_form) }}
                         {% endif %}
-                        <h2 class="h4 text-columbia-blue-e my-4">Insurance Product Information Document:</h2>
-                        <ul class="list-unstyled icn-fa-list mb-0">
-                            <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
-                            <li class="text-white mb-5">
-                                <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
-                                {% if validation_required is not null %}
-                                    <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="track-data text-white"
-                                       data-event="user-download-ipid-agg"
-                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u>Download a copy of our IPID</u></a>
-                                {% else %}
-                                    <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="track-data text-white"
-                                       data-event="user-download-ipid"
-                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
-                                {% endif %}
-                            </li>
-                        </ul>
-                        <h2 class="h4 text-columbia-blue-e my-4">Our Policy Document:</h2>
-                        <ul class="list-unstyled icn-fa-list mb-0">
-                            <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> See our policy document for full details.</li>
-                            <li class="text-white mb-5">
-                                <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
-                                {% if validation_required is not null %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="track-data text-white"
-                                       data-event="user-download-sample-policy-doc-quote-agg"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><u>Download a copy of our Policy Document</u></a>
-                                {% else %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="track-data text-white"
-                                       data-event="user-download-sample-policy-doc-quote"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><u>Download a copy of our Policy Document</u></a>
-                                {% endif %}
-                            </li>
-                        </ul>
+                        <h2 class="h4 text-columbia-blue-e mt-4">Insurance Product Information Documents</h2>
+                        <a href="#insurance_product_info"
+                           class="text-white"
+                           data-toggle="collapse"
+                           role="button" aria-expanded="false"
+                           aria-controls="insurance_product_info">Read more <i class="far fa-angle-double-right fa-fw"></i></a>
+                        <div class="collapse mt-4" id="insurance_product_info">
+                            <ul class="list-unstyled icn-fa-list mb-0">
+                                <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
+                                <li class="text-white mb-5">
+                                    <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
+                                    {% if validation_required is not null %}
+                                        <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="track-data text-white"
+                                           data-event="user-download-ipid-agg"
+                                           data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u>Download a copy of our IPID</u></a>
+                                    {% else %}
+                                        <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="track-data text-white"
+                                           data-event="user-download-ipid"
+                                           data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                            <h2 class="h4 text-columbia-blue-e my-4">Our Policy Document:</h2>
+                            <ul class="list-unstyled icn-fa-list mb-0">
+                                <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> See our policy document for full details.</li>
+                                <li class="text-white mb-5">
+                                    <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
+                                    {% if validation_required is not null %}
+                                        <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="track-data text-white"
+                                           data-event="user-download-sample-policy-doc-quote-agg"
+                                           data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><u>Download a copy of our Policy Document</u></a>
+                                    {% else %}
+                                        <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="track-data text-white"
+                                           data-event="user-download-sample-policy-doc-quote"
+                                           data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><u>Download a copy of our Policy Document</u></a>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
                         <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
                         {% if validation_required is not null or instore is not null %}
                             <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
