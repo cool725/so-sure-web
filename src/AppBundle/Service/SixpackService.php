@@ -211,7 +211,7 @@ class SixpackService
         // Exp 3
         //
         // Exp 4
-        self::EXPERIMENT_SCODE_INVITE_IMAGE,
+        //
         // Exp 5
         //
         // Exp 6
@@ -240,7 +240,7 @@ class SixpackService
         // Exp 3
         // self::EXPERIMENT_HOMEPAGE_TAGLINE,
         // Exp 4
-        // self::EXPERIMENT_HOMEPAGE_TABS_AND_USP,
+        self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
         // self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
         // Exp 6
