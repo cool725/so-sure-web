@@ -243,6 +243,7 @@ services:
             - "%kernel.environment%"
             - "@event_dispatcher"
             - "@app.mixpanel"
+            - "@snc_redis.default"
 
     app.scode:
         alias: AppBundle\Service\SCodeService

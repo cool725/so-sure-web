@@ -27,6 +27,8 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
+use AppBundle\Document\Draw\Draw;
+use AppBundle\Document\Draw\Entry;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\SmsOptOut;
@@ -57,6 +59,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 
+use Predis\Client as Redis;
+
 class InvitationService
 {
     use PhoneTrait;
@@ -70,6 +74,9 @@ class InvitationService
 
     const TYPE_SMS_INVITE = 'invite';
     const TYPE_SMS_INVITE_USER = 'invite-user';
+
+    const VIRALITY_INVITE_KEY = 'Virality:Invite:%s';
+    const VIRALITY_TIMEOUT = 2600000;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -106,6 +113,9 @@ class InvitationService
     /** @var MixpanelService */
     protected $mixpanel;
 
+    /** @var Redis */
+    protected $redis;
+
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -123,6 +133,7 @@ class InvitationService
      * @param string                   $environment
      * @param EventDispatcherInterface $dispatcher
      * @param MixpanelService          $mixpanel
+     * @param Redis                    $redis
      */
     public function __construct(
         DocumentManager $dm,
@@ -135,7 +146,8 @@ class InvitationService
         PushService $push,
         $environment,
         EventDispatcherInterface $dispatcher,
-        MixpanelService $mixpanel
+        MixpanelService $mixpanel,
+        Redis $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -148,6 +160,7 @@ class InvitationService
         $this->environment = $environment;
         $this->dispatcher = $dispatcher;
         $this->mixpanel = $mixpanel;
+        $this->redis = $redis;
     }
 
     public function setDebug($debug)
@@ -378,6 +391,52 @@ class InvitationService
             $invitation->invite();
             $this->dm->persist($invitation);
             $this->dm->flush();
+
+            $userId = $policy->getUser()->getId();
+            $key = sprintf(self::VIRALITY_INVITE_KEY, $userId);
+
+            $foundUserId = $this->redis->get($key);
+
+            if ($foundUserId != $userId) {
+                $drawRepo = $this->dm->getRepository(Draw::class);
+
+                /** @var Draw $draw */
+                $draw = $drawRepo->findOneBy(
+                    [
+                        'active' => true,
+                        'current' => true,
+                        'type' => 'virality'
+                    ]
+                );
+
+                if ($draw) {
+                    $entry = new Entry;
+                    $entry->setUser($policy->getUser());
+                    $this->dm->persist($entry);
+                    $draw->addEntry($entry);
+                    $this->dm->flush();
+                    $this->redis->setex($key, self::VIRALITY_TIMEOUT, $userId);
+                    try {
+                        $this->mailer->sendTemplateToUser(
+                            sprintf('Thanks for sharing'),
+                            $policy->getUser(),
+                            'AppBundle:Email:invitation/thanks.html.twig',
+                            ['policy' => $policy],
+                            'AppBundle:Email:invitation/thanks.txt.twig',
+                            ['policy' => $policy]
+                        );
+                    } catch (\Exception $e) {
+                        $this->logger->error(
+                            sprintf('Failed sending virality thanks email to %s', $policy->getUser()->getEmail()),
+                            ['exception' => $e]
+                        );
+                    }
+                } else {
+                    $this->logger->error('Draw Entry failed, No active virality draw found');
+                    $this->dm->clear();
+                }
+            }
+
 
             $link = $this->getShortLink($invitation);
             $invitation->setLink($link);
