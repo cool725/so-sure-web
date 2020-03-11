@@ -179,25 +179,6 @@
         Make a Claim
     </a>
 </li>
-<li class="nav-item pr-xl-4">
-    {% if app.user is not null and app.user %}
-        {% if not app.user.hasPolicy and app.user.hasPartialPolicy %}
-            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_EMPLOYEE') or is_granted('ROLE_CLAIMS') %}
-                <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-outline-deep-sky-blue-d get-a-quote disabled btn-swap">Get a Quote</a>
-            {% else %}
-                <a href="{{ path('purchase') }}"
-                   class="btn btn-sm py-1 btn-white btn-swap"
-                   title="Resume insuring your {{ app.user.policies|first.phone }}">
-                   Resume <span class="ml-1 badge badge-success">{{ app.user.getPartialPolicies|length }}</span>
-                </a>
-            {% endif %}
-        {% else %}
-            <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-outline-deep-sky-blue-d get-a-quote disabled btn-swap">Get a Quote</a>
-        {% endif %}
-    {% else %}
-        <a id="quote_btn" href="#" class="btn btn-sm py-1 btn-outline-deep-sky-blue-d get-a-quote disabled btn-swap">Get a Quote</a>
-    {% endif %}
-</li>
 {# Mobile Login - this shows inside the navigation only #}
 <li class="nav-item d-none-xxs {{ menu_show }} pr-xl-4">
     {% if app.user is not null and app.user %}
