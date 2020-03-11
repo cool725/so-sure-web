@@ -6249,7 +6249,36 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($priceC->getGwp(), $newD->getPremium()->getGwp());
     }
 
-
+    public function testChangeBillingDay()
+    {
+        $user = Create::user();
+        $policy = Create::policy($user, '2019-07-08', Policy::STATUS_ACTIVE, 12);
+        Create::save(static::$dm, $user, $policy);
+        static::$policyService->generateScheduledPayments($policy);
+        $i = 0;
+        foreach ($policy->getScheduledPayments() as $scheduledPayment) {
+            if ($i < 4) {
+                $i++;
+            } else {
+                break;
+            }
+            $payment = Create::standardPayment($policy, $scheduledPayment->getScheduled(), true);
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            static::$dm->persist($scheduledPayment);
+            static::$dm->persist($payment);
+        }
+        static::$dm->flush();
+        static::$policyService->changeBillingDay($policy, 19);
+        $scheduledPayments = $policy->getScheduledPayments();
+        $this->assertEquals(12, count($scheduledPayments));
+        foreach ($scheduledPayments as $scheduled) {
+            if ($scheduled->getStatus() == ScheduledPayment::STATUS_SUCCESS) {
+                $this->assertEquals(8, $scheduled->getScheduled()->format('d'));
+            } else {
+                $this->assertEquals(19, $scheduled->getScheduled()->format('d'));
+            }
+        }
+    }
 
     private function getFormattedWeekendsForOneYear($fromDate = null)
     {

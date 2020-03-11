@@ -30,8 +30,7 @@ class BillingDayType extends AbstractType
             if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
                 $enabled = false;
             } else {
-                $enabled = $policy->isPolicyPaidToDate() &&
-                    !$policy->isWithinCooloffPeriod();
+                $enabled = $policy->isPolicyPaidToDate() && !$policy->isWithinCooloffPeriod(null, false);
             }
         }
 

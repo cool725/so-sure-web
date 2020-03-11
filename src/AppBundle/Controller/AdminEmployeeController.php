@@ -1852,7 +1852,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             } elseif ($request->request->has('billing_form')) {
                 $billingForm->handleRequest($request);
                 if ($billingForm->isValid()) {
-                    $policyService->adjustScheduledPayments($policy);
+                    $policyService->changeBillingDay($policy, $policy->getBilling()->format('d'));
                     $dm->flush();
                     $this->addFlash(
                         'success',

@@ -871,6 +871,29 @@ class PolicyService
     }
 
     /**
+     * Changes the billing day of a policy and reschedules all it's scheduled payments to be on that day.
+     * @param Policy $policy is the policy to change the billing day for.
+     * @param int    $day    is the day of the month to set it to.
+     */
+    public function changeBillingDay(Policy $policy, $day)
+    {
+        if ($policy->getPaymentMethod() instanceof BacsPaymentMethod) {
+            throw new \InvalidArgumentException('No change of billing day for bacs policies');
+        }
+        $policy->setBilling(DateTrait::setDayOfMonth($policy->getBilling(), $day));
+        $scheduledPayments = $policy->getScheduledPayments();
+        foreach ($scheduledPayments as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $scheduledPayment->setScheduled(DateTrait::setDayOfMonth(
+                    $scheduledPayment->getScheduled(),
+                    $day
+                ));
+            }
+        }
+        $this->dm->flush();
+    }
+
+    /**
      * If returns false, make sure to re-load policy
      * $policy = $this->dm->merge($policy);
      * TODO: Fix that
