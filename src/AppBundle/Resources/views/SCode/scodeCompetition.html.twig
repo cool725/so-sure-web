@@ -10,7 +10,11 @@
 {# Set Meta #}
 {% set og_title = 'We can both win £20, it’s super easy, check it out' %}
 {% set og_description = "Check out so-sure to win £20 and benefit from their excellent perks: one month free, up to 80% cash back, etc. It’s super easy to enter!" %}
-{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
+{% if hero_image is defined and hero_image == 'money-voucher' %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-money-voucher.jpg' %}
+{% else %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
+{% endif %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/invite-competition.css') }}">
@@ -22,7 +26,17 @@
         <div class="container-large">
             <div class="row">
                 <div class="col-xl-6 d-none d-xl-block">
-                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_large_540x540.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
+                    {% if hero_image is defined and hero_image == 'money-voucher' %}
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand__holding_money_large_540x540.png"
+                             alt="Hand holding moneu voucher"
+                             class="lozad img-fluid">
+                    {% else %}
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_large_540x540.png"
+                             alt="Hand holding amazon voucher"
+                             class="lozad img-fluid">
+                    {% endif %}
                 </div>
                 <div class="col-xl-6">
                     {% if scode is defined and scode and scode.policy %}
@@ -63,7 +77,17 @@
                 </div>
             </div>
             <div class="hero__illustration-mobile d-block d-xl-none pt-5">
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_small.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
+                {% if hero_image is defined and hero_image == 'money-voucher' %}
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_money_voucher_small.png"
+                         alt="Hand holding moneu voucher"
+                         class="lozad img-fluid">
+                {% else %}
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_small.png"
+                         alt="Hand holding amazon voucher"
+                         class="lozad img-fluid">
+                {% endif %}
             </div>
         </div>
     </section>

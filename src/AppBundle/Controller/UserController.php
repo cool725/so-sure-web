@@ -1358,6 +1358,8 @@ class UserController extends BaseController
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO);
         // A/B Send Quote
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SEND_QUOTE);
+        // A/B Scode/Invite Hero Image Test
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE);
 
         /** @var RouterService $router */
         $router = $this->get('app.router');

@@ -31,6 +31,12 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_SEND_QUOTE = 'Send Quote';
 
+    // Exp 3
+    //
+
+    // Exp 4
+    const EXPERIMENT_SCODE_INVITE_IMAGE = 'Amazon vs Money';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -115,9 +121,9 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_SEND_QUOTE,
         // Exp 3
-        // self::EXPERIMENT_UK_FLAG,
+        //
         // Exp 4
-        // self::EXPERIMENT_HOMEPAGE_TAGLINE,
+        self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
         // self::EXPERIMENT_HOMEPAGE_TABS_AND_USP,
         // Exp 6
@@ -205,7 +211,7 @@ class SixpackService
         // Exp 3
         //
         // Exp 4
-        //
+        self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
         //
         // Exp 6
