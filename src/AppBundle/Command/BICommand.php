@@ -545,6 +545,9 @@ class BICommand extends ContainerAwareCommand
             '"User Id"',
             '"User Created"',
             '"Purchased Policy"',
+            '"First Policy Start"',
+            '"First Phone Insured"',
+            '"First Seen on App"',
             '"Pen Portrait"',
             '"Gender"',
             '"Total Weekly Income"',
@@ -555,12 +558,17 @@ class BICommand extends ContainerAwareCommand
             /** @var User $user */
             $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
             $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            /** @var PhonePolicy $policy */
+            $policy = $user->getFirstPolicy();
             $lines[] = implode(',', [
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
                 sprintf('"%s"', $user->getId()),
                 sprintf('"%s"', $this->timezoneFormat($user->getCreated(), $timezone, 'Y-m-d')),
                 sprintf('"%s"', count($user->getCreatedPolicies()) > 0 ? 'yes' : 'no'),
+                $policy? $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d'): "",
+                $policy? sprintf('%s %s', $policy->getPhone()->getMake(), $policy->getPhone()->getModel()): "",
+                $user->getFirstLoginInApp()? $this->timezoneFormat($user->getFirstLoginInApp(), $timezone, 'Y-m-d'): "",
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
