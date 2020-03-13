@@ -117,19 +117,10 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $template = 'AppBundle:Default:indexB.html.twig';
+        $template = 'AppBundle:Default:index.html.twig';
 
         // Track Normally
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
-
-        // A/B Hero Image Test
-        // To Test use url param ?force=standard-hero-image / ?force=photo-hero-image
-        $heroImageExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO,
-            ['standard-hero-image', 'photo-hero-image'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
 
         $data = array(
             // Make sure to check homepage landing below too
@@ -137,7 +128,6 @@ class DefaultController extends BaseController
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $this->competitorsData(),
             'from_price' => $fromPrice,
-            'hero_image_exp' => $heroImageExp,
         );
 
         return $this->render($template, $data);

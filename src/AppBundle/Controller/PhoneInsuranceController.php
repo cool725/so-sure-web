@@ -521,18 +521,6 @@ class PhoneInsuranceController extends BaseController
         $instore = $this->get('session')->get('store');
 
         // A/B Hero Image Test
-        // To Test use url param ?force=no-send-quote / ?force=send-quote
-        $sendQuoteExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_SEND_QUOTE,
-            ['no-send-quote', 'send-quote'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
-        // A/B Hero Image Test
-        // To Test use url param ?force=standard-hero-image / ?force=photo-hero-image
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HERO_IMAGE_PHOTO);
-        // A/B Scode/Invite Hero Image Test
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
@@ -636,7 +624,6 @@ class PhoneInsuranceController extends BaseController
                         $this->addFlash('success', sprintf(
                             "Thanks! An email of your quote is on it's way"
                         ));
-                        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SEND_QUOTE);
                     } else {
                         $this->addFlash('error', sprintf(
                             "Sorry, didn't quite catch that email. Please try again."
@@ -687,7 +674,6 @@ class PhoneInsuranceController extends BaseController
             'competitor2' => 'GC',
             'competitor3' => 'O2',
             'lead_form' => $leadForm->createView(),
-            'send_quote' => $sendQuoteExp,
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }

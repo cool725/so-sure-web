@@ -151,13 +151,9 @@
                                 <small>Not the phone you're looking for?</small>
                             </a>
                         </div>
-                        {% set button_text = 'Get Started' %}
-                        {% if send_quote is defined and send_quote == 'send-quote' %}
-                            {% set button_text = 'Buy Now' %}
-                        {% endif %}
                         {{ form_start(buy_form, {'attr': { 'class': 'my-5'}}) }}
                             {{ form_widget(buy_form.buy, {
-                                'label': button_text,
+                                'label': 'Get Started',
                                 'attr': {
                                     'class': 'btn btn-success btn-block-xs btn-shadow mr-sm-2'
                             }}) }}
@@ -173,25 +169,6 @@
                         {{ form_end(buy_form) }}
                         {% if validation_required is not null %}
                             <p class="text-white">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
-                        {% endif %}
-                        {% if (send_quote is defined and send_quote == 'send-quote') and (validation_required is null) %}
-                            <p class="text-white">Not ready yet? Enter your email address to send you this quote 🤔</p>
-                            {{ form_start(lead_form, {'attr': {
-                                'data-toggle': 'validator',
-                                'class': 'validate-form',
-                                'data-client-validation': form_client_validation,
-                                'autocomplete': 'off'
-                            }}) }}
-                                <div class="custom-input-with-btn">
-                                    {{ form_widget(lead_form.email, {'attr': {
-                                        'placeholder': 'Enter email address',
-                                        'class': 'form-control form-control-white form-control-shadow'
-                                    }}) }}
-                                    {{ form_widget(lead_form.save, {'label': 'Send Quote', 'attr': {
-                                        'class': 'btn btn-primary btn-sm'
-                                    }}) }}
-                                </div>
-                            {{ form_end(lead_form) }}
                         {% endif %}
                         <h2 class="h4 text-columbia-blue-e mt-4">Insurance Product Information Documents</h2>
                         <a href="#insurance_product_info"

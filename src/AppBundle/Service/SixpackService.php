@@ -26,10 +26,10 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    const EXPERIMENT_HERO_IMAGE_PHOTO = 'Hero Image';
+    //
 
     // Exp 2
-    const EXPERIMENT_SEND_QUOTE = 'Send Quote';
+    //
 
     // Exp 3
     //
@@ -112,22 +112,24 @@ class SixpackService
         'Homepage Tagline',
         'Pricing USP',
         'Homepage Tabs and USP',
-        'Homepage Price USPs'
+        'Homepage Price USPs',
+        'Hero Image',
+        'Send Quote'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_HERO_IMAGE_PHOTO,
+        //
         // Exp 2
-        self::EXPERIMENT_SEND_QUOTE,
+        //
         // Exp 3
         //
         // Exp 4
         self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
-        // self::EXPERIMENT_HOMEPAGE_TABS_AND_USP,
+        //
         // Exp 6
-        // self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
+        //
         // Exp 7
         //
         // Exp 8
@@ -205,7 +207,7 @@ class SixpackService
      */
     public static $purchaseConversionSimple = [
         // Exp 1
-        // self::EXPERIMENT_SEND_QUOTE,
+        //
         // Exp 2
         //
         // Exp 3
@@ -234,11 +236,11 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_HERO_IMAGE_PHOTO,
+        //
         // Exp 2
-        self::EXPERIMENT_SEND_QUOTE,
+        //
         // Exp 3
-        // self::EXPERIMENT_HOMEPAGE_TAGLINE,
+        //
         // Exp 4
         self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
