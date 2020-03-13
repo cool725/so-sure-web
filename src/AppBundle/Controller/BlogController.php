@@ -574,4 +574,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/common-mobile-phone-faults-and-solutions",
+     * name="common_mobile_phone_faults_and_solutions", options={"sitemap" = true})
+     * @Template
+     */
+    public function commonMobilePhoneFaultsAndSolutionsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/common-mobile-phone-faults-and-solutions.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

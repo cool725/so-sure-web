@@ -1,0 +1,173 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %} Common Mobile Phone Faults And Solutions | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Did you know that lots of smartphone issues can be resolved quickly and easily at home? Read on to learn common solutions to smartphone problems."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = ' Common Mobile Phone Faults And Solutions | so-sure' %}
+{% set og_description = "Did you know that lots of smartphone issues can be resolved quickly and easily at home? Read on to learn common solutions to smartphone problems." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/common-mobile-phone-faults-and-solutions-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Common Mobile Phone Faults and Solutions</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Common Mobile Phone Faults and Solutions</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Mar 12, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/common-mobile-phone-faults-and-solutions-1.jpg"
+                                     alt="Woman holding phone"
+                                     class="img-fluid lozad mb-5">
+                                <p>Tech issues can aggravate and frustrate in equal measure, but did you know that lots of common smartphone issues can be solved quickly and easily at home? In this blog, we’ll review the most common problems people have with their phones and share the most likely solutions.</p>
+                                <p><em>Note: These are just common solutions, they're not guaranteed to work and, in some cases, might invalidate your manufacturer warranty.</em></p>
+                                <h2>Phone is running slowly</h2>
+                                <p><strong>Solution:</strong> Clear your device’s cache</p>
+                                <p>If your phone is responding slowly, start by closing any apps that you aren't using as they can run in the background and monopolise your phone’s RAM space, causing your device to slow down.</p>
+                                <p>If internet speeds become an issue, try alternating between your mobile data and Wi-Fi to determine which has the strongest signal, then close your other apps and location services as they may be eating into your network bandwidth.</p>
+                                <h2>Battery draining too quickly</h2>
+                                <p><strong>Solution:</strong> Maximise standby time</p>
+                                <p>Fast-draining batteries are one of the most common smartphone issues and tend to be caused by the user. We’ve collated some simple solutions to this common occurrence below.</p>
+                                <h3>Phone charger</h3>
+                                <p>Make sure you’re using a proprietary charger from your phone’s manufacturer or a reputable brand that specialises in quality phone accessories.</p>
+                                <h3>Charging location</h3>
+                                <p>Many people tend to overlook where they place their phone when they’re charging it, but try to avoid leaving it on a heat conductive surface like metal, as they could contribute to heat build-up.</p>
+                                <h3>Screen timeout</h3>
+                                <p>Try shortening the time your phone remains idle before its display automatically darkens. This can usually be done by heading to your display settings.</p>
+                                <h3>Battery saver mode</h3>
+                                <p>Maximise your battery power by activating battery saver mode in your power settings. In this setting, your phone will pare back animations and pause both location services and background syncing, allowing your CPU to conserve energy. Some handsets, such as the Samsung Galaxy series, feature an ‘extreme power-saving mode’s setting, which deactivates data connections, GPS, Auto Sync and Bluetooth, leaving only the essential apps like text messaging and the clock active.</p>
+                                <h2>Cracked screen</h2>
+                                <p><strong>Solution:</strong> Repair now, prevent future problems</p>
+                                <p>Aside from obscuring your view of the screen, a severely cracked screen can actually affect your touchscreen’s functionality, too. Therefore, if it’s cracked, it’s best to have it repaired as soon as possible, before equipping it with a high-quality case and screen protector to protect against damage in the future.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/common-mobile-phone-faults-and-solutions-2.jpg"
+                                     alt="Phone with cracked screen"
+                                     class="img-fluid lozad mb-5">
+                                <h2>Water damage</h2>
+                                <p><strong>Solution:</strong> Rice bath</p>
+                                <p>While it’s one of the trickiest smartphone issues to deal with, there is still hope when your handset has suffered water damage. To ensure the best chance of recovery for your smartphone, consider the following tips.</p>
+                                <ol>
+                                    <li>Switch off your phone immediately, while making sure not to push any other buttons or keys as this may short circuit your device and cause further internal damage.</li>
+                                    <li>Gently dab off any excess water.</li>
+                                    <li>Place your phone into a sealable freezer bag filled with rice for 24-48 hours. This allows adequate time for the rice to absorb the water.</li>
+                                    <li>After 48 hours have elapsed, remove your phone from the bag and try switching it on. If it works – great! If you’re not so lucky, you’ll need to have it repaired by a professional.</li>
+                                </ol>
+                                <h2>Screen is freezing</h2>
+                                <p><strong>Solution:</strong> Perform essential phone maintenance</p>
+                                <p>If your screen freezes frequently, try closing the apps you’re running and clear your handset’s cache, before deleting any apps you don’t actually need.</p>
+                                <p>If your phone’s storage is limited, it’s often worth moving some data onto an external hard drive or SD card to free up some of your device’s memory.</p>
+                                <p>Whether or not the above tips work, it’s usually a good idea to install a cleaner app that’ll perform essential maintenance on your smartphone for you, keeping it well optimised and speedy.</p>
+                                <h2>Phone frequently crashes</h2>
+                                <p><strong>Solution:</strong> Restart or reset</p>
+                                <p>If you’re having performance issues on more than one app or your handset is shutting down or restarting on its own, it can be tricky to diagnose the main problem. Sometimes, a new operating system update will contain bugs that can cause issues like these, but if you haven’t updated your OS recently, it’s something else. Therefore, it’s best to take steps toward cleaning your system.</p>
+                                <ol>
+                                    <li>Start by restarting your device in order to clear temporary memory and active app data. If it’s frozen, you’ll need to force shutdown.</li>
+                                    <li>Next, delete any unnecessary data and apps from your device.</li>
+                                    <li>If the problem persists, you may need to reset your device to its factory settings.</li>
+                                </ol>
+                                <h2>Poor reception</h2>
+                                <p><strong>Solution:</strong> Troubleshooting</p>
+                                <p>While it’s doubtful your phone is responsible for poor network signal, it’s worth doing what you can to rule it out, as hardware issues can sometimes impair signal quality. Consider the following tips to improve your signal whether you’re at home or on the move.</p>
+                                <h3>At home</h3>
+                                <p>If possible, connect your phone to your home Wi-Fi. This allows you to use your phone’s data services through a fast, secure connection, while saving the data allowance included in your phone contract.</p>
+                                <p>Alternatively, consider investing in a signal booster, which is essentially a box that amplifies signal. Just bear in mind that these devices can set you back hundreds of pounds, so a secure Wi-Fi connection is really the most cost-effective signal boosting option.</p>
+                                <h3>In the car</h3>
+                                <p>Firstly, bear in mind that it’s illegal to use a mobile phone while driving unless you have hands-free access.</p>
+                                <p>The signal received within a car is affected by its structural design. Numerous factors come into play here, from the size of the windows to the construction materials used. Of course, you can’t alter such things, but you can be mindful of your phone’s position in your vehicle, which is another determinant of signal strength. You’re likely to get better reception if you house your phone in the dashboard cradle as opposed to the central console or footwell, for example.</p>
+                                <h3>Abroad</h3>
+                                <p>Global roaming SIM cards are a great option for frequent travellers, while devices offering dual-SIM compatibility are becoming increasingly popular by the year.</p>
+                                <h2>Bluetooth issues</h2>
+                                <p><strong>Solution:</strong> Home troubleshooting</p>
+                                <p>While you’d be forgiven for assuming that fewer cables equal fewer technical problems, this isn’t always the case. Although rudimentary, you should first ascertain whether the Bluetooth device is compatible with your phone, before ensuring that no obstruction is causing the connection to falter. If the problem persists, however, try restarting your phone before taking it to a professional for repair.</p>
+                                <h2>Faulty charging port</h2>
+                                <p><strong>Solution:</strong> Keep it clean</p>
+                                <p>Over time, your phone’s charging port will likely get dirty, which can impair its charging capacity. If there’s simply an accumulation of dirt, try using a cotton bud to remove the debris. If this isn’t the issue, it’s likely to be a fault with the hardware.</p>
+                                <h2>Limited storage space</h2>
+                                <p><strong>Solution:</strong> Clear unnecessary data and apps and expand your device’s storage capacity</p>
+                                <p>People are snapping on their smartphones more than ever, and with regular OS updates and a plethora of apps available, limited storage space can quickly become an issue. There are, however, a few simple steps you can take to free up some room and get your phone working optimally again.</p>
+                                <p>Firstly, be sure to make use of cloud-based storage. This will enable you to manage and maintain your data online, as opposed to storing it all on your phone’s memory. If you’re not convinced by storing your data online, however, consider transferring your files to an external hard drive or microSD card.</p>
+                                <p>While we’ve covered the most common smartphone faults and offered solutions, it’s worth bearing in mind that in some instances, your handset may be beyond repair. A <a href="{{ path('phone_insurance') }}">phone insurance policy</a> provides extra peace of mind in such circumstances, and with so-sure, you could receive up to 80% cashback at the end of your policy. Win-win.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
