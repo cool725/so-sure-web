@@ -146,6 +146,18 @@
                                         <div class="with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
                                     </div>
                                 </div>
+                                <div id="other_police_force" class="form-row hideme">
+                                    <div class="col form-group">
+                                        {{ form_label(claim_form.other, 'Other Police Force') }}
+                                        {{ form_widget(claim_form.other, {
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'placeholder': 'Other',
+                                                'value': 'Incident happened abroad'
+                                            }}) }}
+                                        <div class="with-errors">{{ form_errors(claim_form.other) }}</div>
+                                    </div>
+                                </div>
                                 <div id="report_my_loss"
                                      class="form-row"
                                      style="{% if claim.reportType != 'online' %}display:none;{% endif %}">

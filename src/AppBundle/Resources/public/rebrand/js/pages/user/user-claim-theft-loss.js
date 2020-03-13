@@ -134,4 +134,17 @@ $(function() {
         }
     });
 
+    if ($('#claim_theftloss_form_force').val() == 'Other') {
+        $('#other_police_force').removeClass('hideme');
+    }
+
+    $('#claim_theftloss_form_force').on('change', function(e) {
+        e.preventDefault();
+        if ($(this).val() == 'Other') {
+            $('#other_police_force').removeClass('hideme');
+        } else {
+            $('#other_police_force').addClass('hideme');
+        }
+    });
+
 });

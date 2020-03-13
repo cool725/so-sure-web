@@ -69,6 +69,12 @@ class ClaimFnolTheftLoss
      */
     protected $force;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     */
+    protected $other;
+
     public function getHasContacted()
     {
         return $this->hasContacted;
@@ -177,6 +183,16 @@ class ClaimFnolTheftLoss
     public function setForce($force)
     {
         $this->force = $force;
+    }
+
+    public function getOther()
+    {
+        return $this->other;
+    }
+
+    public function setOther($other)
+    {
+        $this->other = $other;
     }
 
     public function getClaim()

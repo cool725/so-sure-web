@@ -53,6 +53,9 @@ class ClaimFnolTheftLossType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $choices = $this->receperio->getForces();
+        $choices['Other'] = 'Other';
+
         $builder
             ->add('hasContacted', ChoiceType::class, [
                 'required' => false,
@@ -82,8 +85,9 @@ class ClaimFnolTheftLossType extends AbstractType
             ->add('save', SubmitType::class)
             ->add('confirm', SubmitType::class)
             ->add('crimeReferenceNumber', TextType::class, ['required' => false])
+            ->add('other', TextType::class, ['required' => false])
             ->add('force', ChoiceType::class, [
-                'choices' => $this->receperio->getForces(),
+                'choices' => $choices,
                 'required' => false,
                 'placeholder' => 'Select a Police Force',
             ])
