@@ -7,6 +7,7 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
+        SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL, ['homepage', 'homepage-with-email'],
         SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE, ['amazon-voucher', 'money-voucher'],
     ];
 

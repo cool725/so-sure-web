@@ -520,18 +520,14 @@ class PhoneInsuranceController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        // A/B Hero Image Test
+        // A/B Homepage Quote Email
+        // To Test use url param ?force=homepage / ?force=homepage-with-email
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
-
-        $lead = new Lead();
-        $lead->setSource(Lead::SOURCE_SEND_QUOTE);
-        $leadForm = $this->get('form.factory')
-            ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
-            ->getForm();
 
         // if no price, will be sample policy of £100 annually
         $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
@@ -591,50 +587,6 @@ class PhoneInsuranceController extends BaseController
                         return $this->redirectToRoute('purchase');
                     }
                 }
-            } elseif ($request->request->has('lead_form')) {
-                try {
-                    $leadForm->handleRequest($request);
-
-                    if ($leadForm->isValid()) {
-                        $leadRepo = $dm->getRepository(Lead::class);
-                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
-                        if (!$existingLead) {
-                            $dm->persist($lead);
-                            $dm->flush();
-                        } else {
-                            $lead = $existingLead;
-                        }
-                        $days = new \DateTime();
-                        $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
-                        $mailer = $this->get('app.mailer');
-                        // @codingStandardsIgnoreStart
-                        $mailer->sendTemplate(
-                            sprintf('Your saved so-sure quote for %s', $phone),
-                            $lead->getEmail(),
-                            'AppBundle:Email:quote/priceGuarantee.html.twig',
-                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()],
-                            'AppBundle:Email:quote/priceGuarantee.txt.twig',
-                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()]
-                        );
-                        // @codingStandardsIgnoreEnd
-                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
-                        $this->get('app.mixpanel')->queuePersonProperties([
-                            '$email' => $lead->getEmail()
-                        ], true);
-                        $this->addFlash('success', sprintf(
-                            "Thanks! An email of your quote is on it's way"
-                        ));
-                    } else {
-                        $this->addFlash('error', sprintf(
-                            "Sorry, didn't quite catch that email. Please try again."
-                        ));
-                    }
-                } catch (\Exception $ex) {
-                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
-                    $this->addFlash('error', sprintf(
-                        "Sorry, didn't quite catch that email.  Please try again."
-                    ));
-                }
             }
         }
 
@@ -672,8 +624,7 @@ class PhoneInsuranceController extends BaseController
             'competitor' => $this->competitorsData(),
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
-            'competitor3' => 'O2',
-            'lead_form' => $leadForm->createView(),
+            'competitor3' => 'O2'
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }

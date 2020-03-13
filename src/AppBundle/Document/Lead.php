@@ -25,6 +25,7 @@ class Lead
     const SOURCE_INVITE_NOT_READY = 'invite-not-ready';
     const SOURCE_PURCHASE_FLOW = 'purchase-flow';
     const SOURCE_CONTACT_US = 'contact-us';
+    const SOURCE_QUOTE_EMAIL_HOME = 'quote-email-home';
 
     // Competition/Cold leads
     const SOURCE_COMPETITION = 'competition';
@@ -92,7 +93,7 @@ class Lead
      * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote",
      *                 "purchase-flow", "contact-us",
      *                 "invitation", "scode", "affiliate",
-     *                 "invite-not-ready", "competition", "aggregator", "send-quote"}, strict=true)
+     *                 "invite-not-ready", "competition", "aggregator", "send-quote", "quote-email-home"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

@@ -26,13 +26,13 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    //
+    // const EXPERIMENT_HERO_IMAGE_PHOTO = 'Hero Image';
 
     // Exp 2
-    //
+    // const EXPERIMENT_SEND_QUOTE = 'Send Quote';
 
     // Exp 3
-    //
+    const EXPERIMENT_HOMEPAGE_QUOTE_EMAIL = 'Quote Email Homepage';
 
     // Exp 4
     const EXPERIMENT_SCODE_INVITE_IMAGE = 'Amazon vs Money';
@@ -119,11 +119,11 @@ class SixpackService
 
     public static $unauthExperiments = [
         // Exp 1
-        //
+        // self::EXPERIMENT_HERO_IMAGE_PHOTO,
         // Exp 2
-        //
+        // self::EXPERIMENT_SEND_QUOTE,
         // Exp 3
-        //
+        self::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
         // Exp 4
         self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
@@ -236,11 +236,11 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        //
+        // self::EXPERIMENT_HERO_IMAGE_PHOTO,
         // Exp 2
-        //
+        // self::EXPERIMENT_SEND_QUOTE,
         // Exp 3
-        //
+        self::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
         // Exp 4
         self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5

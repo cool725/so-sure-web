@@ -14,6 +14,7 @@ require('./common/toggle-text.js');
 require('./common/append-email.js');
 require('./components/nav.js');
 require('./components/phone-search-dropdown.js');
+require('./components/phone-search-dropdown-card.js');
 require('./components/memory-search-dropdown.js');
 require('./components/select.js');
 require('./components/animate.js');

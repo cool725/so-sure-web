@@ -8,14 +8,11 @@
         <div class="container">
             <div class="getquote__contents">
                 <div class="text-white mb-5 opacity-05 d-none-xxs h4">Let's get your quote - it'll only take a few seconds</div>
-                {# Phone Search #}
-                {# TODO: Rework if phone in session #}
                 {% if phone is defined and phone %}
                     {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
                 {% else %}
                     {{ render(controller('AppBundle:Search:phoneSearchDropdown', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
                 {% endif %}
-                {# End Phone Search #}
             </div>
         </div>
     </div>

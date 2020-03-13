@@ -119,11 +119,26 @@ class DefaultController extends BaseController
 
         $template = 'AppBundle:Default:index.html.twig';
 
-        // Track Normally
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        // A/B Homepage Quote Email
+        // To Test use url param ?force=homepage / ?force=homepage-with-email
+        $homepageQuoteEmailExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
+            ['homepage', 'homepage-with-email'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
+        if ($homepageQuoteEmailExp == 'homepage-with-email') {
+            // @codingStandardsIgnoreStart
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE,['page' => 'homepage-with-email']);
+            // @codingStandardsIgnoreEnd
+            $template = 'AppBundle:Default:indexQuickQuote.html.twig';
+        } else {
+            // Track Normally
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        }
 
         $data = array(
-            // Make sure to check homepage landing below too
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $this->competitorsData(),

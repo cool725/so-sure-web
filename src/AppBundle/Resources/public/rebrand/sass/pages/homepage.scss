@@ -9,10 +9,10 @@
 
 .hero {
     position: relative;
-    padding-top: 8rem;
+    padding-top: 6rem;
     padding-bottom: 4rem;
 
-    @include blue-gradient;
+    @include blue-gradient-45;
 
     .container-large {
         position: relative;
@@ -36,42 +36,43 @@
         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
         opacity: 0.44;
+        transform: scaleX(-1);
     }
 
     @include media-breakpoint-up(lg) {
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
         }
     }
 
 }
 
-.intro {
-    text-align: center;
-    background-color: $pattens-blue;
-}
-
 .video {
+    min-height: 400px;
     position: relative;
     overflow: hidden;
     z-index: 3;
 
-    video {
-        width: 100%; height: auto;
-        z-index: -1;
+    @include video-background;
+
+    &-img {
+        width: 580px;
+        margin-left: -360px;
+        position: absolute;
+        top: 0; left: 50%;
 
         @include media-breakpoint-up(lg) {
-            object-fit: cover;
+            top: -20px;
+            position: absolute;
+            margin-left: -440px;
         }
     }
 
     &__play {
         width: 120px; height: 120px;
         display: block;
-        position: absolute;
-        left: 50%; top: 50%;
-        margin-left: -60px;
-        margin-top: -60px;
+        position: relative;
         z-index: 100;
 
         transition: all .2s ease-in-out;
@@ -82,40 +83,32 @@
         }
     }
 
-    &__quote {
-        width: 300px;
-        position: absolute;
-        left: 50%; top: 50%;
-        margin-left: -150px;
-        z-index: 10;
+    @include media-breakpoint-up(lg) {
+        min-height: 450px;
     }
 }
 
-.cover {
+.knowledge-base {
+    background-color: $athens-gray;
     position: relative;
+    z-index: 4;
 
-    &__illustration__mobile {
-        height: 240px;
-        overflow: hidden;
+    &__mobile {
         position: relative;
     }
 
-    &__mobile {
-        background-color: $pattens-blue;
+    &__desktop {
+        position: relative;
     }
+}
 
-    &__list {
-        margin-top: 7rem;
-    }
-
-    svg {
-        position: absolute;
-        bottom: -1px; left: 0; right: 0;
-    }
+.fact-center {
+    background-color: $athens-gray;
 }
 
 .other-phones {
     text-align: center;
+    // background-color: $athens-gray;
 
     a img {
 
@@ -125,67 +118,8 @@
     }
 }
 
-.differently {
-    position: relative;
-    z-index: 1;
-    background-color: $pattens-blue;
-
-    @include media-breakpoint-up(lg) {
-        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 200px;
-        background-size: 500px;
-    }
-
-    @include media-breakpoint-up(xl) {
-        background-position: -40px 200px;
-        background-size: 600px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 500px 200px;
-        background-size: 600px;
-    }
-
-    &__illustration__mobile {
-        position: relative;
-    }
-}
-
-.reward {
-    background-color: $white;
-
-    @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png') no-repeat -220px 440px;
-        background-size: 480px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 500px 440px;
-    }
-}
-
-.app {
-    position: relative;
-
-    @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_app-illustration.png') no-repeat 550px 120px;
-        background-size: 600px;
-    }
-
-    @include media-breakpoint-up(xl) {
-        background-position: 800px 120px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 1400px 120px;
-    }
-
-    &__illustration__mobile {
-        position: relative;
-    }
-}
-
 .claims {
-    background-color: $pattens-blue;
+    background-color: $athens-gray;
     text-align: center;
 
     &__step {
@@ -218,85 +152,11 @@
     }
 }
 
-.comparison {
-    position: relative;
-    background-color: $pattens-blue;
-
-    // .table-list {
-    //     position: relative;
-
-    //     @include media-breakpoint-up(md) {
-    //         width: 520px;
-    //     }
-
-    //     @include media-breakpoint-up(lg) {
-
-    //         &__insurers {
-    //             transform: translateX(25px);
-    //             z-index: 10;
-    //         }
-
-    //         &__so-sure {
-    //             transform: translateX(-25px);
-    //             z-index: 11;
-    //         }
-    //     }
-    // }
-
-    .table-comparison  {
-        position: relative;
-        z-index: 4;
-    }
-
-    svg {
-        position: absolute;
-        top: -20%; left: 0;
-        z-index: 1;
-    }
-}
-
-.reviews {
-    padding-bottom: 200px;
-    margin-bottom: 4rem;
-
-    .carousel-inner {
-        min-height: 280px;
-        background: $white url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
-
-        @include media-breakpoint-up(lg) {
-            min-height: none;
-        }
-    }
-
-    background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px bottom;
-    background-size: 500px;
-
-    @include media-breakpoint-up(sm) {
-        background-position: 300px bottom;
-    }
-
-    @include media-breakpoint-up(lg) {
-        padding-bottom: inherit;
-        margin-bottom: 0;
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 70px;
-        background-size: 600px;
-    }
-
-    @include media-breakpoint-up(xl) {
-        background-position: 940px 70px;
-        background-size: 700px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 1400px 70px;
-    }
-}
-
 .banner {
     position: relative;
     text-align: center;
 
-    @include blue-gradient;
+    @include blue-gradient-45;
 
     &__close {
         position: absolute;
@@ -305,5 +165,16 @@
 
     @include media-breakpoint-up(lg) {
         text-align: left;
+    }
+}
+
+.our-reviews {
+    // background-color: $pattens-blue;
+    text-align: center;
+    position: relative;
+
+    .reviews {
+        position: relative;
+        z-index: 4;
     }
 }

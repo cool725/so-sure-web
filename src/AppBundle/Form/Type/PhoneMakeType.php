@@ -7,6 +7,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -76,8 +77,11 @@ class PhoneMakeType extends AbstractType
                 'required' => $this->required
             ])
             ->add('memory', ChoiceType::class, [
-                    'choices' => $memory,
-                    'required' => $this->required
+                'choices' => $memory,
+                'required' => $this->required
+            ])
+            ->add('email', EmailType::class, [
+                'mapped' => false
             ])
             ->add('next', SubmitType::class)
         ;

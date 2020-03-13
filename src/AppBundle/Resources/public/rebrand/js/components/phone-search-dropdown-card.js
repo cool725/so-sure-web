@@ -1,18 +1,54 @@
 // phone-search-dropdown-card.js
 
+require('jquery-validation');
+require('../common/validation-methods.js');
+
 $(function() {
 
     if ($('.phone-search-dropdown-card').length) {
 
-        // Elements
-        let form    = $('.phone-search-dropdown-card'),
+        let validateForm = $('.validate-form'),
+            isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g),
+            form    = $('.phone-search-dropdown-card'),
             phones  = $('.phone-search-dropdown-card').data('phones'),
             make    = $('.phone-search-option-make'),
             model   = $('.phone-search-option-model'),
             memory  = $('.phone-search-option-memory'),
+            email   = $('.phone-search-email'),
             button  = $('.phone-search-button'),
             firstOp = $('.phone-search-option-make option:first');
 
+        const addValidationEmail = () => {
+            validateForm.validate({
+                // When to validate
+                validClass: 'is-valid-ss',
+                errorClass: 'is-invalid',
+                // onfocusout: false,
+                onkeyup: false,
+                onclick: false,
+                rules: {
+                    "launch_phone[email]": {
+                        required: false,
+                        email: true,
+                        emaildomain: true
+                    },
+                },
+                messages: {
+                    "launch_phone[email]": {
+                        required: 'Please enter your email address',
+                        email: 'Please enter a valid email address',
+                        emaildomain: 'Please enter a valid email address',
+                    },
+                },
+                submitHandler: function(form) {
+                    form.submit();
+                },
+            });
+        }
+
+        if (validateForm.data('client-validation') && !isIE) {
+            addValidationEmail();
+        }
 
         const updateModels = () => {
 
@@ -56,19 +92,7 @@ $(function() {
             $.each(phones[make.val()][model.val()], function(key, value) {
                 memory.append($('<option />').val(key).text(value['memory'] + 'GB'));
             });
-
-            // If only one option for size auto select
-            // Note: The placeholder value means a length of 2
-            // if (memory.find('option').length == 2) {
-            //     memory.find('option:eq(1)').prop('selected', true);
-            //     button.prop('disabled', '')
-            //           .removeClass('btn-secondary')
-            //           .addClass('btn-success');
-
-            //     button.focus();
-            // }
         }
-
 
         // On load
         updateModels();
@@ -121,18 +145,19 @@ $(function() {
 
             // Enable/disable model
             if ($(this).val()) {
+                email.prop('disabled', '');
                 button.prop('disabled', '')
                       .removeClass('btn-secondary')
                       .addClass('btn-success');
 
-                button.focus();
+                email.focus();
             } else {
+                email.prop('disabled', 'disabled');
                 button.prop('disabled', 'disabled')
                 .removeClass('btn-success')
                 .addClass('btn-secondary');
             }
         });
-
     }
 
 });

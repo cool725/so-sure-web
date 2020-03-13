@@ -1347,12 +1347,16 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+        // A/B Homepage Quote Email
+        // To Test use url param ?force=homepage / ?force=homepage-with-email
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL);
+
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));
             $dm->flush($policy);
         }
-
+      
         // A/B Scode/Invite Hero Image Test
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE);
 

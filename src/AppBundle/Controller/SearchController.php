@@ -17,6 +17,10 @@ use AppBundle\Form\Type\ModelDropdownType;
 use AppBundle\Document\Form\PhoneMake;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\Lead;
+use AppBundle\Document\PhonePrice;
+
+use AppBundle\Service\MixpanelService;
 
 class SearchController extends BaseController
 {
@@ -142,24 +146,12 @@ class SearchController extends BaseController
             }
         }
 
-        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-
-            // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_phone');
-        } elseif ($phone && in_array($type, ['learn-more'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-        }
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown'),
             ])
             ->getForm();
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('launch_phone')) {
                 $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
@@ -168,10 +160,46 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
+                    $email = $this->getDataString($request->get('launch_phone'), 'email');
+                    if ($email) {
+                        $lead = new Lead();
+                        $lead->setEmail($email);
+                        $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME);
+                        $leadRepo = $dm->getRepository(Lead::class);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
+                        if (!$existingLead) {
+                            $dm->persist($lead);
+                            $dm->flush();
+                        } else {
+                            $lead = $existingLead;
+                        }
+                        $days = new \DateTime();
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
+                        $quoteUrl = $this->setPhoneSession($request, $phone);
+                        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+                        $mailer = $this->get('app.mailer');
+                        // @codingStandardsIgnoreStart
+                        $mailer->sendTemplate(
+                            sprintf('Your saved so-sure quote for %s', $phone),
+                            $lead->getEmail(),
+                            'AppBundle:Email:quote/priceGuarantee.html.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()],
+                            'AppBundle:Email:quote/priceGuarantee.txt.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()]
+                        );
+                        // @codingStandardsIgnoreEnd
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                        $this->get('app.mixpanel')->queuePersonProperties([
+                            '$email' => $lead->getEmail()
+                        ], true);
+                        $this->addFlash('success', sprintf(
+                            "Thanks! An email of your quote is on it's way"
+                        ));
+                    }
                     if ($phone->getMemory()) {
                         return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
+                            'make' => $phone->getMakeCanonical(),
+                            'model' => $phone->getEncodedModelCanonical(),
                             'memory' => $phone->getMemory()
                         ], 301);
                     } else {

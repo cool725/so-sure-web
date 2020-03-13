@@ -1,29 +1,30 @@
 <div class="cardbox cardbox-100 p-4 p-lg-5 pb-lg-0 🍆">
-    <div class="mb-3 h5 text-center d-md-none">Select your device for an instant quote and get <span class="text-primary">a month free if you pay yearly</span></div>
-    <div class="mb-3 h4 d-none d-md-block fit">Select your device for an instant quote and get <span class="text-primary">a month free if you pay yearly</span></div>
+    <div class="mb-3 h3 text-primary">Cheap, Fast and Easy</div>
     <ul class="list-unstyled icn-fa-list mb-4">
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>
-            24-72 hour replace or repair
+            Low price and excess from &pound;50
         </li>
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Low excess from just &pound;50
+            Fast replace and repair service
         </li>
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Up to 80% money back
+            Easy cashback scheme
         </li>
     </ul>
     {{ form_start(form_phone, { 'attr': {
-        'class': 'phone-search-dropdown-card',
+        'data-toggle': 'validator',
+        'class': 'phone-search-dropdown-card validate-form',
+        'data-client-validation': form_client_validation,
         'data-phones': phones|json_encode|raw,
         'autocomplete': 'off'
     }}) }}
         <div class="form-group">
             {{ form_widget(form_phone.make, {
               'attr': {
-                'class': 'form-control phone-search-dropdown-card__select phone-search-option-make',
+                'class': 'form-control phone-search-dropdown-card__select phone-search-option-make'
             }}) }}
         </div>
         <div class="form-group">
@@ -40,22 +41,21 @@
                     'disabled': 'disabled'
             }}) }}
         </div>
-        <div class="form-group mt-4 mb-0">
+        <div class="form-group">
+            {{ form_widget(form_phone.email, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown-card__text phone-search-email',
+                'placeholder': 'Email (optional)',
+                'disabled': 'disabled'
+            }}) }}
+        </div>
+        <div class="form-group">
             {{ form_widget(form_phone.next, {
               'label': 'Get my quote',
               'attr': {
-                'class': 'btn btn-secondary btn-block mb-4 phone-search-button',
+                'class': 'btn btn-secondary btn-block phone-search-button',
                 'disabled': 'disabled'
             }}) }}
-            {% if type == 'homepage-b' %}
-                <div class="text-center">
-                    <a href="#cred"
-                       id="watch_tv_advert"
-                       class="text-zaffre btn-block">
-                        📺 Watch our Sky TV Ad
-                    </a>
-                </div>
-            {% endif %}
         </div>
     {{ form_end(form_phone) }}
 </div>

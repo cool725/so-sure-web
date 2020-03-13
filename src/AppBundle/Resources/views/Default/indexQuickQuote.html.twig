@@ -51,36 +51,24 @@
 
     <section class="hero">
         <div class="container-large">
+            <h1 class="mb-4 text-white text-center fit">
+                <span class="sub text-deep-sky-blue-d">Simply Better</span> Mobile Insurance 🇬🇧
+            </h1>
             <div class="row">
                 <div class="col-lg-6 d-none d-lg-block">
-                    <div class="hero__illustration">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                    <div class="hero__illustration mt-lg-4">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png"
+                             alt="so-sure - social insurance"
+                             class="img-fluid lozad animated jackInTheBox">
                     </div>
                 </div>
-                <div class="offset-md-1 col-lg-5 offset-lg-1">
-                    <div class="hero__intro">
-                        <h1 class="mb-4 text-white fit">
-                            Mobile Insurance<br><span class="sub text-deep-sky-blue-d">that's Simply Better 🇬🇧</span>
-                        </h1>
-                        <div class="h4 text-white mb-3">Cheap, Fast and Easy</div>
-                        <ul class="list-unstyled icn-fa-list mb-5">
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Low price and excess from &pound;50
-                            </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Fast replace and repair service
-                            </li>
-                            <li class="h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Easy cashback scheme
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="hero__controls pb-3">
-                        <a href="#" class="btn btn-success btn-block-xs btn-shadow mr-sm-2 get-a-quote disabled">Get a Quote</a>
-                    </div>
+                <div class="col-lg-5 offset-lg-1">
+                    {% if phone is defined and phone %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
+                    {% endif %}
                 </div>
             </div>
             <div class="row">
@@ -158,7 +146,6 @@
     </section>
 
     {# Page Modals #}
-    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
 {% endblock %}
 

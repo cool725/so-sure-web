@@ -20,7 +20,6 @@ Encore
     .addEntry('error', './src/AppBundle/Resources/public/rebrand/js/pages/error.js')
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
-    .addEntry('homepageB', './src/AppBundle/Resources/public/rebrand/js/pages/homepageB.js')
     .addEntry('homepage-xmas', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-xmas.js')
     .addEntry('homepage-vday', './src/AppBundle/Resources/public/rebrand/js/pages/homepage-vday.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')

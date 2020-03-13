@@ -133,4 +133,31 @@
         }
 
     }
+
+
+    &__text {
+        // Style;
+        border-radius: 3px;
+        background-size: 10px;
+        border-width: 1.2px;
+        border-color: $azureeradiance;
+        font-weight: normal;
+        outline: none;
+
+        &:focus {
+            border-color: $dodger-blue;
+            background: $azureeradiance-20;
+            box-shadow: none;
+            outline: none;
+        }
+
+        &:disabled {
+            border-color: $azureeradiance-20;
+            background: $blacksqueeze;
+            color: $azureeradiance-50;
+            font-weight: normal;
+        }
+
+        @include placeholder-color($azureeradiance-50);
+    }
 }
