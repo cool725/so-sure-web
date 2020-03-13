@@ -42,12 +42,11 @@
             }}) }}
         </div>
         <div class="form-group">
-            {{ form_widget(form_phone.email, {
-              'attr': {
-                'class': 'form-control phone-search-dropdown-card__text phone-search-email',
-                'placeholder': 'Email (optional)',
-                'disabled': 'disabled'
-            }}) }}
+            <input type="email"
+                   class="form-control phone-search-dropdown-card__text phone-search-email"
+                   placeholder="Email (optional)"
+                   disabled="disabled"
+                   name="launch_phone[email]">
         </div>
         <div class="form-group">
             {{ form_widget(form_phone.next, {

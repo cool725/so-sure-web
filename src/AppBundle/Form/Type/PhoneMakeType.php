@@ -80,9 +80,6 @@ class PhoneMakeType extends AbstractType
                 'choices' => $memory,
                 'required' => $this->required
             ])
-            ->add('email', EmailType::class, [
-                'mapped' => false
-            ])
             ->add('next', SubmitType::class)
         ;
     }
