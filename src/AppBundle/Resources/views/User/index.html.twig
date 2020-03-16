@@ -194,7 +194,7 @@
         {% set toDoThree = false %}
 
         {# Check all to-dos for step 1 #}
-        {% if policy is defined and policy and policy.phoneVerified and (policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod or policy.hasPolicyOrUserBacsPaymentMethod) %}
+        {% if policy is defined and policy and policy.phoneVerified %}
             {% set toDoOne = true %}
         {% endif %}
 
@@ -219,7 +219,7 @@
                         <div class="timeline-content">
                             <div class="h6">{% if toDoOne %}Complete{% else %}To-Do{% endif %}</div>
                             <div class="h5 text-primary mb-4">Activate Account</div>
-                            <ul class="list-unstyled icn-fa-list">
+                            <ul class="list-unstyled icn-fa-list {% if not toDoOne %}mb-4{% endif %}">
                                 <li class="mb-3">
                                     {% if policy is defined and policy %}
                                         <i class="far fa-check fa-lg fa-fw text-success"></i>
@@ -235,14 +235,6 @@
                                         <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                     {% endif %}
                                     Verify phone number
-                                </li>
-                                <li>
-                                    {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod or policy.hasPolicyOrUserBacsPaymentMethod %}
-                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    {% else %}
-                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                    {% endif %}
-                                    Setup payment
                                 </li>
                             </ul>
                             {% if not toDoOne %}
