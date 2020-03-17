@@ -68,6 +68,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/new-iphone-se2-rumour-hub' => 'New iPhone SE2 Rumour Hub',
             '/blog/why-is-my-phone-so-hot' => 'Why Is My Phone So Hot?',
             '/blog/common-mobile-phone-faults-and-solutions' => 'Common Mobile Phone Faults and Solutions',
+            '/blog/samsung-galaxy-tips-and-tricks' => 'Samsung Galaxy Tips & Tricks',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

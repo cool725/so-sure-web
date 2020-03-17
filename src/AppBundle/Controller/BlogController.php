@@ -588,4 +588,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/samsung-galaxy-tips-and-tricks",
+     * name="samsung_galaxy_tips_and_tricks", options={"sitemap" = true})
+     * @Template
+     */
+    public function samsungGalaxyTipsAndTricksAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/samsung-galaxy-tips-and-tricks.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

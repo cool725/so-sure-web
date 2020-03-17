@@ -1,0 +1,136 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Samsung Galaxy Tips And Tricks | S8, S9, S10 | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Focusing on the latest iterations, namely the S8, S9 and S10, our quickfire guide will ensure you get the most out of your Samsung smartphone."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Samsung Galaxy Tips And Tricks | S8, S9, S10 | so-sure' %}
+{% set og_description = "Focusing on the latest iterations, namely the S8, S9 and S10, our quickfire guide will ensure you get the most out of your Samsung smartphone." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/samsung-galaxy-tips-and-tricks-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Samsung Galaxy Tips &amp; Tricks</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Samsung Galaxy Tips &amp; Tricks</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Mar 16, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/samsung-galaxy-tips-and-tricks-1.jpg"
+                                     alt="Hand Holding Phone Desk"
+                                     class="img-fluid lozad mb-5">
+                                <p>The Galaxy S smartphone series is Samsung's flagship line, with 1-3 new models released every year since 2010. It has featured some hugely popular handsets in the past decade, with honourable mentions reserved for the Galaxy S8 and S10, while the new S20 launched just last week.</p>
+                                <p>To help you get the most out of your device, we'll share our top tips and tricks for the ever-popular Galaxy S (Super smart) series, including the Galaxy S8, S9 &amp; S10.</p>
+                                <h2>Samsung Galaxy S8</h2>
+                                <h3>Customisable edge panel </h3>
+                                <p>The S8's stunning curved screen – known as the Edge screen - blends sleek aesthetics with a raft of useful functions and features. To access it, swipe the tab on the right-hand edge of the screen. This will bring up shortcuts to your most commonly used apps. Swiping again allows you to view your favourite contacts. A third swipe brings up the S8's smart features. Here, you'll find more than a dozen pre-installed Edge panels, from live weather updates and sports scores to practical features like a torch and compass. Head over to the <a href="https://play.google.com/store?hl=en" target="_blank" rel="noopener noreferrer">Google Play Store</a> to discover more handy Edge panels.</p>
+                                <p>To customise the panels accessible from the Edge screen, simply click the settings cog, which appears on all Edge screen windows. This allows you to organise and prioritise the content you'd like to see.</p>
+                                <h3>Pro Camera Features</h3>
+                                <p>The S8's powerful 12P rear-mounted camera boasts a number of impressive features. The bright f/1.7 lens and large 1.4µm pixels, for instance, combine to allow in more light when it's in short supply, so you can still take stunning shots in lowly lit areas.</p>
+                                <p>Samsung's phase detection autofocus feature keeps up with the speediest of shot snappers; its Dual Pixel sensor and bright lens capture vivid images at the touch of a button. Optical image stabilisation (OIS) supplements this setting by stabilising otherwise wayward shots, allowing you to snap on the move.</p>
+                                <h3>Pro mode</h3>
+                                <p>The S8 pushes the boundaries of innovation further, however, by letting you attune the camera's settings to your personal shooting needs. This is known as Pro mode.</p>
+                                <p>To start snapping professional quality shots using Pro mode, simply head to the camera app and swipe in from the left-hand side to bring up a range of shooting options, such as slow motion, panorama and hyperlapse. Here, you'll also see Pro mode. Click on this to tweak a range of factors, from your camera's shutter speed and ISO rating to focal point and white balance. This helps you capture balanced, impactful shots regardless of conditions.</p>
+                                <h3>DeX Desktop Experience</h3>
+                                <p>Samsung's DeX feature lets users extend their S8 into a desktop-like experience with a simple click. Essentially, DeX is a dock featuring USB ports for desktop hardware like keyboards, flash drives and mice; topped off by large screen output that allows you to use your S8 like a desktop computer. The OS functions like Chrome OS with apps in resizable windows. Here, you'll be able to type, use apps, copy and paste, and more.</p>
+                                <h2>Samsung Galaxy S9</h2>
+                                <h3>One-handed mode</h3>
+                                <p>While the S9's slim bezels make it comfortable in the palm, its large display can make use difficult for those with smaller hands. One-handed mode - located under <em>Settings &gt; Advanced features &gt; One-handed mode</em> - resolves this problem. When active, the feature shrinks down the display to a small area at the bottom of the screen, bringing everything within easy reach. To exit, simply tap outside the condensed window.</p>
+                                <h3>Landscape homescreen</h3>
+                                <p>Flip your display into landscape mode by long pressing an empty space on your screen before tapping the settings button. From here, turn off <em>Portrait mode only</em> and turn your phone 45&deg;. This will immediately reorient the homescreen and scale widgets for efficient landscape functionality.</p>
+                                <h3>Manually control camera aperture</h3>
+                                <p>The S9's dual aperture camera mimics the human eye, seamlessly adapting to both bright light and darkness automatically. Activate f/2.4 mode when snapping in bright areas, and f/1.5 after dark or in low light spots. To take advantage of these innovative features, you'll need to activate Pro mode.</p>
+                                <p>To do this, swipe left twice, before tapping the aperture icon. Then, at the bottom of the landscape display, you’ll notice a button that indicates the status of the aperture setting. Simply tap this button to flip back and forth between f/1.5 and f/2.4.</p>
+                                <h2>Samsung Galaxy S10</h2>
+                                <h3>Super steady video footage</h3>
+                                <p>The Galaxy S10 allows you to stabilise your video footage when on the move. Do this by opening the Camera app, hit <em>Video</em>, before tapping the square camera icon – the location of which depends on how you're holding your phone. In portrait display, this will be at the top of the screen, and on the edge of the screen in landscape mode. Once activated, you'll receive confirmation that <em>super steady mode</em> has been activated.</p>
+                                <h3>Chat heads for any messaging app</h3>
+                                <p>If you're a fan of Facebook Messenger's chat head feature, which displays on screen bubbles containing your contacts' images, you're in for a treat, as the S10 allows you to use chat heads on any compatible messenger app. To activate this nifty feature, open <em>Advanced Features &gt; Smart pop-up view</em>. The next screen allows you to customise your chat heads for any apps with multi-window compatibility.</p>
+                                <h3>Charge other devices with Wireless PowerShare</h3>
+                                <p>The Galaxy S10 enables device-to-device charging with other QI compatible devices, without the need for a charger. What's more, you can charge your S10 and another device simultaneously using Samsung's dual charging feature.</p>
+                                <p>The S10 also employs sophisticated AI that learns your behaviour, and automatically adapts to power-saving modes and restricts less frequently used apps to conserve battery power.</p>
+                                <p>With the raft of innovative features Samsung packs into their devices, you'll want the peace of mind that your favourite device is covered against accidental damage – which is exactly what you'll get with <a href="{{ path('phone_insurance') }}">so-sure insurance</a>. You'll also be covered on your travels overseas and could receive up to 80% cashback at the end of your policy.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
