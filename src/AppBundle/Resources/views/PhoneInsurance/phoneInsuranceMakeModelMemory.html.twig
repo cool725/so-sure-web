@@ -2,6 +2,8 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
+{% set include_get_a_quote = true %}
+{% set trustpilot = true %}
 {% if instore is not null %}
     {% set instore_mode = true %}
 {% endif %}
@@ -261,7 +263,7 @@
                         <img src="{{ cdn_url }}/images/onexone.png"
                              data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png"
                              alt="{{ phone.make }} {{ phone.model }} {{ phone.memory }} - Phone Insurance"
-                             class="lozad img-fluid hero-generic animated bounceInUp">
+                             class="lozad img-fluid hero-generic">
                     </div>
                 </div>
             </div>
@@ -322,6 +324,7 @@
 
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 

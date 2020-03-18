@@ -50,6 +50,7 @@ $g-medium: 'gorditamedium', -apple-system, BlinkMacSystemFont, "Segoe UI", Robot
          url('#{$cdn_url}/fonts/gordita-bold-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 $g-bold: 'gorditabold', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";

@@ -2,6 +2,7 @@ var Encore = require('@symfony/webpack-encore');
 var webpack = require('webpack');
 
 Encore
+    // Using runtime in it's own js
     .enableSingleRuntimeChunk()
 
     // the project directory where all compiled assets will be stored
@@ -14,7 +15,6 @@ Encore
     .createSharedEntry('vendor', './web/components/vendor.js')
 
     // List all files here
-    .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
     .addEntry('dev', './src/AppBundle/Resources/public/rebrand/js/dev.js')
     .addEntry('error', './src/AppBundle/Resources/public/rebrand/js/pages/error.js')
@@ -103,6 +103,9 @@ Encore
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
+    // Third Party
+    .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
+
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
     .addEntry('rollbar-js-error', './src/AppBundle/Resources/public/rebrand/js/pages/rollbar-js-error.js')
@@ -142,20 +145,6 @@ Encore
 
 var config = Encore.getWebpackConfig();
 
-// enable file system polling.
-config.watchOptions = {
-    poll: true,
-    ignored: /node_modules/
-};
-
-// disable amd, for datatable
-config.module.rules.unshift({
-  parser: {
-    amd: false
-  }
-});
+config.watchOptions = { poll: true, ignored: /node_modules/ };
 
 module.exports = config;
-
-// export the final configuration
-// module.exports = Encore.getWebpackConfig();

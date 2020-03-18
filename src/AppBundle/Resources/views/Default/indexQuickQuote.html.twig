@@ -2,6 +2,8 @@
 
 {# Set vars #}
 {% set body_class = 'home' %}
+{% set include_get_a_quote = true %}
+{% set trustpilot = true %}
 
 {% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
 {% block meta %}
@@ -60,7 +62,7 @@
                         <img src="{{ cdn_url }}/images/onexone.png"
                              data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png"
                              alt="so-sure - social insurance"
-                             class="img-fluid lozad animated jackInTheBox">
+                             class="img-fluid lozad">
                     </div>
                 </div>
                 <div class="col-lg-5 offset-lg-1">
@@ -74,7 +76,7 @@
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <div class="hero__illustration d-block d-lg-none mt-4">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid animated lozad jackInTheBox">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad">
                     </div>
                 </div>
             </div>
@@ -146,6 +148,8 @@
     </section>
 
     {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 

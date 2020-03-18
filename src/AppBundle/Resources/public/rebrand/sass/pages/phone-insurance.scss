@@ -9,7 +9,7 @@
 
 .hero {
     position: relative;
-    padding-top: 8rem;
+    padding-top: 5rem;
     padding-bottom: 4rem;
     overflow: hidden;
 
@@ -46,10 +46,6 @@
             padding-top: 2.7rem;
         }
     }
-
-    // &__illustration {
-    //     position: sticky;
-    // }
 
     .hero__illustration-iphone-x {
         height: 250px;
@@ -157,18 +153,10 @@
             right: -200px;
         }
     }
-
-    // @include media-breakpoint-up(lg) {
-    //     text-align: left;
-    // }
 }
 
 .cover {
     position: relative;
-
-    @include media-breakpoint-up(lg) {
-        // background-color: $pattens-blue;
-    }
 
     &__illustration__mobile {
         height: 240px;
@@ -269,15 +257,10 @@
 
 .other-phones,
 .make-phones {
-    text-align: center;
 
-    a img {
-
-        &:hover {
-            transform: translateY(-5px);
-        }
+    @include media-breakpoint-up(md) {
+        text-align: left
     }
-
     &-gray {
         background-color: $athens-gray;
     }
@@ -372,7 +355,6 @@
     img {
         width: 120px;
         margin: 0.5rem;
-        // opacity: 0.3;
 
         &:hover {
             filter: brightness(0.9);

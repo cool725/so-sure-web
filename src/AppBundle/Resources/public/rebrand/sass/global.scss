@@ -42,20 +42,14 @@
 // Layout
 // - header, footer, navigation
 @import "layout/main";
-@import "layout/header";
 @import "layout/footer";
 
 // Vendor
 // - third parts CSS
 @import "vendor/hamburgers/hamburgers";
-@import "vendor/cookieconsent.min.css";
 @import "vendor/classic.css";
 @import "vendor/animate.css";
-@import "vendor/jssocials.css";
-@import "vendor/jssocials-theme-flat.css";
 @import "vendor/tempusdominus-bootstrap-4.css";
 @import "vendor/flickity.css";
 @import "vendor/jquery.dataTables";
 
-// Pages
-// @import "pages/homepage";

@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance-second-hand' %}
+{% set include_get_a_quote = true %}
 {% set max_width = '400px' %}
 {% if device_category() == 'Desktop' %}
     {% set max_width = '' %}
@@ -86,7 +87,7 @@
                 </div>
                 <div class="col-lg-6 order-lg-1">
                    <div class="hero__illustration hero__illustration-second-hand text-center">
-                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-second-hand.png" alt="Second Hand Phones" class="img-fluid lozad animated bounceInUp">
+                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-second-hand.png" alt="Second Hand Phones" class="img-fluid lozad">
                     </div>
                 </div>
             </div>
@@ -307,6 +308,9 @@
 
     {# Banner #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_banner.html.twig' %}
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 

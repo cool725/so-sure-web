@@ -63,7 +63,9 @@
     </div>
 
     {# Get a Quote #}
-    {% include 'AppBundle::Search/getQuote.html.twig' %}
+    {% if include_get_a_quote is defined and include_get_a_quote == true %}
+        {% include 'AppBundle::Search/getQuote.html.twig' %}
+    {% endif %}
 
     {# Mobile Menu #}
     {% if user_mode is defined and user_mode == true %}

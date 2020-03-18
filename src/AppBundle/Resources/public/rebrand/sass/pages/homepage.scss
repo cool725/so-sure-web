@@ -108,13 +108,16 @@
 
 .other-phones {
     text-align: center;
-    // background-color: $athens-gray;
 
-    a img {
+    // a img {
 
-        &:hover {
-            transform: translateY(-5px);
-        }
+    //     &:hover {
+    //         transform: translateY(-5px);
+    //     }
+    // }
+
+    @include media-breakpoint-up(md) {
+        text-align: left
     }
 }
 
@@ -169,12 +172,33 @@
 }
 
 .our-reviews {
-    // background-color: $pattens-blue;
+    background-color: $pattens-blue;
     text-align: center;
     position: relative;
 
     .reviews {
         position: relative;
         z-index: 4;
+    }
+}
+
+.makes {
+    text-align: center;
+    position: relative;
+    @include blue-gradient;
+    z-index: 5;
+
+    img {
+        width: 120px;
+        margin: 0.5rem;
+
+        &:hover {
+            filter: brightness(0.9);
+        }
+
+        @include media-breakpoint-up(lg) {
+            width: 160px;
+            margin: 0;
+        }
     }
 }

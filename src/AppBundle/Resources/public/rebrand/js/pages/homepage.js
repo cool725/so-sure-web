@@ -4,6 +4,9 @@ require('../../sass/pages/homepage.scss');
 
 // Require components
 require('../components/table.js');
+require('../components/modalVideo.js');
+require('../components/phone-search-dropdown-card.js');
+
 let jQueryBridget = require('jquery-bridget');
 let Flickity = require('flickity');
 

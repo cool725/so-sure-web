@@ -14,6 +14,8 @@ let textFit = require('textfit');
 require('../components/table.js');
 require('jquery-validation');
 require('../common/validation-methods.js');
+require('../components/modalVideo.js');
+require('../components/memory-search-dropdown.js');
 
 
 let jQueryBridget = require('jquery-bridget');

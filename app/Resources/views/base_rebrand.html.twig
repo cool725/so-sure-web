@@ -8,30 +8,21 @@
             <meta name="robots" content="noindex" />
         {% endif %}
         {% include '::meta_rebrand.html.twig' %}
-
         <title>{% block title %}so-sure{% endblock %}</title>
-
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
-
         {% block cssPage %}{% endblock %}
-
-        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
-
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous" defer>
         {% block meta %}{% endblock %}
-
         {% block pixel %}{% endblock %}
-
         {% block schema %}{% endblock %}
-
         {% if environment == 'prod' %}
             {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
-                <script type="text/javascript">
+                <script type="text/javascript" async>
                 var _iub = _iub || [];
                 _iub.csConfiguration = {"lang":"en","siteId":505658,"cookiePolicyId":7804419,"cookiePolicyUrl":"https://www.iubenda.com/privacy-policy/7805295/cookie-policy", "banner":{ "acceptButtonDisplay":true,"customizeButtonDisplay":true,"position":"float-top-center","acceptButtonColor":"#3fc67d","acceptButtonCaptionColor":"#ffffff","customizeButtonColor":"#2593f3","customizeButtonCaptionColor":"#ffffff","textColor":"#081a9a","backgroundColor":"#f5f7f9","backgroundOverlay":true }};
                 </script><script type="text/javascript" src="https://cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
             {% endif %}
         {% endif %}
-
         <script>
             var dataLayer = window.dataLayer = window.dataLayer || [];
 
@@ -106,44 +97,33 @@
                 {% block gtm_data %}{% endblock %}
             });
         </script>
-
         {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
-            <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            <script async>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
             j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             'https://www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env|raw }}';f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
         {% endif %}
-
         {% block remotestylesheets %}{% endblock %}
         {% block metaend %}{% endblock %}
     </head>
     <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
-
         {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
             <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KGBBJQ{{ ga_tag_manager_env|raw }}"
             height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         {% endif %}
-
         {% block nav %}
             {% if hide_nav is not defined or not hide_nav %}
                 {% include '::navigation/main.html.twig' %}
             {% endif %}
         {% endblock %}
-
         {% include '::flash_rebrand.html.twig' %}
-
         {% if hide_devbar is not defined or not hide_devbar %}
             {% include '::dev_bar_rebrand.html.twig' %}
         {% endif %}
-
         <main id="content" class="w-100 flex-grow-1">
             {% block body %}{% endblock %}
         </main>
-
-        {# Site-wide Modals #}
-        {% include 'AppBundle::Default/_modalVideo.html.twig' %}
-
         {% block footer %}
             {% if hide_footer is not defined or not hide_footer %}
                 {% if small_footer is defined and small_footer %}
@@ -153,19 +133,16 @@
                 {% endif %}
             {% endif %}
         {% endblock %}
-
         {% include '::footer_data.html.twig' %}
-
-        <script src="{{ asset('css-js/runtime.js') }}"></script>
-        <script src="{{ asset('css-js/vendor.js') }}"></script>
+        <script src="{{ asset('css-js/runtime.js') }}" async></script>
+        <script src="{{ asset('css-js/vendor.js') }}" async></script>
         <script src="{{ asset('css-js/global.js') }}" async></script>
-
         {% block javascriptsPage %}{% endblock %}
-
-        <script async type="text/javascript" src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-
+        {% if trustpilot is defined and trustpilot == true %}
+            <script async type="text/javascript" src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"></script>
+        {% endif %}
         {% if environment != 'prod' %}
-            <script src="{{ asset('css-js/dev.js') }}"></script>
+            <script src="{{ asset('css-js/dev.js') }}" async></script>
         {% endif %}
     </body>
 </html>
