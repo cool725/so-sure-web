@@ -110,8 +110,6 @@ Encore
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
     .addEntry('rollbar-js-error', './src/AppBundle/Resources/public/rebrand/js/pages/rollbar-js-error.js')
 
-    // .enableSingleRuntimeChunk()
-
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
 
@@ -146,5 +144,7 @@ Encore
 var config = Encore.getWebpackConfig();
 
 config.watchOptions = { poll: true, ignored: /node_modules/ };
+
+config.module.rules.unshift({ parser: { amd: false }});
 
 module.exports = config;
