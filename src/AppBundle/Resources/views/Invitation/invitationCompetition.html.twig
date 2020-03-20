@@ -27,17 +27,10 @@
         <div class="container-large">
             <div class="row">
                 <div class="col-xl-6 d-none d-xl-block">
-                    {% if hero_image is defined and hero_image == 'money-voucher' %}
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand__holding_money_large_540x540.png"
-                             alt="Hand holding amazon voucher"
-                             class="lozad img-fluid">
-                    {% else %}
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_large_540x540.png"
-                             alt="Hand holding amazon voucher"
-                             class="lozad img-fluid">
-                    {% endif %}
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_large_540x540.png"
+                         alt="Hand holding amazon voucher"
+                         class="lozad img-fluid">
                 </div>
                 <div class="col-xl-6">
                     {% if invitation.inviter is defined %}
@@ -78,17 +71,10 @@
                 </div>
             </div>
             <div class="hero__illustration-mobile d-block d-xl-none pt-5">
-                {% if hero_image is defined and hero_image == 'money-voucher' %}
-                    <img src="{{ cdn_url }}/images/onexone.png"
-                         data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_money_voucher_small.png"
-                         alt="Hand holding moneu voucher"
-                         class="lozad img-fluid">
-                {% else %}
-                    <img src="{{ cdn_url }}/images/onexone.png"
-                         data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_small.png"
-                         alt="Hand holding amazon voucher"
-                         class="lozad img-fluid">
-                {% endif %}
+                <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_small.png"
+                     alt="Hand holding amazon voucher"
+                     class="lozad img-fluid">
             </div>
         </div>
     </section>

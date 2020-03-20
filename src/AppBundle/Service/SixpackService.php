@@ -35,7 +35,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_QUOTE_EMAIL = 'Quote Email Homepage';
 
     // Exp 4
-    const EXPERIMENT_SCODE_INVITE_IMAGE = 'Amazon vs Money';
+    // const EXPERIMENT_SCODE_INVITE_IMAGE = 'Amazon vs Money';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -114,7 +114,8 @@ class SixpackService
         'Homepage Tabs and USP',
         'Homepage Price USPs',
         'Hero Image',
-        'Send Quote'
+        'Send Quote',
+        'Amazon vs Money'
     ];
 
     public static $unauthExperiments = [
@@ -125,7 +126,7 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
         // Exp 4
-        self::EXPERIMENT_SCODE_INVITE_IMAGE,
+        // self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
         //
         // Exp 6
@@ -242,7 +243,7 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
         // Exp 4
-        self::EXPERIMENT_SCODE_INVITE_IMAGE,
+        // self::EXPERIMENT_SCODE_INVITE_IMAGE,
         // Exp 5
         // self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
         // Exp 6

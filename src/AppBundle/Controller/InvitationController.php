@@ -134,14 +134,6 @@ class InvitationController extends BaseController
         $heroImageExp = null;
 
         if ($competitionFeature) {
-            /// A/B Scode/Invite Hero Image Test
-            // To Test use url param ?force=amazon-voucher / ?force=money-voucher
-            $heroImageExp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE,
-                ['amazon-voucher', 'money-voucher'],
-                SixpackService::LOG_MIXPANEL_ALL
-            );
             $template = 'AppBundle:Invitation:invitationCompetition.html.twig';
         }
 
@@ -152,7 +144,6 @@ class InvitationController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'LICI',
-            'hero_image' => $heroImageExp,
         ];
 
         return $this->render($template, $data);

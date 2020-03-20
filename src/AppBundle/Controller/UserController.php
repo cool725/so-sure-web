@@ -1356,9 +1356,6 @@ class UserController extends BaseController
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));
             $dm->flush($policy);
         }
-      
-        // A/B Scode/Invite Hero Image Test
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE);
 
         /** @var RouterService $router */
         $router = $this->get('app.router');

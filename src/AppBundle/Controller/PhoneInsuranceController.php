@@ -523,7 +523,6 @@ class PhoneInsuranceController extends BaseController
         // A/B Homepage Quote Email
         // To Test use url param ?force=homepage / ?force=homepage-with-email
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL);
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_INVITE_IMAGE);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
