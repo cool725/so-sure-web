@@ -56,5 +56,6 @@
                 'disabled': 'disabled'
             }}) }}
         </div>
+        <input type="hidden" name="token" value="{{ csrf_token('quote-home') }}"/>
     {{ form_end(form_phone) }}
 </div>
