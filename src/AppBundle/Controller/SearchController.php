@@ -154,7 +154,7 @@ class SearchController extends BaseController
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('launch_phone')) {
-                if (!$this->isCsrfTokenValid('quote-home', $request->get('token'))) {
+                if (!$this->isCsrfTokenValid('quote', $request->get('token'))) {
                     throw new \InvalidArgumentException('Invalid CSRF');
                 }
                 $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
