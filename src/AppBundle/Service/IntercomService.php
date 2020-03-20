@@ -1089,7 +1089,7 @@ class IntercomService
                     if (!$lead->email && $age->days >= 7) {
                         $output[] = sprintf('Deleting lead %s age: %d', $lead->id, $age->days);
                         $this->deleteLead($lead->id);
-                    } elseif ($lead->email && $age->days >= 28) {
+                    } elseif ($lead->email && $age->days >= 730) {
                         // Lead w/email, clear out after 4 weeks not seen
                         $output[] = sprintf('Deleting lead %s email: %s age: %d', $lead->id, $lead->email, $age->days);
                         $this->deleteLead($lead->id);
