@@ -549,6 +549,7 @@ nelmio_security:
                 - https://*.eu-west-1.amazonaws.com
                 - http://*.oribi.io
                 - http://hits-i.iubenda.com
+                - https://bat.bing.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
