@@ -1554,7 +1554,7 @@ class PurchaseController extends BaseController
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
-            $logger->warning(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
                 "Unknown Exception for policy '%s' with message '%s'",
                 $policy->getId(),
                 $e->getMessage()
