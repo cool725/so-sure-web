@@ -1126,20 +1126,16 @@ class CheckoutService
         }
 
         $tokens = $checkoutPaymentMethod->getCardTokens();
-        if (!isset($tokens[$card->getId()])) {
-            $cardDetails = [
-                'cardLastFour' => $card->getLast4(),
-                'endDate' => sprintf('%02d%02d', $card->getExpiryMonth(), mb_substr($card->getExpiryYear(), 2, 2)),
-                'cardType' => $card->getPaymentMethod(),
-                'fingerprint' => $card->getFingerprint(),
-                'authCode' => $card->getAuthCode(),
-                'cvvCheck' => $card->getCvvCheck(),
-                'avsCheck' => $card->getAvsCheck(),
-            ];
-            $checkoutPaymentMethod->addCardToken($card->getId(), json_encode($cardDetails));
-        } else {
-            $checkoutPaymentMethod->setCardToken($card->getId());
-        }
+        $cardDetails = [
+            'cardLastFour' => $card->getLast4(),
+            'endDate' => sprintf('%02d%02d', $card->getExpiryMonth(), mb_substr($card->getExpiryYear(), 2, 2)),
+            'cardType' => $card->getPaymentMethod(),
+            'fingerprint' => $card->getFingerprint(),
+            'authCode' => $card->getAuthCode(),
+            'cvvCheck' => $card->getCvvCheck(),
+            'avsCheck' => $card->getAvsCheck(),
+        ];
+        $checkoutPaymentMethod->addCardToken($card->getId(), json_encode($cardDetails));
     }
 
     /**
