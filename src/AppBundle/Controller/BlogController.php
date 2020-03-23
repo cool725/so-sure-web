@@ -602,4 +602,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/how-to-fix-cracked-phone-screen",
+     * name="how_to_fix_cracked_phone_screen", options={"sitemap" = true})
+     * @Template
+     */
+    public function howToFixCrackedPhoneScreenAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/how-to-fix-cracked-phone-screen.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

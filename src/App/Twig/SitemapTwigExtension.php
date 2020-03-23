@@ -69,6 +69,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/why-is-my-phone-so-hot' => 'Why Is My Phone So Hot?',
             '/blog/common-mobile-phone-faults-and-solutions' => 'Common Mobile Phone Faults and Solutions',
             '/blog/samsung-galaxy-tips-and-tricks' => 'Samsung Galaxy Tips & Tricks',
+            '/blog/how-to-fix-cracked-phone-screen' => 'What To Do About A Cracked Phone Screen',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',
