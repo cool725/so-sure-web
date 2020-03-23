@@ -299,7 +299,7 @@ class IntercomService
             $data['retryAttempts'] += 1;
             $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
         } else {
-            $this->logger->error(sprintf(
+            $this->logger->warning(sprintf(
                 'Error (retry exceeded) sending message to Intercom %s. Ex: %s',
                 json_encode($data),
                 $e->getMessage()
@@ -1050,7 +1050,7 @@ class IntercomService
                         if ($e->getResponse() && $e->getResponse()->getStatusCode() == "404") {
                             $user = false;
                         } elseif ($e->getResponse() && $e->getResponse()->getStatusCode() == "409") {
-                            $this->logger->error(sprintf('Error getting user per email:  %s', $e->getMessage()));
+                            $this->logger->warning(sprintf('Error getting user per email:  %s', $e->getMessage()));
                             $user = false;
                         } else {
                             throw $e;

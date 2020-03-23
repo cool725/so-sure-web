@@ -1515,7 +1515,7 @@ class PurchaseController extends BaseController
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (PaymentDeclinedException $e) {
-            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_PAYMENT_DECLINED, sprintf(
+            $logger->warning(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_PAYMENT_DECLINED, sprintf(
                 "Payment declined for policy '%s'",
                 $policy->getId()
             )));
@@ -1526,7 +1526,7 @@ class PurchaseController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Failed card');
             }
         } catch (AccessDeniedException $e) {
-            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_ACCESS_DENIED, sprintf(
+            $logger->warning(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_ACCESS_DENIED, sprintf(
                 "Access Denied for policy '%s'",
                 $policy->getId()
             )));
@@ -1547,14 +1547,14 @@ class PurchaseController extends BaseController
                     $pennies
                 );
             }
-            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_COMMISSION, $message));
+            $logger->warning(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_COMMISSION, $message));
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
             }
         } catch (\Exception $e) {
-            $logger->error(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
+            $logger->warning(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_UNKNOWN, sprintf(
                 "Unknown Exception for policy '%s' with message '%s'",
                 $policy->getId(),
                 $e->getMessage()
