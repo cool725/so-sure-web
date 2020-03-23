@@ -1,0 +1,129 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}How to Fix Cracked Phone Screen | Smashed Screen | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Smartphones are invaluable, and we use them all the time, so it&rsquo;s no wonder we might end up with a smashed screen. Find out what to do with a smashed phone screen in our blog."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'How to Fix Cracked Phone Screen | Smashed Screen | so-sure' %}
+{% set og_description = "Smartphones are invaluable, and we use them all the time, so it&rsquo;s no wonder we might end up with a smashed screen. Find out what to do with a smashed phone screen in our blog." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/how-to-fix-cracked-phone-screen-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">What To Do About A Cracked Phone Screen</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">What To Do About A Cracked Phone Screen</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Mar 23, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/how-to-fix-cracked-phone-screen-1.jpg"
+                                     alt="Cracked Phone Screen"
+                                     class="img-fluid lozad mb-5">
+                                <p>Smartphones are incredibly expensive these days, with some of the latest models costing over &pound;1000. Not only are they invaluable to our modern lives, but they've now become extensions of ourselves. Look around on your commute, and almost everyone will be using their phone - whether it's for music, social media, keeping in contact with friends or work.</p>
+                                <p>Most of the time, we simply carry our phones in our hands rather than using a pocket or bag to store them safely away. We're prone to dropping them, they slip out of our hands and they even get a scratched screen from keys or other sharp objects in our pockets. But smashed screens are worse than a little scratch or crack. They can actually damage your phone's functionality - but if your phone still works, it could still be a quick fix.</p>
+                                <h2>If your phone insurance covers a cracked screen</h2>
+                                <p>If you're insured for accidental damage, a cracked screen may be covered by your <a href="{{ path('phone_insurance') }}">mobile phone insurer</a>. You may have to pay an excess charge, or you might even have to send your phone away for repair by an approved contractor. When you phone up to alert the insurance company about the damage, you can ask about their procedure.</p>
+                                <p>At so-sure, we know that a smashed phone screen is more than just an annoyance – it could be the difference between forking out for a new phone or being able to keep the same one. so-sure will replace or repair your phone within 24-72 hours so you're back in business at the drop of a hat.</p>
+                                <h2>If you don't have phone insurance</h2>
+                                <h3>Will the warranty cover the smashed screen?</h3>
+                                <p>Generally speaking, a warranty doesn't usually cover accidental damage - it's normally just for faults within the phone itself. Because of this, it's unlikely that you'll get a free repair for a cracked screen. If you don't have insurance, you could consider contacting the manufacturer and paying to have the screen fixed through them. This is a good place to start as they will understand the device completely and will have dealt with these problems before. However, bear in mind that the cost could be more than getting a repair through a trusted repair shop.</p>
+                                <h3>How to choose a trusted phone repair shop</h3>
+                                <p>If your phone isn't covered by insurance, or you'd prefer to not pay the excess, you could consider using a trusted phone repair shop. These are everywhere on the high street these days, but finding a trusted one with good reviews can be difficult - so make sure you ask for recommendations or look at online reviews.</p>
+                                <h3>How to fix a cracked phone screen at home</h3>
+                                <p>Alternatively, you can try to repair your cracked phone screen at home, but it should be noted that this comes with the risk of invalidating an existing warranty. Make sure to check with your phone retailer or manufacturer first, to avoid making a costly mistake.</p>
+                                <p>The process of fixing a cracked phone screen is different for every handset, but generally it will involve the following steps:</p>
+                                <ol>
+                                    <li>Find and buy a replacement phone screen</li>
+                                    <li>Turn off and open up your phone carefully</li>
+                                    <li>Remove the broken display, being careful of any loose shards of glass</li>
+                                    <li>Replace the screen adhesive on your handset</li>
+                                    <li>Fit your new display, taking your time to make sure it's snug</li>
+                                    <li>Ensure that the cables connecting your screen to the handset are connected properly</li>
+                                    <li>Reboot your phone and make sure that the screen works properly</li>
+                                </ol>
+                                <h2>Preventing a smashed screen in the future</h2>
+                                <p>The best way to fix a smashed screen is to not let it happen at all! Choose a heavy-duty <a href="{{ path('best_phone_cases') }}">phone case</a> that will protect your phone against drops, and use a screen protector to prevent scratches and cracks. Keeping your phone in excellent condition will not only preserve its life, but it will also ensure that it has a high resale value if you ever decide to trade it in.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    &lt;script src="{{ asset('css-js/content-pages.js') }}"&gt;&lt;/script&gt;
+{% endblock %}
