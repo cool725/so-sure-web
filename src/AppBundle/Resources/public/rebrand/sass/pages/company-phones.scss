@@ -13,7 +13,7 @@
     padding-top: 6rem;
     // padding-bottom: 4rem;
 
-    @include blue-gradient;
+     @include blue-gradient-45;
 
     .container-large {
         position: relative;
@@ -62,26 +62,6 @@
         z-index: 3;
         right: -140px; bottom: -40px;
     }
-
-    &:before {
-        width: 100%; height: 100%;
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        content: '';
-        z-index: 1;
-        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
-        background-size: cover;
-        opacity: 0.44;
-    }
-
-    @include media-breakpoint-up(lg) {
-        padding-top: 10rem;
-
-        &:before {
-            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
-        }
-    }
-
 }
 
 .intro {

@@ -12,7 +12,7 @@
     padding-top: 8rem;
     padding-bottom: 4rem;
 
-    @include blue-gradient;
+    @include blue-gradient-45;
 
     .container-large {
         position: relative;
@@ -52,11 +52,13 @@
         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
         opacity: 0.44;
+        transform: scaleX(-1);
     }
 
     @include media-breakpoint-up(lg) {
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
         }
     }
 
