@@ -37,6 +37,14 @@ class PurchaseStepPayment
 
     protected $new;
 
+    /**
+     * @var string
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="6", max="8")
+     * @Assert\NotBlank(message="This value is required.")
+     */
+    protected $promoCode;
+
     /** @var array */
     protected $prices = [];
 
@@ -91,6 +99,16 @@ class PurchaseStepPayment
     public function setNew($new)
     {
         $this->new = $new;
+    }
+
+    public function getPromoCode()
+    {
+        return $this->promoCode;
+    }
+
+    public function setPromoCode($promoCode)
+    {
+        $this->promoCode = $promoCode;
     }
 
     /**

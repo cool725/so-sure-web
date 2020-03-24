@@ -12,6 +12,7 @@ use AppBundle\Document\Form\PurchaseStepPledge;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Postcode;
+use AppBundle\Document\SCode;
 use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
@@ -26,6 +27,7 @@ use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\SCodeRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Security\PolicyVoter;
 use AppBundle\Service\CheckoutService;
@@ -849,6 +851,8 @@ class PurchaseController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
+        /** @var SCodeRepository $scodeRepo */
+        $scodeRepo = $dm->getRepository(SCode::class);
 
         $phone = $this->getSessionQuotePhone($request);
         $priceService = $this->get('app.price');
@@ -885,7 +889,12 @@ class PurchaseController extends BaseController
             }
         }
 
-        //$purchase->setAgreed(true);
+        // Get scode
+        $scode = null;
+        if ($session = $this->get('session')) {
+            $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
+        }
+
         $purchase->setNew(true);
 
         /** @var Form $purchaseForm */
@@ -894,6 +903,10 @@ class PurchaseController extends BaseController
             ->getForm();
         $webpay = null;
         $allowPayment = true;
+        if (!empty($scode)) {
+            $scode = $scode ? $scode->getCode() : null;
+            $purchaseForm->get('promoCode')->setData($scode);
+        }
 
         $paymentProvider = null;
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
@@ -1005,6 +1018,7 @@ class PurchaseController extends BaseController
             'prices' => $priceService->userPhonePriceStreams($user, $policy->getPhone(), new \DateTime()),
             'instore' => $instore,
             'validation_required' => $validationRequired,
+            'user_code' => $scode
         );
 
         if ($toCardForm) {
@@ -1416,6 +1430,7 @@ class PurchaseController extends BaseController
         $pennies = null;
         $publicKey = null;
         $cardToken = null;
+        $scode = null;
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
@@ -1451,6 +1466,33 @@ class PurchaseController extends BaseController
                     throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
                 }
             }
+
+            $code = $request->query->get("scode");
+            if ($code != $this->get('session')->get('scode')) {
+                try {
+                    $scodeRepo = $dm->getRepository(Scode::class);
+                    if ($scode = $scodeRepo->findOneBy(['code' => $code])) {
+                        if (in_array($scode->getType(), [SCode::TYPE_STANDARD, SCode::TYPE_MULTIPAY])) {
+                            if (!$scode->getPolicy() || !$scode->getPolicy()->getUser()) {
+                                throw new \Exception('Unknown scode');
+                            }
+                        } elseif (in_array($scode->getType(), [SCode::TYPE_REWARD])) {
+                            if (!$scode->getReward() || !$scode->getReward()->getUser()) {
+                                throw new \Exception('Unknown scode');
+                            }
+                        }
+                    } else {
+                        $code = false;
+                    }
+                } catch (\Exception $e) {
+                    $code = false;
+                }
+
+                if ($code != false) {
+                    $this->get('session')->set('scode', $code);
+                }
+            }
+
             $csrf = $request->get("csrf");
             $publicKey = $request->get("cko-public-key");
             $cardToken = $request->get("cko-card-token");

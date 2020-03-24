@@ -30,7 +30,6 @@
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title mb-0">Monthly</h6>
                                 <div class="radio-btn__price">&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
-                                {# <small>(1 year = &pound;{{ withoutDiscount }})</small> #}
                             </div>
                         </div>
                     </div>
@@ -50,6 +49,11 @@
             </div>
         </div>
         <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
+    </div>
+    <div class="form-group {% if form_errors(purchase_form.promoCode) %}has-error{% endif %}">
+        {{ form_label(purchase_form.promoCode, 'Got a promo code or invite code?', { 'label_attr': {'class': ''} }) }}
+        {{ form_widget(purchase_form.promoCode, {'attr':{'class':'form-control', 'placeholder': 'Enter code'}}) }}
+        <div class="with-errors">{{ form_errors(purchase_form.promoCode) }}</div>
     </div>
     {{ form_widget(purchase_form.next, {
         'label': 'Continue',
@@ -82,7 +86,8 @@
             {{ path('user_welcome', {id: policy.id}) }}
           {% endif %}"
           data-title="Pay now"
-          data-subtitle="Please enter your card details">
+          data-subtitle="Please enter your card details"
+          data-scode="{% if user_code is not null %}{{ user_code }}{% endif %}">
     </form>
     <div class="form-group text-md-right">
         {% block to_card_form %}

@@ -16,7 +16,8 @@ $(function(){
 
     let validateForm = $('.validate-form'),
         isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g),
-        paymentForm = $('.payment-form');
+        paymentForm = $('.payment-form'),
+        userCode = $('#purchase_form_promoCode');
 
     const addValidation = () => {
         validateForm.validate({
@@ -27,10 +28,20 @@ $(function(){
             onfocusout: false,
             onkeyup: false,
             rules: {
-
+                "purchase_form[promoCode]" : {
+                    required: false,
+                    minlength: 6,
+                    maxlength: 8,
+                    alphanumeric: true
+                }
             },
             messages: {
-
+                "purchase_form[promoCode]" : {
+                    required: 'Please enter a valid code',
+                    minlength: 'Please enter a valid code',
+                    maxlength: 'Please enter a valid code',
+                    alphanumeric: 'Please enter a valid code'
+                }
             },
 
             errorPlacement: function(error, element) {
@@ -67,18 +78,16 @@ $(function(){
             themeColor: '#2593f3',
             forceMobileRedirect: true,
             redirectUrl: paymentForm.data('url'),
+            userCode: paymentForm.data('scode'),
             cardTokenised: function(event) {
                 $('html, body').animate({ scrollTop: 0 }, 'fast');
-                // Show loading screen
                 $('.loading-screen').fadeIn();
-                // Scroll to top of page
-                // console.log(event.data.cardToken);
                 let url = paymentForm.data('url'),
                     csrf = paymentForm.data('csrf'),
-                    pennies = paymentForm.data('value');
-                // console.log(url);
-                $.post(url, {'csrf': csrf, 'token': event.data.cardToken, 'pennies': pennies}, function(resp) {
-                    // console.log(resp);
+                    pennies = paymentForm.data('value'),
+                    scode = paymentForm.data('scode');
+                $.post(url, {'csrf': csrf, 'token': event.data.cardToken, 'pennies': pennies, 'scode': scode}, function(resp) {
+                    console.log(resp);
                 }).fail(function() {
                     $('.loading-screen').fadeOut();
                 }).always(function() {
@@ -116,9 +125,12 @@ $(function(){
             amount = val * 100;
         url.searchParams.set('pennies', amount);
         url.searchParams.set('premium', type);
-        let newUrl = url.href;
 
-        // console.log(newUrl);
+        if (userCode.val()) {
+            url.searchParams.set('scode', userCode.val());
+        }
+
+        let newUrl = url.href;
 
         // Clear payment data
         paymentForm.removeData('value');
@@ -127,21 +139,33 @@ $(function(){
         // Update the checkout form
         paymentForm.attr('data-value', amount);
         paymentForm.attr('data-url', newUrl);
-
-        // console.log(paymentForm.data());
     });
 
-    // console.log(paymentForm.data());
+    userCode.on('blur', function(e) {
+        if (validateForm.valid() == true) {
+            // Set scode if user adds one
+            if (!paymentForm.data('scode') && userCode.val()) {
+                paymentForm.attr('data-scode', userCode.val());
+                let checkoutUrl = paymentForm.data('url'),
+                    url = new URL(checkoutUrl);
+                url.searchParams.set('scode', userCode.val());
+                let newUrl = url.href;
+                paymentForm.removeData('url');
+                paymentForm.attr('data-url', newUrl);
+            }
+        }
+    });
 
     $('.btn-card-pay').on('click', function(e) {
         e.preventDefault();
 
-        // Ensurre that all previous configure event handlers are cleared before adding another
-        Checkout.removeAllEventHandlers(Checkout.Events.CARD_TOKENISED);
-        // Set configure
-        configureCheckout();
-
-        // Open the lightbox
-        Checkout.open();
+        if (validateForm.valid() == true) {
+            // Ensurre that all previous configure event handlers are cleared before adding another
+            Checkout.removeAllEventHandlers(Checkout.Events.CARD_TOKENISED);
+            // Set configure
+            configureCheckout();
+            // Open the lightbox
+            Checkout.open();
+        }
     });
 });
