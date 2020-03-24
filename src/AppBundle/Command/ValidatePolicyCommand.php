@@ -267,7 +267,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $this->redis->del(['policy:validation']);
 
                 $validations = [];
-                $policies = $policyRepo->findAll();
+                $policies = $policyRepo->findValidationPolicies();
                 $lines[] = sprintf(
                     'Policy Validation (<a href="%s">Admin</a>)',
                     $this->routerService->generateUrl('admin_policy_validation', [])

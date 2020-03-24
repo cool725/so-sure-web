@@ -382,4 +382,15 @@ class PolicyRepository extends BaseDocumentRepository
             $start += $n;
         }
     }
+
+    /**
+     * Finds all of the policies that should be subject to policy validations.
+     * @return array containing all of the relevant policies.
+     */
+    public function findValidationPolicies()
+    {
+        return $this->createQueryBuilder()
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
+            ->getQuery()->execute()->toArray();
+    }
 }
