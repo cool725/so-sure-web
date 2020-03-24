@@ -99,7 +99,7 @@ class HelvetiaExportService
         $paidPremium = 0;
         $paidBrokerFee = 0;
         /** @var HelvetiaPhonePolicy $policy */
-        foreach ($repo->getAllPoliciesForExport() as $policy) {
+        foreach ($repo->getAllPoliciesForExport()->toArray() as $policy) {
             $lines[] = CsvHelper::line(
                 $policy->getPolicyNumber(),
                 $policy->getStatus(),
@@ -140,7 +140,7 @@ class HelvetiaExportService
     {
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
-        $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_HELVETIA_PHONE);
+        $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_HELVETIA_PHONE)->toArray();
         $lines = [];
         $lines[] = CsvHelper::line('PolicyNumber', 'Date', 'Amount', 'Notes', 'BrokerFee');
         $total = 0;
@@ -195,7 +195,7 @@ class HelvetiaExportService
             'Last Updated'
         );
         /** @var Claim $claim */
-        foreach ($repo->getAllClaimsForExport(Policy::TYPE_HELVETIA_PHONE) as $claim) {
+        foreach ($repo->getAllClaimsForExport(Policy::TYPE_HELVETIA_PHONE)->toArray() as $claim) {
             // There's a bit of a timing issue with claims - if a fnol claim gets a claim number via the claims
             // portal (transitioning to in-review), however, this occurs before the claims excel sheet is imported,
             // then this claim would be exported to salva, which breaks their import process
@@ -216,12 +216,12 @@ class HelvetiaExportService
                 $claim->getReservedValue(),
                 $claim->getTotalIncurred(),
                 $claim->getClaimHandlingFees(),
-                $claim->getReplacementReceivedDate(),
+                $claim->getReplacementReceivedDate() ? $claim->getReplacementReceivedDate()->format('Ymd H:i') : '',
                 $claim->getReplacementPhone() ? $claim->getReplacementPhone()->getMake() : '',
                 $claim->getReplacementPhone() ? $claim->getReplacementPhone()->getModel() : '',
                 $claim->getReplacementImei(),
                 $claim->getHandlingTeam(),
-                $claim->getUnderwriterLastUpdated() ? $claim->getUnderwriterLastUpdated()->format("Ymd H:i") : ''
+                $claim->getUnderwriterLastUpdated() ? $claim->getUnderwriterLastUpdated()->format('Ymd H:i') : ''
             );
         }
         return $lines;
@@ -250,7 +250,7 @@ class HelvetiaExportService
             'RenewalPolicyMonthlyPremiumIncDiscount'
         );
         /** @var HelvetiaPhonePolicy $policy */
-        foreach ($repo->getAllExpiredPoliciesForExport() as $policy) {
+        foreach ($repo->getAllExpiredPoliciesForExport()->toArray() as $policy) {
             if (!$this->greaterThanZero($policy->getPotValue())) {
                 continue;
             }
