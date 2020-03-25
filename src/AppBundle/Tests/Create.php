@@ -319,9 +319,9 @@ class Create
 
     /**
      * Creates some policy terms
-     * @param version    is the version of the policy terms to represent.
-     * @param latest     is the value to give to the latest flag.
-     * @param aggregator is the value to give to the aggregator flag.
+     * @param string  $version    is the version of the policy terms to represent.
+     * @param boolean $latest     is the value to give to the latest flag.
+     * @param boolean $aggregator is the value to give to the aggregator flag.
      * @return PolicyTerms the new terms.
      */
     public static function terms($version, $latest = true, $aggregator = false)
