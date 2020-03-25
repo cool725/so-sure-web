@@ -502,7 +502,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $commissionDate = $this->getNextBusinessDay($commissionDate);
 
             // if the policy is old we should not worry about commission as it's already been sent off anyway.
-            //
             if ($policy->getEnd() < (new \DateTime())->sub(new \DateInterval('P2M'))) {
                 // depending on when the chargeback occurs, we may or may not want to exclude that amount
                 // but if they both don't match, then its likely to be a problem
