@@ -501,13 +501,17 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $commissionDate = $data['validateDate'] ?: \DateTime::createFromFormat('U', time());
             $commissionDate = $this->getNextBusinessDay($commissionDate);
 
-            // depending on when the chargeback occurs, we may or may not want to exclude that amount
-            // but if they both don't match, then its likely to be a problem
-            if ($policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance) === false &&
-                $policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance, true) === false) {
-                // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
-                if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
-                    $lines[] = $this->failureCommissionMessage($policy, $commissionDate);
+            // if the policy is old we should not worry about commission as it's already been sent off anyway.
+            //
+            if ($policy->getEnd() < (new \DateTime())->sub(new \DateInterval('P2M'))) {
+                // depending on when the chargeback occurs, we may or may not want to exclude that amount
+                // but if they both don't match, then its likely to be a problem
+                if ($policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance) === false &&
+                    $policy->hasCorrectCommissionPayments($commissionDate, $allowedVariance, true) === false) {
+                    // Ignore a couple of policies that should have been cancelled unpaid, but went to expired
+                    if (!in_array($policy->getId(), Salva::$commissionValidationExclusions)) {
+                        $lines[] = $this->failureCommissionMessage($policy, $commissionDate);
+                    }
                 }
             }
 
