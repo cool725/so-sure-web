@@ -1,0 +1,217 @@
+// phone-insurance-quote.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+
+.hero {
+    position: relative;
+    padding-top: 8rem;
+    padding-bottom: 4rem;
+    overflow: hidden;
+
+    // @include blue-gradient;
+
+    .container-large {
+        position: relative;
+        z-index: 4;
+    }
+
+    &__intro {
+
+        .h1m {
+            line-height: 1.5;
+            display: inline;
+            font-size: 2rem;
+        }
+
+        .h1b {
+            line-height: 1.5;
+            font-size: 2rem;
+
+            a,
+            a:hover,
+            a:focus,
+            a:active {
+                text-decoration: none;
+                color: $zaffre !important;
+                outline: 0;
+            }
+        }
+
+        @include media-breakpoint-up(lg) {
+            padding-top: 2.7rem;
+        }
+    }
+
+    .hero__illustration-iphone-x {
+        height: 250px;
+
+        @include media-breakpoint-up(lg) {
+            height: 100%;
+            max-width: 340px;
+            position: absolute;
+            z-index: 2;
+            left: 170px; bottom: 0;
+        }
+    }
+
+    .hero__illustration-second-hand {
+        height: 180px;
+
+        @include media-breakpoint-up(lg) {
+            height: 100%;
+            max-width: 380px;
+            position: absolute;
+            z-index: 2;
+            left: 100px; top: 20px;
+        }
+    }
+
+    .hero__illustration-generic,
+    .hero__illustration-iphone-xr,
+    .hero__illustration-iphone-xs,
+    .hero__illustration-iphone-7,
+    .hero__illustration-iphone-8,
+    .hero__illustration-galaxy-s8,
+    .hero__illustration-galaxy-s9,
+    .hero__illustration-galaxy-note-9,
+    .hero__illustration-pixel
+    .hero__illustration-pixel-3-xl,     {
+        height: 250px;
+
+        @include media-breakpoint-up(lg) {
+            height: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+        }
+    }
+
+    .hero__illustration-iphone-7 {
+        @include media-breakpoint-up(lg) {
+            max-width: 260px;
+        }
+    }
+
+    // TODO: Make better;
+    .hero-generic {
+        max-width: 300px;
+    }
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-quote-mobiletab.svg');
+        background-size: cover;
+    }
+
+    @include media-breakpoint-up(lg) {
+        padding-top: 6rem;
+
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-quote.svg');
+        }
+    }
+
+    @include media-breakpoint-up(fl) {
+        padding-top: 8rem;
+    }
+
+}
+
+.insurance-info {
+    background-color: $athens-gray;
+    position: relative;
+    z-index: 5;
+}
+
+.our-reviews {
+    text-align: center;
+    position: relative;
+
+    .reviews {
+        position: relative;
+        z-index: 4;
+    }
+
+    svg {
+        position: absolute;
+        bottom: 100%; left: 0;
+    }
+}
+
+.banner {
+    position: relative;
+    text-align: center;
+
+    @include blue-gradient-45;
+
+    &__close {
+        position: absolute;
+        top: 2rem; right: 2rem;
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
+    }
+}
+
+.video {
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+    z-index: 3;
+
+    @include video-background;
+
+    &-img {
+        width: 580px;
+        margin-left: -360px;
+        position: absolute;
+        top: 0; left: 50%;
+
+        @include media-breakpoint-up(lg) {
+            top: -20px;
+            position: absolute;
+            margin-left: -440px;
+        }
+    }
+
+    &__play {
+        width: 120px; height: 120px;
+        display: block;
+        position: relative;
+        z-index: 100;
+
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        min-height: 450px;
+    }
+}
+
+.knowledge-base {
+    background-color: $athens-gray;
+    position: relative;
+    z-index: 4;
+
+    &__mobile {
+        position: relative;
+    }
+
+    &__desktop {
+        position: relative;
+    }
+}

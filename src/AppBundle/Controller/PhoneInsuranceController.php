@@ -536,6 +536,23 @@ class PhoneInsuranceController extends BaseController
         $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
         $expIntercom = null;
 
+        // Model template control
+        // Hyphenate Model for images/template
+        $modelHyph = str_replace('+', '-', $model);
+        // Add available images for hero
+        $availableImages = [
+            'iphone-x',
+            'iphone-xr',
+            'iphone-xs',
+            'iphone-7',
+            'iphone-8',
+            'galaxy-s8',
+            'galaxy-s9',
+            'galaxy-note-9',
+            'pixel',
+            'pixel-3-xl',
+        ];
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('buy_form')) {
                 $buyForm->handleRequest($request);
@@ -623,7 +640,9 @@ class PhoneInsuranceController extends BaseController
             'competitor' => $this->competitorsData(),
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
-            'competitor3' => 'O2'
+            'competitor3' => 'O2',
+            'img_url' => mb_strtolower($modelHyph),
+            'available_images' => $availableImages
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }

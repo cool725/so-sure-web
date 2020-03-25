@@ -251,3 +251,37 @@
         }
     }
 }
+
+.table-excess {
+    width: 100%;
+    text-align: center;
+    border: $table-border-width solid $dodger-blue;
+    border-collapse: separate;
+    border-spacing: 0;
+    @include border-radius($g-border-radius);
+
+    th,
+    td {
+        padding: $table-cell-padding;
+        vertical-align: top;
+    }
+
+    th {
+        background-color: $dodger-blue;
+        color: $white;
+    }
+
+    th,
+    tr:not(:last-child) td {
+        border-bottom: $table-border-width solid $dodger-blue;
+    }
+
+    th:not(:last-child),
+    td:not(:last-child) {
+        border-right: $table-border-width solid $dodger-blue;
+    }
+
+    // td {
+    //     border: $table-border-width solid $dodger-blue;
+    // }
+}
