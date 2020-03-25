@@ -8,6 +8,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
@@ -314,5 +315,21 @@ class Create
         $phone = new Phone();
         $phone->addPhonePrice($price);
         return $phone;
+    }
+
+    /**
+     * Creates some policy terms
+     * @param version    is the version of the policy terms to represent.
+     * @param latest     is the value to give to the latest flag.
+     * @param aggregator is the value to give to the aggregator flag.
+     * @return PolicyTerms the new terms.
+     */
+    public static function terms($version, $latest = true, $aggregator = false)
+    {
+        $terms = new PolicyTerms();
+        $terms->setVersion($version);
+        $terms->setLatest($latest);
+        $terms->setAggregator($aggregator);
+        return $terms;
     }
 }
