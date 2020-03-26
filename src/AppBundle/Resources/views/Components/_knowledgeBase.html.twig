@@ -291,13 +291,15 @@
                     <div class="h6">It can cost &pound;250-&pound;300 to repair  top-end phones 💰</div>
                 </div>
             </div>
-            <div class="text-center mb-4">
-                {% if phone is defined and phone %}
-                    <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get covered for <br> &pound;{{ prices['monthly'].monthlyPremiumPrice }}</a>
-                {% else %}
-                    <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get covered from only <br> &pound;3.49 a month</a>
-                {% endif %}
-            </div>
+            {% if no_cta is not defined %}
+                <div class="text-center mb-4">
+                    {% if phone is defined and phone %}
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get covered for <br> &pound;{{ prices['monthly'].monthlyPremiumPrice }}</a>
+                    {% else %}
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get covered from only <br> &pound;3.49 a month</a>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
