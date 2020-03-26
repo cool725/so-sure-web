@@ -9,7 +9,7 @@
 
 .hero {
     position: relative;
-    padding-top: 6rem;
+    padding-top: 4.8rem;
     padding-bottom: 4rem;
 
     @include blue-gradient-45;
@@ -40,6 +40,8 @@
     }
 
     @include media-breakpoint-up(lg) {
+        padding-top: 3.5rem;
+
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
             transform: scaleX(-1);

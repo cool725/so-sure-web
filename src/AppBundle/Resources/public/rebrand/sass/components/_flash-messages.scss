@@ -19,3 +19,15 @@
         }
     }
 }
+
+.alert-strip {
+    position: relative;
+    z-index: 4;
+    line-height: 1.7;
+    text-align: center;
+
+    &-green {
+        background-color: $aquamarine;
+        color: darken($aquamarine, 45%);
+    }
+}
