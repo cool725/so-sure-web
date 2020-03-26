@@ -160,10 +160,10 @@
                             {{ form_widget(buy_form.buy, {
                                 'label': 'Buy Now',
                                 'attr': {
-                                    'class': 'btn btn-success btn-block-xs btn-shadow mr-sm-2'
+                                    'class': 'btn btn-success btn-block-xs btn-shadow mb-4 mb-sm-0 mr-sm-3'
                             }}) }}
+                            <a class="btn-simple-link" href="#excess_cardbox" data-cardbox-target="#excess_cardbox" data-cardbox-anchor="#excess_cardbox">View my excess</a>
                         {{ form_end(buy_form) }}
-                        <a class="link-subtle" href="#excess_cardbox" data-cardbox-target="#excess_cardbox" data-cardbox-anchor="#excess_cardbox">View my excess</a>
                         {% if validation_required is not null %}
                             <p>👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
                         {% endif %}
