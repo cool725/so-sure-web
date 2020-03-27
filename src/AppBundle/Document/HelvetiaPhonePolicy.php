@@ -118,7 +118,8 @@ class HelvetiaPhonePolicy extends PhonePolicy
         if ($numPayments > 12 || $numPayments < 0) {
             throw new \Exception(sprintf('Unable to calculate expected broker fees for policy %s', $this->getId()));
         }
-        $expectedMonthlyCommission = $numPayments * $this->getPremium()->getGwp() * Helvetia::COMMISSION_PROPORTION;
+        $expectedMonthlyCommission = $numPayments *
+            ($this->getPremium()->getGwp() * Helvetia::COMMISSION_PROPORTION + Helvetia::MONTHLY_BROKER_COMMISSION);
         $commissionReceived = Payment::sumPayments($this->getSuccessfulPayments(), true)['totalCommission'];
         if ($this->isCooloffCancelled()) {
             return 0;
