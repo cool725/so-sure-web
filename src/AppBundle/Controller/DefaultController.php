@@ -849,6 +849,8 @@ class DefaultController extends BaseController
             ->createNamedBuilder('lead_form', CompanyLeadType::class)
             ->getForm();
 
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_COMPANY_PHONES);
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
                 $leadForm->handleRequest($request);
@@ -878,6 +880,8 @@ class DefaultController extends BaseController
                         'success',
                         "Thanks. We'll be in touch shortly"
                     );
+
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_COMPANY_LEAD_CAPTURE);
 
                     return $this->redirectToRoute('company_phone_insurance_thanks');
                 } else {

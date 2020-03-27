@@ -210,9 +210,7 @@
         background-color: $ultramarine;
         color: $white;
 
-        // @include media-breakpoint-up(lg) {
-            @include border-top-radius($g-border-radius);
-        // }
+        @include border-top-radius($g-border-radius);
     }
 
     &__body {
@@ -220,9 +218,7 @@
         padding: 2rem;
         background-color: lighten($selago, 5%);
 
-        // @include media-breakpoint-up(lg) {
-            @include border-bottom-radius($g-border-radius);
-        // }
+        @include border-bottom-radius($g-border-radius);
     }
 
     &__cta {
@@ -236,9 +232,7 @@
             color: $white;
             cursor: pointer;
 
-            // @include media-breakpoint-up(lg) {
-                @include border-bottom-radius($g-border-radius);
-            // }
+            @include border-bottom-radius($g-border-radius);
 
             &:hover, &:focus {
                 outline: 0;

@@ -20,10 +20,6 @@ $(function() {
         tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 4;
         knowledgeBaseD.css('top', -tabsHeight);
 
-    let knowledgeBaseM = $('.knowledge-base__mobile'),
-        cardboxHeight  = knowledgeBaseM.children(':first').height() / 2;
-        knowledgeBaseM.css('top', -cardboxHeight);
-
     // Tabs - style the arrow if open
     $('.tab-link').on('click', function (e) {
         $('.tab-indicator').removeClass('fa-arrow-circle-down')

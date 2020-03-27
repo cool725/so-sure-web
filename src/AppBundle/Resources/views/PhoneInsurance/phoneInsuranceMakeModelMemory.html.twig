@@ -1,7 +1,7 @@
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
-{% set body_class = 'phone-insurance-make-model' %}
+{% set body_class = 'phone-insurance-make-model-memory' %}
 {% set include_get_a_quote = true %}
 {% set trustpilot = true %}
 {% if instore is not null %}
@@ -61,12 +61,15 @@
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance-quote.css') }}">
 {% endblock %}
 
 {% block body %}
 
     <section class="hero">
+        <div class="alert-strip alert-strip-green h6 p-3 pt-0 mb-4">
+            <div class="container-large">😕 Worried about being stuck at home with a broken phone during the lockdown? <br class="d-none d-lg-inline"> We’re committed more than ever to getting your phone repaired and back to you in just 72 hours.</div>
+        </div>
         <div class="container-large">
             <div class="row">
                 <div class="col-lg-6 order-lg-2">
@@ -78,192 +81,110 @@
                                 <li class="list-inline-item"
                                     property="itemListElement"
                                     typeof="ListItem">
-                                    <a href="{{ path('homepage') }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Home</span>
-                                    </a>
-                                    <meta property="position" content="1">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
                                     <a href="{{ path('phone_insurance') }}"
-                                       class="text-columbia-blue-e"
+                                       class="text-primary"
                                        property="item"
                                        typeof="WebPage">
                                        <span property="name">Phone Insurance</span>
                                     </a>
-                                    <meta property="position" content="2">
+                                    <meta property="position" content="1">
                                 </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
+                                <li class="list-inline-item">
+                                    <i class="fal fa-angle-right"></i>
                                 </li>
                                 <li class="list-inline-item"
                                     property="itemListElement"
                                     typeof="ListItem">
                                     <a href="{{ path('phone_insurance_make', {'make': phone.makeCanonical}) }}"
-                                       class="text-columbia-blue-e"
+                                       class="text-primary"
                                        property="item"
                                        typeof="WebPage">
                                        <span property="name">{{ phone.make }}</span>
                                     </a>
-                                    <meta property="position" content="3">
+                                    <meta property="position" content="2">
                                 </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
+                                <li class="list-inline-item">
+                                    <i class="fal fa-angle-right"></i>
                                 </li>
-                                <li class="list-inline-item text-white"
+                                <li class="list-inline-item"
                                     property="itemListElement"
                                     typeof="ListItem">
                                     <span property="name">{{ phone.model }} ({{ phone.memory }}GB)</span>
-                                    <meta property="position" content="4">
+                                    <meta property="position" content="3">
                                 </li>
                             </ul>
                         </div>
-                        <h1 class="text-white h1b fit">
+                        <h1 class="h1b fit mb-4">
                             <a href="#mem_sizes"
-                               class="text-white"
+                               class=""
                                data-toggle="collapse"
                                role="button"
                                aria-expanded="false"
                                aria-controls="mem_sizes"
                                title="Not the phone you're looking for?">
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> <span class="sub text-deep-sky-blue-d">for just &pound;{{ prices['monthly'].monthlyPremiumPrice }} per month</span>
+                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB) <br> <span class="sub text-primary">for just &pound;{{ prices['monthly'].monthlyPremiumPrice }} per month</span>
                             </a>
                         </h1>
-                        <div class="text-white h5 mb-4"><span class="sub">Get one month free when you pay yearly!</span></div>
                         <div class="collapse mb-4" id="mem_sizes">
                             {% if phones | length > 1 %}
                                 <ul class="list-inline">
                                     {% for phone_mem in phones %}
                                         {% if phone_mem.id != phone.id  %}
                                             <li class="list-inline-item">
-                                                <a href="{{ path('quote_phone', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-white btn-sm" href="#">{{ phone_mem.memory }}GB</a>
+                                                <a href="{{ path('quote_phone', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-primary btn-sm" href="#">{{ phone_mem.memory }}GB</a>
                                             </li>
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
                             {% endif %}
-                            <a class="text-white get-a-quote disabled" href="#">
+                            <a class="text-primary get-a-quote disabled" href="#">
                                 <small>Not the phone you're looking for?</small>
                             </a>
                         </div>
-                        {{ form_start(buy_form, {'attr': { 'class': 'my-5'}}) }}
+                        <ul class="list-unstyled icn-fa-list mb-4">
+                            <li class="mb-3 h5">
+                                <i class="far fa-check fa-lg fa-fw text-primary"></i>
+                                <span class="sub">One month free when you pay yearly</span>
+                            </li>
+                            <li class="mb-3 h5">
+                                <i class="far fa-check fa-lg fa-fw text-primary"></i>
+                                <span class="sub">Fast replace and repair service</span>
+                            </li>
+                            <li class="mb-3 h5">
+                                <i class="far fa-check fa-lg fa-fw text-primary"></i>
+                                <span class="sub">Low excess from &pound;50</span>
+                            </li>
+                            <li class="h5">
+                                <i class="far fa-check fa-lg fa-fw text-primary"></i>
+                                <span class="sub">Easy cashback scheme</span>
+                            </li>
+                        </ul>
+                        {{ form_start(buy_form, {'attr': { 'class': 'mb-3'}}) }}
                             {{ form_widget(buy_form.buy, {
-                                'label': 'Get Started',
+                                'label': 'Buy Now',
                                 'attr': {
-                                    'class': 'btn btn-success btn-block-xs btn-shadow mr-sm-2'
+                                    'class': 'btn btn-success btn-block-xs btn-shadow mb-4 mb-sm-0 mr-sm-3'
                             }}) }}
-                            <a href="#"
-                               class="btn btn-outline-white watch-video btn-block-xs"
-                               data-event="watch-video-quote"
-                               data-toggle="modal"
-                               data-target="#sosure-video-modal"
-                               data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
-                                <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
-                                Watch our Video
-                            </a>
+                            <a class="btn-simple-link" href="#excess_cardbox" data-cardbox-target="#excess_cardbox" data-cardbox-anchor="#excess_cardbox">View my excess</a>
                         {{ form_end(buy_form) }}
                         {% if validation_required is not null %}
-                            <p class="text-white">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
+                            <p>👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
                         {% endif %}
-                        <h2 class="h4 text-columbia-blue-e mt-4">Insurance Product Information Documents</h2>
-                        <a href="#insurance_product_info"
-                           class="text-white"
-                           data-toggle="collapse"
-                           role="button" aria-expanded="false"
-                           aria-controls="insurance_product_info">Read more <i class="far fa-angle-double-right fa-fw"></i></a>
-                        <div class="collapse mt-4" id="insurance_product_info">
-                            <ul class="list-unstyled icn-fa-list mb-0">
-                                <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
-                                <li class="text-white mb-5">
-                                    <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
-                                    {% if validation_required is not null %}
-                                        <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="track-data text-white"
-                                           data-event="user-download-ipid-agg"
-                                           data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u>Download a copy of our IPID</u></a>
-                                    {% else %}
-                                        <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="track-data text-white"
-                                           data-event="user-download-ipid"
-                                           data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
-                                    {% endif %}
-                                </li>
-                            </ul>
-                            <h2 class="h4 text-columbia-blue-e my-4">Our Policy Document:</h2>
-                            <ul class="list-unstyled icn-fa-list mb-0">
-                                <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> See our policy document for full details.</li>
-                                <li class="text-white mb-5">
-                                    <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
-                                    {% if validation_required is not null %}
-                                        <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="track-data text-white"
-                                           data-event="user-download-sample-policy-doc-quote-agg"
-                                           data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><u>Download a copy of our Policy Document</u></a>
-                                    {% else %}
-                                        <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="track-data text-white"
-                                           data-event="user-download-sample-policy-doc-quote"
-                                           data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><u>Download a copy of our Policy Document</u></a>
-                                    {% endif %}
-                                </li>
-                            </ul>
-                        </div>
-                        <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-                        {% if validation_required is not null or instore is not null %}
-                            <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
-                        {% else %}
-                            <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
-                        {% endif %}
-                        <div class="table-responsive">
-                            <table class="table table-bordered text-white">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th class="h6">Damage</th>
-                                        <th class="h6">Loss</th>
-                                        <th class="h6">Theft</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="h6">Excess</td>
-                                        <td>&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
-                                        <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
-                                        <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
-                                    </tr>
-                                    {% if instore is null %}
-                                        {% if validation_required is null %}
-                                            <tr>
-                                                <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
-                                            </tr>
-                                        {% endif %}
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6 order-lg-1">
-                   <div class="hero__illustration hero__illustration-generic text-center">
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png"
-                             alt="{{ phone.make }} {{ phone.model }} {{ phone.memory }} - Phone Insurance"
-                             class="lozad img-fluid hero-generic">
+                   <div class="hero__illustration hero__illustration-{{ img_url }} text-center">
+                        {% if img_url in available_images %}
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                 data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hero-{{ img_url }}.png"
+                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
+                                 class="lozad img-fluid">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                 data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png"
+                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
+                                 class="lozad img-fluid hero-generic">
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -272,6 +193,109 @@
 
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="insurance-info">
+        <div class="container-large py-5">
+            <div id="excess_cardbox" class="expanding-cardbox expanding-cardbox-white mb-4">
+                <div class="expanding-cardbox__body">
+                    <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                        Your Excess <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h2>
+                    <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                {% if validation_required is not null or instore is not null %}
+                                    <p class="mb-4">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app.</p>
+                                {% else %}
+                                    <p>Reduce the excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> by using our app to verify that it isn't already damaged prior to any claim.</p>
+                                    <p class="mb-4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive.</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-6">
+                                <table class="table-excess">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="3" class="h5 text-white">Excess after Validation ✅</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="h6 bg-athens-gray" width="33.3333333333%">Damage</td>
+                                            <td class="h6 bg-athens-gray" width="33.3333333333%">Loss</td>
+                                            <td class="h6 bg-athens-gray" width="33.3333333333%">Theft</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="h4">&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
+                                            <td class="h4">&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
+                                            <td class="h4">&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="expanding-cardbox expanding-cardbox-white">
+                <div class="expanding-cardbox__body">
+                    <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
+                        Insurance Information Documents <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    </h2>
+                    <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="row">
+                            <div class="col-lg-6 mb-4 mb-lg-0">
+                                <h3 class="h5">IPID</h3>
+                                <p>The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</p>
+                                {% if validation_required is not null %}
+                                    <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-primary btn-block-xs track-data"
+                                       data-event="user-download-ipid-agg"
+                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                                {% else %}
+                                    <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-primary btn-block-xs track-data"
+                                       data-event="user-download-ipid"
+                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                                {% endif %}
+                            </div>
+                            <div class="col-lg-6">
+                                <h3 class="h5">Our Policy Document</h3>
+                                <p>See our policy document for full details.</p>
+                                {% if validation_required is not null %}
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-primary btn-block-xs track-data"
+                                       data-event="user-download-sample-policy-doc-quote-agg"
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                                {% else %}
+                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="btn btn-outline-primary btn-block-xs track-data"
+                                       data-event="user-download-sample-policy-doc-quote"
+                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-4 text-center">
+                {{ form_start(buy_form_banner) }}
+                    {{ form_widget(buy_form_banner.buy, {
+                        'label': 'Buy Now',
+                        'attr': {
+                            'class': 'btn btn-success btn-block-xs btn-shadow'
+                    }}) }}
+                {{ form_end(buy_form_banner) }}
+            </div>
+        </div>
+    </section>
 
     <section class="video d-flex align-items-center justify-content-center">
         <a href="#"
@@ -292,7 +316,7 @@
 
     <section class="knowledge-base">
         <div class="container-large">
-            {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
+            {% include 'AppBundle::Components/_knowledgeBase.html.twig' with { 'no_cta': true } %}
         </div>
     </section>
 
@@ -312,7 +336,7 @@
                 <div class="banner__controls text-center text-lg-left">
                     {{ form_start(buy_form_banner_two) }}
                         {{ form_widget(buy_form_banner_two.buy, {
-                            'label': 'Get Started',
+                            'label': 'Buy Now',
                             'attr': {
                                 'class': 'btn btn-success btn-block-xs btn-shadow'
                         }}) }}
@@ -329,5 +353,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/phone-insurance.js') }}"></script>
+    <script src="{{ asset('css-js/phone-insurance-quote.js') }}"></script>
 {% endblock %}

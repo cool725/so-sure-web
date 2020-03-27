@@ -155,21 +155,17 @@ abstract class ExcelSftpService
     public function import($sheetName, $useMime = true, $maxParseErrors = 0, $skipCleanup = false)
     {
         $lines = [];
-        $files = $this->listSftp();
+        $files = $this->listSftp('.xlsx');
         foreach ($files as $file) {
             $this->clearWarnings();
             $this->clearErrors();
             $tempFile = null;
-            $unzipTempFiles = null;
             $lines[] = sprintf('Processing %s/%s', $this->path, $file);
             $processed = false;
             try {
                 $tempFile = $this->downloadFile($file);
-                $unzipTempFiles = $this->unzipFile($tempFile);
-                foreach ($unzipTempFiles as $excelFile) {
-                    $data = $this->parseExcel($excelFile, $sheetName, $useMime, $maxParseErrors);
-                    $processed = $this->processExcelData($file, $data);
-                }
+                $data = $this->parseExcel($tempFile, $sheetName, $useMime, $maxParseErrors);
+                $processed = $this->processExcelData($file, $data);
             } catch (\Exception $e) {
                 $processed = false;
                 $this->logger->error(sprintf(
@@ -193,21 +189,10 @@ abstract class ExcelSftpService
                 if (file_exists($tempFile)) {
                     unlink($tempFile);
                 }
-                foreach ($unzipTempFiles as $unzipTempFile) {
-                    if (file_exists($unzipTempFile)) {
-                        unlink($unzipTempFile);
-                    }
-                }
-
                 $this->moveSftp($file, self::PROCESSED_FOLDER);
             } else {
                 if (file_exists($tempFile)) {
                     $lines[] = sprintf('Skipping cleanup for %s', $tempFile);
-                }
-                foreach ($unzipTempFiles as $unzipTempFile) {
-                    if (file_exists($unzipTempFile)) {
-                        $lines[] = sprintf('Skipping cleanup for %s', $unzipTempFile);
-                    }
                 }
             }
         }
@@ -345,29 +330,6 @@ abstract class ExcelSftpService
         }
 
         return $tempFile;
-    }
-
-    public function unzipFile($file, $extension = '.xlsx')
-    {
-        $files = [];
-
-        $zip = new \ZipArchive();
-        if ($zip->open($file) === true) {
-            if ($zip->setPassword($this->zipPassword)) {
-                if (!$zip->extractTo(sys_get_temp_dir())) {
-                    throw new \Exception("Extraction failed (wrong password?)");
-                }
-                for ($i = 0; $i < $zip->numFiles; $i++) {
-                    if (mb_stripos($zip->getNameIndex($i), $extension) !== false) {
-                        $files[] = sprintf('%s/%s', sys_get_temp_dir(), $zip->getNameIndex($i));
-                    }
-                }
-            }
-
-            $zip->close();
-        }
-
-        return $files;
     }
 
     /**
