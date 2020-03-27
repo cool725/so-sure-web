@@ -2,6 +2,10 @@
 
 require('../../sass/pages/homepage.scss');
 
+// Require BS component(s)
+require('bootstrap/js/dist/util');
+require('bootstrap/js/dist/tab');
+
 // Require components
 require('../components/table.js');
 require('../components/modalVideo.js');
