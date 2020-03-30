@@ -9,7 +9,6 @@ require('bootstrap/js/dist/tab');
 
 // Require components
 require('../components/banner.js');
-require('../components/phone-search-dropdown-card.js');
 let textFit = require('textfit');
 require('../components/table.js');
 require('jquery-validation');

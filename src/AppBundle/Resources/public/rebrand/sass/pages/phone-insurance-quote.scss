@@ -6,6 +6,7 @@
 @import "../abstracts/mixins";
 @import "../abstracts/palette";
 @import "../abstracts/variables";
+@import "../base/fonts";
 
 .hero {
     position: relative;
@@ -44,6 +45,38 @@
 
         @include media-breakpoint-up(lg) {
             padding-top: 2.7rem;
+        }
+    }
+
+    &__illustration {
+        position: relative;
+    }
+
+    &__badge {
+        width: 155px; height: 155px;
+        position: absolute;
+        top: 0; right: 0;
+        text-align: center;
+        background-color: $froly;
+        color: $white;
+        font-family: $g-medium;
+        cursor: pointer;
+
+        transition: all 0.5s linear;
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
+                    0 5px 15px 0 rgba(8,27,154,0.2);
+        @include border-radius(50%);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background-color: darken($froly, 10%);
+        }
+
+        &-inner {
+            padding: 0.2rem;
         }
     }
 
