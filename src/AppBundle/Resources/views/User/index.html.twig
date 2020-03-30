@@ -508,7 +508,7 @@
                         <div class="d-flex">
                             <a href="#"
                                class="btn btn-outline-primary btn-copy w-100"
-                               data-clipboard-text="Hey, we could win &pound;20 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                               data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}">🔗 Copy link</a>
                             <a href="#"
                                class="btn btn-outline-primary w-100 ml-3 native-share track-data"
                                data-native-title="{{ og_title }}"
@@ -549,7 +549,7 @@
                         </form>
                         <a href="#"
                            class="btn btn-outline-primary win-btn btn-copy mr-3"
-                           data-clipboard-text="Hey, we could win &pound;20 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                           data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}">🔗 Copy link</a>
                         <div class="d-flex align-items-center justify-content-between">
                             <a href="#"
                                class="track-data mr-3"
