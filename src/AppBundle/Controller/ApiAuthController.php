@@ -2890,7 +2890,7 @@ class ApiAuthController extends BaseController
 
     /**
      * Gives you the share message for the given policy.
-     * @param Request $request is the http request made.
+     * @param Request     $request is the http request made.
      * @param string|null $id      is the id of the policy.
      * @return Response the http response to send.
      * @Route("/policy/{id}/share-message", name="api_auth_policy_share_message")
