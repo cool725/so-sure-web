@@ -1042,7 +1042,7 @@ abstract class Policy
     /**
      * Finds a positive payment that had a large enough amount to be refunded by the given amount.
      * @param float $amount is the amount that you want to refund as an either negative or positive number.
-     * @return Payment|null the found payment or null if there is no found payment.
+     * @return CheckoutPayment|null the found payment or null if there is no found payment.
      */
     public function findPaymentForRefund($amount)
     {
@@ -1050,7 +1050,7 @@ abstract class Policy
         return array_reduce(
             $this->getSuccessfulUserPaymentCredits(),
             function ($carry, $payment) use ($amount) {
-                if ($payment && $payment->getAmount() >= $amount &&
+                if ($payment && $payment->getAmount() >= $amount && $payment->getType() == 'checkout' &&
                     (!$carry || $payment->getAmount() > $carry->getAmount())
                 ) {
                     return $payment;
