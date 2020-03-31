@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\ValidatorTrait;
@@ -2889,9 +2890,9 @@ class ApiAuthController extends BaseController
 
     /**
      * Gives you the share message for the given policy.
-     * @param HttpRequest $request is the http request made.
+     * @param Request $request is the http request made.
      * @param string|null $id      is the id of the policy.
-     * @return HttpResponse the http response to send.
+     * @return Response the http response to send.
      * @Route("/policy/{id}/share-message", name="api_auth_policy_share_message")
      * @Method({"GET"})
      */

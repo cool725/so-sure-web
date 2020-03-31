@@ -6106,7 +6106,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $user = Create::user();
         $policy = Create::policy($user, new \DateTime(), Policy::STATUS_ACTIVE, 12);
         $scode = Create::scode('bongol');
-        $policy->addScode($scode);
+        $policy->addSCode($scode);
         Create::save(static::$dm, $user, $policy);
         $url = sprintf('/api/v1/auth/policy/%s/share-message?_method=GET', $policy->getId());
         $cognitoIdentityId = $this->getAuthUser($user);
