@@ -2886,4 +2886,32 @@ class ApiAuthController extends BaseController
         }
 
     }
+
+    /**
+     * Gives you the share message for the given policy.
+     * @param HttpRequest $request is the http request made.
+     * @param string|null $id      is the id of the policy.
+     * @return HttpResponse the http response to send.
+     * @Route("/policy/{id}/share-message", name="api_auth_policy_share_message")
+     * @Method({"GET"})
+     */
+    public function shareMessageAction(Request $request, $id = null)
+    {
+        $policyRepo = $this->getManager()->getRepository(Policy::class);
+        /** @var Policy $policy */
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy',
+                404
+            );
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        $templating = $this->get('templating');
+        return new JsonResponse([
+            'scode' => $policy->getStandardSCode()->getCode(),
+            'share' => $templating->render('AppBundle:SCode:share.txt.twig', ['policy' => $policy])
+        ]);
+    }
 }
