@@ -70,6 +70,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/common-mobile-phone-faults-and-solutions' => 'Common Mobile Phone Faults and Solutions',
             '/blog/samsung-galaxy-tips-and-tricks' => 'Samsung Galaxy Tips & Tricks',
             '/blog/how-to-fix-cracked-phone-screen' => 'What To Do About A Cracked Phone Screen',
+            '/blog/phone-insurance-vs-contents-insurance' => 'Phone Insurance vs Contents Insurance',
+            // '/blog/best-waterproof-phone-cases' => 'Best Waterproof Phone Cases',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',
