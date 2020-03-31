@@ -3192,7 +3192,8 @@ abstract class Policy
             // Never refund for certain cancellation reasons
             return false;
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_USER_REQUESTED &&
-            !$this->getPolicyTerms()->isInstantUserCancellationEnabled()) {
+            (!$this->getPolicyTerms()->isInstantUserCancellationEnabled() || $this->getPremiumInstallments() == 1)
+        ) {
             return true;
         } elseif ($this->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
             return true;
