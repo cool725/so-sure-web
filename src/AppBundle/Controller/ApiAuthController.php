@@ -2897,6 +2897,7 @@ class ApiAuthController extends BaseController
      */
     public function shareMessageAction(Request $request, $id = null)
     {
+        NoOp::ignore($request);
         $policyRepo = $this->getManager()->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $policyRepo->find($id);
