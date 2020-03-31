@@ -2,6 +2,10 @@
 
 require('../../sass/pages/homepage.scss');
 
+// Require BS component(s)
+require('bootstrap/js/dist/util');
+require('bootstrap/js/dist/tab');
+
 // Require components
 require('../components/table.js');
 require('../components/modalVideo.js');
@@ -20,10 +24,6 @@ $(function() {
     let knowledgeBaseD = $('.knowledge-base__desktop'),
         tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 2;
         knowledgeBaseD.css('top', -tabsHeight);
-
-    let knowledgeBaseM = $('.knowledge-base__mobile'),
-        cardboxHeight  = knowledgeBaseM.children(':first').height() / 2;
-        knowledgeBaseM.css('top', -cardboxHeight);
 
     // Tabs - style the arrow if open
     $('.tab-link').on('click', function (e) {

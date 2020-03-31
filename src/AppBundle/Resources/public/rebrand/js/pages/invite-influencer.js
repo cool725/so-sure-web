@@ -21,10 +21,6 @@ $(function() {
         tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 4;
         knowledgeBaseD.css('top', -tabsHeight);
 
-    let knowledgeBaseM = $('.knowledge-base__mobile'),
-        cardboxHeight  = knowledgeBaseM.children(':first').height() / 2;
-        knowledgeBaseM.css('top', -cardboxHeight);
-
     // Carousel setup
     const startStep = () => {
         $('#hero_img_1_1').show().addClass('animated bounceInUp');

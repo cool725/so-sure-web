@@ -1,6 +1,6 @@
-// phone-insurance.js
+// phone-insurance-quope.js
 
-require('../../sass/pages/phone-insurance.scss');
+require('../../sass/pages/phone-insurance-quote.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/carousel');
@@ -14,8 +14,6 @@ require('../components/table.js');
 require('jquery-validation');
 require('../common/validation-methods.js');
 require('../components/modalVideo.js');
-require('../components/memory-search-dropdown.js');
-
 
 let jQueryBridget = require('jquery-bridget');
 let Flickity = require('flickity');
@@ -50,9 +48,5 @@ $(function() {
     let knowledgeBaseD = $('.knowledge-base__desktop'),
         tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 2;
         knowledgeBaseD.css('top', -tabsHeight);
-
-    let knowledgeBaseM = $('.knowledge-base__mobile'),
-        cardboxHeight  = knowledgeBaseM.children(':first').height() / 2;
-        knowledgeBaseM.css('top', -cardboxHeight);
 });
 

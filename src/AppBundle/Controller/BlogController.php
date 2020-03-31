@@ -616,4 +616,32 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/phone-insurance-vs-contents-insurance",
+     * name="phone_insurance_vs_contents_insurance", options={"sitemap" = true})
+     * @Template
+     */
+    public function phoneInsuranceVsContentsInsuranceAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/phone-insurance-vs-contents-insurance.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    // /**
+    //  * @Route("/best-waterproof-phone-cases",
+    //  * name="best_waterproof_phone_cases", options={"sitemap" = true})
+    //  * @Template
+    //  */
+    // public function bestWaterproofPhoneCasesAction()
+    // {
+    //     $data = [];
+
+    //     $template = 'AppBundle:Blog:Articles/best-waterproof-phone-cases.html.twig';
+
+    //     return $this->render($template, $data);
+    // }
 }

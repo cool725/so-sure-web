@@ -67,6 +67,10 @@ class MixpanelService
     // Unused, but reserved
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
 
+    // Company Page
+    const EVENT_COMPANY_PHONES = 'Company Phones Page';
+    const EVENT_COMPANY_LEAD_CAPTURE = 'Company Lead Capture';
+
     // Deprecated - use EVENT_CPC_QUOTE_PAGE
     const EVENT_LANDING_PAGE = 'Landing Page';
 
@@ -183,7 +187,9 @@ class MixpanelService
         self::EVENT_EMAIL,
         self::EVENT_SMS,
         self::EVENT_PROMO_PAGE,
-        self::EVENT_UPGRADE_POLICY
+        self::EVENT_UPGRADE_POLICY,
+        self::EVENT_COMPANY_PHONES,
+        self::EVENT_COMPANY_LEAD_CAPTURE
     ];
 
     public static function getCampaignSources($event)

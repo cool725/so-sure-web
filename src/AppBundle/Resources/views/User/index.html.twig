@@ -62,7 +62,7 @@
                             <div class="h5 text-columbia-blue-e fit">MY SO-SURE <span class="mx-2 text-white">|</span> {{ policy.phone.make }} {{ policy.phone.model }}</div>
                         {% endif %}
                         <h1 class="text-white mb-5 mb-lg-4">
-                            Welcome {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}to so-sure{% else %}back{% endif %}, <span class="text-nowrap">{{ app.user.firstname }}</span>
+                            Welcome, <span class="text-nowrap">{{ app.user.firstname }}</span>
                         </h1>
                         {{ form_start(scode_form, {'attr': {
                             'class': 'w-75 d-none d-lg-block',
