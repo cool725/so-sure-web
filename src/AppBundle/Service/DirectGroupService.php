@@ -433,7 +433,7 @@ class DirectGroupService extends ExcelSftpService
         $this->validateClaimDetails($claim, $directGroupClaim);
 
         if ($claim->getType() != $directGroupClaim->getClaimType()) {
-            $claim->setType($directGroupClaim->getClaimType());
+            $claim->setType($directGroupClaim->getClaimType(), true);
             $update = true;
         }
 
@@ -1016,22 +1016,20 @@ class DirectGroupService extends ExcelSftpService
 
         if ($claim->getReplacementImei() && !$claim->getReplacementReceivedDate()) {
             if (!$policy->getImeiReplacementDate()) {
-                throw new \Exception(sprintf(
-                    'Expected imei replacement date for policy %s',
-                    $policy->getPolicyNumber()
-                ));
-            }
-
-            $now = \DateTime::createFromFormat('U', time());
-            // no set time of day when the report is sent, so for this, just assume the day, not time
-            $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
-            $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);
-            if ($now >= $twoBusinessDays) {
-                $msg = sprintf(
-                    'Claim %s is missing a replacement recevied date (expected 2 days after imei replacement)',
-                    $directGroupClaim->claimNumber
-                );
+                $msg = sprintf('Expected imei replacement date for policy %s', $policy->getPolicyNumber());
                 $this->errors[$directGroupClaim->claimNumber][] = $msg;
+            } else {
+                $now = \DateTime::createFromFormat('U', time());
+                // no set time of day when the report is sent, so for this, just assume the day, not time
+                $replacementDay = $this->startOfDay(clone $policy->getImeiReplacementDate());
+                $twoBusinessDays = $this->addBusinessDays($replacementDay, 2);
+                if ($now >= $twoBusinessDays) {
+                    $msg = sprintf(
+                        'Claim %s is missing a replacement recevied date (expected 2 days after imei replacement)',
+                        $directGroupClaim->claimNumber
+                    );
+                    $this->errors[$directGroupClaim->claimNumber][] = $msg;
+                }
             }
         }
     }

@@ -22,7 +22,7 @@ $(function() {
         }
 
         // Fix for resizing select if phone in session
-        if ($('body').is('.quote, .purchase, .phone-insurance-make-model, .phone-insurance-make, .home-instore')) {
+        if ($('body').is('.quote, .purchase, .phone-insurance-make-model, .phone-insurance-make, .home-instore, .phone-insurance-make-model-memory')) {
             $('.phone-search-dropdown__make, .phone-search-dropdown__model').resizeselect();
         }
 
