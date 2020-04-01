@@ -6113,6 +6113,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $messageData = $this->verifyResponse(200);
         $this->assertTrue(mb_strpos($messageData['message'], 'bongol') !== false);
+        $this->assertTrue(mb_strpos($messageData['subject'], 'perks') !== false);
     }
 
     public function testupgradePolicyGetAction()

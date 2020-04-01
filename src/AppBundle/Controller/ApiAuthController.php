@@ -2912,7 +2912,8 @@ class ApiAuthController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         $templating = $this->get('templating');
         return new JsonResponse([
-            'message' => $templating->render('AppBundle:SCode:share.txt.twig', ['policy' => $policy])
+            'message' => $templating->render('AppBundle:SCode:share.txt.twig', ['policy' => $policy]),
+            'subject' => 'Irresistible perks inside. Open with care'
         ]);
     }
 }
