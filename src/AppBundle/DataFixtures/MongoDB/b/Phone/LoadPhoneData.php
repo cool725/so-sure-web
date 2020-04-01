@@ -8,6 +8,7 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Repository\PolicyTermsRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -45,9 +46,10 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
         /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var PolicyTermsRepository $policyTermsRepo */
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         /** @var PolicyTerms $latestTerms */
-        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $latestTerms = $policyTermsRepo->findLatestTerms();
 
         if (!$date) {
             $date = new \DateTime('2016-01-01');

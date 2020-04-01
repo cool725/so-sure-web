@@ -185,6 +185,12 @@
                                  alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
                                  class="lozad img-fluid hero-generic">
                         {% endif %}
+                        <div class="hero__badge"
+                             data-toggle="modal"
+                             data-target="#covid_modal"
+                             role="button">
+                            <div class="hero__badge-inner"><span class="h5">FREE</span><br> Loss &amp; Theft during Coronavirus lockdown!</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -347,6 +353,20 @@
     </section>
 
     {# Page Modals #}
+    <div class="modal fade"
+         id="covid_modal"
+         tabindex="-1" role="dialog"
+         aria-labelledby="covid_modal"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p>You are still covered for Accidental Damage, Loss and Theft, but our prices reflect the lower risk of loss and theft during this isolation period.</p>
+                    <a href="#" class="btn btn-primary mx-auto" data-dismiss="modal" aria-label="Close">Close</a>
+                </div>
+            </div>
+        </div>
+    </div>
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
