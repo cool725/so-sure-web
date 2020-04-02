@@ -6101,6 +6101,21 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(403);
     }
 
+    public function testShareMessageAction()
+    {
+        $user = Create::user();
+        $policy = Create::policy($user, new \DateTime(), Policy::STATUS_ACTIVE, 12);
+        $scode = Create::scode('bongol');
+        $policy->addSCode($scode);
+        Create::save(static::$dm, $user, $policy);
+        $url = sprintf('/api/v1/auth/policy/%s/share-message?_method=GET', $policy->getId());
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $messageData = $this->verifyResponse(200);
+        $this->assertTrue(mb_strpos($messageData['message'], 'bongol') !== false);
+        $this->assertTrue(mb_strpos($messageData['subject'], 'perks') !== false);
+    }
+
     public function testupgradePolicyGetAction()
     {
         $user = Create::user();

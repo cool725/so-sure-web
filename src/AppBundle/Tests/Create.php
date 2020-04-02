@@ -3,6 +3,7 @@
 namespace AppBundle\Tests;
 
 use AppBundle\Document\User;
+use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
@@ -315,6 +316,20 @@ class Create
         $phone = new Phone();
         $phone->addPhonePrice($price);
         return $phone;
+    }
+
+    /**
+     * Creates a nice scode.
+     * @param string $value is the value to give to the scode.
+     * @return SCode the create scode.
+     */
+    public static function scode($value)
+    {
+        $scode = new SCode();
+        $scode->setCode($value);
+        $scode->setType(SCode::TYPE_STANDARD);
+        $scode->setActive(true);
+        return $scode;
     }
 
     /**

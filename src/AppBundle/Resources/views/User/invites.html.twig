@@ -45,7 +45,7 @@
                    Invite Friends</a>
                 <a href="#"
                    class="btn btn-outline-deep-sky-blue-d btn-block-xs btn-copy"
-                   data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                   data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}">🔗 Copy link</a>
             </div>
             <div class="win-invite d-none d-lg-flex mb-4">
                 <form id="invite_form_one" autocomplete="nope" class="invite-form text-left flex-grow-1 mr-3">
@@ -59,7 +59,7 @@
                 </form>
                 <a href="#"
                    class="btn btn-outline-deep-sky-blue-d win-btn btn-copy mr-1"
-                   data-clipboard-text="Hey, we could win &pound;200 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                   data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}">🔗 Copy link</a>
                 <div class="d-flex align-items-center justify-content-between">
                     <a href="#"
                        class="track-data"
@@ -227,7 +227,7 @@
                     <div class="d-flex">
                         <a href="#"
                            class="btn btn-outline-primary btn-copy w-100"
-                           data-clipboard-text="Hey, we could win &pound;20 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
+                           data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}">🔗 Copy link</a>
                         <a href="#"
                            class="btn btn-outline-primary w-100 ml-3 native-share track-data"
                            data-native-title="{{ og_title }}"
