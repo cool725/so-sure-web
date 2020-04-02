@@ -1,0 +1,131 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}New Huawei Release Rumour Hub | Release Date &amp; Price | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Despite widespread bans, Huawei will release its latest flagship smartphone in 2020. Find out everything you need to know about the Huawei P40 here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'New Huawei Release Rumour Hub | Release Date & Price | so-sure' %}
+{% set og_description = "Despite widespread bans, Huawei will release its latest flagship smartphone in 2020. Find out everything you need to know about the Huawei P40 here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/new-huawei-release-rumour-hub-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">New Huawei Release Rumour Hub</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">New Huawei Release Rumour Hub</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Mar 26, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/new-huawei-release-rumour-hub-1.jpg"
+                                     alt="Huawei P40"
+                                     class="img-fluid lozad mb-5">
+                                <p>Despite the uncertainty surrounding Huawei's future amid potential bans in the US, the Chinese tech giant intends to launch the successor to its flagship phone - the Huawei P30 – imminently.</p>
+                                <p>In this blog, we'll collate the most credible rumours from industry insiders to bring you everything you need to know about Huawei's latest smartphone, the Huawei P40. This includes the rumoured release date, price, design and specifications.</p>
+                                <h2>Huawei P40 Release Date</h2>
+                                <p>The Huawei P40 was set to be released in late March 2020, <a href="https://www.huaweicentral.com/breaking-huawei-p40-series-will-come-with-harmonyos-if-not-allowed-to-use-google-mobile-services/" target="_blank" rel="noopener noreferrer">according to Huawei CEO Richard Yu</a>. Though more recent rumours (potentially influenced by the current Coronavirus pandemic) put the release date in early April. This timeframe aligns with previous launch campaigns, with the Huawei P20 and P20 Pro being released in April 2018, followed by the Huawei P30 series in March 2019.</p>
+                                <h2>Huawei P40 Price Rumours</h2>
+                                <p>While there's been no official word yet, we can estimate the price of the Huawei P40 by considering its previous flagship releases. Upon release, the Huawei P20 was priced at &pound;599, while the Pro version cost &pound;799.</p>
+                                <p>A year later, the Huawei P30 launched at &pound;699 with the Pro version costing &pound;899.</p>
+                                <p>With the above figures in mind, we're guessing that the Huawei P40 will launch at &pound;799, with the Huawei P40 Pro costing around &pound;999.</p>
+                                <h2>Huawei P40 Design Rumours</h2>
+                                <p><a href="https://www.techradar.com/uk/news/huawei-p40-set-for-late-march-launch-with-a-never-seen-design" target="_blank" rel="noopener noreferrer">Huawei's consumer division CEO revealed to French media outlets that the P40 will feature a 'never seen' design</a>. However, leaked renders suggest it'll strongly resemble the Samsung S20 and OnePlus8. Other renders suggest there may be no bezels at any of the phone's edges, giving the device a striking flat design.</p>
+                                <p>However, <a href="https://www.t3.com/news/huawei-p40-pro-leak-shows-samsung-galaxy-s11-beating-screen-in-real-life" target="_blank" rel="noopener noreferrer">this image</a> of the rumoured P40 screen protector recently made the rounds on Chinese social media, prompting speculation that Huawei's latest iteration will feature a curved screen and no 'punch-hole' notch, which will delight admirers of clean, streamlined devices.</p>
+                                <h3>Colour</h3>
+                                <p>Renders revealed by a 'reliable industry source' over at <a href="https://www.91mobiles.com/" target="_blank" rel="noopener noreferrer">91mobiles</a> claim the Huawei P40 will be available in the following colours: Black, Blush Gold, Silver Frost, Deep Sea Blue and Ice White.</p>
+                                <h3>Resolution</h3>
+                                <p>2K resolution is likely to be retained, while the refresh rate could rise to 120Hz - double what most smartphones run at.</p>
+                                <h3>Chassis</h3>
+                                <p>Rumours emanating from Indian media outlet <a href="https://www.mysmartprice.com/gear/huawei-p40-pro-leaked-high-resolution-renders-ahead-launch-tipped-come-ceramic-body/" target="_blank" rel="noopener noreferrer">MySmartPrice</a> claim the premium P40 Pro will replace its gorilla glass chassis with a ceramic body.</p>
+                                <h2>Huawei P40 Camera Rumours</h2>
+                                <p>The current consensus is that the Huawei P40 will feature a triple camera system, consisting of a main camera flanked by ultra-wide and telephoto options. We're guessing that it'll include a 64MP main sensor, 20MP ultra-wide and a 12MP zoom function.</p>
+                                <p>The Huawei P40 Pro is likely to have four cameras on the back, including a 5x periscope zoom, as well as a cutting-edge <a href="https://www.pocket-lint.com/phones/news/147024-what-is-a-time-of-flight-camera-and-which-phones-have-it" target="_blank" rel="noopener noreferrer">time-of-flight (ToF) camera</a> for depth detection.</p>
+                                <h3>Huawei P40 Pro Premium Edition</h3>
+                                <p>Further murmurs hint at the production of a Huawei P40 Pro Premium Edition, which is rumoured to have five cameras on the back. This device is likely to include a 10x periscope zoom and a fifth macro camera, reflecting the macro camera trend that gained momentum in 2019.</p>
+                                <h2>Huawei P40 Specification Rumours</h2>
+                                <h3>Chipset and RAM</h3>
+                                <p>Announced at the <a href="https://www.t3.com/news/ifa" target="_blank" rel="noopener noreferrer">IFA 2019</a>, the Huawei P40 will be equipped with the world's first all-in-one 5G chipset, the Kirin 990, as well as around 10GB of RAM. The former merges a 5G modem with eight cores, producing maximum download speeds of 2.3Gbps per second and powerful performance across the board. The software is supplemented by its capacity to delegate tasks to individual cores, which streamlines the device's internal processes and makes the phone faster.</p>
+                                <p>Sadly, we're not currently able to insure the P40 as our app is not supported on it. However, we'll keep you posted if things change! And we're still covering <a href="{{ path('phone_insurance_make', {'make': 'huawei'}) }}">Huawei's older devices</a>, including the hugely popular P30!</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
