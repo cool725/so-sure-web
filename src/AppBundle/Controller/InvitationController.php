@@ -58,13 +58,11 @@ class InvitationController extends BaseController
                 $flashType,
                 $flashMessage
             );
-            // return $this->render('AppBundle:Invitation:invitation.html.twig', ['id' => $id]);
         } elseif ($this->getUser() !== null) {
             return $this->redirect($this->getParameter('branch_share_url'));
         } elseif ($invitation && $invitation->isCancelled()) {
-            // If invitation was cancelled, don't mention who invited them (clear the invitation),
-            // but still try to convert user
             $invitation = null;
+            return $this->redirectToRoute('homepage');
         }
 
         $lead = new Lead();
@@ -120,6 +118,11 @@ class InvitationController extends BaseController
             ], true);
         }
 
+        $scode = $invitation->getInviter()->getStandardSCode();
+        if ($scode) {
+            $this->get('session')->set('scode', $scode->getCode());
+        }
+
         if ($invitation && !$isUK) {
             // @codingStandardsIgnoreStart
             $this->addFlash('error-raw', sprintf(
@@ -128,13 +131,12 @@ class InvitationController extends BaseController
             // @codingStandardsIgnoreEnd
         }
 
-        $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
+        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
 
         $template = 'AppBundle:Invitation:invitation.html.twig';
-        $heroImageExp = null;
 
-        if ($competitionFeature) {
-            $template = 'AppBundle:Invitation:invitationCompetition.html.twig';
+        if ($referralFeature) {
+            $template = 'AppBundle:Invitation:invitationReferral.html.twig';
         }
 
         $data = [

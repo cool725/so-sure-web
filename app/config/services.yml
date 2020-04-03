@@ -244,6 +244,7 @@ services:
             - "@event_dispatcher"
             - "@app.mixpanel"
             - "@snc_redis.default"
+            - "@app.feature"
 
     app.scode:
         alias: AppBundle\Service\SCodeService
@@ -755,6 +756,19 @@ services:
             - "@app.sixpack"
             - "@app.feature"
             - "@app.price"
+        calls:
+            - [setCheckoutService, ["@app.checkout"]]
+
+    app.referral:
+        alias: AppBundle\Service\ReferralService
+        public: true
+
+    AppBundle\Service\ReferralService:
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.mailer"
+            - "@app.policy"
 
     app.quote:
         alias: AppBundle\Service\QuoteService
@@ -1154,6 +1168,15 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.upgraded, method: onPolicyUpgradedEvent }
+
+    app.listener.referral:
+        class:   AppBundle\Listener\ReferralListener
+        arguments:
+            - "@app.referral"
+            - "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
 
     app.listener.user:
         class:   AppBundle\Listener\UserListener

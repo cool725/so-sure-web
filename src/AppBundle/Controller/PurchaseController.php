@@ -30,6 +30,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\SCodeRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Security\PolicyVoter;
+use AppBundle\Security\InvitationVoter;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
@@ -71,10 +72,12 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Stats;
+use AppBundle\Document\ReferralBonus;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\Form\PurchaseStepPersonalAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
+use AppBundle\Document\Invitation\Invitation;
 
 use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\BasicUserType;
@@ -102,6 +105,7 @@ use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Exception\ClaimException;
 
 /**
  * @Route("/purchase")
@@ -1541,6 +1545,58 @@ class PurchaseController extends BaseController
                     null,
                     $this->getIdentityLogWeb($request)
                 );
+                $scodeRepo = $dm->getRepository(SCode::class);
+                if ($this->get('session')->has('scode')) {
+                    $code = $this->get('session')->get('scode');
+                    $scode = $scodeRepo->findOneBy([
+                        'code' => $code,
+                        'type' => SCode::TYPE_STANDARD
+                    ]);
+                }
+                $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
+                if ($referralFeature) {
+                    if ($scode) {
+                        $referral = new ReferralBonus();
+                        $scode->getPolicy()->addInviterReferralBonus($referral);
+                        $policy->addInviteeReferralBonus($referral);
+                        $referral->setStatus(ReferralBonus::STATUS_PENDING);
+                        $dm->persist($referral);
+                        $dm->flush();
+                    }
+                }
+                if ($scode) {
+                    $invitationRepo = $dm->getRepository(Invitation::class);
+                    $invitation = $invitationRepo->findOneBy([
+                        'inviter' => $scode->getPolicy()->getUser(),
+                        'invitee' => $policy->getUser()
+                    ]);
+                    if ($invitation) {
+                        if (!$invitation->isAccepted() && !$invitation->isCancelled()) {
+                            $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                            try {
+                                $connection = $this->get('app.invitation')->accept($invitation, $policy);
+                                $this->addFlash(
+                                    'success',
+                                    sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                                );
+                            } catch (ClaimException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Your inviter has a claim and is unable to connect.")
+                                );
+                            }
+                        }
+                    } else {
+                        $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
+                        if ($invitation) {
+                            $message = sprintf(
+                                '%s has been invited  to connect with you',
+                                $invitation->getInvitee()->getName()
+                            );
+                            $this->addFlash('success', $message);
+                        }
+                    }
+                }
             } else {
                 $checkout->updatePaymentMethod(
                     $policy,

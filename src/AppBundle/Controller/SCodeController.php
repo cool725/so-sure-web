@@ -65,6 +65,11 @@ class SCodeController extends BaseController
             // @codingStandardsIgnoreEnd
         }
 
+        // Redirect to homepage if scode not found
+        if (!$scode) {
+            return $this->redirectToRoute('homepage');
+        }
+
         $session = $this->get('session');
         $session->set('scode', $code);
 
@@ -126,13 +131,12 @@ class SCodeController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
 
-        $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
+        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
 
         $template = 'AppBundle:SCode:scode.html.twig';
-        $heroImageExp = null;
 
-        if ($competitionFeature) {
-            $template = 'AppBundle:SCode:scodeCompetition.html.twig';
+        if ($referralFeature) {
+            $template = 'AppBundle:SCode:scodeReferral.html.twig';
         }
 
         $data = [

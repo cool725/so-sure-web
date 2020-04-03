@@ -639,6 +639,24 @@ abstract class Policy
      */
     protected $dontCancelIfUnpaid;
 
+    /**
+     * Referral bonuses where this policy is the inviter.
+     * @MongoDB\ReferenceMany(
+     *     targetDocument="AppBundle\Document\ReferralBonus",
+     *     cascade={"persist"}
+     * )
+     */
+    protected $inviterReferralBonuses;
+
+    /**
+     * Referral bonuses where this policy is the invitee.
+     * @MongoDB\ReferenceMany(
+     *     targetDocument="AppBundle\Document\ReferralBonus",
+     *     cascade={"persist"}
+     * )
+     */
+    protected $inviteeReferralBonuses;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -651,6 +669,8 @@ abstract class Policy
         $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->notesList = new \Doctrine\Common\Collections\ArrayCollection();
         $this->participations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->inviterReferralBonuses = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->inviteeReferralBonuses = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -2915,6 +2935,58 @@ abstract class Policy
         return $this->dontCancelIfUnpaid;
     }
 
+    public function getInviterReferralBonuses()
+    {
+        return $this->inviterReferralBonuses;
+    }
+
+    public function addInviterReferralBonus($referralBonus)
+    {
+        $referralBonus->setInviter($this);
+        $this->inviterReferralBonuses[] = $referralBonus;
+    }
+
+    public function getInviteeReferralBonuses()
+    {
+        return $this->inviteeReferralBonuses;
+    }
+
+    public function addInviteeReferralBonus($referralBonus)
+    {
+        $referralBonus->setInvitee($this);
+        $this->inviteeReferralBonuses[] = $referralBonus;
+    }
+
+    public function getPaidInviterReferralBonusAmount()
+    {
+        $amount = $this->getUpgradedStandardMonthlyPrice();
+        if ($this->getPremiumInstallments() == 1) {
+            $amount = $this->getUpgradedYearlyPrice() / 11;
+        }
+        $total = 0;
+        foreach ($this->getInviterReferralBonuses() as $bonus) {
+            if ($bonus->getInviterPaid()) {
+                $total += $amount;
+            }
+        }
+        return $total;
+    }
+
+    public function getPaidInviteeReferralBonusAmount()
+    {
+        $total = 0;
+        $amount = $this->getUpgradedStandardMonthlyPrice();
+        if ($this->getPremiumInstallments() == 1) {
+            $amount = $this->getUpgradedYearlyPrice() / 11;
+        }
+        foreach ($this->getInviteeReferralBonuses() as $bonus) {
+            if ($bonus->getInviteePaid()) {
+                $total += $amount;
+            }
+        }
+        return $total;
+    }
+
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)
     {
         $user->addPolicy($this);
@@ -4503,6 +4575,21 @@ abstract class Policy
         // We should only bill policies that are active or unpaid
         // Doesn't make sense to bill expired or cancelled policies
         return $this->isActive();
+    }
+
+    /**
+     * Gives you the sum of all of this policy's scheduled scheduled payments. It does not count pending scheduled
+     * payments or anything like that.
+     * @return float the amount of money they have got scheduled yet to pay.
+     */
+    public function getTotalScheduled()
+    {
+        return array_reduce($this->getActiveScheduledPayments(), function ($carry, $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                return CurrencyTrait::toTwoDp($carry + $scheduledPayment->getAmount());
+            }
+            return $carry;
+        }, 0);
     }
 
     public function getSentInvitations($onlyProcessed = true)

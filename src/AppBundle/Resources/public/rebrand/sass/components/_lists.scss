@@ -70,6 +70,16 @@
             top: 2px;
         }
     }
+
+    li.lead {
+        padding-left: 35px;
+
+        > .far,
+        > .fal,
+        > .fab {
+            top: 5px;
+        }
+    }
 }
 
 // Use .list-unstyled

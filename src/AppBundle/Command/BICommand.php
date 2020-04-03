@@ -439,7 +439,11 @@ class BICommand extends ContainerAwareCommand
             'Premium Paid',
             'Premium Outstanding',
             'Past Due Amount (Bad Debt Only)',
-            'Company of Policy'
+            'Company of Policy',
+            'Referrals made',
+            'Referrals made amount',
+            'Referrals received',
+            'Referrals received amount'
         );
         foreach ($policies as $policy) {
             if ($policy->getEnd() <= $policy->getStart()) {
@@ -520,7 +524,11 @@ class BICommand extends ContainerAwareCommand
                 $policy->getPremiumPaid(),
                 $policy->getUnderwritingOutstandingPremium(),
                 $policy->getBadDebtAmount(),
-                $company ? $company->getName() : ''
+                $company ? $company->getName() : '',
+                count($policy->getInviterReferralBonuses()),
+                $policy->getPaidInviterReferralBonusAmount(),
+                count($policy->getInviteeReferralBonuses()),
+                $policy->getPaidInviteeReferralBonusAmount()
             );
         }
         if (!$skipS3) {

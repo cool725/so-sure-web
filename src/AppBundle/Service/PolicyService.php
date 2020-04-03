@@ -39,6 +39,8 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\Payment\SoSurePayment;
+use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Promotion;
@@ -161,6 +163,9 @@ class PolicyService
     /** @var PriceService */
     protected $priceService;
 
+    /** @var CheckoutService */
+    protected $checkoutService;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -271,6 +276,17 @@ class PolicyService
         $this->sixpackService = $sixpackService;
         $this->featureService = $featureService;
         $this->priceService = $priceService;
+    }
+
+    /**
+     * Sets the checkout service that this service will use. It is necessary to make it possible for this service to be
+     * constructed without a checkoutservice because both need each other and so there would be a circular dependency
+     * at the time of construction.
+     * @param CheckoutService $checkoutService is the checkout service to use.
+     */
+    public function setCheckoutService($checkoutService)
+    {
+        $this->checkoutService = $checkoutService;
     }
 
     public function validateUser(User $user)
@@ -2808,5 +2824,82 @@ class PolicyService
             $this->dm->flush();
         }
         return $rescheduledAmount;
+    }
+
+    /**
+     * Applys a referral bonus to the given policy if possible.
+     * If it is monthly delete a scheduled payment, and if they are yearly refund a month's worth.
+     * Also apparently we are supposed to ignore that there is an existing discount on yearly.
+     * @param Policy $policy is the policy to refund.
+     */
+    public function applyReferralBonus($policy)
+    {
+        $bonusPayment = new SoSurePayment();
+        if ($policy->getPremiumInstallments() == 12) {
+            $bonusPayment->setAmount($policy->getUpgradedStandardMonthlyPrice());
+        } else {
+            $bonusPayment->setAmount($this->toTwoDp($policy->getUpgradedYearlyPrice() / 11));
+        }
+        $bonusPayment->setPolicy($policy);
+        $bonusPayment->calculateSplit();
+        $policy->setCommission($bonusPayment);
+        $bonusPayment->setSuccess(true);
+        $bonusPayment->setNotes('Referral Bonus');
+        if ($policy->getPremiumInstallments() == 1) {
+            $paymentMethod = $policy->getPaymentMethod();
+            if ($paymentMethod->getType() == PaymentMethod::TYPE_CHECKOUT) {
+                /** @var CheckoutPayment $refundPayment */
+                $refundPayment = $policy->findPaymentForRefund($bonusPayment->getAmount());
+                if ($refundPayment) {
+                    $this->checkoutService->refund(
+                        $refundPayment,
+                        $bonusPayment->getAmount(),
+                        $bonusPayment->getCoverholderCommission(),
+                        $bonusPayment->getBrokerCommission(),
+                        "Referral Bonus"
+                    );
+                    $bonusPayment->setNotes('Referral Refund');
+                    $policy->addPayment($bonusPayment);
+                    $this->dm->persist($bonusPayment);
+                    $this->dm->flush();
+                } else {
+                    $this->logger->error(sprintf(
+                        'Unable to find refundable payment for referral bonus on policy %s',
+                        $policy->getId()
+                    ));
+                }
+            } elseif ($paymentMethod->getType() == PaymentMethod::TYPE_BACS) {
+                $scheduledPayment = new ScheduledPayment();
+                $scheduledPayment->setPolicy($policy);
+                $scheduledPayment->setAmount(0 - $bonusPayment->getAmount());
+                $scheduledPayment->setType(ScheduledPayment::TYPE_USER_WEB);
+                $scheduledPayment->setNotes('Referral Bonus');
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                $policy->addScheduledPayment($scheduledPayment);
+                $policy->addPayment($bonusPayment);
+                $this->dm->persist($scheduledPayment);
+                $this->dm->persist($bonusPayment);
+                $this->dm->flush();
+            } else {
+                $this->logger->error(sprintf(
+                    'Policy %s has invalid payment method',
+                    $policy->getId()
+                ));
+            }
+        } else {
+            foreach ($policy->getScheduledPayments() as $scheduledPayment) {
+                if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                    $scheduledPayment->cancel("Referral Bonus");
+                    $policy->addPayment($bonusPayment);
+                    $this->dm->persist($bonusPayment);
+                    $this->dm->flush();
+                    return;
+                }
+            }
+            $this->logger->error(sprintf(
+                'Could not find scheduled payment to skip for policy %s referral bonus',
+                $policy->getId()
+            ));
+        }
     }
 }

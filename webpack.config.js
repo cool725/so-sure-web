@@ -91,7 +91,8 @@ Encore
     .addEntry('user-claim-theft-loss', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-theft-loss.js')
     .addEntry('user-claim-submitted', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-claim-submitted.js')
     .addEntry('user-cancel', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-cancel.js')
-    .addEntry('user-competition', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-competition.js')
+    // .addEntry('user-competition', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-competition.js')
+    .addEntry('user-referral', './src/AppBundle/Resources/public/rebrand/js/pages/user/user-referral.js')
 
     // Upgrades
     .addEntry('upgrades', './src/AppBundle/Resources/public/rebrand/js/pages/user/upgrades.js')

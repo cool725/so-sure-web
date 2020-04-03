@@ -1,9 +1,19 @@
 
+{% if feature_enabled('referral') %}
+Get a FREE month phone insurance with {{ invitation.inviterName }}!
+
+Hey, {{ invitation.inviterName }}, invited you to join so-sure.
+
+Sign-up today and we'll reward both of you with a free month cover on your mobile phone insurance 🙂
+Click here to connect or to check out the other great perks so-sure offers: {{ invitation.link }}
+
+{% else %}
 {{ invitation.inviterName }} invited you don't miss out 😥
 
 Hey, {{ invitation.inviterName }}, invited you to join so-sure – sign-up today and we'll reward both of you ☺️
 
 Connect: {{ invitation.link }}
+{% endif %}
 
 Have a question or issue? Contact us: {{ contact_us_url }}
 

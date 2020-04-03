@@ -38,6 +38,7 @@ use AppBundle\Document\Invitation\SCodeInvitation;
 use AppBundle\Document\Invitation\FacebookInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\Feature;
 
 use AppBundle\Event\InvitationEvent;
 use AppBundle\Event\ConnectionEvent;
@@ -116,6 +117,9 @@ class InvitationService
     /** @var Redis */
     protected $redis;
 
+    /** @var FeatureService */
+    protected $feature;
+
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -134,6 +138,7 @@ class InvitationService
      * @param EventDispatcherInterface $dispatcher
      * @param MixpanelService          $mixpanel
      * @param Redis                    $redis
+     * @param FeatureService           $feature
      */
     public function __construct(
         DocumentManager $dm,
@@ -147,7 +152,8 @@ class InvitationService
         $environment,
         EventDispatcherInterface $dispatcher,
         MixpanelService $mixpanel,
-        Redis $redis
+        Redis $redis,
+        FeatureService $feature
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -161,6 +167,7 @@ class InvitationService
         $this->dispatcher = $dispatcher;
         $this->mixpanel = $mixpanel;
         $this->redis = $redis;
+        $this->feature = $feature;
     }
 
     public function setDebug($debug)
@@ -892,6 +899,7 @@ class InvitationService
         $subject = null;
         $htmlTemplate = sprintf('AppBundle:Email:invitation/%s.html.twig', $type);
         $textTemplate = sprintf('AppBundle:Email:invitation/%s.txt.twig', $type);
+        $referralFeature = $this->feature->isEnabled(Feature::FEATURE_REFERRAL);
         if ($type == self::TYPE_EMAIL_ACCEPT) {
             $to = $invitation->getInviter()->getEmail();
             $subject = sprintf('%s has accepted your invitation to so-sure', $invitation->getInviteeName());
@@ -909,7 +917,11 @@ class InvitationService
             }
             $from = ['noreply@wearesosure.com' => $invitation->getInviter()->getName()];
             $to = $invitation->getEmail();
-            $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
+            if ($referralFeature) {
+                $subject = 'Irresistible perks inside. Open with care';
+            } else {
+                $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
+            }
         } elseif ($type == self::TYPE_EMAIL_INVITE_USER) {
             // Only able to do for EmailInvitations
             if (!$invitation instanceof EmailInvitation) {
@@ -923,7 +935,11 @@ class InvitationService
                 return;
             }
             $to = $invitation->getEmail();
-            $subject = sprintf('%s has re-invited you to so-sure', $invitation->getInviterName());
+            if ($referralFeature) {
+                $subject = sprintf('Get a FREE month phone insurance with %s', $invitation->getInviterName());
+            } else {
+                $subject = sprintf('%s has re-invited you to so-sure', $invitation->getInviterName());
+            }
         } elseif ($type == self::TYPE_EMAIL_REJECT) {
             $to = $invitation->getInviter()->getEmail();
             $subject = sprintf(

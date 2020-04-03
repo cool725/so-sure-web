@@ -14,13 +14,29 @@ Download the app: {{ url('download_google', {'medium': 'pic-sure-required-welcom
 Nice to have you on board {{ policy.user.firstName }} 🥳
 
 Your phone is now covered and the policy details are below.
+{% if feature_enabled('referral') %}
 
+Now for the exciting bits 😀
+
+Get a month free each time one of your friends signs up with your sharing code. On top of that, you also get &pound;10 in your No Claims Reward Pot each time you connect with friends on so-sure.
+
+Download the app or log in to start earning rewards now!
+
+{% if policy.phone.isITunes %}
+Download the app: {{ url('download_apple', {'medium': 'pic-sure-required-welcome-email'}) }}
+{% elseif policy.phone.isGooglePlay %}
+Download the app: {{ url('download_google', {'medium': 'pic-sure-required-welcome-email'}) }}
+{% endif %}
+
+Or login here: {{ url('user_home', {'id': policy.id }) }}
+{% else %}
 Now for the fun bits 😀 share the love and earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback if you don't claim.
 
 Head to your dashboard to start earning rewards: {{ url('user_home', {'id': policy.id }) }}
 
 Katie Booth so-sure customer 😎
 "This insurance is your peace of mind when you spend so much on technology these days it’s better to insure them"
+{% endif %}
 {% endif %}
 
 Important boring bits:

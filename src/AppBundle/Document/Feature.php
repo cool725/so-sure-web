@@ -37,6 +37,7 @@ class Feature
     const FEATURE_CHECKOUT = 'checkout';
     const FEATURE_APPLY_SIGN_UP_BONUS = 'apply-sign-up-bonus';
     const FEATURE_INVITE_PAGES_COMPETITION = 'invite-competition';
+    const FEATURE_REFERRAL = 'referral';
 
     // All Features should be here
     public static $features = [
@@ -60,7 +61,8 @@ class Feature
         self::FEATURE_USER_PAYMENT_HISTORY,
         self::FEATURE_CHECKOUT,
         self::FEATURE_APPLY_SIGN_UP_BONUS,
-        self::FEATURE_INVITE_PAGES_COMPETITION
+        self::FEATURE_INVITE_PAGES_COMPETITION,
+        self::FEATURE_REFERRAL
     ];
 
     // @codingStandardsIgnoreStart
@@ -85,7 +87,8 @@ class Feature
         self::FEATURE_USER_PAYMENT_HISTORY => 'Allow users to view their payment history',
         self::FEATURE_CHECKOUT => 'Use Checkout instead of Judo for payments',
         self::FEATURE_APPLY_SIGN_UP_BONUS => 'Automatically apply any active sign-up bonuses to new users first policy',
-        self::FEATURE_INVITE_PAGES_COMPETITION => 'Invite pages competition (Amazon voucher)'
+        self::FEATURE_INVITE_PAGES_COMPETITION => 'Invite pages competition (Amazon voucher)',
+        self::FEATURE_REFERRAL => 'Referral Bonus'
     ];
     // @codingStandardsIgnoreEnd
 
