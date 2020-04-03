@@ -87,7 +87,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/water-damage' => 'Water damage',
             '/text-me-the-app' => 'Get a download link sent to your phone!',
             '/social-insurance' => 'Social Insurance',
-            '/company-phone-insurance' => 'Mobile phone insurance for your company',
+            '/company-phone-insurance' => 'Business Mobile Phone Insurance',
             '/phone-insurance/apple' => 'Apple Insurance',
             '/phone-insurance/alcatel' => 'Alcatel Insurance',
             '/phone-insurance/htc' => 'HTC Insurance',
