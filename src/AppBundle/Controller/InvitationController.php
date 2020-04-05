@@ -123,14 +123,6 @@ class InvitationController extends BaseController
             $this->get('session')->set('scode', $scode->getCode());
         }
 
-        if ($invitation && !$isUK) {
-            // @codingStandardsIgnoreStart
-            $this->addFlash('error-raw', sprintf(
-                '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents. If you are a UK resident, you may continue below.'
-            ));
-            // @codingStandardsIgnoreEnd
-        }
-
         $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
 
         $template = 'AppBundle:Invitation:invitation.html.twig';
