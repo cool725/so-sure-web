@@ -905,8 +905,12 @@ class IntercomService
             }
         }
 
-        $oldleads = false;
-        $duplicates = false;
+        $warmleads = false;
+        $activeInvalidDuplicates = false;
+        $activeValidDuplicates = false;
+        $inactiveDuplicates = false;
+        $leadDuplicates = false;
+        $invalids = false;
         // For each intercom user per email ( Can be several if duplicates)
         foreach ($users as $email => $intercomUsers) {
             if (mb_strpos($email, 'so-sure') !== false) {
@@ -916,8 +920,8 @@ class IntercomService
             /** @var User $sosureUser */
             $sosureUser = $userRepo->findOneBy((['emailCanonical' => mb_strtolower($email)]));
             if ($sosureUser) {
-                $validIntercomUsers = false;
-                $invalidIntercomUsers = false;
+                $validIntercomUsers = [];
+                $invalidIntercomUsers = [];
                 // Separate Intercom Users per Valid and Invalid ( Based on the premium)
                 foreach ($intercomUsers as $key => $intercomUser) {
                     if ($intercomUser['premium'] > 0) {
@@ -928,11 +932,30 @@ class IntercomService
                 }
                 // For the intercom users with duplicates, and without
                 if (count($intercomUsers) > 1) {
-                    if (!$validIntercomUsers) {
-                        if ($sosureUser->hasActivePolicy()) {
-                            $message = sprintf("Multiple invalid Intercom users for valid user: %s", $email);
-                            $this->logger->warning($message);
-                            $output[] = $message;
+                    if (count($validIntercomUsers) < 1) {
+                        if (count($invalidIntercomUsers) >= 1) {
+                            if ($sosureUser->hasActivePolicy()) {
+                                foreach ($invalidIntercomUsers as $intercomUser) {
+                                    $activeInvalidDuplicates[] = ["id" => $intercomUser['id']];
+                                }
+                                $message = sprintf("Multiple invalid Intercom users for valid user: %s", $email);
+                                $this->logger->warning($message);
+                                $output[] = $message;
+                            } elseif ($sosureUser->hasPolicy()) {
+                                foreach ($invalidIntercomUsers as $intercomUser) {
+                                    $inactiveDuplicates[] = ["id" => $intercomUser['id']];
+                                }
+                                $message = sprintf("Multiple invalid Intercom users for inactive user: %s", $email);
+                                $this->logger->info($message);
+                                $output[] = $message;
+                            } else {
+                                foreach ($invalidIntercomUsers as $intercomUser) {
+                                    $leadDuplicates[] = ["id" => $intercomUser['id']];
+                                }
+                                $message = sprintf("Multiple invalid Intercom users for warm lead: %s", $email);
+                                $this->logger->info($message);
+                                $output[] = $message;
+                            }
                         }
                     } elseif (count($validIntercomUsers) > 1) {
                         $matchingIntercomId = false;
@@ -951,7 +974,7 @@ class IntercomService
                     } elseif (count($validIntercomUsers) == 1) {
                         if ($invalidIntercomUsers) {
                             foreach ($invalidIntercomUsers as $intercomUser) {
-                                $duplicates[] = ["id" => $intercomUser['id']];
+                                $activeValidDuplicates[] = ["id" => $intercomUser['id']];
                                 $message = sprintf("Duplicate to be tagged: %s", $email);
                                 $this->logger->warning($message);
                                 $output[] = $message;
@@ -959,7 +982,7 @@ class IntercomService
                         }
                     }
                 } elseif (count($intercomUsers) == 1) {
-                    if (!$validIntercomUsers) {
+                    if (count($validIntercomUsers) < 1) {
                         if ($sosureUser->hasActivePolicy()) {
                             if (!$dry) {
                                 if (!($intercomUsers[0]['id'] === $sosureUser->getIntercomId())) {
@@ -970,13 +993,13 @@ class IntercomService
                                 $this->queue($sosureUser);
                             }
                             $message = sprintf("Intercom user with invalid data updated for email: %s", $email);
-                            $this->logger->warning($message);
+                            $this->logger->info($message);
                             $output[] = $message;
                         } else {
                             if (!$sosureUser->hasPolicy()) {
-                                $oldleads[] = ["id" => $intercomUsers[0]['id']];
+                                $warmleads[] = ["id" => $intercomUsers[0]['id']];
                                 $message = sprintf("Old Lead: %s", $email);
-                                $this->logger->warning($message);
+                                $this->logger->info($message);
                             }
                         }
                     }
@@ -986,16 +1009,31 @@ class IntercomService
                     $output[] = $message;
                 }
             } else {
+                foreach ($intercomUsers as $key => $intercomUser) {
+                    $invalids[] = ["id" => $intercomUser['id']];
+                }
                 $message = sprintf("No system user found for the intercom user: %s", $email);
                 $this->logger->warning($message);
                 $output[] = $message;
             }
         }
-        if ($oldleads && !$dry) {
-            $this->updateTag('M: old leads', $oldleads);
+        if ($warmleads && !$dry) {
+            $this->updateTag('C: Warm Lead', $warmleads);
         }
-        if ($duplicates && !$dry) {
-            $this->updateTag('M: duplicates', $duplicates);
+        if ($activeValidDuplicates && !$dry) {
+            $this->updateTag('C: Active Valid Duplicates', $activeValidDuplicates);
+        }
+        if ($activeInvalidDuplicates && !$dry) {
+            $this->updateTag('C: Active Invalid Duplicates', $activeInvalidDuplicates);
+        }
+        if ($inactiveDuplicates && !$dry) {
+            $this->updateTag('C: Inactive Duplicates', $inactiveDuplicates);
+        }
+        if ($leadDuplicates && !$dry) {
+            $this->updateTag('C: Warm Lead Duplicates', $leadDuplicates);
+        }
+        if ($invalids && !$dry) {
+            $this->updateTag('C: No System User', $invalids);
         }
         $output[] = sprintf('Total Users Checked: %d', $count);
         return $output;
