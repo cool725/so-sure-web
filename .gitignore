@@ -43,3 +43,4 @@ yarn-error.log
 *.swp
 .vimrc
 .swo
+*.swo
