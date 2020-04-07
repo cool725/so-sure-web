@@ -41,10 +41,14 @@
                     'disabled': 'disabled'
             }}) }}
         </div>
+        {% set email_place_holder = 'Enter Email (optional)' %}
+        {% if email_optional is defined and email_optional == 'email' %}
+            {% set email_place_holder = 'Enter Email' %}
+        {% endif %}
         <div class="form-group">
             <input type="email"
                    class="form-control phone-search-dropdown-card__text phone-search-email"
-                   placeholder="Email (optional)"
+                   placeholder="{{ email_place_holder }}"
                    disabled="disabled"
                    name="launch_phone[email]">
         </div>

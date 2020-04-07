@@ -117,32 +117,31 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $template = 'AppBundle:Default:index.html.twig';
+        $template = 'AppBundle:Default:indexQuickQuote.html.twig';
 
-        // A/B Homepage Quote Email
-        // To Test use url param ?force=homepage / ?force=homepage-with-email
-        $homepageQuoteEmailExp = $this->sixpack(
+        // A/B Email Optional
+        $homepageEmailOptionalExp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
-            ['homepage', 'homepage-with-email'],
+            SixpackService::EXPERIMENT_EMAIL_OPTIONAL,
+            ['email-optional', 'email'],
             SixpackService::LOG_MIXPANEL_ALL
         );
 
-        if ($homepageQuoteEmailExp == 'homepage-with-email') {
-            // @codingStandardsIgnoreStart
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE,['page' => 'homepage-with-email']);
-            // @codingStandardsIgnoreEnd
-            $template = 'AppBundle:Default:indexQuickQuote.html.twig';
+        if ($homepageEmailOptionalExp == 'email') {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+                'page' => 'homepage-email'
+            ]);
         } else {
-            // Track Normally
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+                'page' => 'homepage-email-optional'
+            ]);
         }
 
         $data = array(
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $this->competitorsData(),
-            'from_price' => $fromPrice,
+            'from_price' => $fromPrice
         );
 
         return $this->render($template, $data);
