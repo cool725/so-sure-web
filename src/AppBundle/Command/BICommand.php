@@ -1048,7 +1048,7 @@ class BICommand extends ContainerAwareCommand
         ]);
 
         //Get Referral bonuses
-        $referrals = $rewardRepo->findBy([], ['created'=>'ASC']);
+        $referrals = $rewardRepo->findBy([], ['created'=>'DESC']);
 
         //Generate data
         foreach ($referrals as $key => $referral) {
