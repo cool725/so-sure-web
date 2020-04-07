@@ -191,8 +191,6 @@ class UserController extends BaseController
         }
 
         $scode = null;
-        $codeMessage = null;
-        $codeButtonText = 'Apply Code';
 
         if ($session = $this->get('session')) {
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
@@ -204,12 +202,13 @@ class UserController extends BaseController
         $emailInvitationForm = $this->get('form.factory')
             ->createNamedBuilder('email', EmailInvitationType::class, $emailInvitiation)
             ->getForm();
+        // TODO: Remove setting code once all codes applied from payment page
         $scodeForm = $this->get('form.factory')
-            ->createNamedBuilder('scode', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
+            ->createNamedBuilder('scode', SCodeInvitationType::class)
             ->getForm();
         // @codingStandardsIgnoreStart
         $scodeFormTwo = $this->get('form.factory')
-            ->createNamedBuilder('scode_two', SCodeInvitationType::class, ['scode' => $scode ? $scode->getCode() : null])
+            ->createNamedBuilder('scode_two', SCodeInvitationType::class)
             ->getForm();
         // @codingStandardsIgnoreEnd
 
@@ -382,34 +381,11 @@ class UserController extends BaseController
                 }
             }
             // @codingStandardsIgnoreEnd
-        } elseif ($scode) {
-            if ($scode->isStandard()) {
-                $codeMessage = sprintf('Connect with %s.', $scode->getUser()->getName());
-                $codeButtonText = 'Confirm';
-            } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() != true) {
-                // @codingStandardsIgnoreStart
-                $codeMessage = sprintf('Apply your £%0.2f reward bonus from %s', $scode->getReward()->getDefaultValue(), $scode->getUser()->getName());
-                // @codingStandardsIgnoreEnd
-                $codeButtonText = 'Add Reward';
-            } elseif ($scode->isReward() and $scode->getUser()->getIsInfluencer() == true) {
-                // @codingStandardsIgnoreStart
-                $codeMessage = sprintf('Connect with %s.', $scode->getUser()->getName());
-                // @codingStandardsIgnoreEnd
-                $codeButtonText = 'Confirm';
-            }
         }
 
         $renewMessage = false;
         foreach ($user->getValidPolicies(true) as $checkPolicy) {
             if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
-                // $this->addFlash(
-                //     'success-raw',
-                //     sprintf(
-                //         '%s is ready for <a href="%s">renewal</a>',
-                //         $checkPolicy->getPolicyNumber(),
-                //         $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
-                //     )
-                // );
                 $renewMessage = true;
             }
 
@@ -444,9 +420,7 @@ class UserController extends BaseController
             'scode_form_two' => $scodeFormTwo->createView(),
             'scode' => $scode,
             'friends' => $fbFriends,
-            'code_message' => $codeMessage,
-            'max_connections' => $maxConnections,
-            'code_button_text' => $codeButtonText,
+            'max_connections' => $maxConnections
         );
     }
 

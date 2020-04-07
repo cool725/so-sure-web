@@ -69,26 +69,22 @@
                             'autocomplete': 'off'
                         }}) }}
                             <p class="text-white mb-2">
-                                {% if code_message is not null %}
-                                    {{ code_message }} 👇
-                                {% else %}
-                                    Already received an invite code?
-                                    <span class="text-dodger-blue">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#scode_info"
-                                           role="button">
-                                            <i class="fal fa-info-circle fa-fw text-columbia-blue-e"></i>
-                                        </a>
-                                    </span>
-                                {% endif %}
+                                Already received an invite code?
+                                <span class="text-dodger-blue">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#scode_info"
+                                       role="button">
+                                        <i class="fal fa-info-circle fa-fw text-columbia-blue-e"></i>
+                                    </a>
+                                </span>
                             </p>
                             <div class="custom-input-with-btn">
                                 {{ form_widget(scode_form.scode, {'attr': {
                                     'placeholder': 'Enter Code',
                                     'class': 'form-control form-control-white form-control-shadow'
                                 }}) }}
-                                {{ form_widget(scode_form.submit, {'label': code_button_text, 'attr': {
+                                {{ form_widget(scode_form.submit, {'label': 'Apply Code', 'attr': {
                                     'class': 'btn btn-success btn-sm'
                                 }}) }}
                             </div>
@@ -158,26 +154,22 @@
                             'autocomplete': 'off'
                         }}) }}
                             <p class="text-white mb-2">
-                                {% if code_message is not null %}
-                                    {{ code_message }} 👇
-                                {% else %}
-                                    Already received an invite code?
-                                    <span class="text-dodger-blue">
-                                        <a href="#"
-                                           data-toggle="modal"
-                                           data-target="#scode_info"
-                                           role="button">
-                                            <i class="fal fa-info-circle fa-fw text-columbia-blue-e"></i>
-                                        </a>
-                                    </span>
-                                {% endif %}
+                                Already received an invite code?
+                                <span class="text-dodger-blue">
+                                    <a href="#"
+                                       data-toggle="modal"
+                                       data-target="#scode_info"
+                                       role="button">
+                                        <i class="fal fa-info-circle fa-fw text-columbia-blue-e"></i>
+                                    </a>
+                                </span>
                             </p>
                             <div class="custom-input-with-btn">
                                 {{ form_widget(scode_form_two.scode, {'attr': {
                                     'placeholder': 'Enter Code',
                                     'class': 'form-control form-control-white form-control-shadow'
                                 }}) }}
-                                {{ form_widget(scode_form_two.submit, {'label': code_button_text, 'attr': {
+                                {{ form_widget(scode_form_two.submit, {'label': 'Apply Code', 'attr': {
                                     'class': 'btn btn-success btn-sm'
                                 }}) }}
                             </div>
