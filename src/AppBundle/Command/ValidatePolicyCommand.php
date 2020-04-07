@@ -555,7 +555,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $refundCommission,
                         $pendingBacsTotalCommission
                     );
-                } elseif ($refund === 0 && $refundCommission !== 0) {
+                } elseif ($refund === 0 && $refundCommission !== 0 &&
+                    $policy->getEnd() < (new \DateTime())->sub(new \DateInterval('P2M'))
+                ) {
                     if ($refundCommission !== $pendingBacsTotalCommission) {
                         $lines[] = $this->failureRefundCommissionMessage(
                             $policy,
