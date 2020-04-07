@@ -645,6 +645,20 @@ class BlogController extends BaseController
         return $this->render($template, $data);
     }
 
+    /**
+     * @Route("/best-phone-running-armbands",
+     * name="best_phone_running_armbands", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestPhoneRunningArmbandsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/best-phone-running-armbands.html.twig';
+
+        return $this->render($template, $data);
+    }
+
     // /**
     //  * @Route("/best-waterproof-phone-cases",
     //  * name="best_waterproof_phone_cases", options={"sitemap" = true})

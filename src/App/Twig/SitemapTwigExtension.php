@@ -72,6 +72,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/how-to-fix-cracked-phone-screen' => 'What To Do About A Cracked Phone Screen',
             '/blog/phone-insurance-vs-contents-insurance' => 'Phone Insurance vs Contents Insurance',
             '/blog/new-huawei-release-rumour-hub' => 'New Huawei Release Rumour Hub',
+            '/blog/best-phone-running-armbands' => 'Best Phone Running Armbands',
             // '/blog/best-waterproof-phone-cases' => 'Best Waterproof Phone Cases',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
