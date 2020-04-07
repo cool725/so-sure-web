@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\ValidatorTrait;
@@ -2885,5 +2886,34 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
 
+    }
+
+    /**
+     * Gives you the share message for the given policy.
+     * @param Request     $request is the http request made.
+     * @param string|null $id      is the id of the policy.
+     * @return Response the http response to send.
+     * @Route("/policy/{id}/share-message", name="api_auth_policy_share_message")
+     * @Method({"GET"})
+     */
+    public function shareMessageAction(Request $request, $id = null)
+    {
+        NoOp::ignore($request);
+        $policyRepo = $this->getManager()->getRepository(Policy::class);
+        /** @var Policy $policy */
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy',
+                404
+            );
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        $templating = $this->get('templating');
+        return new JsonResponse([
+            'message' => $templating->render('AppBundle:SCode:share.txt.twig', ['policy' => $policy]),
+            'subject' => 'Irresistible perks inside. Open with care'
+        ]);
     }
 }

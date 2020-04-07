@@ -1347,9 +1347,8 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        // A/B Homepage Quote Email
-        // To Test use url param ?force=homepage / ?force=homepage-with-email
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL);
+        // A/B Email Optional
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_OPTIONAL);
 
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
@@ -1386,11 +1385,11 @@ class UserController extends BaseController
 
         $template = 'AppBundle:User:onboarding.html.twig';
 
-        $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
+        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
 
         // TODO: This should not be a feature
-        if ($competitionFeature) {
-            $template = 'AppBundle:User:welcomeCompetition.html.twig';
+        if ($referralFeature) {
+            $template = 'AppBundle:User:welcomeReferral.html.twig';
         }
 
         if ($request->get('_route') == 'user_instore') {

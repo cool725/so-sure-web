@@ -329,7 +329,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
     public function getYearlyPremiumPrice()
     {
         if (!$this->getPreviousIterations()) {
-            return $this->getPremium()->getYearlyPremiumPrice();
+            return $this->getPremium()->getAdjustedYearlyPremiumPrice();
         }
         return array_reduce($this->getAllIterations(), function ($carry, $iteration) {
             return $carry + $iteration->getProRataPremium($this->getDaysInPolicyYear());

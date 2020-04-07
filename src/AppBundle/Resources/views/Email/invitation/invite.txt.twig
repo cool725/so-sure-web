@@ -1,13 +1,12 @@
-{% if feature_enabled('invite-competition') %}
+
+{% if feature_enabled('referral') %}
 Danger, irresistible perks inside. Open with care.
 
-Your friend {{ invitation.inviterName }} invited you to join so-sure to benefit from it’s amazing perks: free competition entries, cashback opportunities and a free month cover if you pay annually. And that’s on top of the game changing low price, easy as pie cover and lighting fast claims we offer! Yes, we’re cheap, fast and easy. Don’t tell your parents.
+Your friend {{ invitation.inviterName }} invited you to join so-sure to benefit from its amazing perks - which include free months of cover, and cashback opportunities. And that’s on top of the game changing low price, easy as pie cover and lighting fast claims we offer! Yes, we’re cheap, fast and easy. Don’t tell your parents.
 
-About that competition… this month 10 people will win a &pound;20 Amazon voucher. You don’t even need to buy a policy with us to enter! Just answer 3 quick quiz questions and share with your friends to earn more entries into our prize draw.
+Check our website to find out more about our comprehensive cover from just &pound;2.74 and how you can get up to 80% of your cash back with us!
 
-If you do need to insure your phone, there’s loads of info about our comprehensive cover from just £2.74/month. Plus you can see how you can get up to 80% of your cash back with us!
-
-Click here to enter {{ invitation.link }}
+Find out more: {{ invitation.link }}
 
 Have a question or issue? Contact us: {{ contact_us_url }}
 {% else %}

@@ -520,9 +520,8 @@ class PhoneInsuranceController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        // A/B Homepage Quote Email
-        // To Test use url param ?force=homepage / ?force=homepage-with-email
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL);
+        // A/B Email Optional
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_OPTIONAL);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');

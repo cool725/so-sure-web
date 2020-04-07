@@ -142,7 +142,7 @@ class HelvetiaExportService
         $repo = $this->dm->getRepository(Payment::class);
         $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_HELVETIA_PHONE)->toArray();
         $lines = [];
-        $lines[] = CsvHelper::line('PolicyNumber', 'Date', 'Amount', 'Notes', 'BrokerFee');
+        $lines[] = CsvHelper::line('PolicyNumber', 'Date', 'Amount', 'Notes', 'BrokerFee', 'Type');
         $total = 0;
         $n = 0;
         $daily = [];
@@ -153,7 +153,8 @@ class HelvetiaExportService
                 $payment->getDate()->format("Ymd H:i"),
                 $payment->getAmount(),
                 $payment->getNotes(),
-                $payment->getTotalCommission()
+                $payment->getTotalCommission(),
+                $payment->getType()
             );
             $total += $payment->getAmount();
             $n++;

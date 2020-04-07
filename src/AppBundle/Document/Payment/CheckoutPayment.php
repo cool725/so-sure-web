@@ -236,7 +236,9 @@ class CheckoutPayment extends Payment
      */
     protected function userPaymentName()
     {
-        if ($this->amount < 0) {
+        if ($this->notes == 'Referral Bonus') {
+            return $this->notes;
+        } elseif ($this->amount < 0) {
             return "Card Refund";
         } else {
             return "Card Payment";

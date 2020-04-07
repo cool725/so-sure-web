@@ -7,7 +7,7 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-        SixpackService::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL, ['homepage', 'homepage-with-email'],
+        SixpackService::EXPERIMENT_EMAIL_OPTIONAL, ['email-optional', 'email'],
     ];
 
     private static $authExperiments = [];

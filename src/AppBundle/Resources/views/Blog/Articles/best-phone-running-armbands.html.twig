@@ -1,0 +1,164 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Best Phone Running Armbands | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Many of us carry our phones while running, but not everyone protects their device. In this blog, we review some of the best running armbands on the market."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Best Phone Running Armbands | so-sure' %}
+{% set og_description = "Many of us carry our phones while running, but not everyone protects their device. In this blog, we review some of the best running armbands on the market." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/best-phone-running-armbands-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Best Phone Running Armbands</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Best Phone Running Armbands</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Apr 7, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/best-phone-running-armbands-1.jpg"
+                                     alt="Woman running with phone armband"
+                                     class="img-fluid lozad mb-5">
+                                <p>Many of us carry our phones when we're out running – whether it's for mapping our route, streaming music or simply safety – but no one wants to stress over their phone while hurtling after their personal best. A high-quality running armband is therefore essential; it should hold your phone securely in place without pinching, chafing, bouncing or overheating, so you can focus on what matters: running.</p>
+                                <p>But how do you find the right running armband for you? Well, we've ran the rule over the best phone armbands on the market and collated a list of worthy winners in numerous categories, from awesome all-rounders to our best budget choice. Read on to discover the best running armband for you and your phone.</p>
+                                <h2>What makes for a good running armband?</h2>
+                                <ul>
+                                    <li>Easy to take on and off</li>
+                                    <li>Sweat resistance properties</li>
+                                    <li>Secure enough to protect your phone and prevent it from bouncing as you run</li>
+                                    <li>Storage space (if required)</li>
+                                    <li>Unobtrusive design</li>
+                                    <li>Touchscreen access when armband is fitted</li>
+                                </ul>
+                                <p>So, without further ado, let’s take a look at our top running armband picks.</p>
+                                <h2>Best All-Around Armband</h2>
+                                <h3><a href="https://www.grantwoodtechnology.com/" target="_blank" rel="noopener noreferrer">Grantwood Technology Tuneband Go</a></h3>
+                                <p>Accommodating almost any make or model, the Grantwood Tuneband is a durable, heat-resistant silicone skin that gives you complete control over your phone's functions, including all ports, buttons and cameras.</p>
+                                <p>There's a full-frontal screen protector that safeguards against snags, bumps and drops, while the dual elastic straps ensure the perfect fit regardless of the size of your arm (it fits arms between 7"–18"). Grantwood Technology also offers a second customised strap if required, so you can rest assured the running band will fit securely. There's a whole spectrum of colourways to match your style too, from classic matte black to glow in the dark varieties, making it easier than ever to customise your workout wardrobe.</p>
+                                <p>Nevertheless, as with any running armband, there are a couple of drawbacks. Firstly, while the band's slim build is unobtrusive in its design, it doesn't accommodate thick phone cases, so accidental drops can become an issue. Moreover, the band tends to absorb excess perspiration, which can cause minor discomfort.</p>
+                                <p>These issues are minor, however, and the Tuneband Go's excellent features and reasonable price point place it in the premium running band bracket.</p>
+                                <h2>Best Armband for Non–iPhone Users</h2>
+                                <h3><a href="https://www.tunebelt.com/" target="_blank" rel="noopener noreferrer">Tune Belt Armband</a></h3>
+                                <p>Built for the green-text bubblers among us, the Tune Belt's non-specific device design houses almost any smartphone, making it an immediate hit for non-iPhone users. And unlike the Grantwood above, it can accommodate bulky phone cases, providing further protection for your device.</p>
+                                <p>The Tune Belt's sweat-wicking neoprene construction keeps your phone clean during the most demanding trail runs, while the touchscreen retains full functionality, allowing you to skip through songs until you find the perfect motivating track. Fitting is flexible too, thanks to its adjustable strap that fits most arms from 9" – 16" and maintains a secure comfortable grip while preventing excessive movement. Overall, this is a versatile and reliable running armband that's guaranteed to stand the test of time.</p>
+                                <h2>Best Armband for Long-Distance Runners</h2>
+                                <h3><a href="https://www.armpocket-armband.co.uk/" target="_blank" rel="noopener noreferrer">Armpocket Ultra i-35 Armband</a></h3>
+                                <p>Created by a team of athletes using eco-friendly materials, the Armpocket Ultra i-35 running band contours to the natural shape of your arm, resulting in a comfortable, secure fit that restricts slips and drops.</p>
+                                <p>Compatible with a vast range of devices up to 6", the Ultra i-35 features substantial storage space to house your essentials alongside your phone, as well as a moisture-wicking strap to keep you cool and dry during your exertions. There's even an extra waterproof layer between the back of the armband and the storage compartment, safeguarding your phone and valuables against water damage.</p>
+                                <p>Available in a range of vivid colourways, from classic black to artic blue and reflective pink, you’re sure to find the ideal armband to suit your style.</p>
+                                <h2>Best for Touchscreen Use</h2>
+                                <h3><a href="https://www.lifeproof.co.uk/en-gb/lifeactiv-armband-with-quickmount/78-50355.html" target="_blank" rel="noopener noreferrer">LifeProof LifeActiv Armband with Quickmount</a></h3>
+                                <p>The LifeActiv armband keeps you connected while you're pounding the pavement. Find your stride with an inspiring soundtrack, plan your route with GPS, and track your goals with your favourite fitness app. With the LifeActiv, all your apps are all at arm's length – literally.</p>
+                                <p>Lifeproof's unique armband holsters secure your phone onto a universal mount attached to the armband, enabling full touchscreen functionality when the phone's mounted. There's no need for plastic sleeves either - simply mount your phone to the armband with a click and remove with a secure twist.</p>
+                                <p>Fitting biceps from 8.5" – 19", there's a LifeActiv armband for everyone, all of which are covered by LifeProof's standard two-year warranty.</p>
+                                <p>When discussing the running band's downsides, we couldn't overlook the lack of storage space for other essentials like keys and cash, although its build quality and innovative features go a long way to offset this issue. Similarly, some might baulk at the premium price tag; however, for the features included and the extended warranty, it could prove to be a sound investment.</p>
+                                <h2>Best for Slimline Protection</h2>
+                                <h3><a href="https://incase.com/products/active-armband-for-iphone-8-iphone-7" target="_blank" rel="noopener noreferrer">InCase Active Armband</a></h3>
+                                <p>There aren't many better training partners than the Active armband from InCase, and for slimline protection, you'll be hard pressed to find an armband that tops it.</p>
+                                <p>Firstly, the touch-sensitive screen cover delivers excellent sweat-proof protection, giving you fully functional access to the screen and home button.  In terms of fit, the adjustable strap allows for a vast range of arm sizes, while offering just the right amount of stretch and flexibility to move without slipping. Moreover, the breathable nylon material provides comfort on the move, and its reflective detailing provides extra safety in dark environments, making it perfect for late night sprinting sessions and winter trail running.</p>
+                                <p>The Active's main disadvantages concern the band itself. The Velcro fastening, for example, is weaker than some of its rivals, while the band isn't as stretchy as some of its competitors.</p>
+                                <p>However, if you're after one of the market's lightest bands that can house a range of iPhones, this is a solid pick.</p>
+                                <h2>Best Budget Option</h2>
+                                <h3><a href="https://www.tribefitnessusa.com/products/armband" target="_blank" rel="noopener noreferrer">Tribe Fitness Premium Running Armband</a></h3>
+                                <p>Despite its budget price point, this frill-free running armband boasts a number of useful features including universal compatibility, weatherproof technology and an extra-thick reflective strip for night-time running.</p>
+                                <p>Crafted from a composite of polyurethane, lycra and neoprene, the armband combines comfort, protection and practicality, while the adjustable elastic band is specially designed to flex, twist and bend according to your body's movements.</p>
+                                <p>The armband accommodates any device with a screen size up to 5.2" and includes a built-in key holder for safekeeping.</p>
+                                <p>The latest face recognition enabled phones are catered for too, so there's no need to remove the case during your run as is the case with many budget options.</p>
+                                <p>The Tribe armband is available in numerous vibrant colourways, but if the bold graphics are too much for your taste, there are a few understated designs available too.</p>
+                                <p>If you're seeking a running armband with additional storage capacity, however, you're out of luck. But don't worry, our next armband pick addresses this issue.</p>
+                                <h2>Best for Colour Options and Storage Space</h2>
+                                <h3><a href="https://www.armpocket-armband.co.uk/armpocket-mega-i-40-arctic-blue-fits-samsung-galaxy-note-5-8-c2x24627211" target="_blank" rel="noopener noreferrer">Armpocket Mega i-40</a></h3>
+                                <p>The Armpocket Mega i-40 is a fantastic running armband that comfortably houses large smartphones, including those already fitted with a case.</p>
+                                <p>Strategically placed audio access ports make it compatible with most smartphones, while the ergonomic interior compartments make it easy to carry your essentials along with your phone.</p>
+                                <p>As with the Armpocket i-35, there are many colours and designs to choose from, making the Mega i-40 ideal for style conscious smartphone owners.</p>
+                                <p>Combining a unique memory foam construction, weatherproof properties, ample storage and a reflective zip, the Armpocket Mega i-40 is worthy of your attention when considering a new phone running band.</p>
+                                <p>Please note, this running band fits devices up to 6.5" inches; those with smaller devices who like this armband should seek out the <a href="https://www.armpocket-armband.co.uk/armpocket-ultra-i-35-armband-arctic-blue-save-20-c2x21334030" target="_blank" rel="noopener noreferrer">Ultra i-35</a>.</p>
+                                <h2>Best Snug Fit</h2>
+                                <h3><a href="https://www.tunebelt.com/sport-armbands/" target="_blank" rel="noopener noreferrer">Tune Belt Sport Armband</a></h3>
+                                <p>The second Tune Belt to grace our list, the Sport running band comes in six sizes to accommodate all phone models, from the most diminutive iPhones to behemoths like the Samsung Galaxy Note 10+.</p>
+                                <p>The Tune Belt Sport is constructed from stretchy neoprene material that contours to your arm and stays in place without feeling too tight.</p>
+                                <p>Fitting biceps from 9" – 16", the ‘snug fit' title is cemented further by the <a href="https://www.amazon.co.uk/Tune-Belt-armband-Extender-EX3/dp/B002WDAR06" target="_blank" rel="noopener noreferrer">armband extender ex3</a>, which allows you to wear the running band over clothing. Combined with the reflective logo, the sport band is ideal for night running and cross-country races.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

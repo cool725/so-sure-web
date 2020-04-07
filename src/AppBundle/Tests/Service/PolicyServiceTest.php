@@ -6249,35 +6249,48 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($priceC->getGwp(), $newD->getPremium()->getGwp());
     }
 
-    public function testChangeBillingDay()
+    public function testFreeMonthMonthly()
     {
         $user = Create::user();
-        $policy = Create::policy($user, '2019-07-08', Policy::STATUS_ACTIVE, 12);
+        $policy = Create::policy($user, '2020-02-13', Policy::STATUS_ACTIVE, 12);
         Create::save(static::$dm, $user, $policy);
         static::$policyService->generateScheduledPayments($policy);
-        $i = 0;
-        foreach ($policy->getScheduledPayments() as $scheduledPayment) {
-            if ($i < 4) {
-                $i++;
-            } else {
-                break;
-            }
-            $payment = Create::standardPayment($policy, $scheduledPayment->getScheduled(), true);
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
-            static::$dm->persist($scheduledPayment);
-            static::$dm->persist($payment);
+        Create::refresh(static::$dm, $policy);
+        $this->assertEquals($policy->getPremium()->getAdjustedYearlyPremiumPrice(), $policy->getTotalScheduled());
+        for ($i = 0; $i < 12; $i++) {
+            static::$policyService->applyReferralBonus($policy);
+            Create::refresh(static::$dm, $policy);
+            $this->assertEquals(
+                $policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * (11 - $i),
+                $policy->getTotalScheduled()
+            );
         }
-        static::$dm->flush();
-        static::$policyService->changeBillingDay($policy, 19);
-        $scheduledPayments = $policy->getScheduledPayments();
-        $this->assertEquals(12, count($scheduledPayments));
-        foreach ($scheduledPayments as $scheduled) {
-            if ($scheduled->getStatus() == ScheduledPayment::STATUS_SUCCESS) {
-                $this->assertEquals(8, $scheduled->getScheduled()->format('d'));
-            } else {
-                $this->assertEquals(19, $scheduled->getScheduled()->format('d'));
-            }
-        }
+        static::$policyService->applyReferralBonus($policy);
+        Create::refresh(static::$dm, $policy);
+        $this->assertEquals(0, $policy->getTotalScheduled());
+        $this->assertEquals(0, $policy->getOutstandingPremium());
+    }
+
+    public function testFreeMonthYearlyBacs()
+    {
+        $user = Create::user();
+        $policy = Create::bacsPolicy($user, '2020-02-13', Policy::STATUS_ACTIVE, 1);
+        $payment = Create::standardPayment($policy, '2020-02-13', true);
+        Create::save(static::$dm, $user, $policy);
+        static::$policyService->applyReferralBonus($policy);
+        Create::refresh(static::$dm, $policy);
+        $this->assertEquals(
+            0 - $policy->getPremium()->getAdjustedYearlyPremiumPrice() / 11,
+            $policy->getTotalScheduled(),
+            '',
+            0.01
+        );
+        $this->assertEquals(
+            0 - $policy->getPremium()->getAdjustedYearlyPremiumPrice() / 11,
+            $policy->getOutstandingPremium(),
+            '',
+            0.01
+        );
     }
 
     private function getFormattedWeekendsForOneYear($fromDate = null)

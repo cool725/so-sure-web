@@ -560,6 +560,65 @@
                                 </div>
                             </div>
                         </div>
+                        {% if feature_enabled('referral') %}
+                            <div class="expanding-cardbox mb-4"
+                                 itemscope
+                                 itemprop="mainEntity"
+                                 itemtype="https://schema.org/Question">
+                                <div class="expanding-cardbox__body">
+                                    <h3 class="h5 expanding-cardbox__title text-zaffre mb-0"
+                                        itemprop="name">
+                                        Do I get a discount if I refer someone? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                    </h3>
+                                    <div class="expanding-cardbox__expand mt-4"
+                                         itemscope
+                                         itemprop="acceptedAnswer"
+                                         itemtype="https://schema.org/Answer">
+                                        <div itemprop="text">
+                                            Yes, absolutely, you get one month off your premium, if the person you referred bought a policy and has not cancelled within 16 days of purchase. You can refer as many people as you like! The person you refer will also get a month free!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="expanding-cardbox mb-4"
+                                 itemscope
+                                 itemprop="mainEntity"
+                                 itemtype="https://schema.org/Question">
+                                <div class="expanding-cardbox__body">
+                                    <h3 class="h5 expanding-cardbox__title text-zaffre mb-0"
+                                        itemprop="name">
+                                        Do I get my month free immediately? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                    </h3>
+                                    <div class="expanding-cardbox__expand mt-4"
+                                         itemscope
+                                         itemprop="acceptedAnswer"
+                                         itemtype="https://schema.org/Answer">
+                                        <div itemprop="text">
+                                            If you pay annually, yes indeed, we will deduct a full month’s premium from your yearly amount at purchase. If you pay monthly, you won’t be billed the second month.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="expanding-cardbox mb-4"
+                                 itemscope
+                                 itemprop="mainEntity"
+                                 itemtype="https://schema.org/Question">
+                                <div class="expanding-cardbox__body">
+                                    <h3 class="h5 expanding-cardbox__title text-zaffre mb-0"
+                                        itemprop="name">
+                                        If I get a month free, do I still get money in my reward pot for connecting? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                    </h3>
+                                    <div class="expanding-cardbox__expand mt-4"
+                                         itemscope
+                                         itemprop="acceptedAnswer"
+                                         itemtype="https://schema.org/Answer">
+                                        <div itemprop="text">
+                                            Yes, both can be combined, however, the referral bonus is only awarded if the person you refer uses your sharing code at purchase, by entering your code just before payment. The referral bonus will not be awarded if the person you want to refer already has a policy.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
 
                         <h2 id="the-insurance-policy" class="text-primary mt-5 mb-4">The Insurance Policy</h2>
                         <div class="expanding-cardbox mb-4"

@@ -8,12 +8,14 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\ReferralBonus;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\Premium;
 use AppBundle\Document\Phone;
+use AppBundle\Document\SCode;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
@@ -40,7 +42,7 @@ class Create
      * @param DocumentManager $dm       is the document manager used to refresh the item.
      * @param mixed           ...$items is the set of the passed items.
      */
-    public static function refresh($dm, ...$items)
+    public static function refresh(DocumentManager $dm, ...$items)
     {
         foreach ($items as $item) {
             $dm->persist($item);
@@ -53,7 +55,7 @@ class Create
      * @param DocumentManager $dm       is the document manager to use to persist to the database.
      * @param mixed           ...$items is the set of all items to persist.
      */
-    public static function save($dm, ...$items)
+    public static function save(DocumentManager $dm, ...$items)
     {
         foreach ($items as $item) {
             $dm->persist($item);
@@ -315,6 +317,37 @@ class Create
         $phone = new Phone();
         $phone->addPhonePrice($price);
         return $phone;
+    }
+
+    /**
+     * Creates a referral bonus.
+     * @param Policy    $a    is the inviter.
+     * @param Policy    $b    is the invitee.
+     * @param \DateTime $date is the date for the referral bonus creation date.
+     * @return ReferralBonus that was just created.
+     */
+    public static function referralBonus($a, $b, $date)
+    {
+        $referralBonus = new ReferralBonus();
+        $a->addInviterReferralBonus($referralBonus);
+        $b->addInviteeReferralBonus($referralBonus);
+        $referralBonus->setStatus(ReferralBonus::STATUS_PENDING);
+        $referralBonus->setCreated($date);
+        return $referralBonus;
+    }
+
+    /**
+     * Creates a nice scode.
+     * @param string $value is the value to give to the scode.
+     * @return SCode the create scode.
+     */
+    public static function scode($value)
+    {
+        $scode = new SCode();
+        $scode->setCode($value);
+        $scode->setType(SCode::TYPE_STANDARD);
+        $scode->setActive(true);
+        return $scode;
     }
 
     /**

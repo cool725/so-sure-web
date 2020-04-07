@@ -5,6 +5,7 @@ require('../../sass/pages/onboarding.scss');
 // Require BS component(s)
 require('bootstrap/js/dist/tooltip');
 require('bootstrap/js/dist/carousel');
+require('bootstrap/js/dist/modal');
 
 // Require components
 require('jquery-validation');

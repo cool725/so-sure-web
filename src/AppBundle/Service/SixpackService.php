@@ -26,16 +26,7 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    // const EXPERIMENT_HERO_IMAGE_PHOTO = 'Hero Image';
-
-    // Exp 2
-    // const EXPERIMENT_SEND_QUOTE = 'Send Quote';
-
-    // Exp 3
-    const EXPERIMENT_HOMEPAGE_QUOTE_EMAIL = 'Quote Email Homepage';
-
-    // Exp 4
-    // const EXPERIMENT_SCODE_INVITE_IMAGE = 'Amazon vs Money';
+    const EXPERIMENT_EMAIL_OPTIONAL = 'Email Optional';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -115,83 +106,23 @@ class SixpackService
         'Homepage Price USPs',
         'Hero Image',
         'Send Quote',
-        'Amazon vs Money'
+        'Amazon vs Money',
+        'Quote Email Homepage'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        // self::EXPERIMENT_HERO_IMAGE_PHOTO,
-        // Exp 2
-        // self::EXPERIMENT_SEND_QUOTE,
-        // Exp 3
-        self::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
-        // Exp 4
-        // self::EXPERIMENT_SCODE_INVITE_IMAGE,
-        // Exp 5
-        //
-        // Exp 6
-        //
-        // Exp 7
-        //
-        // Exp 8
-        //
-        // Exp 9
-        //
-        // Exp 10
-        //
-        // Exp 11
-        //
+        self::EXPERIMENT_EMAIL_OPTIONAL,
     ];
 
     public static $authExperiments = [
         // Exp 1
-        // self::EXPERIMENT_APP_PICSURE_LOCATION,
-        // Exp 2
-        // self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION,
-        // Exp 3
-        //
-        // Exp 4
-        //
-        // Exp 5
-        //
-        // Exp 6
-        //
-        // Exp 7
-        //
-        // Exp 8
-        //
-        // Exp 9
-        //
-        // Exp 10
-        //
-        // Exp 11
         //
     ];
 
     public static $appExperiments = [
         // Exp 1
-        // self::EXPERIMENT_APP_PICSURE_LOCATION
-        // Exp 2
-        // self::EXPERIMENT_APP_REQUEST_PICSURE_LOCATION
-        // Exp 3
         //
-        // Exp 4
-        //
-        // Exp 5
-        //
-        // Exp 6
-        //
-        // Exp 7
-        //
-        // Exp 8
-        //
-        // Exp 9
-        //
-        // Exp 10
-        //
-        // Exp 11
-        //
-
     ];
 
     public static function getAppParticipationByClientId()
@@ -209,26 +140,6 @@ class SixpackService
     public static $purchaseConversionSimple = [
         // Exp 1
         //
-        // Exp 2
-        //
-        // Exp 3
-        //
-        // Exp 4
-        //
-        // Exp 5
-        //
-        // Exp 6
-        //
-        // Exp 7
-        //
-        // Exp 8
-        //
-        // Exp 9
-        //
-        // Exp 10
-        //
-        // Exp 11
-        //
     ];
 
     /**
@@ -237,27 +148,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        // self::EXPERIMENT_HERO_IMAGE_PHOTO,
-        // Exp 2
-        // self::EXPERIMENT_SEND_QUOTE,
-        // Exp 3
-        self::EXPERIMENT_HOMEPAGE_QUOTE_EMAIL,
-        // Exp 4
-        // self::EXPERIMENT_SCODE_INVITE_IMAGE,
-        // Exp 5
-        // self::EXPERIMENT_HOMEPAGE_USP_VARIATIONS,
-        // Exp 6
-        //
-        // Exp 7
-        //
-        // Exp 8
-        //
-        // Exp 9
-        //
-        // Exp 10
-        //
-        // Exp 11
-        //
+         self::EXPERIMENT_EMAIL_OPTIONAL,
     ];
 
     /** @var LoggerInterface */

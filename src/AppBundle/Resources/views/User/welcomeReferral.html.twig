@@ -1,0 +1,185 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user-referral' %}
+{% set robots_noindex = true %}
+{% set small_footer = true %}
+{% set intercom_enabled = false %}
+
+{% block title %}Welcome to so-sure, {{ policy.user.firstname }} 🎉{% endblock %}
+
+{# Set Meta #}
+{% set og_title = '1 month free phone insurance thanks to' ~ policy.user.firstname %}
+{% set og_description = "Check out so-sure to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!" %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-referral.jpg' %}
+{% if policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/user-referral.css') }}">
+{% endblock %}
+
+{% block gtm_data %}
+    ,
+    'policy': {
+        'id': '{{ policy.id }}'
+    },
+    'affilinet': {
+        'rate': {% if policy.getPremiumPlan == 'monthly'%}1{% elseif policy.getPremiumPlan == 'yearly' %}2{% else %}-1{% endif %},
+        'gwp': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %}
+    },
+    {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
+        'ecommerce': {
+            'purchase': {
+                'products': [{
+                    'id': '{{ policy.phone.id }}',
+                    'name': '{{ policy.phone.make }} {{ policy.phone.model }}',
+                    'price': '{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}',
+                    'brand': '{{ policy.phone.make }}',
+                    'category': '{{ policy.phone.make }}',
+                    'variant': '{{ policy.phone.memory }}GB',
+                    'quantity': 1
+                }]
+            }
+        },
+        'transactionId': '{{ policy.policyNumber }}',
+        'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+        'transactionProducts': [{
+            'name': '{{ policy.phone.make }} {{ policy.phone.model }}',
+            'sku':  '{{ policy.phone.id }}',
+            'category': '{{ policy.phone.make }}',
+            'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+            'quantity': 1
+        }]
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/misc/so-sure_friends-we-are-different-polaroid.png" alt="so-sure - social insurance" class="img-fluid lozad max-400">
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <h1 class="text-white fit mt-lg-4 mb-4">Congratulations 🥳</h1>
+                    <p class="lead text-white"><strong>{{ policy.user.firstname }}</strong>, you’re all covered! Shortly you will receive a confirmation email and a link to download our app to verify your <strong>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</strong>.  </p>
+                    <p class="lead text-white mb-4">You can now invite friends to join <span class="text-nowrap">so-sure</span> and you will both get a month free if your friend signs up.</p>
+                    <a href="#"
+                       class="btn btn-success btn-block-xs native-share track-data d-md-none"
+                       data-native-title="{{ og_title }}"
+                       data-native-url="{{ og_url }}"
+                       data-native-text="{{ og_description }}"
+                       data-event="invite-competition-welcome-page-native">
+                       Invite Friends</a>
+                    <div class="d-none d-md-block non-native-share">
+                        <div class="h6 text-deep-sky-blue-d">📨 Invite via email</div>
+                        <form id="invite_form" class="mb-5" autocomplete="nope">
+                            <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                            <div class="custom-input-with-btn mb-4">
+                                <input type="text" class="form-control form-control-white input-invite" placeholder="Enter email address" name="email_invite" />
+                                <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                    Invite</button>
+                            </div>
+                        </form>
+                        <div class="text-center text-lg-left">
+                            {% if policy.phone.iTunes %}
+                                <a href="{{ apple_download('user-required-account') }}"
+                                   class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
+                                   data-clicklabel="iTunes"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                            {% endif %}
+                            {% if policy.phone.googlePlay %}
+                                <a href="{{ google_download('user-required-account') }}"
+                                   class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
+                                   data-clicklabel="PlayStore"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__illustration d-block d-lg-none mt-4 text-center">
+                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/misc/so-sure_friends-we-are-different-polaroid.png" alt="so-sure - social insurance" class="img-fluid lozad max-300">
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 mb-3 text-primary">How to get your free months</h2>
+            <p class="mb-5 lead">Each time you refer a friend to us, we’ll give you a month off your phone insurance and more!</p>
+            <div class="timeline d-lg-none mb-3">
+                <div class="timeline-block timeline-block-complete-green">
+                    <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
+                    <div class="timeline-content">
+                        <h3 class="h5 text-primary">Invite your friends via email or with our app</h3>
+                    </div>
+                </div>
+                <div class="timeline-block timeline-block-complete-green">
+                    <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
+                    <div class="timeline-content">
+                        <h3 class="h5 text-primary">You both get a month FREE when your friend signs up!</h3>
+                    </div>
+                </div>
+                <div class="timeline-block timeline-block-complete-green">
+                    <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
+                    <div class="timeline-content">
+                        <h3 class="h5 text-primary">You also get &pound;10 in your no claims reward pot</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="d-none d-lg-block mb-5">
+                <div class="row">
+                    <div class="col-4 step">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_connect.png" alt="Connect app" width="180px" class="lozad mb-3">
+                        <h3 class="h5 text-primary mb-2">Invite your friends via email or with our app</h3>
+                    </div>
+                    <div class="col-4 step">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="Wallet" width="180px" class="lozad mb-3">
+                        <h3 class="h5 text-primary mb-2">You both get a month FREE when your friend signs up!</h3>
+                    </div>
+                    <div class="col-4 step">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="Friends having fun" width="180px" class="lozad mb-3">
+                        <h3 class="h5 text-primary mb-2">You also get &pound;10 in your no claims reward pot</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="banner py-5">
+        <div class="container-large">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline mt-lg-2 lozad" alt="so-sure App Icon">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h2 class="h4 text-white">Login online or download the app</h2>
+                        <p class="lead text-white">To earn cashback and rewards every month</p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    <a href="{{ path('user_home') }}" class="btn btn-success btn-block-xs">Login to your dashboard</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modal #}
+    {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
+        {% include 'AppBundle::User/_starlingModal.html.twig' %}
+    {% endif %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/user-referral.js') }}"></script>
+{% endblock %}

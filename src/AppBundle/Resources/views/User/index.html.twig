@@ -9,10 +9,10 @@
 {% block title %}Welcome {{ app.user.firstname }} 🎉 | so-sure{% endblock %}
 
 {# Set Meta #}
-{% if feature_enabled('invite-competition') %}
-    {% set og_title = 'We can both win £20, it’s super easy, check it out' %}
-    {% set og_description = "Check out so-sure to win £20 and benefit from their excellent perks: one month free, up to 80% cash back, etc. It’s super easy to enter!" %}
-    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
+{% if feature_enabled('referral') %}
+    {% set og_title = '1 Month FREE Phone Insurance thanks to ' ~ app.user.firstname %}
+    {% set og_description = 'Check out so-sure to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!' %}
+    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-referral.jpg' %}
 {% else %}
     {% set og_title = 'Sign up and save' %}
     {% set og_description = 'Hey, check out so-sure, a fun new company. Better & up to 80% cheaper phone insurance.' %}
@@ -234,7 +234,15 @@
                                     {% else %}
                                         <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                     {% endif %}
-                                    Verify phone number
+                                    Install the app
+                                </li>
+                                <li class="mb-3">
+                                    {% if policy.phoneVerified %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Finish registration on the app
                                 </li>
                             </ul>
                             {% if not toDoOne %}
@@ -271,7 +279,15 @@
                                     {% else %}
                                         <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                     {% endif %}
-                                    Take phone selfie
+                                    Take a phone selfie with the app
+                                </li>
+                                <li class="mb-3">
+                                    {% if policy.picSureStatus == 'approved' or policy.picSureStatus == 'preapproved' %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Confirmation from so-sure
                                 </li>
                                 <li>
                                     {% if policy.picSureStatus == 'approved' or policy.picSureStatus == 'preapproved' %}
@@ -279,7 +295,7 @@
                                     {% else %}
                                         <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                     {% endif %}
-                                    so-sure confirmation
+                                    Excess reduced by &pound;100
                                 </li>
                             </ul>
                             {% if not toDoTwo %}
@@ -316,18 +332,26 @@
                                     {% else %}
                                         <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                     {% endif %}
-                                    Send invites to to join so-sure
+                                    Invite your friends to join so-sure
                                 </li>
-                                <li>
-                                    {% if policy.connections|length >= max_connections %}
+                                <li class="mb-3">
+                                    {% if policy.connections|length >= 1 %}
                                         <i class="far fa-check fa-lg fa-fw text-success"></i>
                                     {% else %}
                                         <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                     {% endif %}
-                                    Connect to {{ max_connections }} friends
+                                    Get 1 month free for each new sign-up
+                                </li>
+                                <li>
+                                    {% if policy.connections|length >= 1 %}
+                                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    {% else %}
+                                        <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    {% endif %}
+                                    Earn &pound;10 in your reward pot for each connection
                                 </li>
                             </ul>
-                            <a href="{{ path('user_invite') }}" class="btn btn-success btn-block">Invite Friends</a>
+                            <a href="{{ path('user_invite') }}" class="btn btn-success btn-block"><i class="fas fa-users mr-2 fa-lg"></i> Invite Friends</a>
                         </div>
                     </div>
                 </div>
@@ -351,22 +375,22 @@
                                         {% endif %}
                                         Sign up to so-sure
                                     </li>
-                                    <li class="">
+                                    <li class="mb-3">
                                         {% if policy.phoneVerified %}
                                             <i class="far fa-check fa-lg fa-fw text-success"></i>
                                         {% else %}
                                             <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                         {% endif %}
-                                        Verify phone number
+                                        Install the app
                                     </li>
- {#                                    <li>
-                                        {% if policy.getPolicyOrUserPaymentMethod and policy.hasCardPaymentMethod or policy.hasPolicyOrUserBacsPaymentMethod %}
+                                    <li>
+                                        {% if policy.phoneVerified %}
                                             <i class="far fa-check fa-lg fa-fw text-success"></i>
                                         {% else %}
                                             <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                         {% endif %}
-                                        Setup payment
-                                    </li> #}
+                                        Finish registration on the app
+                                    </li>
                                 </ul>
                                 {% if not toDoOne %}
                                     {% if policy.phone.iTunes %}
@@ -407,7 +431,15 @@
                                         {% else %}
                                             <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                         {% endif %}
-                                        Take phone selfie
+                                        Take a phone selfie with the app
+                                    </li>
+                                    <li class="mb-3">
+                                        {% if policy.picSureStatus == 'approved' or policy.picSureStatus == 'preapproved' %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Confirmation from so-sure
                                     </li>
                                     <li>
                                         {% if policy.picSureStatus == 'approved' or policy.picSureStatus == 'preapproved' %}
@@ -415,7 +447,7 @@
                                         {% else %}
                                             <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                         {% endif %}
-                                        so-sure confirmation
+                                        Excess reduced by &pound;100
                                     </li>
                                 </ul>
                                 {% if not toDoTwo %}
@@ -456,19 +488,27 @@
                                         {% else %}
                                             <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                         {% endif %}
-                                        Send invites to to join so-sure
+                                        Invite your friends to join so-sure
                                     </li>
-                                    <li>
-                                        {% if policy.connections|length >= max_connections %}
+                                    <li class="mb-3">
+                                        {% if policy.connections|length >= 1 %}
                                             <i class="far fa-check fa-lg fa-fw text-success"></i>
                                         {% else %}
                                             <i class="far fa-times fa-lg fa-fw text-danger"></i>
                                         {% endif %}
-                                        Connect to {{ max_connections }} friends
+                                        Get 1 month free for each new sign-up
+                                    </li>
+                                    <li class="mb-3">
+                                        {% if policy.connections|length >= 1 %}
+                                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                        {% else %}
+                                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                        {% endif %}
+                                        Earn &pound;10 in your reward pot for each connection
                                     </li>
                                 </ul>
                                 {% if not toDoThree %}
-                                    <a href="{{ path('user_invite') }}" class="btn btn-success btn-block-xs ">Invite Friends</a>
+                                    <a href="{{ path('user_invite') }}" class="btn btn-success btn-block-xs "><i class="fas fa-users mr-2 fa-lg"></i> Invite Friends</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -496,91 +536,6 @@
                 </div>
             </div>
         </div>
-
-        {% if feature_enabled('invite-competition') %}
-            <div id="win_share" class="win py-lg-5">
-                <div class="container d-md-none py-5">
-                    <h2 class="h4">10 customers will win a &pound;20 Amazon voucher<br><span class="sub">📨  Send more to earn more</span></h2>
-                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="lozad img-fluid">
-                    <div class="cardbox cardbox-100 text-center p-4 mb-4">
-                        <h3 class="h4">Share your link to enter</h3>
-                        <p>(more invites = better chance of winning)</p>
-                        <div class="d-flex">
-                            <a href="#"
-                               class="btn btn-outline-primary btn-copy w-100"
-                               data-clipboard-text="Hey, we could win &pound;20 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
-                            <a href="#"
-                               class="btn btn-outline-primary w-100 ml-3 native-share track-data"
-                               data-native-title="{{ og_title }}"
-                               data-native-url="{{ og_url }}"
-                               data-native-text="{{ og_description }}"
-                               data-event="share-user-dashboard-mb">
-                               💬 Share</a>
-                        </div>
-                    </div>
-                    <p class="text-left">Know someone that might need mobile insurance? even if they’re not ready now we’ll still enter you both in the draw to win a &pound;20 amazon voucher. As a so-sure customer you can invite as many people as you like (each invite = another entry)</p>
-                </div>
-                <div class="container d-none d-md-block py-5">
-                    <div class="d-flex">
-                        <div class="win-dashboard-dial mr-4">
-                            <div class="dashboard-dial-cta mr-3">
-                                <div class="dashboard-dial-cta-inner">
-                                    <div class="h2 mb-0 text-white">{{ policy.sentInvitations|length }} 📨</div>
-                                    <div class="h6 text-white opacity-75">INVITES SENT</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="win-text mr-1">
-                            <h2 class="h3 mb-2">10 customers will win a &pound;20 Amazon voucher 📨 <br> <span class="sub">Send more to earn more</span></h2>
-                            <p class="mb-5">Know someone that might need mobile insurance? even if they're not ready now we'll still enter you both in the draw to <strong>win a &pound;20 amazon voucher</strong>. As a so-sure customer you can invite as many people as you like <span class="text-nowrap">(each invite = another entry)</span></p>
-                        </div>
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_hand_holding_amazon_voucher_mobile.png" alt="Hand holding amazon voucher" class="d-none d-xl-inline lozad" width="400px">
-                    </div>
-                    <hr class="mt-0 mb-5">
-                    <div class="win-invite">
-                        <form id="invite_form_one" autocomplete="nope" class="invite-form flex-grow-1 mr-3">
-                            <input class="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
-                            <div class="custom-input-with-btn mb-4">
-                                <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
-                                <button class="btn btn-success btn-invite btn-sm"
-                                        data-path="{{ path('json_invite_email') }}"
-                                        data-form="#invite_form_one">Send invite</button>
-                            </div>
-                        </form>
-                        <a href="#"
-                           class="btn btn-outline-primary win-btn btn-copy mr-3"
-                           data-clipboard-text="Hey, we could win &pound;20 with mobile phone insurer so-sure. It’s super easy to enter! Check it out here: {{ url('scode', {'code': policy.standardSCode.code}) }}">🔗 Copy link</a>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <a href="#"
-                               class="track-data mr-3"
-                               data-sharer="twitter"
-                               data-title="{{ og_description }}"
-                               data-url="{{ og_url }}"
-                               data-via="wearesosure"
-                               data-hashtags="so-sure, phoneinsurance"
-                               data-event="share-twitter-user-dashboard-dt">
-                               <i class="fab fa-twitter fa-fw fa-2x text-twitter"></i> <span class="sr-only">Tweet</span></a>
-                            <a href="#"
-                               class="track-data mr-3"
-                               data-sharer="facebook"
-                               data-title="{{ og_description }}"
-                               data-url="{{ og_url }}"
-                               data-hashtags="so-sure, phoneinsurance"
-                               data-event="share-facebook-user-dashboard-dt">
-                               <i class="fab fa-facebook-square fa-fw fa-2x text-facebook"></i> <span class="sr-only">Facebook</span></a>
-                            <a href="#"
-                               class="track-data"
-                               data-sharer="whatsapp"
-                               data-web
-                               data-title="{{ og_description }}"
-                               data-url="{{ og_url }}"
-                               data-event="share-whatsapp-user-dashboard-dt">
-                               <i class="fab fa-whatsapp fa-fw fa-2x text-whatsapp"></i> <span class="sr-only">Whatsapp</span></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
     {% endif %}
 
     {# Page Modals #}

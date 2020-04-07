@@ -57,12 +57,9 @@ class SCodeController extends BaseController
             $scode = null;
         }
 
-        if ($scode && !$isUK) {
-            // @codingStandardsIgnoreStart
-            $this->addFlash('error-raw', sprintf(
-                '<i class="fa fa-warning"></i> Sorry, we currently only offer policies to UK residents. If you are a UK resident, you may continue below.'
-            ));
-            // @codingStandardsIgnoreEnd
+        // Redirect to homepage if scode not found
+        if (!$scode) {
+            return $this->redirectToRoute('homepage');
         }
 
         $session = $this->get('session');
@@ -126,13 +123,12 @@ class SCodeController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
 
-        $competitionFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_INVITE_PAGES_COMPETITION);
+        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
 
         $template = 'AppBundle:SCode:scode.html.twig';
-        $heroImageExp = null;
 
-        if ($competitionFeature) {
-            $template = 'AppBundle:SCode:scodeCompetition.html.twig';
+        if ($referralFeature) {
+            $template = 'AppBundle:SCode:scodeReferral.html.twig';
         }
 
         $data = [

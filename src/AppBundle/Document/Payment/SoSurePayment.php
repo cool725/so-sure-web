@@ -38,6 +38,8 @@ class SoSurePayment extends Payment
     {
         if ($this->areEqualToTwoDp(0, $this->amount)) {
             return false;
+        } elseif ($this->notes == 'Referral Refund') {
+            return false;
         }
 
         return $this->success;
@@ -51,6 +53,8 @@ class SoSurePayment extends Payment
     {
         if ($this->amount < 0) {
             return "so-sure adjustment";
+        } elseif ($this->notes == 'Referral Bonus') {
+            return $this->notes;
         } else {
             return "Payment by so-sure";
         }

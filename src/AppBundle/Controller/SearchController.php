@@ -21,6 +21,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\PhonePrice;
 
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 
 class SearchController extends BaseController
 {
@@ -146,6 +147,14 @@ class SearchController extends BaseController
             }
         }
 
+        // A/B Email Optional
+        $homepageEmailOptionalExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_EMAIL_OPTIONAL,
+            ['email-optional', 'email'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown'),
@@ -178,6 +187,10 @@ class SearchController extends BaseController
                         }
                         $days = new \DateTime();
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
+                        $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_optional';
+                        if ($homepageEmailOptionalExp == 'email') {
+                            $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_not_optional';
+                        }
                         $quoteUrl = $this->setPhoneSession($request, $phone);
                         $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                         $mailer = $this->get('app.mailer');
@@ -186,9 +199,9 @@ class SearchController extends BaseController
                             sprintf('Your saved so-sure quote for %s', $phone),
                             $lead->getEmail(),
                             'AppBundle:Email:quote/priceGuarantee.html.twig',
-                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()],
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl.$utm, 'price' => $price->getMonthlyPremiumPrice()],
                             'AppBundle:Email:quote/priceGuarantee.txt.twig',
-                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl, 'price' => $price->getMonthlyPremiumPrice()]
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl.$utm, 'price' => $price->getMonthlyPremiumPrice()]
                         );
                         // @codingStandardsIgnoreEnd
                         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
@@ -220,6 +233,7 @@ class SearchController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
+            'email_optional' => $homepageEmailOptionalExp
         ];
     }
 
