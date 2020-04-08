@@ -250,13 +250,13 @@ class ReferralBonus
      */
     public function getAmountForInviter()
     {
-        if ($this->getStatus = self::STATUS_CANCELLED) {
+        if ($this->getStatus == self::STATUS_CANCELLED) {
             return 0;
         }
         if ($this->getInviter()->getPremiumInstallments() == 1) {
-            return $this->getInviter()->getUpgradedYearlyPremiumPrice() / 11;
+            return $this->getInviter()->getUpgradedYearlyPrice() / 11;
         } else {
-            return $this->getInviter()->getUpgradedStandardMonthlyPremiumPrice();
+            return $this->getInviter()->getUpgradedStandardMonthlyPrice();
         }
     }
 
@@ -266,13 +266,13 @@ class ReferralBonus
      */
     public function getAmountForInvitee()
     {
-        if ($this->getStatus = self::STATUS_CANCELLED) {
+        if ($this->getStatus == self::STATUS_CANCELLED) {
             return 0;
         }
         if ($this->getInvitee()->getPremiumInstallments() == 1) {
-            return $this->getInvitee()->getUpgradedYearlyPremiumPrice() / 11;
+            return $this->getInvitee()->getUpgradedYearlyPrice() / 11;
         } else {
-            return $this->getInvitee()->getUpgradedStandardMonthlyPremiumPrice();
+            return $this->getInvitee()->getUpgradedStandardMonthlyPrice();
         }
     }
 
