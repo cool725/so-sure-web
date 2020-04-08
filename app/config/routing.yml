@@ -947,3 +947,59 @@ redirect_faq_faq:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /faq
         permanent: true
+
+redirect_taste_card:
+    path: /free-taste-card
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_free_phone_case:
+    path: /free-phone-case
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_free_phone_case_v_day:
+    path: /valentines-day-free-phone-case
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_snapchat:
+    path: /snapchat
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_snapchat_b:
+    path: /snapchat-b
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_twitter:
+    path: /twitter
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_facebook:
+    path: /facebook
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
+
+redirect_youtube:
+    path: /youtube
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
