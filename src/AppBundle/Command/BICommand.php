@@ -1055,10 +1055,10 @@ class BICommand extends ContainerAwareCommand
             $lines[] = implode(',', [
                 sprintf('"%s"', $referral->getCreated()->format('Y-m-d')),
                 sprintf('"%s"', $referral->getInviter()->getId()),
-                sprintf('"%s"', "0"),
+                sprintf('"%s"', $referral->getAmountForInviter()),
                 sprintf('"%s"', $referral->getInviterPaid()?"Yes":"No"),
                 sprintf('"%s"', $referral->getInvitee()->getId()),
-                sprintf('"%s"', "0"),
+                sprintf('"%s"', $referral->getAmountForInvitee()),
                 sprintf('"%s"', $referral->getInviteePaid()?"Yes":"No"),
                 sprintf('"%s"', $referral->getStatus())
             ]);

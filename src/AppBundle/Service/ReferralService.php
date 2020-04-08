@@ -160,6 +160,7 @@ class ReferralService
                 $referral->setStatus(ReferralBonus::STATUS_RETRY);
             }
         }
+        $this->dm->flush();
     }
 
     public function cancelReferrals(Policy $policy)
