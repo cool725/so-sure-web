@@ -16,7 +16,8 @@
     {% set withoutDiscount = phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') * 12 %}
 
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-        <h4 class="payment-options__title text-dodger-blue mb-4">How would you like to pay?</h4>
+        <h4 class="payment-options__title text-dodger-blue">How would you like to pay?</h4>
+        <p class="mb-4">Get one month free when you pay yearly 🤑</p>
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
             {{ form_widget(purchase_form.amount) }}
@@ -50,9 +51,22 @@
         </div>
         <div class="with-errors">{{ form_errors(purchase_form.amount) }}</div>
     </div>
+    {% set scode_label = 'Have a promocode or referral code? Enter it here' %}
+    {% set scode_class = 'form-control' %}
+    {% if user_code is not null %}
+        {% set scode_type = 'referral' %}
+        {% if user_code_type == 'reward' %}
+            {% set scode_type = 'reward' %}
+        {% endif %}
+        {% set scode_label = 'The ' ~ scode_type ~ ' code ' ~ user_code ~ ' has been applied' %}
+        {% set scode_class = 'form-control hideme' %}
+    {% endif %}
     <div class="form-group {% if form_errors(purchase_form.promoCode) %}has-error{% endif %}">
-        {{ form_label(purchase_form.promoCode, 'Have a promocode or referral code? Enter it here', { 'label_attr': {'class': ''} }) }}
-        {{ form_widget(purchase_form.promoCode, {'attr':{'class':'form-control', 'placeholder': 'Enter code'}}) }}
+        {{ form_label(purchase_form.promoCode, scode_label, { 'label_attr': {'class': ''} }) }}
+        {{ form_widget(purchase_form.promoCode, {'attr':{
+            'class': scode_class,
+            'placeholder': 'Enter code'
+        }}) }}
         <div class="with-errors">{{ form_errors(purchase_form.promoCode) }}</div>
     </div>
     {{ form_widget(purchase_form.next, {
@@ -62,8 +76,6 @@
             'hidden': 'hidden'
     }}) }}
 {{ form_end(purchase_form) }}
-
-<p class="text-center my-4">Get one month free when you pay yearly 🤑</p>
 
 <div class="mb-4">
     <form class="payment-form"

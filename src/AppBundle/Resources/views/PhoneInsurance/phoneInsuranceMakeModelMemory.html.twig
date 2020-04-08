@@ -165,7 +165,10 @@
                                 'attr': {
                                     'class': 'btn btn-success btn-block-xs btn-shadow mb-4 mb-sm-0 mr-sm-3'
                             }}) }}
-                            <a class="btn-simple-link" href="#excess_cardbox" data-cardbox-target="#excess_cardbox" data-cardbox-anchor="#excess_cardbox">View my excess</a>
+                            <a class="btn-simple-link scroll-to"
+                               href="#insurance_info"
+                               data-scroll-to-anchor="#insurance_info"
+                               data-scroll-to-offset="100">View my excess</a>
                         {{ form_end(buy_form) }}
                         {% if validation_required is not null %}
                             <p>👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
@@ -200,109 +203,6 @@
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
-    <section class="insurance-info">
-        <div class="container-large py-5">
-            <div id="excess_cardbox" class="expanding-cardbox expanding-cardbox-white mb-4">
-                <div class="expanding-cardbox__body">
-                    <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                        Your Excess <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                    </h2>
-                    <div class="expanding-cardbox__expand text-zaffre mt-4">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                {% if validation_required is not null or instore is not null %}
-                                    <p class="mb-4">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app.</p>
-                                {% else %}
-                                    <p>Reduce the excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> by using our app to verify that it isn't already damaged prior to any claim.</p>
-                                    <p class="mb-4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive.</p>
-                                {% endif %}
-                            </div>
-                            <div class="col-lg-6">
-                                <table class="table-excess">
-                                    <thead>
-                                        <tr>
-                                            <th colspan="3" class="h5 text-white">Excess after Validation ✅</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="h6 bg-athens-gray" width="33.3333333333%">Damage</td>
-                                            <td class="h6 bg-athens-gray" width="33.3333333333%">Loss</td>
-                                            <td class="h6 bg-athens-gray" width="33.3333333333%">Theft</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="h4">&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
-                                            <td class="h4">&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
-                                            <td class="h4">&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="expanding-cardbox expanding-cardbox-white">
-                <div class="expanding-cardbox__body">
-                    <h2 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                        Insurance Information Documents <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
-                    </h2>
-                    <div class="expanding-cardbox__expand text-zaffre mt-4">
-                        <div class="row">
-                            <div class="col-lg-6 mb-4 mb-lg-0">
-                                <h3 class="h5">IPID</h3>
-                                <p>The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</p>
-                                {% if validation_required is not null %}
-                                    <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="btn btn-outline-primary btn-block-xs track-data"
-                                       data-event="user-download-ipid-agg"
-                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
-                                {% else %}
-                                    <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="btn btn-outline-primary btn-block-xs track-data"
-                                       data-event="user-download-ipid"
-                                       data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
-                                {% endif %}
-                            </div>
-                            <div class="col-lg-6">
-                                <h3 class="h5">Our Policy Document</h3>
-                                <p>See our policy document for full details.</p>
-                                {% if validation_required is not null %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="btn btn-outline-primary btn-block-xs track-data"
-                                       data-event="user-download-sample-policy-doc-quote-agg"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
-                                {% else %}
-                                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="btn btn-outline-primary btn-block-xs track-data"
-                                       data-event="user-download-sample-policy-doc-quote"
-                                       data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="my-4 text-center">
-                {{ form_start(buy_form_banner) }}
-                    {{ form_widget(buy_form_banner.buy, {
-                        'label': 'Buy Now',
-                        'attr': {
-                            'class': 'btn btn-success btn-block-xs btn-shadow'
-                    }}) }}
-                {{ form_end(buy_form_banner) }}
-            </div>
-        </div>
-    </section>
-
     <section class="video d-flex align-items-center justify-content-center">
         <a href="#"
            data-toggle="modal"
@@ -326,6 +226,90 @@
         </div>
     </section>
 
+    <section id="insurance_info" class="insurance-info pb-lg-5">
+        <div class="container-large pb-5">
+            <div class="d-md-flex justify-content-md-between">
+                <div class="cardbox cardbox-100 mb-4 mr-md-3">
+                    <div class="cardbox__body">
+                        <h2 class="h5">Your Excess</h2>
+                        {% if validation_required is not null or instore is not null %}
+                            <p class="mb-4">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app.</p>
+                        {% else %}
+                            <p>Reduce the excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> by using our app to verify that it isn't already damaged prior to any claim.</p>
+                            <p class="mb-4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive.</p>
+                        {% endif %}
+                        <table class="table-excess">
+                            <thead>
+                                <tr>
+                                    <th colspan="3" class="h5 text-white">Excess after Validation ✅</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="h6 bg-athens-gray" width="33.3333333333%">Damage</td>
+                                    <td class="h6 bg-athens-gray" width="33.3333333333%">Loss</td>
+                                    <td class="h6 bg-athens-gray" width="33.3333333333%">Theft</td>
+                                </tr>
+                                <tr>
+                                    <td class="h4">&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
+                                    <td class="h4">&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
+                                    <td class="h4">&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="cardbox cardbox-100 mb-4 ml-md-3">
+                    <div class="cardbox__body">
+                        <h2 class="h5">IPID</h2>
+                        <p>The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</p>
+                        {% if validation_required is not null %}
+                            <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-outline-primary btn-block-xs track-data"
+                               data-event="user-download-ipid-agg"
+                               data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                        {% else %}
+                            <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-outline-primary btn-block-xs track-data"
+                               data-event="user-download-ipid"
+                               data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                        {% endif %}
+                        <h2 class="h5 mt-4">Our Policy Document</h2>
+                        <p>See our policy document for full details.</p>
+                        {% if validation_required is not null %}
+                            <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-outline-primary btn-block-xs track-data"
+                               data-event="user-download-sample-policy-doc-quote-agg"
+                               data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                        {% else %}
+                            <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="btn btn-outline-primary btn-block-xs track-data"
+                               data-event="user-download-sample-policy-doc-quote"
+                               data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                {{ form_start(buy_form_banner) }}
+                    {{ form_widget(buy_form_banner.buy, {
+                        'label': 'Buy Now',
+                        'attr': {
+                            'class': 'btn btn-success btn-block-xs btn-shadow'
+                    }}) }}
+                {{ form_end(buy_form_banner) }}
+            </div>
+        </div>
+    </section>
+
     {# Reviews #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %}
 
@@ -335,7 +319,7 @@
                 <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
                     <div class="banner__text text-center text-lg-left ml-lg-4">
-                        <h4 class="text-white">Insure your phone in minutes</h4>
+                        <div class="h4 text-white">Insure your phone in minutes</div>
                         <p class="lead text-white">{{ make_desc }} {{ phone.model }} for just <strong>&pound;{{ prices['monthly'].monthlyPremiumPrice }}</strong> per month</p>
                     </div>
                 </div>

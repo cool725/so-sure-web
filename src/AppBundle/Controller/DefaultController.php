@@ -147,71 +147,71 @@ class DefaultController extends BaseController
         return $this->render($template, $data);
     }
 
-    /**
-     * @Route("/free-taste-card", name="free_taste_card")
-     */
-    public function freeTasteCard()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'tastecard']);
+    // /**
+    //  * @Route("/free-taste-card", name="free_taste_card")
+    //  */
+    // public function freeTasteCard()
+    // {
+    //     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'tastecard']);
 
-        $pageType = 'tastecard';
+    //     $pageType = 'tastecard';
 
-        $data = array(
-            'page_type' => $pageType,
-        );
+    //     $data = array(
+    //         'page_type' => $pageType,
+    //     );
 
 
-        $template = 'AppBundle:Default:indexPromotions.html.twig';
+    //     $template = 'AppBundle:Default:indexPromotions.html.twig';
 
-        return $this->render($template, $data);
-    }
+    //     return $this->render($template, $data);
+    // }
 
-    /**
-     * @Route("/free-phone-case", name="free_phone_case")
-     * @Route("/case", name="case")
-     */
-    public function freePhoneCase()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'freephonecase']);
+    // /**
+    //  * @Route("/free-phone-case", name="free_phone_case")
+    //  * @Route("/case", name="case")
+    //  */
+    // public function freePhoneCase()
+    // {
+    //     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'freephonecase']);
 
-        $pageType = 'phonecase';
+    //     $pageType = 'phonecase';
 
-        $data = array(
-            'page_type' => $pageType,
-        );
+    //     $data = array(
+    //         'page_type' => $pageType,
+    //     );
 
-        $template = 'AppBundle:Default:indexPromotions.html.twig';
+    //     $template = 'AppBundle:Default:indexPromotions.html.twig';
 
-        return $this->render($template, $data);
-    }
+    //     return $this->render($template, $data);
+    // }
 
-    /**
-     * @Route("/marlow", name="marlow")
-     */
-    public function marlowAction()
-    {
-        return $this->redirectToRoute('promo', ['code' => 'MARLOW15']);
-    }
+    // /**
+    //  * @Route("/marlow", name="marlow")
+    //  */
+    // public function marlowAction()
+    // {
+    //     return $this->redirectToRoute('promo', ['code' => 'MARLOW15']);
+    // }
 
-    /**
-     * @Route("/valentines-day-free-phone-case", name="valentines_day_free_phone_case")
-     */
-    public function valentinesDayCase()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => 'valentinesdayfreephonecase'
-        ]);
+    // /**
+    //  * @Route("/valentines-day-free-phone-case", name="valentines_day_free_phone_case")
+    //  */
+    // public function valentinesDayCase()
+    // {
+    //     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+    //         'page' => 'valentinesdayfreephonecase'
+    //     ]);
 
-        $pageType = 'vdayphonecase';
+    //     $pageType = 'vdayphonecase';
 
-        $data = array(
-            'page_type' => $pageType,
-        );
+    //     $data = array(
+    //         'page_type' => $pageType,
+    //     );
 
-        $template = 'AppBundle:Default:indexPromotions.html.twig';
+    //     $template = 'AppBundle:Default:indexPromotions.html.twig';
 
-        return $this->render($template, $data);
-    }
+    //     return $this->render($template, $data);
+    // }
 
     /**
      * @Route("/social-insurance", name="social_insurance", options={"sitemap" = true})
@@ -223,106 +223,11 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/snapchat", name="snapchat")
-     */
-    public function snapchatLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => 'snapchat'
-        ]);
-
-        $data = [
-            'competitor' => $this->competitorsData(),
-            'competitor1' => 'PYB',
-            'competitor2' => 'GC',
-            'competitor3' => 'LICI',
-        ];
-
-        return $this->render('AppBundle:Default:indexSnapchat.html.twig', $data);
-    }
-
-    /**
-     * @Route("/snapchat-b", name="snapchat-b")
-     */
-    public function snapchatbLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => 'snapchat-b'
-        ]);
-
-        $data = [
-            'competitor' => $this->competitorsData(),
-            'competitor1' => 'PYB',
-            'competitor2' => 'GC',
-            'competitor3' => 'LICI',
-        ];
-
-        return $this->render('AppBundle:Default:indexSnapchatB.html.twig', $data);
-    }
-
-    /**
-     * @Route("/twitter", name="twitter")
-     */
-    public function twitterLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => 'twitter'
-        ]);
-
-        $data = [
-            'competitor' => $this->competitorsData(),
-            'competitor1' => 'PYB',
-            'competitor2' => 'GC',
-            'competitor3' => 'LICI',
-        ];
-
-        return $this->render('AppBundle:Default:indexTwitter.html.twig', $data);
-    }
-
-    /**
-     * @Route("/facebook", name="facebook")
-     */
-    public function facebookLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => 'facebook'
-        ]);
-
-        $data = [
-            'competitor' => $this->competitorsData(),
-            'competitor1' => 'PYB',
-            'competitor2' => 'GC',
-            'competitor3' => 'LICI',
-        ];
-
-        return $this->render('AppBundle:Default:indexFacebook.html.twig', $data);
-    }
-
-    /**
-     * @Route("/youtube", name="youtube")
-     */
-    public function youtubeLanding()
-    {
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-            'page' => 'youtube'
-        ]);
-
-        $data = [
-            'competitor' => $this->competitorsData(),
-            'competitor1' => 'PYB',
-            'competitor2' => 'GC',
-            'competitor3' => 'LICI',
-        ];
-
-        return $this->render('AppBundle:Default:indexYoutube.html.twig', $data);
-    }
-
-    /**
      * @Route("/terms-test", name="terms_test")
      */
     public function termsTest()
     {
-        return $this->render('AppBundle:Pdf:policyTermsV14.html.twig');
+        return $this->render('AppBundle:Pdf:policyTermsV15.html.twig');
     }
 
     private function competitorsData()
@@ -560,199 +465,6 @@ class DefaultController extends BaseController
             'page' => $data['affiliate_page']]);
 
         return $this->render($template, $data);
-    }
-
-    /**
-     * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
-     * @Route("/select-phone-dropdown/{type}/{id}", name="select_phone_make_dropdown_type_id")
-     * @Route("/select-phone-dropdown/{type}", name="select_phone_make_dropdown_type")
-     * @Template()
-     */
-    public function selectPhoneMakeDropdownAction(Request $request, $type = null, $id = null)
-    {
-        $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phone = null;
-        $phoneMake = new PhoneMake();
-        if ($id) {
-            $phone = $phoneRepo->find($id);
-            if (!$phone) {
-                throw $this->createNotFoundException('Invalid id');
-            }
-
-            $phoneMake->setMake($phone->getMake());
-        }
-
-        // throw new \Exception($id);
-
-        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-
-            // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_phone');
-        } elseif ($phone && in_array($type, ['learn-more'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-        }
-
-        $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $this->generateUrl('select_phone_make_dropdown'),
-            ])
-            ->getForm();
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('launch_phone')) {
-                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
-                if ($phoneId) {
-                    $phone = $phoneRepo->find($phoneId);
-                    if (!$phone) {
-                        throw $this->createNotFoundException('Invalid id');
-                    }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                        ]);
-                    } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                        ]);
-                    }
-                }
-            }
-        }
-
-        // throw new \Exception(print_r($this->getPhonesArray(), true));
-
-        return [
-            'form_phone' => $formPhone->createView(),
-            'phones' => $this->getPhonesArray(),
-            'type' => $type,
-            'phone' => $phone,
-        ];
-    }
-
-    /**
-     * @Route("/phone-dropdown", name="phone_make_dropdown")
-     * @Route("/phone-dropdown/{type}/{id}", name="phone_make_dropdown_type_id")
-     * @Route("/phone-dropdown/{type}", name="phone_make_dropdown_type")
-     * @Template()
-     */
-    public function phoneMakeDropdownNewAction(Request $request, $type = null, $id = null)
-    {
-        $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phone = null;
-        $phoneMake = new PhoneDropdown();
-        if ($id) {
-            $phone = $phoneRepo->find($id);
-            $phoneMake->setMake($phone->getMake());
-        }
-
-        // throw new \Exception($id);
-
-        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-
-            // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_phone');
-        } elseif ($phone && in_array($type, ['learn-more'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-        }
-
-        $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneDropdownType::class, $phoneMake, [
-                'action' => $this->generateUrl('phone_make_dropdown'),
-            ])
-            ->getForm();
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('launch_phone')) {
-                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
-                if ($phoneId) {
-                    $phone = $phoneRepo->find($phoneId);
-                    if (!$phone) {
-                        throw new \Exception('unknown phone');
-                    }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                        ]);
-                    } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                        ]);
-                    }
-                }
-            }
-        }
-
-        // throw new \Exception(print_r($this->getPhonesArray(), true));
-
-        return [
-            'form_phone' => $formPhone->createView(),
-            'phones' => $this->getPhonesArray(),
-            'type' => $type,
-            'phone' => $phone,
-        ];
-    }
-
-    /**
-     * @Route("/select-phone-search", name="select_phone_make_search")
-     * @Route("/select-phone-search/{type}", name="select_phone_make_search_type")
-     * @Route("/select-phone-search/{type}/{id}", name="select_phone_make_search_type_id")
-     * @Template()
-     */
-    public function selectPhoneMakeSearchAction(Request $request, $type = null, $id = null)
-    {
-        $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phone = null;
-        if ($id) {
-            $phone = $phoneRepo->find($id);
-        }
-
-        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
-
-            // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_phone', [], 301);
-        }
-
-        return [
-            'phones' => $this->getPhonesArray(),
-            'type' => $type,
-            'phone' => $phone,
-        ];
-    }
-
-    /**
-     * @Route("/search-phone", name="search_phone_data")
-     * @Route("/search-phone-combined", name="search_phone_combined_data")
-     */
-    public function searchPhoneAction(Request $request)
-    {
-        $type = 'simple';
-        if ($request->get('_route') == 'search_phone_combined_data') {
-            $type = 'highlight';
-        }
-
-        return new JsonResponse(
-            $this->getPhonesSearchArray($type)
-        );
     }
 
     /**
@@ -1318,32 +1030,6 @@ class DefaultController extends BaseController
         );
 
         return new RedirectResponse($this->generateUrl('user_home'));
-    }
-
-    /**
-     * @Route("/iphone8", name="iphone8_redirect")
-     */
-    public function iPhone8RedirectAction()
-    {
-        return new RedirectResponse($this->generateUrl('phone_insurance_make_model', [
-            'make' => 'apple',
-            'model' => 'iphone+8',
-            'utm_medium' => 'flyer',
-            'utm_source' => 'sosure',
-            'utm_campaign' => 'iPhone8',
-        ]));
-    }
-
-    /**
-     * @Route("/trinitiymaxwell", name="trinitiymaxwell_redirect")
-     */
-    public function tmAction()
-    {
-        return new RedirectResponse($this->generateUrl('homepage', [
-            'utm_medium' => 'flyer',
-            'utm_source' => 'sosure',
-            'utm_campaign' => 'trinitiymaxwell',
-        ]));
     }
 
     /**
