@@ -245,6 +245,38 @@ class ReferralBonus
     }
 
     /**
+     * Tells you the amount that the inviter shall get.
+     * @return float the amount that they will get.
+     */
+    public function getAmountForInviter()
+    {
+        if ($this->getStatus() == self::STATUS_CANCELLED) {
+            return 0;
+        }
+        if ($this->getInviter()->getPremiumInstallments() == 1) {
+            return $this->getInviter()->getUpgradedYearlyPrice() / 11;
+        } else {
+            return $this->getInviter()->getUpgradedStandardMonthlyPrice();
+        }
+    }
+
+    /**
+     * Tells you the amount that the invitee shall get.
+     * @return float the amount they will get.
+     */
+    public function getAmountForInvitee()
+    {
+        if ($this->getStatus() == self::STATUS_CANCELLED) {
+            return 0;
+        }
+        if ($this->getInvitee()->getPremiumInstallments() == 1) {
+            return $this->getInvitee()->getUpgradedYearlyPrice() / 11;
+        } else {
+            return $this->getInvitee()->getUpgradedStandardMonthlyPrice();
+        }
+    }
+
+    /**
      * Tells you if the bonus can be applied to the inviter.
      * @param \DateTime $date is the date at which we are checking if it is applicable.
      * @return boolean true if it is applicable.

@@ -19,6 +19,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Lead;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\ReferralBonus;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
@@ -61,7 +62,8 @@ class BICommand extends ContainerAwareCommand
         'scodes',
         'unpaidCalls',
         'rewards',
-        'rewardsBudget'
+        'rewardsBudget',
+        'referrals'
     ];
 
     /** @var S3Client */
@@ -196,6 +198,9 @@ class BICommand extends ContainerAwareCommand
                     break;
                 case 'rewardsBudget':
                     $lines = $this->exportRewardsBudget($skipS3);
+                    break;
+                case 'referrals':
+                    $lines = $this->exportReferrals($skipS3);
                     break;
                 case 'users':
                     $lines = $this->exportUsers($skipS3, $timezone);
@@ -1013,6 +1018,57 @@ class BICommand extends ContainerAwareCommand
         }
 
         return $lines;
+    }
+
+    /**
+     * Exports the referral bonuses
+     * @param boolean $skipS3 tells you whether to skip uploading the file to s3.
+     */
+    private function exportReferrals($skipS3)
+    {
+        $rewardRepo = $this->dm->getRepository(ReferralBonus::class);
+
+        //Initialise data arrays
+        $headers = [];
+        $data = [];
+
+        //Initialise csv lines array
+        $lines = [];
+
+        //Set csv header
+        $lines[] = implode(',', [
+            "Created",
+            "Inviter",
+            "Inviter Bonus Value",
+            "Applied to Inviter",
+            "Invitee",
+            "Invitee Bonus Value",
+            "Applied to Invitee",
+            "Status"
+        ]);
+
+        //Get Referral bonuses
+        $referrals = $rewardRepo->findBy([], ['created'=>'DESC']);
+
+        //Generate data
+        foreach ($referrals as $key => $referral) {
+            $lines[] = implode(',', [
+                sprintf('"%s"', $referral->getCreated()->format('Y-m-d')),
+                sprintf('"%s"', $referral->getInviter()->getId()),
+                sprintf('"%s"', $referral->getAmountForInviter()),
+                sprintf('"%s"', $referral->getInviterPaid()?"Yes":"No"),
+                sprintf('"%s"', $referral->getInvitee()->getId()),
+                sprintf('"%s"', $referral->getAmountForInvitee()),
+                sprintf('"%s"', $referral->getInviteePaid()?"Yes":"No"),
+                sprintf('"%s"', $referral->getStatus())
+            ]);
+        }
+
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'referrals.csv');
+        }
+        return $lines;
+
     }
 
     private function getFirstSCodeUsedType(RewardRepository $rewardRepo, $connections)
