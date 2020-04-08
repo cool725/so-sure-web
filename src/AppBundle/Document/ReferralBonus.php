@@ -250,7 +250,7 @@ class ReferralBonus
      */
     public function getAmountForInviter()
     {
-        if ($this->getStatus == self::STATUS_CANCELLED) {
+        if ($this->getStatus() == self::STATUS_CANCELLED) {
             return 0;
         }
         if ($this->getInviter()->getPremiumInstallments() == 1) {
@@ -266,7 +266,7 @@ class ReferralBonus
      */
     public function getAmountForInvitee()
     {
-        if ($this->getStatus == self::STATUS_CANCELLED) {
+        if ($this->getStatus() == self::STATUS_CANCELLED) {
             return 0;
         }
         if ($this->getInvitee()->getPremiumInstallments() == 1) {
