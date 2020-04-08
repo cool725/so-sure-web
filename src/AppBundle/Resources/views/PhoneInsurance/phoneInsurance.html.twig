@@ -53,7 +53,7 @@
                             </ul>
                         </div>
                         <h1 class="text-white fit">Mobile Phone Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price|number_format(2) }} per month</span></h1>
-                        <p class="my-4 text-white">Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social insurance concept that is significantly cheaper for careful groups of families and friends. We’re here protecting customers when they claim and rewarding them when they don’t.</p>
+                        <p class="my-4 text-white">Our vision is to turn the insurance industry on its head by giving our customers the service they deserve. Provide a new, revolutionary social mobile phone insurance concept that is significantly cheaper for careful groups of families and friends. We’re here protecting customers when they claim and rewarding them when they don’t.</p>
                     </div>
                     <div class="hero__controls pb-3">
                         <a href="#" class="btn btn-success btn-block-xs btn-shadow mr-sm-2 get-a-quote disabled">Get a Quote</a>
@@ -100,6 +100,34 @@
 
     {# Comparison #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
+
+    <section class="cover-examples py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 mb-5 text-primary">Mobile phone insurance coverage</h2>
+            <h3 class="h4 mb-4">Cracked screen</h3>
+            <p class="mb-5">Smashing your phone screen really is rubbish, whether you drop it on hard ground or it inexplicably cracks in your pocket (it happens). If your mobile phone screen is broken, smashed, or cracked to the point where your phone is unusable then so-sure will replace or repair it as quickly as possible.</p>
+            <h3 class="h4 mb-4">Lost phone</h3>
+            <p class="mb-5">Losing your phone can feel like the end of the world and waiting around for a replacement is no fun. With a so-sure phone insurance policy, you’ll be covered for loss and we aim to get a phone back in your hands within 24 hours, so you can get back to taking snaps and messaging friends back.</p>
+            <h3 class="h4 mb-4">Phone theft</h3>
+            <p class="mb-5">Nearly 300,000 mobile phones are stolen every year. Thankfully, when bad stuff like this happens you can be sure that we’ve got you covered. so-sure phone insurance covers your phone for theft at home and abroad (up to 90 days coverage).</p>
+            <h3 class="h4 mb-4">Water damage</h3>
+            <p class="mb-5">Water damage is one of the most common phone insurance claims, and although the ‘rice trick’ can work, you’re much safer having an insurance policy to cover you. Fortunately, water damage is included in so-sure coverage. Just don’t go throwing your phone into water on purpose.</p>
+            <hr class="mb-5">
+            <p class="mb-5">This insurance is arranged and administered by so-sure, which is an appointed representative of Shepherd Compello Ltd, a company authorised and regulated by the Financial Conduct Authority (registered number: 311810). The policies are underwritten by Helvetia.</p>
+            <div class="text-center">
+                <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/misc/shepherd_compello_logo.jpg "
+                     alt="Shepherd Compello Ltd Logo"
+                     class="lozad"
+                     width="200px">
+                <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/misc/helvetia_logo.jpg  "
+                     alt="Helvetia Logo"
+                     class="lozad"
+                     width="200px">
+            </div>
+        </div>
+    </section>
 
     {# Other Manufacturers #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_otherManufacturers.html.twig' %}

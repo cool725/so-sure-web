@@ -63,7 +63,7 @@ class PhoneInsuranceController extends BaseController
             return $this->redirectToRoute('phone_insurance_water_damage', [], 301);
         }
 
-        return array();
+        return $this->redirectToRoute('phone_insurance', [], 301);
     }
 
     /**
@@ -77,7 +77,7 @@ class PhoneInsuranceController extends BaseController
             return $this->redirectToRoute('phone_insurance_theft', [], 301);
         }
 
-        return array();
+        return $this->redirectToRoute('phone_insurance', [], 301);
     }
 
     /**
@@ -91,7 +91,7 @@ class PhoneInsuranceController extends BaseController
             return $this->redirectToRoute('phone_insurance_loss', [], 301);
         }
 
-        return array();
+        return $this->redirectToRoute('phone_insurance', [], 301);
     }
 
     /**
@@ -105,7 +105,7 @@ class PhoneInsuranceController extends BaseController
             return $this->redirectToRoute('phone_insurance_cracked_screen', [], 301);
         }
 
-        return array();
+        return $this->redirectToRoute('phone_insurance', [], 301);
     }
 
     /**
