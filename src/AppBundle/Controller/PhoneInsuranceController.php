@@ -474,6 +474,7 @@ class PhoneInsuranceController extends BaseController
     ) {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
+        $user = $this->getUser();
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $phone = null;
         $decodedModel = Phone::decodeModel($model);
@@ -522,6 +523,17 @@ class PhoneInsuranceController extends BaseController
 
         // A/B Email Optional
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_OPTIONAL);
+
+        // A/B Personalisation Exp
+        $personalisedQuoteExp = null;
+        if ($user) {
+            $personalisedQuoteExp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_PERSONALISED_QUOTE_PAGE,
+                ['standard', 'personalised'],
+                SixpackService::LOG_MIXPANEL_ALL
+            );
+        }
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
@@ -641,7 +653,8 @@ class PhoneInsuranceController extends BaseController
             'competitor2' => 'GC',
             'competitor3' => 'O2',
             'img_url' => mb_strtolower($modelHyph),
-            'available_images' => $availableImages
+            'available_images' => $availableImages,
+            'personalised_quote' => $personalisedQuoteExp
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }

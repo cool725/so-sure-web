@@ -28,6 +28,9 @@ class SixpackService
     // Exp 1
     const EXPERIMENT_EMAIL_OPTIONAL = 'Email Optional';
 
+    // Exp 2
+    const EXPERIMENT_PERSONALISED_QUOTE_PAGE = 'Personalised Quote';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -117,7 +120,7 @@ class SixpackService
 
     public static $authExperiments = [
         // Exp 1
-        //
+        self::EXPERIMENT_PERSONALISED_QUOTE_PAGE,
     ];
 
     public static $appExperiments = [
@@ -139,7 +142,7 @@ class SixpackService
      */
     public static $purchaseConversionSimple = [
         // Exp 1
-        //
+        self::EXPERIMENT_PERSONALISED_QUOTE_PAGE,
     ];
 
     /**

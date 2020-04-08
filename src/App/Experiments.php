@@ -10,7 +10,9 @@ final class Experiments
         SixpackService::EXPERIMENT_EMAIL_OPTIONAL, ['email-optional', 'email'],
     ];
 
-    private static $authExperiments = [];
+    private static $authExperiments = [
+        SixpackService::EXPERIMENT_PERSONALISED_QUOTE_PAGE, ['standard', 'personalised'],
+    ];
 
     /**
      * Examine the groups of experiments available, and return the alternatives available.

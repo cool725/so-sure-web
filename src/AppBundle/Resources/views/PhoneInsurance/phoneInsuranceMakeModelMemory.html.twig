@@ -68,7 +68,7 @@
 
     <section class="hero">
         <div class="alert-strip alert-strip-green h6 p-3 pt-0 mb-4">
-            <div class="container-large">😕 Worried about being stuck at home with a broken phone during the lockdown? <br class="d-none d-lg-inline"> We’re committed more than ever to getting your phone repaired and back to you in just 72 hours.</div>
+            <div class="container-large">😕 During the lockdown we can still get your phone fixed in just 72 hours</div>
         </div>
         <div class="container-large">
             <div class="row">
@@ -114,6 +114,11 @@
                                 </li>
                             </ul>
                         </div>
+                        {% if (app.user is not null and app.user) and (personalised_quote is defined and personalised_quote == 'personalised') %}
+                            <div class="personalised mb-2 lead">
+                                Hi <strong>{{ app.user.firstName }}</strong> 👋 here's your quote:
+                            </div>
+                        {% endif %}
                         <h1 class="h1b fit mb-4">
                             <a href="#mem_sizes"
                                class=""
@@ -148,11 +153,11 @@
                             </li>
                             <li class="mb-3 h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">Fast replace and repair service</span>
+                                <span class="sub">Low excess from &pound;50</span>
                             </li>
                             <li class="mb-3 h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">Low excess from &pound;50</span>
+                                <span class="sub">Fast replace and repair service</span>
                             </li>
                             <li class="h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
