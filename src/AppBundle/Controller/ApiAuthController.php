@@ -2781,6 +2781,9 @@ class ApiAuthController extends BaseController
               ];
             $quote['upgrade_premium'] = $upgradePremium;
             $quote['phone_id'] = $newPhone->getId();
+            $quote['make'] = $newPhone->getMake();
+            $quote['model'] = $newPhone->getModel();
+            $quote['memory'] = $newPhone->getMemory();
 
             return new JsonResponse($quote);
         } catch (AccessDeniedException $e) {
