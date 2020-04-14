@@ -659,17 +659,17 @@ class BlogController extends BaseController
         return $this->render($template, $data);
     }
 
-    // /**
-    //  * @Route("/best-waterproof-phone-cases",
-    //  * name="best_waterproof_phone_cases", options={"sitemap" = true})
-    //  * @Template
-    //  */
-    // public function bestWaterproofPhoneCasesAction()
-    // {
-    //     $data = [];
+    /**
+     * @Route("/best-waterproof-phone-cases",
+     * name="best_waterproof_phone_cases", options={"sitemap" = true})
+     * @Template
+     */
+    public function bestWaterproofPhoneCasesAction()
+    {
+        $data = [];
 
-    //     $template = 'AppBundle:Blog:Articles/best-waterproof-phone-cases.html.twig';
+        $template = 'AppBundle:Blog:Articles/best-waterproof-phone-cases.html.twig';
 
-    //     return $this->render($template, $data);
-    // }
+        return $this->render($template, $data);
+    }
 }
