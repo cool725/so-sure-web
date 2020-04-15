@@ -2482,8 +2482,10 @@ class PolicyService
 
     public function autoRenew(Policy $policy, \DateTime $date = null)
     {
-        if ($policy->getStatus() == Policy::STATUS_CANCELLED || !$policy->isFullyPaid()) {
-            $this->logger->warning(sprintf(
+        if ($policy->getStatus() == Policy::STATUS_CANCELLED ||
+            $policy->getOutstandingPremium() - $policy->getPendingBacsPaymentsTotal() >= 0.01
+        ) {
+            $this->logger->error(sprintf(
                 'Skipping renewal as policy %s/%s is not fully paid or cancelled',
                 $policy->getId(),
                 $policy->getPolicyNumber()
