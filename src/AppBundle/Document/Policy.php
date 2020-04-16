@@ -3237,7 +3237,7 @@ abstract class Policy
     {
         $total = 0;
         foreach ($this->getPayments() as $payment) {
-            switch($payment->getType()) {
+            switch ($payment->getType()) {
                 case 'policyDiscount':
                     $total += $payment->getAmount();
                     break;
