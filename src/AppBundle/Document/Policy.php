@@ -3229,6 +3229,26 @@ abstract class Policy
         return $this->getPremium()->getYearlyIpt();
     }
 
+    /**
+     * Gives you the amount of renewal reward pot paid in to this policy.
+     * @return float the amount.
+     */
+    public function getRewardPaidIn()
+    {
+        $total = 0;
+        foreach ($this->getPayments() as $payment) {
+            switch($payment->getType()) {
+                case 'policyDiscount':
+                    $total += $payment->getAmount();
+                    break;
+                case 'policyDiscountRefund':
+                    $total -= $payment->getAmount();
+                    break;
+            }
+        }
+        return $total;
+    }
+
     public function getPremiumPlan()
     {
         if ($this->getPremiumInstallments() == 1) {

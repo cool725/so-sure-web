@@ -94,7 +94,8 @@ class HelvetiaExportService
             'PaidMGACommission',
             'PotValue',
             'MarketingPotValue',
-            'CashToHelvetia'
+            'CashToHelvetia',
+            'RenewalPotPaidIn'
         );
         $paidPremium = 0;
         $paidBrokerFee = 0;
@@ -122,7 +123,8 @@ class HelvetiaExportService
                 $policy->getCoverholderCommissionPaid(),
                 $policy->getPotValue(),
                 $policy->getPromoPotValue(),
-                $policy->getHelvetiaCash()
+                $policy->getHelvetiaCash(),
+                $policy->getRewardPaidIn()
             );
             $paidPremium += $policy->getPremiumPaid();
             $paidBrokerFee += $policy->getTotalCommissionPaid();
