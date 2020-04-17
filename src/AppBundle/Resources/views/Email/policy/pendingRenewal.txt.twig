@@ -10,7 +10,7 @@ Your renewal premium will be £{{ policy.nextPolicy.premium.monthlyPremiumPrice|
 For comparison the premium paid last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
 
 The excess for your policy is
-{% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus == 'approved' %}
+{% if (policy.policyTerms.isPicSureEnabled and policy.picSureStatus == 'approved') or (policy.policyTerms.isPicSureEnabled and policy.picSureStatus == 'preapproved')  %}
 Damage claims: &pound;{{ policy.nextPolicy.premium.picSureExcess.damage }}
 Warranty claims: &pound;{{ policy.nextPolicy.premium.picSureExcess.warranty }}
 Loss and Theft Claims: &pound;{{ policy.nextPolicy.premium.picSureExcess.loss }}
