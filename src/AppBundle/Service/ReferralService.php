@@ -77,7 +77,7 @@ class ReferralService
                         $this->logger->error(sprintf(
                             'Error applying referral bonus %s to inviter policy %s',
                             $referral->getId(),
-                            $referral->getInviter()
+                            $referral->getInviter()->getId()
                         ), ['exception' => $e]);
                         $applyError = true;
                     }
@@ -99,7 +99,7 @@ class ReferralService
                         $this->logger->error(sprintf(
                             'Error applying referral bonus %s to invitee policy %s',
                             $referral->getId(),
-                            $referral->getInviter()
+                            $referral->getInviter()->getId()
                         ), ['exception' => $e]);
                         $applyError = true;
                     }
@@ -107,7 +107,7 @@ class ReferralService
                     $this->logger->error(sprintf(
                         'Referral bonus %s to invitee policy %s failed',
                         $referral->getId(),
-                        $referral->getInviter()
+                        $referral->getInviter()->getId()
                     ));
                     $applyError = true;
                 }
