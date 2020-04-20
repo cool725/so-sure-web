@@ -235,8 +235,9 @@ class SalvaExportService
         /** @var SalvaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPolicy(null)));
+        $policies = $repo->getAllPoliciesForExport($date)->toArray();
         /** @var SalvaPhonePolicy $policy */
-        foreach ($repo->getAllPoliciesForExport($date) as $policy) {
+        foreach ($policies as $policy) {
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $data = $this->transformPolicy($policy, $version);
                 $paidPremium += $data[16];
@@ -285,7 +286,7 @@ class SalvaExportService
         /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
-        $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_SALVA_PHONE);
+        $payments = $repo->getAllPaymentsForExport($date, false, Policy::TYPE_SALVA_PHONE)->toArray();
         /** @var Payment $payment */
         foreach ($payments as $payment) {
             if (!$payment->getPolicy()) {
@@ -345,9 +346,10 @@ class SalvaExportService
         $lines = [];
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
+        $claims = $repo->getAllClaimsForExport(Policy::TYPE_SALVA_PHONE)->toArray();
         $lines[] =  sprintf('%s', $this->formatLine($this->transformClaim(null)));
         /** @var Claim $claim */
-        foreach ($repo->getAllClaimsForExport(Policy::TYPE_SALVA_PHONE) as $claim) {
+        foreach ($claims as $claim) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$claim->getPolicy()->isValidPolicy()) {
                 continue;
@@ -390,9 +392,10 @@ class SalvaExportService
         $lines = [];
         /** @var SalvaPhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+        $renewals = $repo->getAllExpiredPoliciesForExport($date)->toArray();
         $lines[] =  sprintf('%s', $this->formatLine($this->transformRenewal(null)));
         /** @var SalvaPhonePolicy $policy */
-        foreach ($repo->getAllExpiredPoliciesForExport($date) as $policy) {
+        foreach ($renewals as $policy) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
                 continue;
