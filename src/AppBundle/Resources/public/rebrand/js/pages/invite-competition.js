@@ -10,6 +10,13 @@ require('bootstrap/js/dist/tab');
 let textFit = require('textfit');
 require('../components/table.js');
 
+let jQueryBridget = require('jquery-bridget');
+let Flickity = require('flickity');
+
+// make Flickity a jQuery plugin
+Flickity.setJQuery( $ );
+jQueryBridget( 'flickity', Flickity, $ );
+
 $(function() {
 
     // Use textfit plugin for h1 tag
@@ -27,5 +34,20 @@ $(function() {
         $(this).find('.fas').removeClass('fa-arrow-circle-right')
                             .addClass('fa-arrow-circle-down');
     });
+
+    // Reviews
+    let $carousel = $('#customer_reviews').flickity({
+        wrapAround: true,
+        prevNextButtons: false,
+        pageDots: false
+    });
+
+    $('.review__controls-prev').on('click', function(e) {
+        $carousel.flickity('previous');
+    });
+
+    $('.review__controls-next').on('click', function(e) {
+        $carousel.flickity('next');
+    });    
 
 });

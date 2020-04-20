@@ -52,6 +52,7 @@
     "lodash": "^4.17.15",
     "lozad": "^1.8.0",
     "mem": "^5.1.1",
+    "minimist": "^1.2.3",
     "moment": "^2.24.0",
     "popper.js": "^1.15.0",
     "progressbar.js": "^1.1.0",

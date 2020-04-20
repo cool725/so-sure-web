@@ -160,6 +160,17 @@
     }
 }
 
+.our-reviews {
+    background-color: $pattens-blue;
+    text-align: center;
+    position: relative;
+
+    .reviews {
+        position: relative;
+        z-index: 4;
+    }
+}
+
 .banner {
     position: relative;
     text-align: center;
