@@ -99,7 +99,7 @@ class ReferralService
                         $this->logger->error(sprintf(
                             'Error applying referral bonus %s to invitee policy %s',
                             $referral->getId(),
-                            $referral->getInviter()->getId()
+                            $referral->getInvitee()->getId()
                         ), ['exception' => $e]);
                         $applyError = true;
                     }
@@ -107,7 +107,7 @@ class ReferralService
                     $this->logger->error(sprintf(
                         'Referral bonus %s to invitee policy %s failed',
                         $referral->getId(),
-                        $referral->getInviter()->getId()
+                        $referral->getInvitee()->getId()
                     ));
                     $applyError = true;
                 }
@@ -155,7 +155,7 @@ class ReferralService
                 $this->logger->error(sprintf(
                     'Error applying referral bonus %s to inviter policy %s',
                     $referral->getId(),
-                    $referral->getInviter()
+                    $referral->getInviter()->getId()
                 ), ['exception' => $e]);
                 $referral->setStatus(ReferralBonus::STATUS_RETRY);
             }
@@ -191,7 +191,7 @@ class ReferralService
         }
     }
 
-    private function sendInviteeAppliedEmail($referral, $attachmentFiles = null, $bcc = null)
+    private function sendInviteeAppliedEmail($referral)
     {
         if (!$this->mailer) {
             return;
@@ -203,9 +203,7 @@ class ReferralService
                 'AppBundle:Email:invitation/invitee-post-cooloff.html.twig',
                 ['referral' => $referral],
                 'AppBundle:Email:invitation/invitee-post-cooloff.txt.twig',
-                ['referral' => $referral],
-                $attachmentFiles,
-                $bcc
+                ['referral' => $referral]
             );
             $referral->getInvitee()->setLastEmailed(new \DateTime());
         } catch (\Exception $e) {
@@ -216,7 +214,7 @@ class ReferralService
         }
     }
 
-    private function sendInviterAppliedEmail($referral, $attachmentFiles = null, $bcc = null)
+    private function sendInviterAppliedEmail($referral)
     {
         if (!$this->mailer) {
             return;
@@ -228,9 +226,7 @@ class ReferralService
                 'AppBundle:Email:invitation/inviter-post-cooloff.html.twig',
                 ['referral' => $referral],
                 'AppBundle:Email:invitation/inviter-post-cooloff.txt.twig',
-                ['referral' => $referral],
-                $attachmentFiles,
-                $bcc
+                ['referral' => $referral]
             );
             $referral->getInviter()->setLastEmailed(new \DateTime());
         } catch (\Exception $e) {
