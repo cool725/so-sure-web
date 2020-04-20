@@ -48,6 +48,9 @@ class GoCompare
         1715 => ['make' => 'Apple', 'model' => 'iPhone 11 Pro Max', 'memory' => 512],
         1723 => ['make' => 'Apple', 'model' => 'iPhone 8', 'memory' => 128],
         1724 => ['make' => 'Apple', 'model' => 'iPhone 8 Plus', 'memory' => 128],
+        1826 => ['make' => 'Apple', 'model' => 'iPhone SE2', 'memory' => 64],
+        1827 => ['make' => 'Apple', 'model' => 'iPhone SE2', 'memory' => 128],
+        1828 => ['make' => 'Apple', 'model' => 'iPhone SE2', 'memory' => 256],
 
         // no longer supported by gocompare.
         // 215 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 128],
