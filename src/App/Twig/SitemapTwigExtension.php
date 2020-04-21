@@ -74,6 +74,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/new-huawei-release-rumour-hub' => 'New Huawei Release Rumour Hub',
             '/blog/best-phone-running-armbands' => 'Best Phone Running Armbands',
             '/blog/best-waterproof-phone-cases' => 'Best Waterproof Phone Cases',
+            '/blog/uk-phone-statistics' => 'UK Phone Statistics',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

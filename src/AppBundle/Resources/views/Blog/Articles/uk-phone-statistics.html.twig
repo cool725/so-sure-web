@@ -1,0 +1,163 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}UK Phone Statistics | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Smartphones and Wi-Fi are crucial to modern life. In this blog, we review the telling phone statistics that highlight our increasing reliance on technology."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'UK Phone Statistics | so-sure' %}
+{% set og_description = "Smartphones and Wi-Fi are crucial to modern life. In this blog, we review the telling phone statistics that highlight our increasing reliance on technology." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/uk-phone-statistics-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">UK Phone Statistics</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">UK Phone Statistics</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Apr 21, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">                                
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/uk-phone-statistics-1.jpg"
+                                     alt="UK Phone Stats"
+                                     class="img-fluid lozad mb-5">
+                                <p>Most people in the UK rely heavily on their digital devices and require a constant internet connection, according to <a href="https://www.ofcom.org.uk/about-ofcom/latest/features-and-news/decade-of-digital-dependency" target="_blank" rel="noopener noreferrer">research by Ofcom</a>. Meanwhile, the regulator’s comprehensive <a href="https://www.ofcom.org.uk/research-and-data/multi-sector-research/cmr" target="_blank" rel="noopener noreferrer">Communications Market Report</a> highlights how communicative methods in the UK are changing, with the main focus of the report being the revolutionary nature of the devices we use and how they’ve impacted our lives over the past decade.</p>
+                                <p>When smartphones took off in 2008, just 17% of the population owned one. As of 2020, <a href="https://www2.deloitte.com/uk/en/pages/technology-media-and-telecommunications/articles/the-market.html" target="_blank" rel="noopener noreferrer">89%</a> of 16-75 year olds own a smartphone, a figure which jumps to <a href="https://www2.deloitte.com/uk/en/pages/technology-media-and-telecommunications/articles/the-market.html" target="_blank" rel="noopener noreferrer">95%</a> of digital natives (16-24). In 2020, the smartphone represents the digital device people say they would miss the most, highlighting their increasing impact on our lives, in both positive and negative ways.</p>
+                                <p>In this blog, we review some telling phone statistics that highlight our increasing reliance on our smartphones and Wi-Fi connectivity.</p>
+                                <h2><a href="https://www.ofcom.org.uk/about-ofcom/latest/features-and-news/decade-of-digital-dependency" target="_blank" rel="noopener noreferrer">Always connected</a></h2>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/uk-phone-statistics-3.jpg"
+                                     alt="Group of people holding phones"
+                                     class="img-fluid lozad mb-5">
+                                <p>In contrast to a decade ago, most people say they require and expect a constant internet connection wherever they go. And this is hardly surprising when 64% of UK adults state that the Internet is an essential part of their life. So, how does this trend of increased reliance look in numbers?</p>
+                                <p>According to <a href="https://www.ofcom.org.uk/about-ofcom/latest/features-and-news/decade-of-digital-dependency" target="_blank" rel="noopener noreferrer">Ofcom</a>, UK citizens check their smartphone, on average, every 12 minutes, while two in five adults (40%) look at their phone within 5 minutes of waking up, jumping to 65% for millennials. These statistics are embedded in our evening routines too, with 37% of adults checking their phone five minutes before sleeping, climbing to 60% for millennials.</p>
+                                <p>Despite the pervasiveness of smartphones, the time we spend making phone calls – arguably a smartphone’s primary function – has fallen. This decline comes at the expense of a major surge in the use of internet-based messaging apps like Facebook Messenger and WhatsApp. And while 75% of smartphone users consider making calls on their device important, a staggering 92% regard web browsing as an indispensable feature.</p>
+                                <h2><a href="https://www.ofcom.org.uk/about-ofcom/latest/features-and-news/decade-of-digital-dependency" target="_blank" rel="noopener noreferrer">How do you feel without the internet?</a></h2>
+                                <p>Approximately one third of respondents say they feel either cut off (34%) or lost (29%) without the internet, while half of those surveyed claim their life would be boring without web access.</p>
+                                <p>Conversely, there are some who view a lack of internet access positively. For instance, one in ten consider themselves more productive offline, rising to 15% for 18 to 34-year-olds. Meanwhile, 16% say they feel less distracted when web access is off limits.</p>
+                                <p>But despite evidence pointing to increased productivity, our reliance on technology shows no sign of abating.</p>
+                                <h2><a href="https://www.ofcom.org.uk/about-ofcom/latest/features-and-news/decade-of-digital-dependency" target="_blank" rel="noopener noreferrer">Reliance on smartphones</a></h2>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/uk-phone-statistics-2.jpg"
+                                     alt="Line of people holding phones"
+                                     class="img-fluid lozad mb-5">
+                                <p>The responsible use of technology opens many doors, enabling us to connect, create and learn. For many of us, however, our smartphones have become a consuming habit that can compromise our engagement in the real world. According to Ofcom’s Director of Market Intelligence, Ian Macrae:</p>
+                                <p><em>“While people appreciate their smartphone as their constant companion, some are finding themselves feeling overloaded when online, or frustrated when they’re not.”</em></p>
+                                <p>And this isn’t merely anecdotal evidence; let’s unpack the facts.</p>
+                                <p>71% of Ofcom’s survey participants say they never turn off their phone, while a staggering 78% say they couldn’t live without it – reinforcing the statistics in the ‘always connected’ section above.</p>
+                                <p>Furthermore, the proportion of people accessing the internet via their smartphone has ballooned from 20% in 2008 to 72% in 2018. As of 2020, the average time spent online on a smartphone is approximately 2 hrs 28 minutes a day, rising to around 3 hrs and 14 minutes for millennials.</p>
+                                <h2><a href="https://www2.deloitte.com/uk/en/pages/technology-media-and-telecommunications/articles/the-market.html" target="_blank" rel="noopener noreferrer">The smartphone market</a></h2>
+                                <p>In the <a href="https://www.idc.com/promo/smartphone-market-share/vendor" target="_blank" rel="noopener noreferrer">latest smartphone market share statistics</a> (Q3, 2019), Samsung leads the way with 21.8%, followed by Huawei (18.6%) and Apple (13%). These market share figures are reflected in the table below, which indicates the amount spent on research and development in the previous year.</p>
+                                <h3>Research and development in 2018</h3>
+                                <table class="table mt-3 mb-5">
+                                    <thead>
+                                      <tr>
+                                        <td class="h6">Smartphone manufacturer</td>
+                                        <td class="h6">Billions in £</td>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>Samsung</td>
+                                        <td>12.8</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Huawei</td>
+                                        <td>11.7</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Microsoft</td>
+                                        <td>11.3</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Apple</td>
+                                        <td>10.9</td>
+                                      </tr>
+                                    </tbody>
+                                </table>
+                                <p>It’s worth noting that Huawei’s meteoric rise is likely due to its considerable <a href="https://www.bbc.co.uk/news/business-46480208" target="_blank" rel="noopener noreferrer">increase on expenditure on research and development</a>. As the table shows, there is considerable evidence that links research expenditure to the total market share.</p>
+                                <h2>so-sure insurance</h2>
+                                <p>Despite our increasing reliance on our smartphones, <a href="https://www2.deloitte.com/uk/en/pages/technology-media-and-telecommunications/articles/the-market.html" target="_blank" rel="noopener noreferrer">1 in 5 (20%)</a> of us keep the same smartphone for over 2.5 years. A lot can happen in that time, so can you really afford to risk your phone being lost, stolen or damaged without adequate cover? Our <a href="{{ path('phone_insurance') }}">phone insurance plans</a> provide a security blanket when you need it most, both at home and overseas, and protect you against theft, loss and accidental damage – helping you stay connected no matter what.</p>
+                                <p>We also cover second-hand handsets up to 3 years from purchase and offer an innovative <a href="{{ path('social_insurance') }}">social insurance package</a>, which allows you to connect your policy with friends and family and potentially earn up to 80% cashback at the end of your plan. </p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

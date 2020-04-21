@@ -672,4 +672,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/uk-phone-statistics",
+     * name="uk_phone_statistics", options={"sitemap" = true})
+     * @Template
+     */
+    public function ukPhoneStatisticsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/uk-phone-statistics.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
