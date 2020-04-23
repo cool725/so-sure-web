@@ -37,6 +37,10 @@ class SixpackService
 
     const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';
 
+    const EXPERIMENT_APP_SHARE_GAME = 'app-share-game';
+    const ALTERNATIVES_APP_SHARE_GAME = 'share-game';
+    const ALTERNATIVES_APP_SHARE_NOGAME = 'no-share-game';
+
     public static $archivedExperiments = [
         'homepage-aa',
         'quote-calc-lower',
@@ -121,11 +125,15 @@ class SixpackService
     public static $authExperiments = [
         // Exp 1
         self::EXPERIMENT_PERSONALISED_QUOTE_PAGE,
+        self::EXPERIMENT_APP_SHARE_GAME,
     ];
 
     public static $appExperiments = [
         // Exp 1
-        //
+        self::EXPERIMENT_APP_SHARE_GAME => [
+            self::ALTERNATIVES_APP_SHARE_GAME,
+            self::ALTERNATIVES_APP_SHARE_NOGAME,
+        ],
     ];
 
     public static function getAppParticipationByClientId()

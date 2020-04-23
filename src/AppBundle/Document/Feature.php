@@ -38,6 +38,7 @@ class Feature
     const FEATURE_APPLY_SIGN_UP_BONUS = 'apply-sign-up-bonus';
     const FEATURE_INVITE_PAGES_COMPETITION = 'invite-competition';
     const FEATURE_REFERRAL = 'referral';
+    const FEATURE_APP_SHARE_GAME = 'app-share-game';
 
     // All Features should be here
     public static $features = [
@@ -62,7 +63,8 @@ class Feature
         self::FEATURE_CHECKOUT,
         self::FEATURE_APPLY_SIGN_UP_BONUS,
         self::FEATURE_INVITE_PAGES_COMPETITION,
-        self::FEATURE_REFERRAL
+        self::FEATURE_REFERRAL,
+        self::FEATURE_APP_SHARE_GAME
     ];
 
     // @codingStandardsIgnoreStart
@@ -88,7 +90,8 @@ class Feature
         self::FEATURE_CHECKOUT => 'Use Checkout instead of Judo for payments',
         self::FEATURE_APPLY_SIGN_UP_BONUS => 'Automatically apply any active sign-up bonuses to new users first policy',
         self::FEATURE_INVITE_PAGES_COMPETITION => 'Invite pages competition (Amazon voucher)',
-        self::FEATURE_REFERRAL => 'Referral Bonus'
+        self::FEATURE_REFERRAL => 'Referral Bonus',
+        self::FEATURE_APP_SHARE_GAME => 'Share game in app'
     ];
     // @codingStandardsIgnoreEnd
 
