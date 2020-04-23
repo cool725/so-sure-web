@@ -60,14 +60,7 @@ class PhoneMakeType extends AbstractType
             'required' => $this->required,
         ];
         if (!$isAndroid) {
-            $makeChoiceOptions['preferred_choices'] = ['Apple', 'Samsung'];
-            $makeChoiceOptions['group_by'] = function ($value) {
-                if ($value === 'Apple' or $value === 'Samsung') {
-                    return 'Top makes:';
-                } else {
-                    return 'Other makes:';
-                }
-            };
+            $makeChoiceOptions['preferred_choices'] = ['Apple', 'Samsung', 'Huawei', 'Google', 'OnePlus'];
         }
 
         $builder
