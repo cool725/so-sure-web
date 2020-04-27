@@ -1,0 +1,134 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}Sony Xperia 1 II Release Rumours, Release Date & Price | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Sony's latest flagship smartphone may carve out a new niche for the electrical powerhouse. Find out more about the new Sony Xperia here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Sony Xperia 1 II Release Rumours, Release Date & Price | so-sure' %}
+{% set og_description = "Sony's latest flagship smartphone may carve out a new niche for the electrical powerhouse. Find out more about the new Sony Xperia here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/sony-xperia-1-II-release-rumours-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">New Sony Xperia 1 II Release Rumour Hub</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">New Sony Xperia 1 II Release Rumour Hub</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Apr 27, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/sony-xperia-1-II-release-rumours-1.jpg"
+                                     alt="New Sony Xperia 1 II"
+                                     class="img-fluid lozad mb-5">
+                                <p>The new Sony Xperia 1 II (Mark 2) sees Sony revamp its popular flagship model for the new decade, while its new mark II moniker ushers in <a href="https://www.pocket-lint.com/phones/news/sony-mobile/151150-sony-xperia-new-naming-strategy" target="_blank" rel="noopener noreferrer">Sony’s new naming strategy</a>. The phone continues in the same vein as the <a href="{{ path('phone_insurance_make_model', {'make': 'sony', 'model': 'xperia-1'}) }}">Xperia 1</a>, with emphasis placed on its movie-making capacity, potentially carving out a new niche for the electrical powerhouse.</p>
+                                <h2>Sony Xperia 1 II Release Date and Price</h2>
+                                <p>Sony Mobile usually issues such details on the Monday of the <a href="https://www.mwcbarcelona.com/" target="_blank" rel="noopener noreferrer">Mobile World Congress</a>, but the renowned mobile trade show was recently cancelled due to the coronavirus. However, Sony announced its phone via an <a href="https://www.pocket-lint.com/phones/news/sony-mobile/143716-sony-mwc-press-conference-how-to-watch-it-live" target="_blank" rel="noopener noreferrer">online press conference on that date</a> but provided only a loose ‘late Spring’ timeframe for the phone’s release.</p>
+                                <p>They were vague regarding its price too, although we expect the new flagship to release at a similar price point to the 2019 version, which launched at &pound;849 in the UK.</p>
+                                <h2>Design rumours</h2>
+                                <p>The reported design reflects the original Xperia 1, aside from a couple of customer-influenced updates. These modifications come in the form of a repositioned camera and a returning 3.5mm headphone socket that’ll support numerous audio platforms including <a href="https://www.pocket-lint.com/speakers/news/sony/149861-what-is-sony-360-reality-audio-and-how-does-it-work" target="_blank" rel="noopener noreferrer">Sony 360 Reality Audio</a>, DSEE Ultimate, HiRes Audio, and Dolby Atmos support from the stereo’s front speakers.</p>
+                                <p>As it stands, the Xperia 1 II will be available in two colours: black and purple.</p>
+                                <h2>Camera Rumours</h2>
+                                <p>Camera specifications at a glance</p>
+                                <ul>
+                                  <li><em>12MP, 1/3.5in, f/1.7 OIS main</em></li>
+                                  <li><em>12MP, 1/2.6in, f/2.2 OIS ultra-wide</em></li>
+                                  <li><em>12MP, 1/1.7in, f/2.4 OIS telephoto</em></li>
+                                  <li><em>Time-of-flight sensor</em></li>
+                                  <li><em>8MP front camera</em></li>
+                                </ul>
+                                <p>The triple Zeiss lens camera is packed with innovative features, including Photo Pro mode, which shares a visual layout akin to the Sony Alpha 9. Sony’s Alpha cameras are renowned for rapid focusing speeds, which it’s keen to incorporate into this handset (purported to be 60 frames a second) – if this is true, it’d mean the subject should always be in focus. This feature is likely to be complemented by real-time eye focusing, which detects a subject’s eyes and ensures they’re in focus, making quickfire pics of friends and pets more precise than ever. It’ll be accurate in low light too, thanks to its in-built time of flight sensor.</p>
+                                <p>As we’ve alluded to, the Xperia 1 II looks set to become a favourite among filmmakers, thanks to the advanced video functions found in the in-built Cinema Pro app. The headline feature, however, is the 20fps autofocus-enabled burst mode, which includes subject tracking through the burst, so you’ll never miss a moment.</p>
+                                <h2>Specification rumours</h2>
+                                <h3>Display</h3>
+                                <p>The Xperia 1 II is rumoured to have a 6.5-inch OLED display set in 21:9 aspect, again, making it ideal for budding filmmakers. The OLED display also boasts ‘motion blur reduction’ and aims to deliver 90Hz display quality. It’s 3840 x 1644 4K resolution will also be HDR compatible.</p>
+                                <h3>Hardware</h3>
+                                <h4>Chipset</h4>
+                                <p>There’s a Qualcomm Snapdragon 865 chipset under the hood, powered by 8GB RAM and backed by 256GB storage.</p>
+                                <h4>Battery</h4>
+                                <p>The 4000mmAh battery isn’t huge, but this minor gripe is offset by the phone’s slim build and Qi wireless charging option, which purportedly charges the battery to 50% in 30 mins with the 21W PD charger. We also expect it to include Sony’s renowned optimisation features, such as Stamina Mode and adaptive battery care.</p>
+                                <h4>Modem</h4>
+                                <p>The supercharged X55 modem delivers instant 5G connectivity.</p>
+                                <p>Is the Xperia 1 II on your wish-list for 2020? Check back in with us to get it covered once it’s launched – or see what other <a href="{{ path('phone_insurance_make', {'make': 'sony'}) }}">Sony phones</a> we insure!</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
