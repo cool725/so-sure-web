@@ -686,4 +686,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/sony-xperia-1-II-release-rumours",
+     * name="sony_xperia_1_II_release_rumours", options={"sitemap" = true})
+     * @Template
+     */
+    public function sonyXperia1IIReleaseRumoursAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/sony-xperia-1-II-release-rumours.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

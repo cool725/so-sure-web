@@ -75,6 +75,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/best-phone-running-armbands' => 'Best Phone Running Armbands',
             '/blog/best-waterproof-phone-cases' => 'Best Waterproof Phone Cases',
             '/blog/uk-phone-statistics' => 'UK Phone Statistics',
+            '/blog/sony-xperia-1-II-release-rumours' => 'New Sony Xperia 1 II Release Rumour Hub',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',
