@@ -2847,7 +2847,7 @@ class PolicyService
         if ($policy instanceof SalvaPhonePolicy) {
             $bonusPayment->setCoverholderCommission(Salva::MONTHLY_COVERHOLDER_COMMISSION);
             $bonusPayment->setBrokerCommission(Salva::MONTHLY_BROKER_COMMISSION);
-            $bonusPayment->setTotalCommission(Salva::MONTHLY_BROKER_COMMISSION);
+            $bonusPayment->setTotalCommission(Salva::MONTHLY_TITLE_COMMISSION);
         } else {
             $policy->setCommission($bonusPayment);
         }
