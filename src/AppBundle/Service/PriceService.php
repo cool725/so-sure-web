@@ -174,10 +174,12 @@ class PriceService
     /**
      * Sets the premium for a renewal based on the logic that if the new price is more than the price on the old
      * policy, we just use the old premium again.
-     * @param PhonePolicy $policy is the policy to set the price for.
-     * @param \DateTime   $date   is the current date for getting the currently valid price.
+     * @param PhonePolicy $policy            is the policy to set the price for.
+     * @param number      $additionalPremium is additional premium to add.
+     * @param \DateTime   $date              is the current date for getting the currently valid price.
      */
-    public function setPhonePolicyRenewalPremium($policy, $additionalPremium, $date) {
+    public function setPhonePolicyRenewalPremium($policy, $additionalPremium, $date)
+    {
         $previous = $policy->getPrevious();
         if (!$previous) {
             throw new \InvalidArgumentException(sprintf(
