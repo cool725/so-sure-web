@@ -180,7 +180,7 @@ class PriceService
      */
     public function setPhonePolicyRenewalPremium($policy, $additionalPremium, $date)
     {
-        $previous = $policy->getPrevious();
+        $previous = $policy->getPreviousPolicy();
         if (!$previous) {
             throw new \InvalidArgumentException(sprintf(
                 'Given policy %s cannot get a renewal price because it is not a renewal',
