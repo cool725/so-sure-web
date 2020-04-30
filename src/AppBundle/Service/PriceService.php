@@ -172,28 +172,35 @@ class PriceService
     }
 
     /**
-     * Finds the price that a given renewal policy should pay.
-     * @param PhonePolicy $policy is the policy that will have this price potentially.
-     * @param \DateTime   $date   is the date at which the policy shall start.
-     * @return PhonePrice|null the price that the policy should pay.
+     * Sets the premium for a renewal based on the logic that if the new price is more than the price on the old
+     * policy, we just use the old premium again.
+     * @param PhonePolicy $policy is the policy to set the price for.
+     * @param \DateTime   $date   is the current date for getting the currently valid price.
      */
-    public function renewalPhonePrice($policy, $date)
-    {
-        if (!$policy->getPreviousPolicy()) {
-            throw new \InvalidArgumentException(sprintf("Given policy '%s' is not a renewal", $policy->getId()));
+    public function setPhonePolicyRenewalPremium($policy, $additionalPremium, $date) {
+        $previous = $policy->getPrevious();
+        if (!$previous) {
+            throw new \InvalidArgumentException(sprintf(
+                'Given policy %s cannot get a renewal price because it is not a renewal',
+                $policy->getId()
+            ));
         }
-        if ($policy->hasMonetaryClaimed(true)) {
-            return $policy->getPhone()->getCurrentPhonePrice(
-                PhonePrice::installmentsStream($policy->getPremiumInstallments()),
-                $date
-            );
+        $oldPremium = $previous->getPremium();
+        $newPrice = $policy->getPhone()->getCurrentPhonePrice(
+            PhonePrice::installmentsStream($policy->getPremiumInstallments()),
+            $date
+        );
+        if ($newPrice->getGwp() > $oldPremium->getGwp()) {
+            $policy->setPremium($oldPremium);
         } else {
-            // TODO: should be more like the apply premium function so that renewal price can be old price which at
-            //       this point is a premium not a price.
-            return $policy->getPhone()->getCurrentPhonePrice(
+            $this->setPhonePolicyPremium(
+                $policy,
                 PhonePrice::installmentsStream($policy->getPremiumInstallments()),
+                $additionalPremium,
                 $date
             );
         }
+        $this->dm->persist($policy);
+        $this->dm->flush();
     }
 }
