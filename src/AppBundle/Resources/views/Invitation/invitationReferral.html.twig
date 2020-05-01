@@ -37,7 +37,7 @@
                         <ul class="list-unstyled icn-fa-list mb-4">
                             <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>One month FREE thanks to {{ invitation.inviter.firstname }}, <br> just click "Get a quote" below!</li>
                             <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>&pound;10 in your no claims reward pot</li>
-                            <li class="text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>An extra month FREE if you pay yearly</li>
+                            <li class="text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>An extra {{ free_months }} FREE if you pay yearly</li>
                         </ul>
                         <p class="text-white mb-4">And that's on top of the game changing low price, easy as pie cover and lightning fast claims we offer! Yes, we're cheap, fast and easy. Don't tell your parents 😉</p>
                     {# {% else %} #}
@@ -64,7 +64,7 @@
         <div class="container-large py-5">
             <h2 class="h3 mb-3 text-primary">How it works</h2>
             {% if invitation.inviter is defined %}
-                <p class="mb-5 lead">We know <strong>{{ invitation.inviter.firstname }}</strong> referred you to us - so as a thank you, we'll give you a month off your phone insurance!<br class="d-none d-lg-inline"> We'll also give you an extra free month if you pay annually. That's 2 full months for free!</p>
+                <p class="mb-5 lead">We know <strong>{{ invitation.inviter.firstname }}</strong> referred you to us - so as a thank you, we'll give you a month off your phone insurance!<br class="d-none d-lg-inline"> We'll also give you an extra free {{ free_months }} if you pay annually.</p>
             {# {% else %} #}
             {% endif %}
             <div class="timeline d-lg-none mb-3">
@@ -83,7 +83,7 @@
                 <div class="timeline-block timeline-block-complete">
                     <div class="timeline-point"><i class="far fa-check fa-lg fa-fw text-white"></i></div>
                     <div class="timeline-content">
-                        <h3 class="h5 text-primary">If you pay annually, you’ll get another month free!</h3>
+                        <h3 class="h5 text-primary">If you pay annually, you’ll get another {{ free_months }} free!</h3>
                     </div>
                 </div>
             </div>
@@ -99,7 +99,7 @@
                     </div>
                     <div class="col-4 step">
                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="Friends having fun" width="180px" class="lozad mb-3">
-                        <h3 class="h5 text-primary mb-2">If you pay annually, you’ll get another month free!</h3>
+                        <h3 class="h5 text-primary mb-2">If you pay annually, you’ll get another {{ free_months }} free!</h3>
                     </div>
                 </div>
             </div>
