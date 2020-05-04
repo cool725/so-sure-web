@@ -149,7 +149,7 @@
                         <ul class="list-unstyled icn-fa-list mb-4">
                             <li class="mb-3 h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">One month free when you pay yearly</span>
+                                <span class="sub">{{ free_months|capitalize }} free when you pay yearly</span>
                             </li>
                             <li class="mb-3 h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
@@ -193,12 +193,12 @@
                                  alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
                                  class="lozad img-fluid hero-generic">
                         {% endif %}
-                        <div class="hero__badge animated tada"
+                        {# <div class="hero__badge animated tada"
                              data-toggle="modal"
                              data-target="#covid_modal"
                              role="button">
                             <div class="hero__badge-inner">Price includes<br><span class="h5">FREE</span><br> Loss &amp; Theft during lockdown!</div>
-                        </div>
+                        </div> #}
                     </div>
                 </div>
             </div>
@@ -342,7 +342,7 @@
     </section>
 
     {# Page Modals #}
-    <div class="modal fade"
+    {# <div class="modal fade"
          id="covid_modal"
          tabindex="-1" role="dialog"
          aria-labelledby="covid_modal"
@@ -355,7 +355,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 

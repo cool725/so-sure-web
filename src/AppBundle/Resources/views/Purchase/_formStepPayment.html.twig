@@ -17,7 +17,7 @@
 
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
         <h4 class="payment-options__title text-dodger-blue">How would you like to pay?</h4>
-        <p class="mb-4">Get one month free when you pay yearly 🤑</p>
+        <p class="mb-4">Get {{ free_months }} free when you pay yearly 🤑</p>
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
             {{ form_widget(purchase_form.amount) }}
