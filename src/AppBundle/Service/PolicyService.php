@@ -2843,7 +2843,13 @@ class PolicyService
         }
         $bonusPayment->setPolicy($policy);
         $bonusPayment->calculateSplit();
-        $policy->setCommission($bonusPayment);
+        if ($policy instanceof SalvaPhonePolicy) {
+            $bonusPayment->setCoverholderCommission(Salva::MONTHLY_COVERHOLDER_COMMISSION);
+            $bonusPayment->setBrokerCommission(Salva::MONTHLY_BROKER_COMMISSION);
+            $bonusPayment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        } else {
+            $policy->setCommission($bonusPayment);
+        }
         $bonusPayment->setSuccess(true);
         $bonusPayment->setNotes('Referral Bonus');
         if ($policy->getPremiumInstallments() == 1) {
