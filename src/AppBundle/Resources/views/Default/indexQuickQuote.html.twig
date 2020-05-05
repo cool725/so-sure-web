@@ -60,8 +60,8 @@
                 <span class="sub text-deep-sky-blue-d">Simply Better</span> Mobile Insurance
             </h1>
             <div class="row">
-                <div class="col-lg-6 d-none d-lg-block">
-                    <div class="hero__illustration mt-lg-4">
+                <div class="col-md-6 d-none d-md-block">
+                    <div class="hero__illustration mt-md-4">
                         <img src="{{ cdn_url }}/images/onexone.png"
                              data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png"
                              alt="so-sure - social insurance"
@@ -74,7 +74,7 @@
                         </div> #}
                     </div>
                 </div>
-                <div class="col-lg-5 offset-lg-1">
+                <div class="col-md-6 col-lg-5 offset-lg-1">
                     {% if phone is defined and phone %}
                         {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
                     {% else %}
@@ -84,7 +84,7 @@
             </div>
             <div class="row">
                 <div class="col-md-8 offset-md-2">
-                    <div class="hero__illustration d-block d-lg-none mt-4">
+                    <div class="hero__illustration d-block d-md-none mt-4">
                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad">
                         {# <div class="hero__badge animated tada"
                              data-toggle="modal"
