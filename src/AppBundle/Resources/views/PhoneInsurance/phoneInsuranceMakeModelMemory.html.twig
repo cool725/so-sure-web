@@ -114,11 +114,24 @@
                                 </li>
                             </ul>
                         </div>
-                        {% if (app.user is not null and app.user) and (personalised_quote is defined and personalised_quote == 'personalised') %}
+                        {% if (app.user is not null and app.user) and (personalised_quote is defined and personalised_quote == 'time') %}
+                            {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 12) %}
+                                {% set greeting = 'Good morning' %}
+                            {% elseif ('now'|date('G') > 12) and ('now'|date('G') <= 18)  %}
+                                {% set greeting = 'Good afternoon' %}
+                            {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
+                                {% set greeting = 'Good evening' %}
+                            {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
+                                {% set greeting = 'Hello night owl 🦉' %}
+                            {% endif %}
                             <div class="personalised mb-2 lead">
-                                Hi <strong>{{ app.user.firstName }}</strong> 👋 here's your quote:
+                                {{ greeting|raw }} here's your quote:
                             </div>
-                        {% endif %}
+                        {% elseif (app.user is not null and app.user) and (personalised_quote is defined and personalised_quote == 'name') %}
+                            <div class="personalised mb-2 lead">
+                                Hi <strong>{{ app.user.firstName }}</strong>, here's your quote:
+                            </div>                            
+                        {% endif %}                        
                         <h1 class="h1b fit mb-4">
                             <a href="#mem_sizes"
                                class=""

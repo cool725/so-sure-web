@@ -529,8 +529,8 @@ class PhoneInsuranceController extends BaseController
         if ($user) {
             $personalisedQuoteExp = $this->sixpack(
                 $request,
-                SixpackService::EXPERIMENT_PERSONALISED_QUOTE_PAGE,
-                ['standard', 'personalised'],
+                SixpackService::EXPERIMENT_PERSONALISED_QUOTE_PAGE_V2,
+                ['name', 'time'],
                 SixpackService::LOG_MIXPANEL_ALL
             );
         }

@@ -11,7 +11,7 @@ final class Experiments
     ];
 
     private static $authExperiments = [
-        SixpackService::EXPERIMENT_PERSONALISED_QUOTE_PAGE, ['standard', 'personalised'],
+        SixpackService::EXPERIMENT_PERSONALISED_QUOTE_PAGE_V2, ['name', 'time'],
     ];
 
     /**
