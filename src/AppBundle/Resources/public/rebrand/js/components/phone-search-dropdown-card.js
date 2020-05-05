@@ -23,10 +23,16 @@ $(function() {
                 // When to validate
                 validClass: 'is-valid-ss',
                 errorClass: 'is-invalid',
-                // onfocusout: false,
-                onkeyup: false,
-                onclick: false,
                 rules: {
+                    "launch_phone[make]": {
+                        required: true
+                    },
+                    "launch_phone[model]": {
+                        required: true
+                    },    
+                    "launch_phone[memory]": {
+                        required: true
+                    },                                        
                     "launch_phone[email]": {
                         required: false,
                         email: true,
@@ -34,6 +40,15 @@ $(function() {
                     },
                 },
                 messages: {
+                    "launch_phone[make]": {
+                        required: 'Please enter your make'
+                    },
+                    "launch_phone[model]": {
+                        required: 'Please enter your model'
+                    },    
+                    "launch_phone[memory]": {
+                        required: 'Please enter your storage size'
+                    },                     
                     "launch_phone[email]": {
                         required: 'Please enter your email address',
                         email: 'Please enter a valid email address',
@@ -87,7 +102,6 @@ $(function() {
             // Set the default value
             memory.append($('<option />').val('').text('Select Memory Size'));
 
-
             // Get phones from list and add to options
             $.each(phones[make.val()][model.val()], function(key, value) {
                 memory.append($('<option />').val(key).text(value['memory'] + 'GB'));
@@ -112,14 +126,11 @@ $(function() {
             // Enable/disable model
             if ($(this).val()) {
                 model.prop('disabled', '');
+                model.focus();
             } else {
                 model.prop('disabled', 'disabled').val('');
             }
 
-            // Adjust the button
-            button.prop('disabled', 'disabled')
-            .removeClass('btn-success')
-            .addClass('btn-secondary');
         });
 
         // On Model change
@@ -130,14 +141,10 @@ $(function() {
             // Enable/disable model
             if ($(this).val()) {
                 memory.prop('disabled', '');
+                memory.focus();
             } else {
                 memory.prop('disabled', 'disabled').val('');
             }
-
-            // Adjust the button
-            button.prop('disabled', 'disabled')
-            .removeClass('btn-success')
-            .addClass('btn-secondary');
         });
 
         // On Memory change
@@ -146,16 +153,9 @@ $(function() {
             // Enable/disable model
             if ($(this).val()) {
                 email.prop('disabled', '');
-                button.prop('disabled', '')
-                      .removeClass('btn-secondary')
-                      .addClass('btn-success');
-
                 email.focus();
             } else {
                 email.prop('disabled', 'disabled');
-                button.prop('disabled', 'disabled')
-                .removeClass('btn-success')
-                .addClass('btn-secondary');
             }
         });
     }

@@ -43,7 +43,7 @@
         </div>
         {% set email_place_holder = 'Enter Email (optional)' %}
         {% if email_optional is defined and email_optional == 'email' %}
-            {% set email_place_holder = 'Enter Email' %}
+            {% set email_place_holder = 'Enter Email for Quote' %}
         {% endif %}
         <div class="form-group">
             <input type="email"
@@ -56,8 +56,7 @@
             {{ form_widget(form_phone.next, {
               'label': 'Get my quote',
               'attr': {
-                'class': 'btn btn-secondary btn-block phone-search-button',
-                'disabled': 'disabled'
+                'class': 'btn btn-success btn-block phone-search-button'
             }}) }}
         </div>
         <input type="hidden" name="token" value="{{ csrf_token('quote') }}"/>

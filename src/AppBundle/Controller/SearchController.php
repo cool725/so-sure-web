@@ -176,7 +176,11 @@ class SearchController extends BaseController
                     if ($email) {
                         $lead = new Lead();
                         $lead->setEmail($email);
-                        $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME);
+                        if ($homepageEmailOptionalExp == 'email') {
+                            $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME_REQUIRED);
+                        } else {
+                            $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME);
+                        }
                         $leadRepo = $dm->getRepository(Lead::class);
                         $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
