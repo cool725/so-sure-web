@@ -72,7 +72,7 @@
         </div>
         <div class="container-large">
             <div class="row">
-                <div class="col-lg-6 order-lg-2">
+                <div class="col-md-6 order-md-2">
                     <div class="hero__intro">
                         <div class="breadcrumbs">
                             <ul class="list-inline"
@@ -193,7 +193,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="col-lg-6 order-lg-1">
+                <div class="col-md-6 order-md-1">
                    <div class="hero__illustration hero__illustration-{{ img_url }} text-center">
                         {% if img_url in available_images %}
                             <img src="{{ cdn_url }}/images/onexone.png"
@@ -206,12 +206,13 @@
                                  alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
                                  class="lozad img-fluid hero-generic">
                         {% endif %}
-                        {# <div class="hero__badge animated tada"
-                             data-toggle="modal"
-                             data-target="#covid_modal"
-                             role="button">
-                            <div class="hero__badge-inner">Price includes<br><span class="h5">FREE</span><br> Loss &amp; Theft during lockdown!</div>
-                        </div> #}
+                        <div class="hero__badge animated tada"
+                             {# data-toggle="modal" #}
+                             {# data-target="#covid_modal" #}
+                             {# role="button" #}
+                             >
+                            <div class="hero__badge-inner">2 months<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
+                        </div>
                     </div>
                 </div>
             </div>

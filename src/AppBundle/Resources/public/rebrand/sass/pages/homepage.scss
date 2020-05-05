@@ -33,15 +33,15 @@
     }
 
     &__badge {
-        width: 150px; height: 150px;
+        width: 145px; height: 145px;
         position: absolute;
         top: 0; right: 0;
         text-align: center;
         background-color: $froly;
         color: $white;
         font-family: $g-medium;
-        font-size: 80%;
-        cursor: pointer;
+        font-size: 94%;
+        // cursor: pointer;
 
         transition: all 0.5s linear;
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.4),
@@ -52,9 +52,9 @@
         align-items: center;
         justify-content: center;
 
-        &:hover {
-            background-color: darken($froly, 10%);
-        }
+        // &:hover {
+        //     background-color: darken($froly, 10%);
+        // }
 
         &-inner {
             padding: 0.2rem;
