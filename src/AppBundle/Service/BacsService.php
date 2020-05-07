@@ -407,7 +407,7 @@ class BacsService
         if (mb_stripos($originalName, "ADDACS") !== false) {
             $metadata = $this->addacs($file);
             $uploadFile = new BacsReportAddacsFile();
-        } elseif (mb_stripos($originalName, "AUDDIS") !== false) {
+        } elseif (mb_stripos($originalName, "AUDDIS FILE") !== false) {
             $metadata = $this->auddis($file);
             $uploadFile = new BacsReportAuddisFile();
             if (isset($metadata['serial-number'])) {
