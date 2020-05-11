@@ -135,7 +135,6 @@
 }
 
 .why-insure {
-    // text-align: center;
     overflow: hidden;
 
     .container-large {
@@ -255,12 +254,13 @@
     }
 }
 
+.popular-phones {
+    text-align: center;
+}
+
+.popular-phones,
 .other-phones,
 .make-phones {
-
-    @include media-breakpoint-up(md) {
-        text-align: left
-    }
     &-gray {
         background-color: $athens-gray;
     }

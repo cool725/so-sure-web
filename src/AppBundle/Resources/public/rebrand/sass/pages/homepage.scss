@@ -143,15 +143,6 @@
 }
 
 .other-phones {
-    text-align: center;
-
-    // a img {
-
-    //     &:hover {
-    //         transform: translateY(-5px);
-    //     }
-    // }
-
     @include media-breakpoint-up(md) {
         text-align: left
     }
@@ -219,7 +210,6 @@
 }
 
 .makes {
-    text-align: center;
     position: relative;
     @include blue-gradient;
     z-index: 5;
