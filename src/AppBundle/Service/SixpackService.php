@@ -28,9 +28,6 @@ class SixpackService
     // Exp 1
     const EXPERIMENT_EMAIL_OPTIONAL = 'Email Optional';
 
-    // Exp 2
-    const EXPERIMENT_PERSONALISED_QUOTE_PAGE_V2 = 'Personalised Quote V2';
-
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -115,7 +112,8 @@ class SixpackService
         'Send Quote',
         'Amazon vs Money',
         'Quote Email Homepage',
-        'Personalised Quote'
+        'Personalised Quote',
+        'Personalised Quote V2'
     ];
 
     public static $unauthExperiments = [
@@ -124,13 +122,10 @@ class SixpackService
     ];
 
     public static $authExperiments = [
-        // Exp 1
-        self::EXPERIMENT_PERSONALISED_QUOTE_PAGE_V2,
         self::EXPERIMENT_APP_SHARE_GAME,
     ];
 
     public static $appExperiments = [
-        // Exp 1
         self::EXPERIMENT_APP_SHARE_GAME => [
             self::ALTERNATIVES_APP_SHARE_GAME,
             self::ALTERNATIVES_APP_SHARE_NOGAME,
@@ -151,7 +146,6 @@ class SixpackService
      */
     public static $purchaseConversionSimple = [
         // Exp 1
-        self::EXPERIMENT_PERSONALISED_QUOTE_PAGE_V2,
     ];
 
     /**
