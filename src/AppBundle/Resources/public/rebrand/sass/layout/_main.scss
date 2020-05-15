@@ -15,7 +15,7 @@
         }
 
         @include media-breakpoint-up(lg) {
-            width: 60vw; height: 100vh;
+            width: 55vw; height: 100vh;
 
             // Scroll stuff
             overflow-y: scroll;
@@ -32,6 +32,10 @@
             // Firefox
             scrollbar-width: none;
         }
+
+        @include media-breakpoint-up(xl) {
+            width: 55vw;
+        }
     }
 
     &__main {
@@ -39,15 +43,17 @@
         padding-bottom: 1.76rem;
 
         @include media-breakpoint-up(lg) {
-            padding-top: 12rem;
+            padding-top: 10rem;
         }
     }
 
     &__curve {
         position: relative;
+        display: none;
 
-        @include media-breakpoint-up(lg) {
+        @include media-breakpoint-up(xl) {
             width: 5vw; height: 100vh;
+            display: block;
 
             svg {
                 height: 100vh;
@@ -63,7 +69,7 @@
         overflow: hidden;
 
         @include media-breakpoint-up(lg) {
-            width: 35vw; height: 100vh;
+            width: 45vw; height: 100vh;
 
             // Scroll stuff
             overflow-y: scroll;
@@ -79,6 +85,10 @@
 
             // Firefox
             scrollbar-width: none;
+        }
+
+        @include media-breakpoint-up(xl) {
+            width: 40vw;
         }
     }
 
@@ -113,6 +123,10 @@
         .far {
             cursor: pointer;
         }
+    }
+
+    &__h3 {
+        line-height: 1.5;
     }
 
     &__h5 {

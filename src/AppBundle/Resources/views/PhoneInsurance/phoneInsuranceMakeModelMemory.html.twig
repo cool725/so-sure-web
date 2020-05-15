@@ -128,7 +128,7 @@
                                 {{ greeting|raw }} here's your quote:
                             </div>                        
                         {% endif %}                        
-                        <h1 class="h1b fit mb-4">
+                        <h1 class="h1b fit">
                             <a href="#mem_sizes"
                                class=""
                                data-toggle="collapse"
@@ -136,9 +136,11 @@
                                aria-expanded="false"
                                aria-controls="mem_sizes"
                                title="Not the phone you're looking for?">
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB) <br> <span class="sub text-primary">for just &pound;{{ prices['monthly'].monthlyPremiumPrice }} per month</span>
+                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB)
                             </a>
                         </h1>
+                        {% set yearly = prices['yearly'].yearlyPremiumPrice / 12 %}
+                        <div class="h4 mb-4 text-primary fit"><span class="sub">Just</span> &pound;{{ yearly }} <span class="sub">monthly if you pay yearly <br> or pay </span>&pound;{{ prices['monthly'].monthlyPremiumPrice }} <span class="sub">per month</span></div>
                         <div class="collapse mb-4" id="mem_sizes">
                             {% if phones | length > 1 %}
                                 <ul class="list-inline">
@@ -156,10 +158,6 @@
                             </a>
                         </div>
                         <ul class="list-unstyled icn-fa-list mb-4">
-                            <li class="mb-3 h5">
-                                <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">{{ free_months|capitalize }} free when you pay yearly</span>
-                            </li>
                             <li class="mb-3 h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
                                 <span class="sub">Low excess from &pound;50</span>

@@ -7,6 +7,9 @@
 
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
 
+    <h2 class="text-dodger-blue text-center">Phone Details</h2>
+    <p class="text-center mb-4">Please make sure that these are accurate as we will need these to identify your phone and reduce your excess.</p>       
+
     <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
         {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="purchase_form[imei]">
@@ -79,7 +82,7 @@
         </div>
     {% endif %}
 
-    <div class="form-group text-md-right mt-5">
+    <div class="form-group text-md-center mt-5">
         {{ form_widget(purchase_form.next, {
             'label': 'Continue',
             'fa': 'far fa-long-arrow-right fa-lg ml-2',

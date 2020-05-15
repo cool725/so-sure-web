@@ -89,15 +89,19 @@
                                 <small>Not the phone you're looking for?</small>
                             </a>
                         </div>
-                        <div class="qpw__h1 h1 text-center text-lg-left text-white">
-                            <span class="sub">For only</span>
-                            {% if not app.user or app.user.allowedMonthly %}
-                                &pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }} a month
+                        {% set yearly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') %}
+                        {% set yearlyMonthly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') / 12 %}
+                        {% set monthly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') %}
+                        {% set monthlyYearly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') * 12 %}
+                        {% set difference = monthlyYearly - yearly %}
+                        <div class="qpw__h3 h3 text-center text-lg-left text-white mb-4">                            
+                            {% if not app.user or app.user.allowedMonthly %}                  
+                                <span class="sub">For just</span> &pound;{{ monthly }} <span class="sub">per month</span><br>
+                                <span class="sub">Or 2 months free if you pay yearly (save &pound;{{ difference|number_format(0, '.', ',') }})</span>
                             {% else %}
-                                &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} a year
+                                <span class="sub">For only</span> &pound;{{ prices['yearly'].yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} <span class="sub">a year</span>
                             {% endif %}
                         </div>
-                        <div class="text-white text-center text-lg-left h6 mb-4"><span class="sub">Get {{ free_months}} free when you pay yearly!</span></div>
                         {% if validation_required is not null %}
                             <p class="text-white text-center text-lg-left mb-lg-4">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
                         {% endif %}

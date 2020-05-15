@@ -122,67 +122,53 @@
     <p class="text-columbia-blue-e mb-0 mt-1"><small>*FCA report Dec 2015</small></p>
 </div>
 <div class="policy__info mx-4 mx-lg-5 py-5 text-center text-lg-left">
-    <div class="row">
-        <div class="col-md-3">
-            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px">
-        </div>
-        <div class="col-md-8">
-            <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-            {% if validation_required is not null or instore is not null %}
-                <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
-            {% else %}
-                <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
-            {% endif %}
-            <div class="table-responsive">
-                <table class="table table-bordered text-white">
-                    <thead>
+<h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
+    {% if validation_required is not null or instore is not null %}
+        <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
+    {% else %}
+        <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
+    {% endif %}
+    <div class="table-responsive">
+        <table class="table table-bordered text-white">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="h6">Damage</th>
+                    <th class="h6">Loss</th>
+                    <th class="h6">Theft</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="h6">Excess</td>
+                    <td>&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
+                    <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
+                    <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
+                </tr>
+                {% if instore is null %}
+                    {% if validation_required is null %}
                         <tr>
-                            <th></th>
-                            <th class="h6">Damage</th>
-                            <th class="h6">Loss</th>
-                            <th class="h6">Theft</th>
+                            <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="h6">Excess</td>
-                            <td>&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
-                            <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
-                            <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
-                        </tr>
-                        {% if instore is null %}
-                            {% if validation_required is null %}
-                                <tr>
-                                    <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
-                                </tr>
-                            {% endif %}
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    {% endif %}
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 </div>
 <div class="policy__info mx-4 mx-lg-5 py-5 text-center text-lg-left">
-    <div class="row">
-        <div class="col-md-3">
-            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" class="mb-4" width="180px">
-        </div>
-        <div class="col-md-8 text-white">
-            <h2 class="h4 my-4 text-columbia-blue-e">Cashback and Social Insurance</h2>
-            {% if feature_enabled('referral') %}
-                <p>Refer a friend and you’ll both get a month free! You can also get additional cashback if you connect with friends on so-sure and none of you claim.</p>
-                <h3 class="h5 text-columbia-blue-e">How?</h3>
-                <p>Refer a friend and you’ll both get a month for free. Simple as that.</p>
-                <p class="mb-5">Each of you will also get up to £10 in your individual Reward Pots when you connect via our app. You can top this up with another £10 each time you connect to a new friend - and if none of you make a claim, all the money in your pot will be paid out to you at the end of your policy year!</p>
-            {% else %}
-                <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
-                <h3 class="h5 text-columbia-blue-e">How?</h3>
-                <p class="mb-5">Connect to friends/family and each receive up to &pound;10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
-            {% endif %}
-            <a href="{{ path('social_insurance') }}" target="_blank" class="btn btn-outline-white">Find out more</a>
-        </div>
-    </div>
+    <h2 class="h4 my-4 text-columbia-blue-e">Cashback and Social Insurance</h2>
+    {% if feature_enabled('referral') %}
+        <p class="text-white">Refer a friend and you’ll both get a month free! You can also get additional cashback if you connect with friends on so-sure and none of you claim.</p>
+        <h3 class="h5 text-columbia-blue-e">How?</h3>
+        <p class="text-white">Refer a friend and you’ll both get a month for free. Simple as that.</p>
+        <p class="mb-5 text-white">Each of you will also get up to £10 in your individual Reward Pots when you connect via our app. You can top this up with another £10 each time you connect to a new friend - and if none of you make a claim, all the money in your pot will be paid out to you at the end of your policy year!</p>
+    {% else %}
+        <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
+        <h3 class="h5 text-columbia-blue-e">How?</h3>
+        <p class="mb-5 text-white">Connect to friends/family and each receive up to &pound;10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
+    {% endif %}
+    <a href="{{ path('social_insurance') }}" target="_blank" class="btn btn-outline-white">Find out more</a>
 </div>
 <div class="policy__info mx-4 mx-lg-5 py-5">
     <h2 class="h4 text-columbia-blue-e mb-4">Top FAQ's</h2>
@@ -272,22 +258,15 @@
         </div>
     </div>
 </div>
-<div class="policy__info mx-4 mx-lg-5 py-5">
-    <div class="row text-center text-lg-left">
-        <div class="col-md-3">
-            <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="180px">
-        </div>
-        <div class="col-md-8 text-white">
-            <h2 class="h4 my-4 text-columbia-blue-e">About the {{ make_desc }} {{ device.model }}</h2>
-            <ul class="list-inline mb-0">
-                <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ device.camera }} MP</li>
-                <li class="list-inline-item text-columbia-blue-e">|</li>
-                <li class="list-inline-item"><strong class="h5">Size</strong>: {{ device.getScreenPhysicalInch }}</li>
-                <li class="list-inline-item text-columbia-blue-e">|</li>
-                <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ device.getScreenResolution }}</li>
-                <li class="list-inline-item text-columbia-blue-e">|</li>
-                <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ device.getRamDisplay }}</li>
-            </ul>
-        </div>
-    </div>
+<div class="policy__info mx-4 mx-lg-5 py-5 text-center text-lg-left">
+    <h2 class="h4 my-4 text-columbia-blue-e">About the {{ make_desc }} {{ device.model }}</h2>
+    <ul class="list-inline mb-0 text-white">
+        <li class="list-inline-item"><strong class="h5">Camera</strong>: {{ device.camera }} MP</li>
+        <li class="list-inline-item text-columbia-blue-e">|</li>
+        <li class="list-inline-item"><strong class="h5">Size</strong>: {{ device.getScreenPhysicalInch }}</li>
+        <li class="list-inline-item text-columbia-blue-e">|</li>
+        <li class="list-inline-item"><strong class="h5">Screen Resolution</strong>: {{ device.getScreenResolution }}</li>
+        <li class="list-inline-item text-columbia-blue-e">|</li>
+        <li class="list-inline-item"><strong class="h5">RAM</strong>: {{ device.getRamDisplay }}</li>
+    </ul>    
 </div>

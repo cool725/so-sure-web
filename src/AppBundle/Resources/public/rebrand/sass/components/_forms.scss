@@ -1,7 +1,12 @@
 // forms.scss
 
 .form-400 {
-    max-width: 400px;
+    max-width: 440px;
+    margin: 0 auto;
+}
+
+.form-500 {
+    max-width: 500px;
     margin: 0 auto;
 }
 
@@ -150,10 +155,11 @@ label {
 // ".radio-btn-original" to the orignal form-group to hide
 // TODO: Make js based off data attr's.
 .radio-btn {
-    width: 100%; height: 6rem;
+    width: 100%; height: 10.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     text-align: center;
     color: rgba(104, 114, 150, 0.6);
     background-color: rgba(37, 147, 243, 0.1);
@@ -170,6 +176,29 @@ label {
 
     .h1 {
         color: $dodger-blue;
+    }
+
+    &__content {
+        width: 80%;
+    }
+
+    &__badge {
+        width: 60px; height: 60px;
+        position: absolute;
+        top: -20px; right: -20px;
+        background-color: $froly;
+        @include border-radius(50%);
+        font-family: $g-medium;
+        font-size: 94%;
+        line-height: 1.2;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;        
+
+        &-inner {
+            padding: 0.2rem;
+        }
     }
 
     &:hover {

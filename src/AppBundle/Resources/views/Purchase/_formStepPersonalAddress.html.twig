@@ -9,6 +9,9 @@
 
     <div class="form-step">
 
+        <h2 class="text-dodger-blue text-center">Your Details</h2>
+        <p class="text-center mb-4">Please make sure that your details are accurate so we can create and manage your policy.</p>           
+
         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
             {{ form_label(purchase_form.firstName, 'First Name', { 'label_attr': {'class': ''} }) }}
             {{ form_widget(purchase_form.firstName, {'attr':{'class':'form-control', 'placeholder': 'Enter your first name', 'data-hj-suppress' : ''}}) }}
@@ -30,7 +33,7 @@
         <div id="step--one-controls"
              class="form-group form-controls {% if showDOB %}step--hide{% endif %}">
 
-            <div class="form-group text-md-right mt-5">
+            <div class="form-group text-md-center mt-5">
                 <a href="#"
                    id="step--validate"
                    class="btn btn-success btn-block-xs"
@@ -83,7 +86,7 @@
                 {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
             </div>
 
-            <div class="form-group text-md-right mt-5">
+            <div class="form-group text-md-center mt-5">
                 {{ form_widget(purchase_form.next, {
                     'label': 'Continue',
                     'fa': 'far fa-long-arrow-right fa-lg ml-2',
@@ -133,7 +136,7 @@
                     <div class="with-errors">{{ form_errors(purchase_form.postcode) }}</div>
                 {% endif %}
             </div>
-            <div class="form-group text-md-right mt-5">
+            <div class="form-group text-md-center mt-5">
                 {{ form_widget(purchase_form.manual_next, {
                     'label': 'Continue',
                     'fa': 'far fa-long-arrow-right fa-lg ml-2',

@@ -14,23 +14,30 @@
     {% endif %}
 
     {% set withoutDiscount = phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') * 12 %}
+    {% set yearlyMonthly = phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) / 12 %}
+    {% set saving = withoutDiscount - phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
+
+    <h2 class="text-dodger-blue text-center">How would you like to pay?</h2>
+    <p class="text-center mb-4">Get {{ free_months }} free when you pay yearly 🤑</p>    
 
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-        <h4 class="payment-options__title text-dodger-blue">How would you like to pay?</h4>
-        <p class="mb-4">Get {{ free_months }} free when you pay yearly 🤑</p>
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
             {{ form_widget(purchase_form.amount) }}
         </div>
-        <div class="radio-btn-group">
+        <div class="radio-btn-group mb-4">
             <div class="row">
                 {% if app.user.allowedMonthly %}
                     <div class="col-6">
                         <div class="radio-btn {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}radio-btn-active{% endif %}"
                             data-value="{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="month" data-premium-param="monthly">
                             <div class="radio-btn__content">
-                                <h6 class="radio-btn__title mb-0">Monthly</h6>
-                                <div class="radio-btn__price">&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</div>
+                                <h6 class="radio-btn__title">Pay Monthly</h6>
+                                <hr class="my-2" />
+                                <div class="radio-btn__price"><strong>&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong></div>      
+                                <small class="mb-2 d-inline-block">&nbsp;</small><br>
+                                <small>Total &pound;{{ withoutDiscount }}</small><br>
+                                <small>Billed monthly</small>
                             </div>
                         </div>
                     </div>
@@ -39,10 +46,18 @@
                     <div class="col-6">
                         <div class="radio-btn {% if purchase_form.vars.value.amount ==
                             phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}radio-btn-active{% endif %}" data-value="{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}" data-premium-type="year" data-premium-param="yearly">
+                            <div class="radio-btn__badge">
+                                <div class="radio-btn__badge-inner text-white">
+                                    Save <br> &pound;{{ saving|number_format(0, '.', ',') }}
+                                </div>
+                            </div>
                             <div class="radio-btn__content">
-                                <h6 class="radio-btn__title mb-0">Yearly</h6>
-                                <div class="radio-btn__price discount-price">&pound;{{ withoutDiscount }}</div>
-                                <small>&pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</small>
+                                <h6 class="radio-btn__title">Pay Yearly</h6>
+                                <hr class="my-2" />
+                                <div class="radio-btn__price"><strong class="text-columbia-blue-e">&pound;{{ yearlyMonthly }}</strong></div>
+                                <small class="mb-2 d-inline-block">Monthly equivalent</small><br>
+                                <small>Total &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</small><br>
+                                <small>Billed yearly</small>
                             </div>
                         </div>
                     </div>
@@ -61,7 +76,7 @@
         {% set scode_label = 'The ' ~ scode_type ~ ' code ' ~ user_code ~ ' has been applied' %}
         {% set scode_class = 'form-control hideme' %}
     {% endif %}
-    <div class="form-group {% if form_errors(purchase_form.promoCode) %}has-error{% endif %}">
+    <div class="form-group {% if form_errors(purchase_form.promoCode) %}has-error{% endif %} mb-4">
         {{ form_label(purchase_form.promoCode, scode_label, { 'label_attr': {'class': ''} }) }}
         {{ form_widget(purchase_form.promoCode, {'attr':{
             'class': scode_class,
@@ -70,7 +85,7 @@
         <div class="with-errors">{{ form_errors(purchase_form.promoCode) }}</div>
     </div>
     {{ form_widget(purchase_form.next, {
-        'label': 'Continue',
+        'label': 'Continue',        
         'attr': {
             'class': 'btn btn-success btn-block-xs',
             'hidden': 'hidden'
@@ -101,11 +116,13 @@
           data-subtitle="Please enter your card details"
           data-scode="{% if user_code is not null %}{{ user_code }}{% endif %}">
     </form>
-    <div class="form-group text-md-right">
+    <div class="form-group">
         {% block to_card_form %}
-            {{ form_start(to_card_form, {'attr':{'class':'form-400'}}) }}
+            {{ form_start(to_card_form, {'attr':{'class':'form-400 text-center'}}) }}
                 {{ form_widget(to_card_form.submit, {
                     'label': 'Pay Now',
+                    'fa': 'fas fa-credit-card fa-lg ml-2',
+                    'right': true,                                
                     'attr': {
                         'class': 'btn btn-success btn-block-xs btn-card-pay'
                 }}) }}

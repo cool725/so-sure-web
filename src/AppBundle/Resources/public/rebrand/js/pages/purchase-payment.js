@@ -113,12 +113,6 @@ $(function(){
         let val = $(this).data('value');
         $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
 
-        // Adjust the price in the copy
-        let premium = $(this).data('premium-type'),
-            price = $('#purchase_price');
-
-        price.html('&pound;' + val + ' a ' + premium);
-
         let checkoutUrl = paymentForm.data('url'),
             type = $(this).data('premium-param');
             url = new URL(checkoutUrl);
