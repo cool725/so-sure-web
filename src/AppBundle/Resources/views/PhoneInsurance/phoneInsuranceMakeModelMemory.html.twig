@@ -139,8 +139,14 @@
                                 {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB)
                             </a>
                         </h1>
-                        {% set yearly = prices['yearly'].yearlyPremiumPrice / 12 %}
-                        <div class="h4 mb-4 text-primary fit"><span class="sub">Just</span> &pound;{{ yearly }} <span class="sub">monthly if you pay yearly <br> or pay </span>&pound;{{ prices['monthly'].monthlyPremiumPrice }} <span class="sub">per month</span></div>
+                        {% set yearly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') %}
+                        {% set yearlyMonthly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') / 12 %}
+                        {% set monthly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') %}
+                        {% set monthlyYearly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') * 12 %}
+                        {% set difference = monthlyYearly - yearly %}
+                        <div class="h3 mb-4 text-primary fit">
+                            &pound;{{ monthly }} <span class="sub">per month - <br>Save</span> &pound;{{ difference }} <span class="sub">if you pay yearly</span>
+                        </div>
                         <div class="collapse mb-4" id="mem_sizes">
                             {% if phones | length > 1 %}
                                 <ul class="list-inline">
