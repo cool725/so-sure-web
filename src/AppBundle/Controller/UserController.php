@@ -1324,6 +1324,11 @@ class UserController extends BaseController
         // A/B Email Optional
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_OPTIONAL);
 
+        if ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
+            // A/B Pricing Messaging Experiment
+            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PRICING_MESSAGING);
+        }
+
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));

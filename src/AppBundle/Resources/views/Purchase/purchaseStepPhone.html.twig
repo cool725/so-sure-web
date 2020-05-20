@@ -94,9 +94,13 @@
                         {% set monthly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') %}
                         {% set monthlyYearly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') * 12 %}
                         {% set difference = monthlyYearly - yearly %}
-                        <div class="qpw__h3 h3 text-center text-lg-left text-white mb-4 fit">                            
+                        <div class="qpw__h3 h4 text-center text-lg-left text-white mb-4 fit">                            
                             {% if not app.user or app.user.allowedMonthly %}                  
-                                &pound;{{ monthly }} <span class="sub">per month - <br>Save</span> &pound;{{ difference }} <span class="sub">if you pay yearly</span>
+                                {% if pricing_messaging_experiment is defined and pricing_messaging_experiment == 'copy-d' %}
+                                    &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
+                                {% else %}
+                                    &pound;{{ monthly }} <span class="sub">per month - <br>Save</span> &pound;{{ difference|number_format(0, '.', ',') }} <span class="sub">if you pay yearly</span>                                
+                                {% endif %}
                             {% else %}
                                 <span class="sub">For only</span> &pound;{{ yearly }} <span class="sub">a year</span>
                             {% endif %}

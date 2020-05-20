@@ -153,6 +153,17 @@ class PurchaseController extends BaseController
             $purchase->setEmail($session->get('email'));
         }
 
+        // A/B Pricing Messaging Experiment
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PRICING_MESSAGING);
+
+        // A/B Pricing Messaging Experiment
+        $pricingMessagingExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PRICING_MESSAGING,
+            ['copy-c', 'copy-d'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         // TEMP - As using skip add extra event
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
 
@@ -298,6 +309,7 @@ class PurchaseController extends BaseController
             // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
             'validation_required' => $validationRequired,
+            'pricing_messaging_experiment' => $pricingMessagingExperiment,
         );
 
         return $this->render($template, $data);
@@ -369,6 +381,14 @@ class PurchaseController extends BaseController
         if ($phone) {
             $purchase->setPhone($phone);
         }
+
+        // A/B Pricing Messaging Experiment
+        $pricingMessagingExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PRICING_MESSAGING,
+            ['copy-c', 'copy-d'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
@@ -545,6 +565,7 @@ class PurchaseController extends BaseController
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
             'instore' => $instore,
             'validation_required' => $validationRequired,
+            'pricing_messaging_experiment' => $pricingMessagingExperiment,
         );
 
         return $this->render($template, $data);
@@ -612,6 +633,14 @@ class PurchaseController extends BaseController
         $paymentService = $this->get('app.payment');
         /** @var PolicyService $policyService */
         $policyService = $this->get('app.policy');
+
+        // A/B Pricing Messaging Experiment
+        $pricingMessagingExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PRICING_MESSAGING,
+            ['copy-c', 'copy-d'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         /** @var Form $toCardForm */
         $toCardForm = null;
@@ -712,6 +741,7 @@ class PurchaseController extends BaseController
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs' => $bacs,
             'amount' => $amount,
+            'pricing_messaging_experiment' => $pricingMessagingExperiment,
         );
 
         if ($webpay) {
@@ -779,6 +809,14 @@ class PurchaseController extends BaseController
             $this->setSessionQuotePhone($request, $phone);
         }
 
+        // A/B Pricing Messaging Experiment
+        $pricingMessagingExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PRICING_MESSAGING,
+            ['copy-c', 'copy-d'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPledgeType::class, $purchase)
@@ -825,7 +863,8 @@ class PurchaseController extends BaseController
             'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
             'instore' => $instore,
             'validation_required' => $validationRequired,
-            'aggregator' => $this->get('session')->get('aggregator')
+            'aggregator' => $this->get('session')->get('aggregator'),
+            'pricing_messaging_experiment' => $pricingMessagingExperiment,
         );
 
         return $this->render($template, $data);
@@ -882,6 +921,14 @@ class PurchaseController extends BaseController
         }
 
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+        // A/B Pricing Messaging Experiment
+        $pricingMessagingExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PRICING_MESSAGING,
+            ['copy-c', 'copy-d'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         if ($policy && !$phone && $policy->getPhone()) {
             $phone = $policy->getPhone();
@@ -1035,7 +1082,8 @@ class PurchaseController extends BaseController
             'instore' => $instore,
             'validation_required' => $validationRequired,
             'user_code' => $scode,
-            'user_code_type' => $scodeType
+            'user_code_type' => $scodeType,
+            'pricing_messaging_experiment' => $pricingMessagingExperiment,
         );
 
         if ($toCardForm) {

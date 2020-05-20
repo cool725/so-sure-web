@@ -521,6 +521,14 @@ class PhoneInsuranceController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
+        // A/B Pricing Messaging Experiment
+        $pricingMessagingExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PRICING_MESSAGING,
+            ['copy-c', 'copy-d'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         // A/B Email Optional
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_OPTIONAL);
 
@@ -619,6 +627,7 @@ class PhoneInsuranceController extends BaseController
             ], true);
         }
 
+        // Get the price service
         $priceService = $this->get('app.price');
 
         $data = [
@@ -642,7 +651,8 @@ class PhoneInsuranceController extends BaseController
             'competitor2' => 'GC',
             'competitor3' => 'O2',
             'img_url' => mb_strtolower($modelHyph),
-            'available_images' => $availableImages
+            'available_images' => $availableImages,
+            'pricing_messaging_experiment' => $pricingMessagingExperiment,
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }
