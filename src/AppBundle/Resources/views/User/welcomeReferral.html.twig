@@ -67,8 +67,8 @@
                 </div>
                 <div class="col-lg-7">
                     <h1 class="text-white fit mt-lg-4 mb-4">Congratulations 🥳</h1>
-                    <p class="lead text-white"><strong>{{ policy.user.firstname }}</strong>, you’re all covered! Shortly you will receive a confirmation email and a link to download our app to verify your <strong>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</strong>.  </p>
-                    <p class="lead text-white mb-4">You can now invite friends to join <span class="text-nowrap">so-sure</span> and you will both get a month free if your friend signs up.</p>
+                    <p class="lead text-white"><strong>{{ policy.user.firstname }}</strong>, you’re all covered! Shortly you will receive a confirmation email and a link to download our app to verify your <strong>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</strong>.</p>
+                    <p class="text-white mb-4">The main way we grow is through word of mouth. Our members love putting their friends on to a good thing. To say thank you, we’ll give you one month free every time a friend of yours joins so-sure. Even better, your friend will get a month free too - all thanks to your personal introduction. Just send them your personalised link below, via email, Facebook, Whatsapp - whatever!</p>
                     <a href="#"
                        class="btn btn-success btn-block-xs native-share track-data d-md-none"
                        data-native-title="{{ og_title }}"
@@ -77,7 +77,17 @@
                        data-event="invite-competition-welcome-page-native">
                        Invite Friends</a>
                     <div class="d-none d-md-block non-native-share">
-                        <div class="h6 text-deep-sky-blue-d">📨 Invite via email</div>
+                        <div class="h6 text-deep-sky-blue-d">🔗 Copy this link to refer a friend</div>
+                        <div class="custom-input-with-btn mb-4">
+                            <input type="text" 
+                                   class="form-control form-control-white" 
+                                   readonly="readonly"
+                                   value="{{ url('scode', {'code': policy.standardSCode.code}) }}" />
+                            <button class="btn btn-success btn-sm btn-copy" 
+                                    data-clipboard-text="{{ url('scode', {'code': policy.standardSCode.code}) }}">
+                                Copy</button>
+                        </div>
+                        <div class="h6 text-deep-sky-blue-d">📨 or invite via email</div>
                         <form id="invite_form" class="mb-5" autocomplete="nope">
                             <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
                             <div class="custom-input-with-btn mb-4">
@@ -86,7 +96,7 @@
                                     Invite</button>
                             </div>
                         </form>
-                        <div class="text-center text-lg-left">
+                        {# <div class="text-center text-lg-left">
                             {% if policy.phone.iTunes %}
                                 <a href="{{ apple_download('user-required-account') }}"
                                    class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
@@ -103,7 +113,7 @@
                                    rel="noopener noreferrer">
                                     <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
                             {% endif %}
-                        </div>
+                        </div> #}
                     </div>
                 </div>
             </div>
