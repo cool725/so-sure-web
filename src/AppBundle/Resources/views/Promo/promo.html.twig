@@ -4,7 +4,6 @@
 {% set body_class = 'promo' %}
 {% set robots_noindex = true %}
 {% set include_get_a_quote = true %}
-{% set trustpilot = true %}
 
 {% block title %}
     {% if scode is defined and scode and scode.user and not custom %}
@@ -190,7 +189,7 @@
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     {# Reviews #}
-    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %}
 
     {# Page Modals #}
     <div class="modal fade"

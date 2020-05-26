@@ -138,9 +138,7 @@
         <script src="{{ asset('css-js/vendor.js') }}" async></script>
         <script src="{{ asset('css-js/global.js') }}" async></script>
         {% block javascriptsPage %}{% endblock %}
-        {% if trustpilot is defined and trustpilot == true %}
-            <script async type="text/javascript" src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"></script>
-        {% endif %}
+        <script async type="text/javascript" src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"></script>
         {% if environment != 'prod' %}
             <script src="{{ asset('css-js/dev.js') }}" async></script>
         {% endif %}

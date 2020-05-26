@@ -4,7 +4,6 @@
 {% set body_class = 'phone-insurance' %}
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
-{% set trustpilot = true %}
 
 {% block title %}Mobile Phone Insurance From &pound;{{ from_price|number_format(2) }} Monthly | so-sure{% endblock %}
 {% block meta %}
@@ -93,7 +92,7 @@
     {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %}
 
     {# Reviews #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviews.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %}
 
     {# Cover #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_coverSEO.html.twig' %}
