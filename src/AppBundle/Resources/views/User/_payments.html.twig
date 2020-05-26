@@ -27,8 +27,10 @@
                 <i class="fas fa-exclamation-triangle fa-lg fa-fw mr-2 text-warning"></i> <span>Payment pending</span>
             {% elseif policy.getCurrentInvoiceBalance >= 0 or equal_to_two_dp(0, policy.getCurrentInvoiceBalance) %}
                 <i class="fas fa-check fa-lg fa-fw mr-2 text-success"></i> <span>Paid up to date</span>
-            {% else %}
+            {% elseif not policy.hasPolicyOrUserBacsPaymentMethod %}
                 <i class="fas fa-exclamation-square fa-lg fa-fw mr-2 text-danger"></i> <span>Payment overdue</span>
+            {% elseif policy.hasPolicyOrUserBacsPaymentMethod %}
+                <i class="fas fa-exclamation-triangle fa-lg fa-fw mr-2 text-warning"></i> <span>Payment pending</span>
             {% endif %}
         </div>
         <div class="tabbed-cardbox-info-item">

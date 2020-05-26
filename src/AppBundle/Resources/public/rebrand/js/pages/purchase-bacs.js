@@ -1,7 +1,6 @@
-// purchase-payment.js
+// purchase-bacs.js
 
 // Require BS component(s)
-// require('bootstrap/js/dist/modal');
 require('bootstrap/js/dist/collapse');
 require('bootstrap/js/dist/dropdown');
 
@@ -9,38 +8,15 @@ require('bootstrap/js/dist/dropdown');
 require('jquery-validation');
 require('jquery-mask-plugin');
 require('../common/validation-methods.js');
-require('../common/checkout.js');
 let textFit = require('textfit');
 
-const sosure = sosure || {};
+$(function(){
 
-sosure.purchaseStepBacs = (function() {
-    let self = {};
-    self.form = null;
-    self.isIE = null;
-    self.loader = null;
-    self.webPay = null;
-    self.webPayBtn = null;
+    let validateForm = $('.validate-form'),
+    isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
 
-    self.init = () => {
-        self.form = $('.validate-form');
-        self.sortCodeMask();
-        self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
-        self.loader = $('#so-sure-loader');
-        self.webPay = $('#webpay-form');
-        self.webPayBtn = $('#to_judo_form_submit');
-        if (self.form.data('client-validation') && !self.isIE) {
-            self.addValidation();
-        }
-    }
-
-    self.sortCodeMask = () => {
-        // Mask sort code input
-        $('.sort-code').mask('00-00-00');
-    }
-
-    self.addValidation = () => {
-        self.form.validate({
+    const addValidation = () => {
+        validateForm.validate({
             debug: false,
             // When to validate
             validClass: 'is-valid-ss',
@@ -61,19 +37,8 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: true,
                 },
-                "bacs_form[validateSortCode]": {
-                    required: true,
-                    equalTo: '#bacs_form_sortCode',
-                },
-                "bacs_form[accountNumber]": {
-                    required: true,
-                },
                 "bacs_form[billingDate]": {
                     required: true,
-                },
-                "bacs_form[validateAccountNumber]": {
-                    required: true,
-                    equalTo: '#bacs_form_accountNumber',
                 }
             },
             messages: {
@@ -83,19 +48,11 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: 'Please enter your sort code',
                 },
-                "bacs_form[validateSortCode]": {
-                    required: 'Please confirm your sort code',
-                    equalTo: 'Your sort code doesn\'t match, please double check',
-                },
                 "bacs_form[accountNumber]": {
                     required: 'Please enter your account number',
                 },
                 "bacs_form[billingDate]": {
                     required: 'Please select a billing date',
-                },
-                "bacs_form[validateAccountNumber]": {
-                    required: 'Please confirm your account number',
-                    equalTo: 'Your account number doesn\'t match, please double check',
                 },
                 "bacs_form[soleSignature]": {
                     required: ''
@@ -104,46 +61,18 @@ sosure.purchaseStepBacs = (function() {
 
             submitHandler: function(form) {
                 form.submit();
-            }
+            }           
         });
+    }    
+
+    // Add validation
+    if (validateForm.data('client-validation') && !isIE) {
+        addValidation();
     }
-
-    return self;
-})();
-
-$(function() {
 
     textFit($('.fit')[0], {detectMultiLine: false});
 
-    sosure.purchaseStepBacs.init();
-    sosure.purchaseStepBacs.webPayBtn.on('click', function() {
-        sosure.purchaseStepBacs.loader.show();
-    });
-    let webpay = $('#webpay-form');
-    if (webpay.length) {
-        sosure.purchaseStepBacs.loader.show();
-        webpay.submit();
-    }
+    // Mask sort code input
+    $('.sort-code').mask('00-00-00');    
 
-    $('.btn-card-pay').on('click', function(e) {
-        //console.log('click');
-        e.preventDefault();
-        Checkout.open();
-    });
-
-    console.log($('#checkout-payment-form').data());
-
-    Checkout.configure({
-        publicKey: $('.payment-form').data('public-key'),
-        customerEmail: $('.payment-form').data('customer-email'),
-        value: $('.payment-form').data('value'),
-        currency: $('.payment-form').data('currency'),
-        debugMode: $('.payment-form').data('debug-mode'),
-        paymentMode: $('.payment-form').data('payment-mode'),
-        cardFormMode: $('.payment-form').data('card-form-mode'),
-        cardTokenised: function(event) {
-            console.log(event.data.cardToken);
-        }
-    });
-
-});
+})

@@ -55,15 +55,14 @@ class BacsType extends AbstractType
         $days = $this->getEligibleBillingDays();
         $indexedDays = [];
         foreach ($days as $day) {
-            $indexedDays[$day + 1] = $day;
+            $indexedDays[$day] = $day;
         }
-        $today = $this->adjustDayForBilling(new \DateTime())->format("d") - 1;
+        $today = min($this->adjustDayForBilling(new \DateTime())->format("d"), 28);
 
         $builder
             ->add('accountName', TextType::class, ['required' => $this->required])
             ->add('validateName', HiddenType::class)
             ->add('sortCode', TextType::class, ['required' => $this->required, 'attr' => ['maxlength' => 8]])
-            ->add('validateSortCode', TextType::class, ['required' => $this->required])
             ->add('accountNumber', TextType::class, ['required' => $this->required])
             ->add('billingDate', ChoiceType::class, [
                 'placeholder' => 'Select date...',
@@ -71,7 +70,6 @@ class BacsType extends AbstractType
                 'choices' => $indexedDays,
                 'data' => $today,
             ])
-            ->add('validateAccountNumber', TextType::class, ['required' => $this->required])
             ->add('soleSignature', CheckboxType::class, [
                 'label' => 'I am the sole signature on the account',
                 'required' => $this->required
@@ -117,20 +115,17 @@ class BacsType extends AbstractType
      */
     private function getEligibleBillingDays($date = null)
     {
-        if (!$date) {
-            $date = new \DateTime();
-        }
+        $date = $date ?: new \DateTime();
         // wait 4 business days. first payment is scheduled 2 days later, and 2 days for payment to be run.
         $initialDone = $this->addDays($this->addBusinessDays($date, 2), 2);
-        $startOfMonth = $this->startOfMonth($date);
         $endOfMonth = $this->endOfMonth($date);
         if ($initialDone > $endOfMonth) {
             $i = (int)$initialDone->format("d");
         } else {
-            $i = 0;
+            $i = 1;
         }
         $days = [];
-        for ($i; $i < 28; $i++) {
+        for ($i; $i <= 28; $i++) {
             $days[] = $i;
         }
         return $days;

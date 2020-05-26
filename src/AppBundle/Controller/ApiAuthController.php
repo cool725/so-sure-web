@@ -1239,16 +1239,21 @@ class ApiAuthController extends BaseController
                 $accountNumber = $this->getDataString($bacsData, 'account_number');
                 $bankAccount = $pcaService->getBankAccount($sortCode, $accountNumber);
                 if (!$bankAccount) {
-                    throw new DirectDebitBankException('Unknown error');
+                    throw new DirectDebitBankException('No Bank Account');
                 }
 
                 $bankAccount->setAccountName($accountName);
                 $bankAccount->setReference($mandate);
                 $bankAccount->setIdentityLog($this->getIdentityLog($request));
+                
 
                 // todo: record/bill initial amount
                 $initialAmount = $this->getDataString($bacsData, 'initial_amount');
                 $recurringAmount = $this->getDataString($bacsData, 'recurring_amount');
+                if (!$policy->getPremium() && $policy instanceof PhonePolicy) {
+                    $priceService = $this->get('app.price');
+                    $priceService->phonePolicyDeterminePremium($policy, $recurringAmount, new \DateTime());
+                }
                 $paidInstallments = $policy->getPremium()->getNumberOfMonthlyPayments($recurringAmount);
                 if (!in_array($paidInstallments, [1, 12])) {
                     throw new InvalidPremiumException(sprintf(

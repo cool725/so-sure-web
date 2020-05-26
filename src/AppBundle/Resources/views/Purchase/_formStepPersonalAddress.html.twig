@@ -4,32 +4,25 @@
     'data-client-validation': form_client_validation,
     'autocomplete': 'off'
 }}) }}
-
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-
     <div class="form-step">
-
         <h2 class="text-dodger-blue text-center">Your Details</h2>
         <p class="text-center mb-4">Please make sure that your details are accurate so we can create and manage your policy.</p>           
-
         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
             {{ form_label(purchase_form.firstName, 'First Name', { 'label_attr': {'class': ''} }) }}
             {{ form_widget(purchase_form.firstName, {'attr':{'class':'form-control', 'placeholder': 'Enter your first name', 'data-hj-suppress' : ''}}) }}
             <div class="with-errors">{{ form_errors(purchase_form.firstName) }}</div>
         </div>
-
         <div class="form-group {% if form_errors(purchase_form.lastName) %}has-error{% endif %}">
             {{ form_label(purchase_form.lastName, 'Last Name', { 'label_attr': {'class': ''} }) }}
             {{ form_widget(purchase_form.lastName, {'attr':{'class':'form-control', 'placeholder': 'Enter your last name', 'data-hj-suppress' : ''}}) }}
             <div class="with-errors">{{ form_errors(purchase_form.lastName) }}</div>
         </div>
-
         <div class="form-group {% if form_errors(purchase_form.email) %}has-error{% endif %}">
             {{ form_label(purchase_form.email, 'Email', { 'label_attr': {'class': ''} }) }}
             {{ form_widget(purchase_form.email, {'attr':{'class':'form-control', 'placeholder': 'Enter email', 'data-hj-suppress' : ''}}) }}
             <div class="with-errors">{{ form_errors(purchase_form.email) }}</div>
         </div>
-
         <div id="step--one-controls"
              class="form-group form-controls {% if showDOB %}step--hide{% endif %}">
 
@@ -44,21 +37,17 @@
             </div>
         </div>
     </div>
-
     <div class="form-step {% if not showDOB %}step--hide{% endif %}">
-
         <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
             {{ form_label(purchase_form.birthday, 'Date of Birth', { 'label_attr': {'class': ''} }) }}
             {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Enter DD/MM/YYYY', 'data-hj-suppress' : ''}}) }}
             <div class="with-errors">{{ form_errors(purchase_form.birthday) }}</div>
         </div>
-
         <div class="form-group {% if form_errors(purchase_form.mobileNumber) %}has-error{% endif %}">
             {{ form_label(purchase_form.mobileNumber, 'Mobile Number', { 'label_attr': {'class': ''} }) }}
             {{ form_widget(purchase_form.mobileNumber, {'attr':{'class':'form-control', 'placeholder':'Enter mobile number', 'data-hj-suppress' : ''}}) }}
             <div class="mobile-err with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
         </div>
-
         {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
         <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
             <div class="form-group {% if is_postback %}has-error{% endif %}">
@@ -77,7 +66,6 @@
                 </div>
                 <small class="form-text"><a id="address-manual" href="#">Enter address manually</small></a>
             </div>
-
             <div id="display_address" style="margin-bottom: 20px" data-hj-suppress="">
                 {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
                 {% if purchase_form.vars.data.addressLine2|length > 0 %}{{ purchase_form.vars.data.addressLine2 }}<br>{% endif %}
@@ -85,7 +73,6 @@
                 {% if purchase_form.vars.data.city|length > 0 %}{{ purchase_form.vars.data.city }}<br>{% endif %}
                 {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
             </div>
-
             <div class="form-group text-md-center mt-5">
                 {{ form_widget(purchase_form.next, {
                     'label': 'Continue',
@@ -96,7 +83,6 @@
                 }}) }}
             </div>
         </div>
-
         <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
             <div class="form-group form-group-fix address-show-error" style="display: none;">
                 <label class="text-danger address-show-error-text error"></label>
@@ -147,5 +133,4 @@
             </div>
         </div>
     </div>
-
 {{ form_end(purchase_form) }}

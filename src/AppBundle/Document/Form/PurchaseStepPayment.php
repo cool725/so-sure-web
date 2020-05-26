@@ -41,7 +41,6 @@ class PurchaseStepPayment
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="6", max="8")
-     * @Assert\NotBlank(message="This value is required.")
      */
     protected $promoCode;
 

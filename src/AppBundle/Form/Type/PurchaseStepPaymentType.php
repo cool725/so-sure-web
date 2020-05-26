@@ -120,7 +120,8 @@ class PurchaseStepPaymentType extends AbstractType
                         ],
                     ]);
                     $form->add('promoCode', TextType::class, [
-                        'required' => false
+                        'required' => false,
+                        'empty_data'  => null
                     ]);
                 } else {
                     throw new \Exception("No payment amounts are allowed for this user.");

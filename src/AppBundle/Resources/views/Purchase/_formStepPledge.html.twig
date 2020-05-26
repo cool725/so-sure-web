@@ -4,19 +4,15 @@
     'data-client-validation': form_client_validation,
     'autocomplete': 'off'
 }}) }}
-
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-
     {# Set text for pic-sure required policies #}
     {# TODO: Copy for Xiaomi or use this method to adjust fields #}
     {% set excessText = 'I understand the standard excess is only reduced when validated with the so-sure app' %}
     {% if validation_required is not null %}
         {% set excessText = 'I understand my policy will NOT commence until I have verified the condition of phone with your app' %}
     {% endif %}
-
     <h2 class="text-dodger-blue text-center">Pledge of Honesty</h2>
-    <p class="text-center mb-4">Before you continue to payment...</p>
-
+    <p class="text-center mb-4">Before you continue to payment.</p>
     <div class="form-group mb-4">
         <small class="form-text text-center">
             {% if validation_required is not null %}
@@ -26,7 +22,6 @@
             {% endif %}
         </small>
     </div>
-
     <div class="pledge-items">
         <div class="form-group">
             {{ form_widget(purchase_form.agreedDamage, {
@@ -57,7 +52,6 @@
             <div class="with-errors">{{ form_errors(purchase_form.agreedTerms) }}</div>
         </div>
     </div>
-
     <div class="form-group text-md-center mt-5">
         {{ form_widget(purchase_form.next, {
             'label': 'I swear I\'ll be honest!',

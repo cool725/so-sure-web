@@ -596,6 +596,12 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('purchase_step_personal');
         }
 
+        // Aggregators - Get session if coming back
+        $validationRequired = $this->get('session')->get('aggregator');
+
+        // In-store
+        $instore = $this->get('session')->get('store');
+
         $dm = $this->getManager();
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
@@ -615,12 +621,26 @@ class PurchaseController extends BaseController
         $bacs = new Bacs();
         $bacs->setValidateName($user->getLastName());
         $bacsConfirm = new Bacs();
+        $priceService = $this->get('app.price');
+        $additionalPremium = $policy->getUser()->getAdditionalPremium();
         if ($freq == Policy::PLAN_MONTHLY) {
             $policy->setPremiumInstallments(12);
+            $priceService->setPhonePolicyPremium(
+                $policy,
+                PhonePrice::STREAM_MONTHLY,
+                $additionalPremium,
+                new \DateTime()
+            );
             $this->getManager()->flush();
             $amount = $policy->getPremium()->getMonthlyPremiumPrice();
         } elseif ($freq == Policy::PLAN_YEARLY) {
             $policy->setPremiumInstallments(1);
+            $priceService->setPhonePolicyPremium(
+                $policy,
+                PhonePrice::STREAM_YEARLY,
+                $additionalPremium,
+                new \DateTime()
+            );
             $this->getManager()->flush();
             $amount = $policy->getPremium()->getYearlyPremiumPrice();
             $bacs->setAnnual(true);
@@ -661,7 +681,6 @@ class PurchaseController extends BaseController
             ->getForm();
 
         $template = null;
-        $webpay = null;
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
@@ -702,21 +721,126 @@ class PurchaseController extends BaseController
                         $bacsConfirm->getCalculatedBillingDate()
                     );
 
+                    $code = null;
+                    $scode = null;
+                    $scodeRepo = $dm->getRepository(SCode::class);
+                    if ($this->get('session')->has('scode')) {
+                        $code = $this->get('session')->get('scode');
+                        $scode = $scodeRepo->findOneBy([
+                            'code' => $code
+                        ]);
+                    }
+                    $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
+                    if ($referralFeature) {
+                        if ($scode && ($scode->getType() ===  SCode::TYPE_STANDARD)) {
+                            $referral = new ReferralBonus();
+                            $scode->getPolicy()->addInviterReferralBonus($referral);
+                            $policy->addInviteeReferralBonus($referral);
+                            $referral->setStatus(ReferralBonus::STATUS_PENDING);
+                            $dm->persist($referral);
+                            $dm->flush();
+                        }
+                    }
+                    if ($scode) {
+                        $invitation = null;
+                        if ($scode->getType() ===  SCode::TYPE_STANDARD) {
+                            $invitationRepo = $dm->getRepository(Invitation::class);
+                            $invitation = $invitationRepo->findOneBy([
+                                'inviter' => $scode->getPolicy()->getUser(),
+                                'invitee' => $policy->getUser()
+                            ]);
+                        }
+                        if ($invitation) {
+                            if (!$invitation->isAccepted() && !$invitation->isCancelled()) {
+                                $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                                try {
+                                    $connection = $this->get('app.invitation')->accept($invitation, $policy);
+                                    $this->addFlash(
+                                        'success',
+                                        sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                                    );
+                                } catch (ClaimException $e) {
+                                    $this->addFlash(
+                                        'warning',
+                                        sprintf("Your inviter has a claim and is unable to connect.")
+                                    );
+                                }
+                            }
+                        } else {
+                            try {
+                                $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
+                                if ($invitation && !$scode->isReward()) {
+                                    $message = sprintf(
+                                        '%s has been invited  to connect with you',
+                                        $invitation->getInvitee()->getName()
+                                    );
+                                } else {
+                                    $message = 'Your bonus has been added';
+                                }
+                                $this->addFlash('success', $message);
+                            } catch (DuplicateInvitationException $e) {
+                                $message = sprintf("SCode %s has already been used by you", $code);
+                                if ($scode->isReward()) {
+                                    $message = sprintf("Promo Code %s has already been applied", $code);
+                                }
+                                $this->addFlash(
+                                    'warning',
+                                    $message
+                                );
+                            } catch (ConnectedInvitationException $e) {
+                                $message = sprintf("You're already connected");
+                                if ($scode->isReward()) {
+                                    $message = sprintf("Promo Code %s has already been applied", $code);
+                                }
+                                $this->addFlash(
+                                    'warning',
+                                    $message
+                                );
+                            } catch (OptOutException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Sorry, but your friend has opted out of any more invitations")
+                                );
+                            } catch (InvalidPolicyException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Please make sure your policy is paid to date before connecting")
+                                );
+                            } catch (SelfInviteException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("You cannot invite yourself")
+                                );
+                            } catch (FullPotException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("You or your friend has a full pot!")
+                                );
+                            } catch (ClaimException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("You or your friend has a claim.")
+                                );
+                            } catch (CannotApplyRewardException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Cannot apply Promo Code to policy.")
+                                );
+                            } catch (NotFoundHttpException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Not able to find this scode")
+                                );
+                            }
+                        }
+                    }
+
                     $this->addFlash(
                         'success',
                         'Your direct debit is now scheduled. You will receive an email confirmation shortly.'
                     );
 
                     return $this->redirectToRoute('user_welcome_policy_id', ['id' => $policy->getId()]);
-                }
-            } elseif ($request->request->has('to_card_form')) {
-                $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_TEST, [
-                    'Test Name' => 'Bacs to Card',
-                    'Payment Provider' => $cardProvider,
-                ]);
-                if ($checkoutFeature) {
-                    // TODO
-                    NoOp::ignore([]);
                 }
             }
         }
@@ -727,6 +851,7 @@ class PurchaseController extends BaseController
 
         $phone = $policy->getPhone();
         $billingDate = $this->addDays($this->startOfMonth(new \DateTime()), $bacs->getBillingDate());
+        $priceService = $this->get('app.price');
 
         $data = array(
             'phone' => $phone,
@@ -741,19 +866,11 @@ class PurchaseController extends BaseController
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs' => $bacs,
             'amount' => $amount,
+            'prices' => $priceService->userPhonePriceStreams($user, $phone, new \DateTime()),
+            'instore' => $instore,
+            'validation_required' => $validationRequired,
             'pricing_messaging_experiment' => $pricingMessagingExperiment,
         );
-
-        if ($webpay) {
-            $data['webpay_action'] = $webpay ? $webpay['post_url'] : null;
-            $data['webpay_reference'] = $webpay ? $webpay['payment']->getReference() : null;
-        }
-
-        if ($toCardForm) {
-            $data['to_card_form'] = $toCardForm->createView();
-            $data['card_provider'] = $cardProvider;
-        }
-
 
         return $this->render($template, $data);
     }
@@ -964,13 +1081,12 @@ class PurchaseController extends BaseController
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPaymentType::class, $purchase)
             ->getForm();
-        $webpay = null;
-        $allowPayment = true;
         if (!empty($scode)) {
             $scode = $scode ? $scode->getCode() : null;
             $purchaseForm->get('promoCode')->setData($scode);
         }
-
+        $webpay = null;
+        $allowPayment = true;
         $paymentProvider = null;
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
@@ -993,52 +1109,22 @@ class PurchaseController extends BaseController
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
-
                 // as we may recreate the form, make sure to get everything we need from the form first
                 $purchaseFormValid = $purchaseForm->isValid();
-
                 if ($purchaseFormValid) {
                     if ($allowPayment) {
-                        $currentPrice = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
-                        $monthly = null;
-                        $yearly = null;
-                        if ($currentPrice) {
-                            $monthly = $this->areEqualToTwoDp(
-                                $purchase->getAmount(),
-                                $currentPrice->getMonthlyPremiumPrice()
+                        $yearlyPrice = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY);
+                        $useMonthly = $purchase->getAmount() != $yearlyPrice->getYearlyPremiumPrice();
+                        if ($paymentProvider == SoSure::PAYMENT_PROVIDER_BACS) {
+                            return new RedirectResponse(
+                                $this->generateUrl('purchase_step_payment_bacs_id', [
+                                    'id' => $policy->getId(),
+                                    'freq' => $useMonthly ? Policy::PLAN_MONTHLY : Policy::PLAN_YEARLY,
+                                ])
                             );
-                            $yearly = $this->areEqualToTwoDp(
-                                $purchase->getAmount(),
-                                $currentPrice->getYearlyPremiumPrice()
-                            );
-                        }
-
-                        if ($monthly || $yearly) {
-                            if ($paymentProvider == SoSure::PAYMENT_PROVIDER_BACS) {
-                                return new RedirectResponse(
-                                    $this->generateUrl('purchase_step_payment_bacs_id', [
-                                        'id' => $policy->getId(),
-                                        'freq' => $monthly ? Policy::PLAN_MONTHLY : Policy::PLAN_YEARLY,
-                                    ])
-                                );
-                            } elseif ($paymentProvider == SoSure::PAYMENT_PROVIDER_CHECKOUT) {
-                                // TODO
-                                NoOp::ignore([]);
-                                /*
-                                $webpay = $this->get('app.checkout')->webpay(
-                                    $policy,
-                                    $purchase->getAmount(),
-                                    $request->getClientIp(),
-                                    $request->headers->get('User-Agent'),
-                                    JudopayService::WEB_TYPE_STANDARD
-                                );
-                                */
-                            }
-                        } else {
-                            $this->addFlash(
-                                'error',
-                                "Please select the monthly or yearly option."
-                            );
+                        } elseif ($paymentProvider == SoSure::PAYMENT_PROVIDER_CHECKOUT) {
+                            // TODO
+                            NoOp::ignore([]);
                         }
                     }
                 }

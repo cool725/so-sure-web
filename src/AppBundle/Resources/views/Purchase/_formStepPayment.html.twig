@@ -4,22 +4,17 @@
     'data-client-validation': form_client_validation,
     'autocomplete': 'off'
 }}) }}
-
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-
     {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
         {% set premium = 'monthly' %}
     {% else %}
         {% set premium = 'yearly' %}
     {% endif %}
-
     {% set withoutDiscount = phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') * 12 %}
     {% set yearlyMonthly = phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) / 12 %}
     {% set saving = withoutDiscount - phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
-
     <h2 class="text-dodger-blue text-center">How would you like to pay?</h2>
     <p class="text-center mb-4">Get {{ free_months }} free when you pay yearly 🤑</p>    
-
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}
@@ -84,14 +79,29 @@
         }}) }}
         <div class="with-errors">{{ form_errors(purchase_form.promoCode) }}</div>
     </div>
-    {{ form_widget(purchase_form.next, {
-        'label': 'Continue',        
-        'attr': {
-            'class': 'btn btn-success btn-block-xs',
-            'hidden': 'hidden'
-    }}) }}
+    {% set button_text = 'Pay Now' %}
+    {% set button_class = 'btn btn-success btn-block-xs btn-card-pay' %}
+    {% if feature_enabled('card-option-with-bacs') %}
+        {% set button_text = 'Pay via Card' %}
+        {% set button_class = 'btn btn-outline-default btn-block-xs btn-card-pay' %}
+        <div class="form-group text-center">
+            {{ form_widget(purchase_form.next, {
+            'label': 'Setup Direct Debit',
+            'fa': 'far fa-university fa-lg ml-2',
+            'right': true,
+            'attr': {
+                'class': 'btn btn-success btn-block-xs'
+            }}) }}
+        </div>
+    {% else %}
+        <div class="form-group text-center">
+            {{ form_widget(purchase_form.next, {     
+            'attr': {
+                'hidden': 'hidden'
+            }}) }}    
+        </div>        
+    {% endif %}
 {{ form_end(purchase_form) }}
-
 <div class="mb-4">
     <form class="payment-form"
           method="POST"
@@ -120,17 +130,17 @@
         {% block to_card_form %}
             {{ form_start(to_card_form, {'attr':{'class':'form-400 text-center'}}) }}
                 {{ form_widget(to_card_form.submit, {
-                    'label': 'Pay Now',
+                    'label': button_text,
                     'fa': 'fas fa-credit-card fa-lg ml-2',
                     'right': true,                                
                     'attr': {
-                        'class': 'btn btn-success btn-block-xs btn-card-pay'
+                        'class': button_class
                 }}) }}
             {{ form_end(to_card_form) }}
         {% endblock to_card_form %}
     </div>
-    <div class="form-group text-center mt-5">
-        <small class="text-grey">Payments powered by</small><br>
+    <div class="form-group text-center mt-4">
+        <small class="text-grey">Card payments powered by</small><br>
         <img src="{{ cdn_url }}/images/rebrand/misc/so-sure_checkout-logo.png" alt="Checkout" title="Powered by - Checkout" width="125px" class="mt-2">
     </div>
 </div>

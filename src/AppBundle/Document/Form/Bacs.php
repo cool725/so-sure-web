@@ -36,21 +36,6 @@ class Bacs extends BankAccount
      */
     protected $billingDate;
 
-   /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @AppAssert\Token()
-     * @var string
-     */
-    protected $validateSortCode;
-
-    /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @AppAssert\Token()
-     * @var string
-     */
-    protected $validateAccountNumber;
-
-
     public function setSoleSignature($soleSignature)
     {
         $this->soleSignature = filter_var($soleSignature, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -87,27 +72,7 @@ class Bacs extends BankAccount
      */
     public function getCalculatedBillingDate()
     {
-        return $this->addDays($this->startOfMonth(), $this->billingDate);
-    }
-  
-    public function setValidateSortCode($validateSortCode)
-    {
-        $this->validateSortCode = $validateSortCode;
-    }
-
-    public function getValidateSortCode()
-    {
-        return $this->validateSortCode;
-    }
-
-    public function setValidateAccountNumber($validateAccountNumber)
-    {
-        $this->validateAccountNumber = $validateAccountNumber;
-    }
-
-    public function getValidateAccountNumber()
-    {
-        return $this->validateAccountNumber;
+        return DateTrait::setDayOfMonth($this->startOfMonth(), $this->billingDate);
     }
 
     public function setBankAccount(BankAccount $bankAccount = null)

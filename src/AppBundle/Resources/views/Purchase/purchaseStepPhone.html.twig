@@ -45,7 +45,6 @@
 {% endblock %}
 
 {% block body %}
-
     <section class="qpw">
         <div class="d-lg-flex">
             {% if phone %}
@@ -143,7 +142,6 @@
                         {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore } %}
                     </div>
                 </div>
-
                 {# Curve Desktop #}
                 <div class="qpw__curve">
                     <svg class="d-none d-lg-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 57 846" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -155,14 +153,12 @@
                         </g>
                     </svg>
                 </div>
-
                 {# Sub Content #}
                 <div class="qpw__sub__container">
                     <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
                         {% include 'AppBundle::Purchase/_formStepPhone.html.twig' %}
                     </div>
                 </div>
-
                 {# Mobile Info #}
                 <div id="qpw-info" class="qpw__info__container__mobile d-block d-lg-none">
                     {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore } %}

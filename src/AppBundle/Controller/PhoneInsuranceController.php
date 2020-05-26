@@ -535,7 +535,6 @@ class PhoneInsuranceController extends BaseController
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
-
         // if no price, will be sample policy of £100 annually
         $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
         $maxPot = $price ? $price->getMaxPot() : 80;

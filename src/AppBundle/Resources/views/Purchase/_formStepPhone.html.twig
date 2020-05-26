@@ -4,12 +4,9 @@
     'data-client-validation': form_client_validation,
     'autocomplete': 'off'
 }}) }}
-
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-
     <h2 class="text-dodger-blue text-center">Phone Details</h2>
     <p class="text-center mb-4">Please make sure that these are accurate as we will need these to identify your phone and reduce your excess.</p>       
-
     <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
         {{ form_label(purchase_form.imei, 'IMEI Number', { 'label_attr': {'class': 'sr-only'} }) }}
         <label for="purchase_form[imei]">
@@ -48,7 +45,6 @@
         {% endif %}
         <div class="with-errors">{{ form_errors(purchase_form.imei) }}</div>
     </div>
-
     {% if purchase_form.serialNumber is defined %}
         <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
             {{ form_label(purchase_form.serialNumber, 'Serial Number', { 'label_attr': {'class': 'sr-only'} }) }}
@@ -81,7 +77,6 @@
             <div class="with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
         </div>
     {% endif %}
-
     <div class="form-group text-md-center mt-5">
         {{ form_widget(purchase_form.next, {
             'label': 'Continue',
@@ -91,6 +86,5 @@
                 'class': 'btn btn-success btn-block-xs'
         }}) }}
     </div>
-
 {{ form_end(purchase_form) }}
 
