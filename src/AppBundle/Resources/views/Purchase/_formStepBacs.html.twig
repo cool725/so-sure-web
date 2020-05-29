@@ -29,17 +29,10 @@
             <div class="with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
         </div>    
     </div>
-    {# TODO: Currently just hidden and date set by default - remove #}
-    {{ form_label(bacs_form.billingDate, 'Billing date', { 'label_attr': {'class': 'd-none'} }) }}
-    {{ form_widget(bacs_form.billingDate, {'attr': {
-        'hidden': 'hidden',
-        'class': 'form-control', 
-        'data-hj-suppress': ''
-    }}) }}
-    <div class="with-errors d-none">{{ form_errors(bacs_form.billingDate) }}</div>
+    {% do bacs_form.billingDate.setRendered %}
     <div class="form-group text-center mt-2">
         {{ form_widget(bacs_form.soleSignature, {
-             'label': 'I confirm that I\'m the sole signatory of this account',
+             'label': 'Please confirm that you are the account holder',
             'attr': {'class':'custom-control-input'}}
         ) }}
         <div class="with-errors">{{ form_errors(bacs_form.soleSignature) }}</div>

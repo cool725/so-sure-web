@@ -1207,7 +1207,7 @@ class UserController extends BaseController
         $user = $this->getUser();
         foreach ($user->getPartialPolicies() as $partialPolicy) {
             $message = sprintf(
-                'Insure your <a href="%s">%s phone</a>',
+                'Finish insuring your <a href="%s">%s phone</a>',
                 $this->generateUrl('purchase_step_phone_id', ['id' => $partialPolicy->getId()]),
                 $partialPolicy->getPhone()->__toString()
             );
@@ -1390,7 +1390,6 @@ class UserController extends BaseController
 
     /**
      * @Route("/payment-details", name="user_payment_details")
-     * @Route("/payment-details/bacs", name="user_payment_details_bacs")
      * @Route("/payment-details/{policyId}", name="user_payment_details_policy",
      *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
@@ -1485,8 +1484,6 @@ class UserController extends BaseController
 
         /** @var PaymentService $paymentService */
         $paymentService = $this->get('app.payment');
-        // TODO: Move to ajax call
-        $webpay = null;
 
         $billing = new BillingDay();
         if ($policy) {
@@ -1496,6 +1493,135 @@ class UserController extends BaseController
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
             ->getForm();
+        $bacs = new Bacs();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('billing_form')) {
+                $billingForm->handleRequest($request);
+                if ($billingForm->isValid()) {
+                    $policyService = $this->get('app.policy');
+                    $policyService->billingDay($policy, $billing->getDay());
+                    $this->addFlash(
+                        'success',
+                        'Thanks for your request. We will be in touch soon.'
+                    );
+
+                    return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);
+                }
+            }
+        }
+
+        $data = [
+            'user' => $user,
+            'policy' => $policy,
+            'billing_form' => $billingForm->createView(),
+            'bacs_feature' => $bacsFeature,
+            'bacs' => $bacs,
+            'bacs_last_payment_in_progress' => $lastPaymentInProgress,
+            'card_provider' => $cardProvider,
+        ];
+
+        return $data;
+    }
+
+    /**
+     * @Route("/payment-details/bacs", name="user_payment_details_bacs")
+     * @Template
+     */
+    public function paymentBacsDetailsAction(Request $request, $policyId = null)
+    {
+        $dm = $this->getManager();
+        /** @var User $user */
+        $user = $this->getUser();
+        $policyRepo = $dm->getRepository(Policy::class);
+        if ($user->hasPolicyCancelledAndPaymentOwed()) {
+            foreach ($user->getAllPolicies() as $policy) {
+                if ($policy->isCancelledAndPaymentOwed()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_remainder_policy', ['id' => $policy->getId()])
+                    );
+                }
+            }
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy() && !$user->hasPicsureRequiredPolicy()) {
+            if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
+                if ($user->hasPartialPolicy()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_step_phone_id', [
+                            'id' => $user->getPartialPolicies()[0]->getId()
+                        ])
+                    );
+                } else {
+                    return new RedirectResponse($this->generateUrl('purchase_step_phone'));
+                }
+            } else {
+                return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+            }
+        } elseif ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
+        }
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+            if ($user->hasPicsureRequiredPolicy()) {
+                return $this->redirectToRoute("user_home");
+            } else {
+                throw $this->createNotFoundException('No active policy found');
+            }
+        }
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+
+        // Redirect if unpaid
+        if ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
+        }
+
+        if ($policyId) {
+            /** @var Policy $policy */
+            $policy = $policyRepo->find($policyId);
+        } else {
+            /** @var Policy $policy */
+            $policy = $user->getLatestPolicy();
+            if (!$policy) {
+                $policy = $user->getLatestPolicy(false);
+            }
+        }
+
+        // page no longer makes much sense unless associated with a policy
+        if (!$policy) {
+            return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
+        $lastPaymentInProgress = false;
+        if ($policy) {
+            $lastPaymentCredit = $policy->getLastPaymentCredit();
+            if ($policy->hasPolicyOrUserBacsPaymentMethod()) {
+                if ($lastPaymentCredit && $lastPaymentCredit instanceof BacsPayment) {
+                    /** @var BacsPayment $lastPaymentCredit */
+                    $lastPaymentInProgress = $lastPaymentCredit->inProgress();
+                }
+            }
+        }
+
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $swapFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CARD_SWAP_FROM_BACS);
+
+        // For now, only allow monthly policies with bacs
+        if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+            $bacsFeature = false;
+        }
+        // we need enough time for bacs to be billed + reverse payment to be notified + 1 day internal processing
+        // or no point in swapping to bacs
+        if ($bacsFeature && !$policy->canBacsPaymentBeMadeInTime()) {
+            $bacsFeature = false;
+        }
+
+        /** @var PaymentService $paymentService */
+        $paymentService = $this->get('app.payment');
+
+        // To show the correct form
+        $bacsStep = 1;
+
+        $billing = new BillingDay();
+        if ($policy) {
+            $billing->setPolicy($policy);
+        }
         $bacs = new Bacs();
         $bacs->setValidateName($user->getName());
         /** @var FormInterface $bacsForm */
@@ -1508,25 +1634,7 @@ class UserController extends BaseController
             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
             ->getForm();
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('billing_form')) {
-                $billingForm->handleRequest($request);
-                if ($billingForm->isValid()) {
-                    $policyService = $this->get('app.policy');
-                    $policyService->billingDay($policy, $billing->getDay());
-
-                    /*
-                    $policyService = $this->get('app.policy');
-                    $policyService->adjustScheduledPayments($policy);
-                    $dm->flush();
-                    */
-                    $this->addFlash(
-                        'success',
-                        'Thanks for your request. We will be in touch soon.'
-                    );
-
-                    return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);
-                }
-            } elseif ($request->request->has('bacs_form')) {
+            if ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
                     if (!$bacs->isValid()) {
@@ -1534,6 +1642,7 @@ class UserController extends BaseController
                     } else {
                         $paymentService->generateBacsReference($bacs, $user);
                         $bacsConfirm = clone $bacs;
+                        $bacsStep = 2;
                         $bacsConfirmForm = $this->get('form.factory')
                             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
                             ->getForm();
@@ -1558,20 +1667,17 @@ class UserController extends BaseController
         }
 
         $data = [
-            'webpay_action' => $webpay ? $webpay['post_url'] : null,
-            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'user' => $user,
             'policy' => $policy,
-            'billing_form' => $billingForm->createView(),
             'bacs_form' => $bacsForm->createView(),
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs_feature' => $bacsFeature,
             'bacs' => $bacs,
             'bacs_last_payment_in_progress' => $lastPaymentInProgress,
-            'card_provider' => $cardProvider,
+            'bacs_step' => $bacsStep,
         ];
 
-        return $data;
+        return $this->render('AppBundle:User:bacsDetails.html.twig', $data);
     }
 
     /**

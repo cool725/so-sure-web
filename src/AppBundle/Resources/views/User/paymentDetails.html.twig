@@ -6,9 +6,8 @@
 {% set user_mode = true %}
 {% set small_footer = true %}
 
-{% block title %}Payment Details | so-sure{% endblock %}
-
 {# Set Meta #}
+{% block title %}Payment Details | so-sure{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
@@ -26,7 +25,7 @@
                     {% endif %}
                     <h1 class="h2 text-white mb-5 mb-lg-4">Your Payment Details</h1>
                 </div>
-                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0 align-content-lg-stretch">
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
                     <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
                         <div class="cardbox__body text-center">
                             <div class="h5 text-white cardbox__title">📆 Billing Date</div>
@@ -34,8 +33,14 @@
                                 <p>
                                     {% if policy and policy.premiumPlan == 'monthly' %}
                                         Monthly on the {{ policy.billing|date('jS','Europe/London') }}
+                                        {% if policy.hasPolicyOrUserBacsPaymentMethod %}
+                                            <br><small>Taken after weekends/bank holidays</small>
+                                            {% endif %}
                                     {% elseif policy and policy.premiumPlan == 'yearly' %}
                                         Yearly on the {{ policy.billing|date('jS','Europe/London') }}
+                                        {% if policy.hasPolicyOrUserBacsPaymentMethod %}
+                                            <br><small>Taken after weekends/bank holidays</small>
+                                        {% endif %}
                                     {% else %}
                                         ❓ Unknown
                                     {% endif %}
@@ -53,7 +58,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0 align-content-lg-stretch">
+                <div class="col-md-6 offset-md-3 col-lg-3 offset-lg-0">
                     <div class="cardbox cardbox-100 cardbox-opacity mb-4 mr-lg-4">
                         <div class="cardbox__body text-center">
                             <div class="h5 text-white cardbox__title">
@@ -75,30 +80,16 @@
                                         Not setup
                                     {% endif %}
                                 </p>
-                                {% set button_text = 'Update details' %}
-                                {% if not bacs_last_payment_in_progress and policy.hasPolicyOrUserBacsPaymentMethod %}
-                                    {% set button_text = 'Switch to card' %}
+                                {% set button_disabled = '' %}
+                                {% if bacs_last_payment_in_progress %}
+                                    {% set button_disabled = 'disabled' %}
                                 {% endif %}
-                                <form class="payment-form" method="POST"
-                                      data-public-key="{{ checkoutApiKey(policy) }}"
-                                      data-customer-email="{{ app.user.email }}"
-                                      data-value="1"
-                                      data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"
-                                      data-csrf="{{ csrf_token('checkout') }}"
-                                      data-currency="GBP"
-                                      data-payment-mode="cards"
-                                      data-card-form-mode="cardTokenisation"
-                                      data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
-                                      data-title="Update card details"
-                                      data-subtitle="Please enter your new card details. You will NOT be charged the £0.01 transaction fee.">
-                                    <input type="button"
-                                           class="btn btn-outline-deep-sky-blue-d btn-block btn-card-pay"
-                                           {# TODO: This doesn't work #}
-                                           {% if policy.canUpdateBacsDetails != true %}
-                                               disabled="disabled"
-                                           {% endif %}
-                                           value="{{ button_text }}">
-                                </form>
+                                <a href="#update_bank_details"
+                                   class="btn btn-outline-deep-sky-blue-d btn-block scroll-to {{ button_disabled }}"
+                                   data-scroll-to-anchor="#update_bank_details"
+                                   data-scroll-to-offset="-10"
+                                   {{ button_disabled }}>
+                                   Update details</a>
                             </div>
                         </div>
                     </div>
@@ -106,36 +97,98 @@
             </div>
         </div>
     </div>
-
-    <div class="payments pb-lg-5">
-        <div class="payments-inner pb-5">
+    <div class="payments">
+        <div class="payments-inner">
             {% include 'AppBundle::User/_payments.html.twig' %}
-            {% if user.getDisplayableCashbackSorted|length > 0 %}
-                <div class="container-large">
-                    <div class="summary-cardbox my-5">
-                        <div class="summary-cardbox__header">
-                            <h5 class="mb-0">Cashback</h5>
-                        </div>
-                        <div class="summary-cardbox__body">
-                            <ul class="list-unstyled">
-                                {% for cashback in user.getDisplayableCashbackSorted %}
-                                    <li class="mb-3">
-                                        <strong>&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</strong> cashback earned for policy: <strong>{{ policy.policyNumber }}</strong>
-                                        <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i> Paid</span>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                            {% if cashback.status == 'missing' or cashback.status == 'failed' %}
-                                <hr>
-                                <p>To get your cashback paid out, add or update your bank details here:</p>
-                                <a class="btn btn-outline-primary" href="{{ path('user_cashback', {'id': cashback.id }) }}">Update your bank details</a>
+        </div>
+    </div>
+
+    <div class="update-payment-details">
+        <div class="container-large">
+            <div id="update_bank_details" class="summary-cardbox mb-5">
+                <div class="summary-cardbox__header">
+                    <h5 class="mb-0">Update Payment Details</h5>
+                </div>
+                <div class="summary-cardbox__body">
+                    <div class="row border-between">
+                        <div class="col-md-6 pb-3 text-center">
+                            <h6 class="h5">Card Details</h6>
+                            {% if policy.hasPolicyOrUserBacsPaymentMethod %}
+                                <p class="mb-4">Do you prefer to pay by card? You're in the right place to switch to payment by card. Switch to card payment</p>
+                            {% else %}
+                                <p class="mb-4">Do you have a new card or do you need to update your details? You're in the right place. Update card details</p>
                             {% endif %}
+                            {% set button_text = 'Update card details' %}
+                            {% if not bacs_last_payment_in_progress and policy.hasPolicyOrUserBacsPaymentMethod %}
+                                {% set button_text = 'Switch to card' %}
+                            {% endif %}
+                            <form class="payment-form" method="POST"
+                                data-public-key="{{ checkoutApiKey(policy) }}"
+                                data-customer-email="{{ app.user.email }}"
+                                data-value="1"
+                                data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"
+                                data-csrf="{{ csrf_token('checkout') }}"
+                                data-currency="GBP"
+                                data-payment-mode="cards"
+                                data-card-form-mode="cardTokenisation"
+                                data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                                data-title="{{ button_text }}"
+                                data-subtitle="Please enter your new card details. You will NOT be charged the £0.01 transaction fee.">
+                                <input type="button"
+                                       {{ button_disabled }}
+                                       class="btn btn-outline-primary btn-block-xs btn-card-pay"
+                                       value="{{ button_text }}">
+                            </form>
+                        </div>
+                        <div class="col-md-6 pb-3 text-center">
+                            <h6 class="h5">Direct Debit</h6>
+                            {% if policy.hasCheckoutPaymentMethod %}
+                                {% set button_text_two = 'Switch to direct debit' %}
+                                <p class="mb-4">Why not switch to Direct Debit? Avoid issues with card payments and it only takes seconds to setup!</p>
+                            {% elseif policy.hasPolicyOrUserBacsPaymentMethod and policy.canUpdateBacsDetails %}
+                            {% set button_text_two = 'Update bank details' %}
+                                <p class="mb-4">Do you have a new bank account or do you just need to update your details?</p>
+                            {% else %}
+                                {% set button_text_two = 'Not available' %}
+                                {% set button_disabled = 'disabled' %}
+                                <p class="mb-4">Unable to change details: <br> Setup in progress!</p>
+                            {% endif %}
+                            <a href="{{ path('user_payment_details_bacs') }}"
+                               class="btn btn-outline-primary btn-block-xs {{ button_disabled }}"
+                               {{ button_disabled }}>{{ button_text_two }}</a>
                         </div>
                     </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
     </div>
+
+    {% if user.getDisplayableCashbackSorted|length > 0 %}
+        <div class="cashback">
+            <div class="container-large">
+                <div class="summary-cardbox my-5">
+                    <div class="summary-cardbox__header">
+                        <h5 class="mb-0">Cashback</h5>
+                    </div>
+                    <div class="summary-cardbox__body">
+                        <ul class="list-unstyled">
+                            {% for cashback in user.getDisplayableCashbackSorted %}
+                                <li class="mb-3">
+                                    <strong>&pound;{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</strong> cashback earned for policy: <strong>{{ policy.policyNumber }}</strong>
+                                    <span class="badge badge-pill badge-success ml-2"><i class="far fa-check fa-fw"></i> Paid</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% if cashback.status == 'missing' or cashback.status == 'failed' %}
+                            <hr>
+                            <p>To get your cashback paid out, add or update your bank details here:</p>
+                            <a class="btn btn-outline-primary" href="{{ path('user_cashback', {'id': cashback.id }) }}">Update your bank details</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
     {# Components #}
     {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
@@ -169,6 +222,28 @@
                             </div>
                         </div>
                     {{ form_end(billing_form) }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if policy.canUpdateBacsDetails %}
+        <div class="modal fade"
+        id="bank_details_modal"
+        tabindex="-1" role="dialog"
+        aria-labelledby="bank_details_modal"
+        aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Update Account Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        BACS details
+                    </div>
                 </div>
             </div>
         </div>

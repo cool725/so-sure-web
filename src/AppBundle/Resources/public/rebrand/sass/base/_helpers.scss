@@ -90,3 +90,21 @@
 .flex-1 {
     flex: 1;
 }
+
+.border-between > [class*='col-']:before {
+    @include media-breakpoint-up(md) {
+        background: $link-water;
+        bottom: 0;
+        content: '';
+        left: 0;
+        position: absolute;
+        width: 1px;
+        top: 0;
+    }
+ }
+
+ .border-between > [class*='col-']:first-child:before {
+    @include media-breakpoint-up(md) {
+        display: none;
+    }
+ }

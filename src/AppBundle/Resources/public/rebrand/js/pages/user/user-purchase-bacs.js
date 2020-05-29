@@ -1,6 +1,4 @@
-// user-bacs.js
-
-// require('../../../sass/pages/user.scss');
+// purchase-purchase-bacs.js
 
 // Require BS component(s)
 
@@ -9,42 +7,20 @@ require('jquery-validation');
 require('jquery-mask-plugin');
 require('../../common/validation-methods.js');
 
-const sosure = sosure || {};
+$(function(){
 
-sosure.purchaseStepBacs = (function() {
-    let self = {};
-    self.form = null;
-    self.isIE = null;
-    self.loader = null;
-    self.webPay = null;
-    self.webPayBtn = null;
+    let validateForm = $('.validate-form'),
+    isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
 
-    self.init = () => {
-        self.form = $('.validate-form');
-        self.sortCodeMask();
-        self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
-        self.loader = $('#so-sure-loader');
-        self.webPay = $('#webpay-form');
-        self.webPayBtn = $('#to_judo_form_submit');
-        if (self.form.data('client-validation') && !self.isIE) {
-            self.addValidation();
-        }
-    }
-
-    self.sortCodeMask = () => {
-        // Mask sort code input
-        $('.sort-code').mask('00-00-00');
-    }
-
-    self.addValidation = () => {
-        self.form.validate({
+    const addValidation = () => {
+        validateForm.validate({
             debug: false,
             // When to validate
             validClass: 'is-valid-ss',
             errorClass: 'is-invalid',
-            onfocusout: false,
+            focusCleanup: true,
             onkeyup: false,
-            // onclick: false,
+            onclick: false,
             rules: {
                 "bacs_form[accountName]": {
                     required: {
@@ -58,19 +34,8 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: true,
                 },
-                "bacs_form[validateSortCode]": {
-                    required: true,
-                    equalTo: '#bacs_form_sortCode',
-                },
-                "bacs_form[accountNumber]": {
-                    required: true,
-                },
                 "bacs_form[billingDate]": {
                     required: true,
-                },
-                "bacs_form[validateAccountNumber]": {
-                    required: true,
-                    equalTo: '#bacs_form_accountNumber',
                 }
             },
             messages: {
@@ -80,19 +45,11 @@ sosure.purchaseStepBacs = (function() {
                 "bacs_form[sortCode]": {
                     required: 'Please enter your sort code',
                 },
-                "bacs_form[validateSortCode]": {
-                    required: 'Please confirm your sort code',
-                    equalTo: 'Your sort code doesn\'t match, please double check',
-                },
                 "bacs_form[accountNumber]": {
                     required: 'Please enter your account number',
                 },
                 "bacs_form[billingDate]": {
                     required: 'Please select a billing date',
-                },
-                "bacs_form[validateAccountNumber]": {
-                    required: 'Please confirm your account number',
-                    equalTo: 'Your account number doesn\'t match, please double check',
                 },
                 "bacs_form[soleSignature]": {
                     required: ''
@@ -105,10 +62,12 @@ sosure.purchaseStepBacs = (function() {
         });
     }
 
-    return self;
-})();
+    // Add validation
+    if (validateForm.data('client-validation') && !isIE) {
+        addValidation();
+    }
 
-$(function() {
-    sosure.purchaseStepBacs.init();
+    // Mask sort code input
+    $('.sort-code').mask('00-00-00');
 
-});
+})
