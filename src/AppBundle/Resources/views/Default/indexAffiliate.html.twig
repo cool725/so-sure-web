@@ -62,11 +62,11 @@
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto lozad">
                 {% endif %}
             </div>
-            <div class="hero__controls mb-5">
-                <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">
-                    {% if affiliate_page == 'so-sure-compared' %}Get a Quote{% else %}Get Insured {% endif %}
-                    <i class="far fa-arrow-right fa-sm ml-2"></i>
-                </a>
+            <div class="hero__controls mb-2">
+                <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">Pay yearly and get 2 months FREE</a>
+            </div>
+            <div class="hero__controls mb-2">
+                <a href="#" class="btn btn-link btn-block-xs text-white get-a-quote disabled"><u>Pay monthly</u></a>
             </div>
             {% include 'AppBundle::Default/_comparisonTable.html.twig' with {'affiliate_page': affiliate_page } %}
         </div>
@@ -87,8 +87,8 @@
         </div>
     </section>
 
-    <section class="why py-lg-5">
-        <div class="container-large py-5">
+    <section class="why py-lg-5 mt-lg-5">
+        <div class="container-large py-5 mt-5">
             <div class="row">
                 <div class="col-md-4">
                     <div class="why__container">

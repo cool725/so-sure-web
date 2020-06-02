@@ -9,7 +9,7 @@
 
 .hero {
     position: relative;
-    padding-top: 8rem;
+    padding-top: 6rem;
     padding-bottom: 8rem;
     text-align: center;
     background-color: $crayon-blue;
@@ -54,6 +54,7 @@
     }
 
     @include media-breakpoint-up(md) {
+        padding-top: 8rem;
         height: 650px;
     }
 }
