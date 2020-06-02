@@ -31,6 +31,9 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
 
+    // Exp 3
+    const EXPERIMENT_EXIT_POPUP = 'Exit Popup';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -124,6 +127,8 @@ class SixpackService
         self::EXPERIMENT_EMAIL_OPTIONAL,
         // Exp 2
         self::EXPERIMENT_PRICING_MESSAGING,
+        // Exp 3
+        self::EXPERIMENT_EXIT_POPUP,
     ];
 
     public static $authExperiments = [
@@ -150,6 +155,8 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
+        // Exp 3
+        self::EXPERIMENT_EXIT_POPUP,
     ];
 
     /**

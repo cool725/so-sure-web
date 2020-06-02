@@ -18,6 +18,10 @@ class Feature
 
     // TODO: Verify if still used
     const FEATURE_STARLING = 'starling';
+    const FEATURE_JUDO_RECURRING = 'judo-recurring';
+    const FEATURE_USER_PAYMENT_HISTORY = 'user-payment-history';
+    const FEATURE_INVITE_PAGES_COMPETITION = 'invite-competition';
+    const FEATURE_APPLY_SIGN_UP_BONUS = 'apply-sign-up-bonus';
 
     // Active features
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
@@ -32,13 +36,10 @@ class Feature
     const FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP = 'claims-default-direct-group';
     const FEATURE_RATE_LIMITING = 'rate-limiting';
     const FEATURE_PAYMENTS_BCC = 'bcc-payments';
-    const FEATURE_JUDO_RECURRING = 'judo-recurring';
-    const FEATURE_USER_PAYMENT_HISTORY = 'user-payment-history';
     const FEATURE_CHECKOUT = 'checkout';
-    const FEATURE_APPLY_SIGN_UP_BONUS = 'apply-sign-up-bonus';
-    const FEATURE_INVITE_PAGES_COMPETITION = 'invite-competition';
     const FEATURE_REFERRAL = 'referral';
     const FEATURE_APP_SHARE_GAME = 'app-share-game';
+    const FEATURE_EXIT_POPUP = 'exit-popup';
 
     // All Features should be here
     public static $features = [
@@ -64,7 +65,8 @@ class Feature
         self::FEATURE_APPLY_SIGN_UP_BONUS,
         self::FEATURE_INVITE_PAGES_COMPETITION,
         self::FEATURE_REFERRAL,
-        self::FEATURE_APP_SHARE_GAME
+        self::FEATURE_APP_SHARE_GAME,
+        self::FEATURE_EXIT_POPUP
     ];
 
     // @codingStandardsIgnoreStart
@@ -91,7 +93,8 @@ class Feature
         self::FEATURE_APPLY_SIGN_UP_BONUS => 'Automatically apply any active sign-up bonuses to new users first policy',
         self::FEATURE_INVITE_PAGES_COMPETITION => 'Invite pages competition (Amazon voucher)',
         self::FEATURE_REFERRAL => 'Referral Bonus',
-        self::FEATURE_APP_SHARE_GAME => 'Share game in app'
+        self::FEATURE_APP_SHARE_GAME => 'Share game in app',
+        self::FEATURE_EXIT_POPUP => 'Show user exit popup lead form with promo code'
     ];
     // @codingStandardsIgnoreEnd
 

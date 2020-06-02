@@ -1,0 +1,57 @@
+<div class="modal fade"
+     id="exit_popup_modal"
+     tabindex="-1" role="dialog"
+     aria-labelledby="exit_popup_modal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="exit-offer">
+                    {% set exit_title = 'Leaving so soon?' %}
+                    {% set exit_text = 'Enter your email to get a £5 cashback code!' %}
+                    {% if exit_popup_exp is defined and exit_popup_exp == 'variant-b' %}
+                        {% set exit_title = 'Don’t want to insure your phone?' %}
+                        {% set exit_text = 'Let us persuade you with a £5 cashback code.' %}
+                    {% endif %}
+                    <div class="h4">{{ exit_title }}</div>
+                    <p class="mb-4">{{ exit_text }} <a class="exit-popup-promo-page" href="{{ path('promo', {'code': 'STAY05'}) }}">More info</a>.</p>
+                    <form id="exit_popup_form" class="mb-4 text-left">
+                        <div class="custom-input-with-btn mb-4">
+                            <input type="email" class="form-control"
+                                   placeholder="Enter your email..."
+                                   name="email"
+                                   id="exit_popup_email" />
+                            <button class="btn btn-success btn-sm"
+                                    id="exit_popup_submit"
+                                    data-path="{{ path('exit_popup_lead') }}">Reveal my code!</button>
+                        </div>
+                    </form>
+                    <a href="#" class="btn-link-simple mx-auto exit-popup-dismiss"
+                       data-dismiss="modal"
+                       aria-label="Close">Continue without offer</a>
+                </div>
+                <div class="exit-code" style="display: none;">
+                    <div class="h4">Thanks!</div>
+                    <p class="mb-4">Enter the code below at checkout! <a class="exit-popup-promo-page" href="{{ path('promo', {'code': 'STAY05'}) }}">More info</a>.</p>
+                    <div class="custom-input-with-btn mb-4">
+                        <input type="text"
+                               class="form-control"
+                               id="exit_popup_code"
+                               readonly="readonly"
+                               value="STAY05" />
+                        <button class="btn btn-success btn-sm btn-copy"
+                                data-clipboard-target="#exit_popup_code">
+                            Copy</button>
+                    </div>
+                    <a href="#" class="btn-link-simple mx-auto exit-popup-dismiss"
+                       data-dismiss="modal"
+                       aria-label="Close">Close</a>
+                </div>
+                <div class="exit-error" style="display: none;">
+                    <div class="h4">Something went wrong 🤕</div>
+                    <p class="mb-4">Not to worry <a class="exit-popup-promo-page" href="{{ path('promo', {'code': 'STAY05'}) }}">get the code here</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

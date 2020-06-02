@@ -164,22 +164,11 @@
     </section>
 
     {# Page Modals #}
-    {# <div class="modal fade"
-         id="covid_modal"
-         tabindex="-1" role="dialog"
-         aria-labelledby="covid_modal"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <p>You are still covered for Accidental Damage, Loss and Theft, but our prices reflect the lower risk of loss and theft during this isolation period. Excess fees still apply.</p>
-                    <a href="#" class="btn btn-primary mx-auto" data-dismiss="modal" aria-label="Close">Close</a>
-                </div>
-            </div>
-        </div>
-    </div> #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
+    {% if feature_enabled('exit-popup') %}
+        {% include 'AppBundle::Components/_exitPopup.html.twig' with { 'exit_popup_exp': exit_popup_exp } %}
+    {% endif %}
 
 {% endblock %}
 

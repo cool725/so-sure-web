@@ -27,6 +27,7 @@ class Lead
     const SOURCE_CONTACT_US = 'contact-us';
     const SOURCE_QUOTE_EMAIL_HOME = 'quote-email-home';
     const SOURCE_QUOTE_EMAIL_HOME_REQUIRED = 'quote-email-home-required';
+    const SOURCE_EXIT_POPUP = 'exit-popup';
 
     // Competition/Cold leads
     const SOURCE_COMPETITION = 'competition';
@@ -96,7 +97,8 @@ class Lead
      *                 "invitation", "scode", "affiliate",
      *                 "invite-not-ready", "competition",
      *                 "aggregator", "send-quote",
-     *                 "quote-email-home", "quote-email-home-required"}, strict=true)
+     *                 "quote-email-home", "quote-email-home-required",
+     *                 "exit-popup"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

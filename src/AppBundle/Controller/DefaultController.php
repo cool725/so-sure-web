@@ -62,6 +62,7 @@ use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Charge;
+use AppBundle\Document\Feature;
 
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
@@ -127,6 +128,19 @@ class DefaultController extends BaseController
             SixpackService::LOG_MIXPANEL_ALL
         );
 
+        // A/B Exit Popup
+        // Check for feature
+        $exitPopupFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_EXIT_POPUP);
+        $exitPopupExp = null;
+        if ($exitPopupFeature) {
+            $exitPopupExp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_EXIT_POPUP,
+                ['variant-a', 'variant-b'],
+                SixpackService::LOG_MIXPANEL_ALL
+            );
+        }
+
         if ($homepageEmailOptionalExp == 'email') {
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
                 'page' => 'homepage-email'
@@ -141,7 +155,8 @@ class DefaultController extends BaseController
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $this->competitorsData(),
-            'from_price' => $fromPrice
+            'from_price' => $fromPrice,
+            'exit_popup_exp' => $exitPopupExp,
         );
 
         return $this->render($template, $data);

@@ -15,6 +15,7 @@ $(function() {
             model   = $('.phone-search-option-model'),
             memory  = $('.phone-search-option-memory'),
             email   = $('.phone-search-email'),
+            emailR  = $('.phone-search-email').data('required'),
             button  = $('.phone-search-button'),
             firstOp = $('.phone-search-option-make option:first');
 
@@ -34,7 +35,7 @@ $(function() {
                         required: true
                     },                                        
                     "launch_phone[email]": {
-                        required: false,
+                        required: emailR,
                         email: true,
                         emaildomain: true
                     },

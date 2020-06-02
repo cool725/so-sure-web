@@ -41,6 +41,7 @@ use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\Feature;
 
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
@@ -529,6 +530,19 @@ class PhoneInsuranceController extends BaseController
             SixpackService::LOG_MIXPANEL_ALL
         );
 
+        // A/B Exit Popup
+        // Check for feature
+        $exitPopupFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_EXIT_POPUP);
+        $exitPopupExp = null;
+        if ($exitPopupFeature) {
+            $exitPopupExp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_EXIT_POPUP,
+                ['variant-a', 'variant-b'],
+                SixpackService::LOG_MIXPANEL_ALL
+            );
+        }
+
         // A/B Email Optional
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_OPTIONAL);
 
@@ -652,6 +666,7 @@ class PhoneInsuranceController extends BaseController
             'img_url' => mb_strtolower($modelHyph),
             'available_images' => $availableImages,
             'pricing_messaging_experiment' => $pricingMessagingExperiment,
+            'exit_popup_exp' => $exitPopupExp,
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }
