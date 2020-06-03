@@ -90,10 +90,10 @@
                                     </div>
                                 {% endif %}
                                 {% if claim_form.proofOfBarring is defined %}
-                                    <p>You should request a proof of barring document from your Network Provider that has your IMEI number and when it was barred.</p>
+                                    <p>You should request a proof of blacklisting document from your Network Provider that has your IMEI number and when it was barred.</p>
                                     <div class="form-row mb-4">
                                         <div class="col-md form-group">
-                                            {{ form_label(claim_form.proofOfBarring, 'Proof of barring') }}
+                                            {{ form_label(claim_form.proofOfBarring, 'Proof of blacklisting') }}
                                             {{ form_widget(claim_form.proofOfBarring) }}
                                             <small class="form-text">
                                                 <a href="#"
@@ -108,7 +108,7 @@
                                     <p>We require a proof of loss document, which you can file online at <a href="https://www.reportmyloss.com/uk/" target="_blank" rel="noopener noreferrer">Report My Loss</a>.</p>
                                     <div class="form-row mb-4">
                                         <div class="col-md form-group">
-                                            {{ form_label(claim_form.proofOfLoss, 'Proof of barring') }}
+                                            {{ form_label(claim_form.proofOfLoss, 'Proof of blacklisting') }}
                                             {{ form_widget(claim_form.proofOfLoss) }}
                                             <small class="form-text">
                                                 <a href="#"
