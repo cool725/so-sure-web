@@ -139,7 +139,7 @@
                         </div>
                     </div>
                     <div id="qpw-info" class="qpw__info__container mt-4 collapse">
-                        {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore } %}
+                        {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore, 'validation_required': validation_required } %}
                     </div>
                 </div>
                 {# Curve Desktop #}
@@ -161,7 +161,7 @@
                 </div>
                 {# Mobile Info #}
                 <div id="qpw-info" class="qpw__info__container__mobile d-block d-lg-none">
-                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore } %}
+                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore, 'validation_required': validation_required } %}
                 </div>
             {% else %}
                 <div class="purchase__details__container">

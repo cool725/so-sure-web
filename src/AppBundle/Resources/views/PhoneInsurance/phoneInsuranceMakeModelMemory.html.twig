@@ -191,9 +191,6 @@
                                data-scroll-to-anchor="#insurance_info"
                                data-scroll-to-offset="100">View my excess</a>
                         {{ form_end(buy_form) }}
-                        {% if validation_required is not null %}
-                            <p>👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
-                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-6 order-md-1">
@@ -255,7 +252,7 @@
                     <div class="cardbox__body">
                         <h2 class="h5">Your Excess</h2>
                         {% if validation_required is not null or instore is not null %}
-                            <p class="mb-4">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app.</p>
+                            <p class="mb-4">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app. 👋 You must validate your phone within 14 days or you will not be able to claim and the policy will be cancelled.</p>
                         {% else %}
                             <p>Reduce the excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> by using our app to verify that it isn't already damaged prior to any claim.</p>
                             <p class="mb-4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive.</p>
@@ -285,38 +282,31 @@
                     <div class="cardbox__body">
                         <h2 class="h5">IPID</h2>
                         <p>The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</p>
+                        {% set ipidFile = 'IPID_so-sure_030918.pdf' %}
                         {% if validation_required is not null %}
-                            <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="btn btn-outline-primary btn-block-xs track-data"
-                               data-event="user-download-ipid-agg"
-                               data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
-                        {% else %}
-                            <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="btn btn-outline-primary btn-block-xs track-data"
-                               data-event="user-download-ipid"
-                               data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                            {% set ipidFile = 'IPID_so-sure_agg.pdf' %}
                         {% endif %}
+                        <a href="{{ cdn_url }}/files/{{ ipidFile }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-outline-primary btn-block-xs track-data"
+                            data-event="user-download-ipid-agg"
+                            data-event-url="{{ cdn_url }}/files/{{ ipidFile }}">
+                            <i class="fal fa-file-download text-primary fa-fw"></i>
+                            Download
+                        </a>
                         <h2 class="h5 mt-4">Our Policy Document</h2>
                         <p>See our policy document for full details.</p>
+                        {% set policyDocFile = 'so-sure_sample_policy_doc_v' ~ policy_doc_version ~ '.pdf' %}
                         {% if validation_required is not null %}
-                            <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="btn btn-outline-primary btn-block-xs track-data"
-                               data-event="user-download-sample-policy-doc-quote-agg"
-                               data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}_R.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
-                        {% else %}
-                            <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="btn btn-outline-primary btn-block-xs track-data"
-                               data-event="user-download-sample-policy-doc-quote"
-                               data-event-url="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy_doc_version }}.pdf"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
+                            {% set policyDocFile = 'so-sure_sample_policy_doc_v' ~ policy_doc_version ~ '_R.pdf' %}
                         {% endif %}
+                        <a href="{{ cdn_url }}/files/{{ policyDocFile }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-outline-primary btn-block-xs track-data"
+                            data-event="user-download-sample-policy-doc-quote"
+                            data-event-url="{{ cdn_url }}/files/{{ policyDocFile }}"><i class="fal fa-file-download text-primary fa-fw"></i> Download</a>
                     </div>
                 </div>
             </div>

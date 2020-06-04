@@ -29,21 +29,18 @@
         <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
         <li class="text-white mb-5">
             <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
+            {% set ipidFile = 'IPID_so-sure_030918.pdf' %}
             {% if validation_required is not null %}
-                <a href="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="track-data text-white"
-                   data-event="user-download-ipid-agg"
-                   data-event-url="{{ cdn_url }}/files/IPID_so-sure_agg.pdf"><u>Download a copy of our IPID</u></a>
-            {% else %}
-                <a href="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="track-data text-white"
-                   data-event="user-download-ipid"
-                   data-event-url="{{ cdn_url }}/files/IPID_so-sure_030918.pdf"><u>Download a copy of our IPID</u></a>
+                {% set ipidFile = 'IPID_so-sure_agg.pdf' %}
             {% endif %}
+            <a href="{{ cdn_url }}/files/{{ ipidFile }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="track-data text-white"
+                data-event="user-download-ipid"
+                data-event-url="{{ cdn_url }}/files/{{ ipidFile }}">
+                <u>Download a copy of our IPID</u>
+            </a>
         </li>
     </ul>
 </div>
@@ -124,9 +121,10 @@
 <div class="policy__info mx-4 mx-lg-5 py-5 text-center text-lg-left">
 <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
     {% if validation_required is not null or instore is not null %}
-        <p class="mb-5 text-white">The excess for your {{ make_desc }} {{ phone.model }} is:</p>
+        <p class="mb-4 text-white">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app. 👋 You must validate your phone within 14 days or you will not be able to claim and the policy will be cancelled.</p>
     {% else %}
-        <p class="mb-5 text-white">Reduce the excess for your {{ make_desc }} {{ phone.model }} by using our app to verify that it isn't already damaged prior to any claim.</p>
+        <p>Reduce the excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> by using our app to verify that it isn't already damaged prior to any claim.</p>
+        <p class="mb-4 text-white">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive.</p>
     {% endif %}
     <div class="table-responsive">
         <table class="table table-bordered text-white">
@@ -145,12 +143,10 @@
                     <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
                     <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
                 </tr>
-                {% if instore is null %}
-                    {% if validation_required is null %}
-                        <tr>
-                            <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
-                        </tr>
-                    {% endif %}
+                {% if instore is null and validation_required is null %}
+                    <tr>
+                        <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
+                    </tr>
                 {% endif %}
             </tbody>
         </table>
@@ -183,10 +179,8 @@
                     <li>Instant cover from purchase</li>
                     <li>24-72 hour replacement once your claim is approved</li>
                     <li>Hassle-Free Claims</li>
-                    {% if instore is null %}
-                        {% if validation_required is null %}
-                            <li>Low excess from just &pound;{{ prices['monthly'].picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ prices['monthly'].excess.damage }}</li>
-                        {% endif %}
+                    {% if instore is null and validation_required is null %}
+                        <li>Low excess from just &pound;{{ prices['monthly'].picsureexcess.damage }} when validated with our anti-fraud technology. If not validated then excess is &pound;{{ prices['monthly'].excess.damage }}</li>
                     {% endif %}
                     <li>Insure mobiles up to 3 years old</li>
                     <li>No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
