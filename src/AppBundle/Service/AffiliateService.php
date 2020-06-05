@@ -176,7 +176,6 @@ class AffiliateService
                                 $policy->getId()." cannot find charges attributed to it's predecessor ".
                                 $previous->getId()."."
                             );
-                            return null;
                         }
                     }
                 }
@@ -184,7 +183,6 @@ class AffiliateService
                 $this->logger->error(
                     "User ".$user->getEmail()." has multiple active policies, but no affiliate charges recorded."
                 );
-                return null;
             }
         }
         return $generatedCharges;
