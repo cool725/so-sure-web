@@ -135,7 +135,7 @@ class DefaultController extends BaseController
         if ($exitPopupFeature) {
             $exitPopupExp = $this->sixpack(
                 $request,
-                SixpackService::EXPERIMENT_EXIT_POPUP,
+                SixpackService::EXPERIMENT_EXIT_POPUP_MULTI,
                 ['variant-a', 'variant-b'],
                 SixpackService::LOG_MIXPANEL_ALL
             );

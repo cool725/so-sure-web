@@ -32,7 +32,7 @@ class SixpackService
     const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
 
     // Exp 3
-    const EXPERIMENT_EXIT_POPUP = 'Exit Popup';
+    const EXPERIMENT_EXIT_POPUP_MULTI = 'Exit Popup Multi';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -119,7 +119,8 @@ class SixpackService
         'Amazon vs Money',
         'Quote Email Homepage',
         'Personalised Quote',
-        'Personalised Quote V2'
+        'Personalised Quote V2',
+        'Exit Popup'
     ];
 
     public static $unauthExperiments = [
@@ -128,7 +129,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
-        self::EXPERIMENT_EXIT_POPUP,
+        self::EXPERIMENT_EXIT_POPUP_MULTI,
     ];
 
     public static $authExperiments = [
@@ -155,8 +156,6 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
-        // Exp 3
-        self::EXPERIMENT_EXIT_POPUP,
     ];
 
     /**
@@ -168,6 +167,8 @@ class SixpackService
          self::EXPERIMENT_EMAIL_OPTIONAL,
         // Exp 2
         self::EXPERIMENT_PRICING_MESSAGING,
+        // Exp 3
+        self::EXPERIMENT_EXIT_POPUP_MULTI,
     ];
 
     /** @var LoggerInterface */
