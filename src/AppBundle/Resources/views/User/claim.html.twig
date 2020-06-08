@@ -86,8 +86,8 @@
                                         'data-client-validation': form_client_validation
                                     }}) }}
                                         <div class="form-group">
-                                            <p class="mb-4 alert-warning p-4 mb-4 rounded">I, {{ username }}, am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted 🖋️</p>
                                             {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
+                                            <small class="form-text">Sign above: I, {{ username }}, am providing all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted 🖋️</small>
                                             <div class="with-errors">{{ form_errors(claim_form.signature) }}</div>
                                             <input type="hidden" value="{{ username }}" id="username_signature">
                                         </div>
