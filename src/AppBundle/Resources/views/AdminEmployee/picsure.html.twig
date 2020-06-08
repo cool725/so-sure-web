@@ -100,7 +100,7 @@
                                     <td>
                                         {% if policy.picSureStatus == 'manual' %}
                                             <a href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"
-                                               class="btn btn-success btn-sm mb-1 mr-md-2"
+                                               class="btn btn-success btn-confirm btn-sm mb-1 mr-md-2"
                                                title="Approve pic-sure"
                                                >
                                                <i class="far fa-check fa-lg fa-fw"></i>
@@ -115,7 +115,7 @@
                                                <i class="far fa-exclamation-triangle fa-lg fa-fw"></i>
                                                <span class="sr-only">Invalid</span></a>
                                             <a href="{{ path('admin_picsure_reject', {'id': policy.id}) }}"
-                                               class="btn btn-danger btn-sm mb-1 mr-md-2"
+                                               class="btn btn-danger btn-sm btn-reject mb-1 mr-md-2"
                                                title="Reject Damaged pic-sure"
                                                >
                                                <i class="far fa-times fa-lg fa-fw"></i>
