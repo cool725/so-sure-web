@@ -14,8 +14,9 @@ class DirectGroupHandlerClaim extends HandlerClaim
     use ExcelTrait;
 
     const SHEET_NAME_V1 = 'Report';
-    const CLIENT_NAME = "SO-SURE";
     const COLUMN_COUNT_V1 = 43;
+    const SALVA_NAME = 'SO-SURE';
+    const HELVETIA_NAME = 'HE SO-SURE';
 
     const STATUS_OPEN = 'Open';
     const STATUS_CLOSED = 'Paid Closed';
@@ -267,7 +268,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
             // TODO: Improve validation - should should exceptions in the setters
             $i = 0;
             $this->client = trim($data[$i]);
-            if ($this->client !== self::CLIENT_NAME) {
+            if (!in_array($this->client, [self::SALVA_NAME, self::HELVETIA_NAME])) {
                 // We now have lots of other data in the report, so just ignore lines that don't match
                 return null;
             }
