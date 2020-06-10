@@ -75,6 +75,7 @@ class HelvetiaExportService
         $lines[] = CsvHelper::line(
             'PolicyNumber',
             'Status',
+            'CancellationReason',
             'StartDate',
             'EndDate',
             'TerminationDate',
@@ -84,6 +85,8 @@ class HelvetiaExportService
             'Make',
             'Model',
             'Memory',
+            'Imei',
+            'Value',
             'NumberInstallments',
             'InstallmentAmount',
             'TotalPremium',
@@ -93,6 +96,7 @@ class HelvetiaExportService
             'PaidBrokerFee',
             'PaidMGACommission',
             'PotValue',
+            'PaymentMethod',
             'MarketingPotValue',
             'CashToHelvetia',
             'RenewalPotPaidIn'
@@ -104,6 +108,7 @@ class HelvetiaExportService
             $lines[] = CsvHelper::line(
                 $policy->getPolicyNumber(),
                 $policy->getStatus(),
+                $policy->getCancelledReason(),
                 $policy->getStart()->format("Ymd H:i"),
                 $policy->getStaticEnd()->format("Ymd H:i"),
                 $policy->getEnd()->format("Ymd H:i"),
@@ -113,6 +118,8 @@ class HelvetiaExportService
                 $policy->getPhone()->getMake(),
                 $policy->getPhone()->getModel(),
                 $policy->getPhone()->getMemory(),
+                $policy->getImei(),
+                $policy->getPhone()->getCurrentRetailPrice(),
                 $policy->getPremiumInstallmentCount(),
                 $policy->getPremiumInstallmentPrice(),
                 $policy->getProRataPremium(),
@@ -122,6 +129,7 @@ class HelvetiaExportService
                 $policy->getBrokerCommissionPaid(),
                 $policy->getCoverholderCommissionPaid(),
                 $policy->getPotValue(),
+                $policy->getPaymentMethod()->getType(),
                 $policy->getPromoPotValue(),
                 $policy->getHelvetiaCash(),
                 $policy->getRewardPaidIn()
