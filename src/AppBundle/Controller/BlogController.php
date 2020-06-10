@@ -700,4 +700,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/how-long-do-mobile-phones-last",
+     * name="how_long_do_mobile_phones_last", options={"sitemap" = true})
+     * @Template
+     */
+    public function howLongDoMobilePhonesLastAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/how-long-do-mobile-phones-last.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

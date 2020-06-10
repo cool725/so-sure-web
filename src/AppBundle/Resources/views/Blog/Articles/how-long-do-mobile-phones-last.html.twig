@@ -1,0 +1,135 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+
+{% block title %}How Long Do Mobile Phones Last? - Blog | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="How long exactly do mobile phones last? Find out everything you need to know about phone lifespan here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'How Long Do Mobile Phones Last? - Blog | so-sure' %}
+{% set og_description = "How long exactly do mobile phones last? Find out everything you need to know about phone lifespan here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/how-long-do-mobile-phones-last-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">How Long Do Mobile Phones Last?</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">How Long Do Mobile Phones Last?</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Susan</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>June 10, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/how-long-do-mobile-phones-last-1.jpg"
+                                     alt="Man using phone"
+                                     class="img-fluid lozad mb-5">
+                                <p>How many people do you know that don’t own a smartphone? Probably not very many! That’s because <a href="https://www.finder.com/uk/mobile-internet-statistics" target="_blank" rel="noopener noreferrer">79% of UK adults</a> in the UK owned a smartphone in 2019. Mobile phones are so prevalent these days that it feels almost impossible to live without one, but they also don’t last forever.</p>
+                                <p>In fact, phones seem to have a much shorter lifespan than you’d expect, given how essential they are to our daily existence, meaning that people are often locked into a cycle of buying a new phone every 12-36 months, like clockwork.</p>
+                                <p>How long exactly do mobile phones last? That’s a difficult question to answer because there are a lot of factors that influence their lifespan, from usage levels to build quality. We’re here to explore what you need to know about your phone’s potential longevity.</p>
+                                <h2>How long should a phone last?</h2>
+                                <p>Generally, people seem to expect the average smartphone to last around 2-3 years. That number makes sense when you think about the normal length of a phone contract, which is usually 18-36 months. But it’s actually not that long considering handsets can cost up to £1000 or more.</p>
+                                <p>Despite how long people generally think that a smart phone can last, data from a study into <a href="https://www.fool.com/investing/general/2015/07/15/how-often-does-the-average-american-replace-his-or.aspx" target="_blank" rel="noopener noreferrer">American phone buying habits</a> found that 44% of people will upgrade their model as soon as their contract allows it, while 2% buy a new phone every year regardless of the condition of theirs.</p>
+                                <p>That means that the average phone lifespan per owner is probably quite a lot less than its max lifespan.</p>
+                                <h2>What stops phones from lasting longer?</h2>
+                                <p>There’s a range of <a href="{{ path('common_mobile_phone_faults_and_solutions') }}">reasons phones don’t last forever</a>, from hardware lifespan to lack of ongoing software support. Here are the three main reasons your phone might need to be upgraded.</p>
+                                <h3>Failing battery</h3>
+                                <p>The battery in your phone is an understandably central part of its hardware, providing the power that enables it to even turn on in the first place. However, phone battery technology is remarkably under-developed compared to some other components, like screens. Batteries are still using essentially <a href="https://www.forbes.com/sites/nicolemartin1/2019/07/16/why-your-phone-battery-still-dies-quickly/#72305fb23fe7" target="_blank" rel="noopener noreferrer">the same technology</a> as was used in the 90s.</p>
+                                <p>Batteries generally have a certain number of ‘cycles’ (charges and subsequent drains) they can make it through before beginning to degrade. As modern phones have such powerful software and energy-draining features like HD screens, batteries are draining quicker than ever – and the technology hasn’t kept up to maintain the same level of battery longevity.</p>
+                                <p>However, the handset landscape is shifting to try and fix this, with some manufacturers picking up on consumer demands and focusing on developing <a href="{{ path('best_battery_life_phones') }}">phones with longer battery lives</a>.</p>
+                                <h3>Old software</h3>
+                                <p>Another leading cause of phones becoming defunct is outdated software. Both Apple and Android, the two leading mobile operating system developers, phase out OS updates and software support for older models gradually.</p>
+                                <p>When a phone is released, it will normally be guaranteed to receive updates for at least 2 years, keeping it fresh and spritely. After that time period, though, it’ll stop receiving regular updates and the software will start to age, relative to newer models.</p>
+                                <p>This can mean that an old phone quickly starts to become ill-equipped to handle new apps and features, which generally require more and more power over time. This is one of the main reasons your phone starts to slow down and <a href="{{ path('why_does_my_phone_keep_crashing') }}">increasingly crash</a> towards the end of its life.</p>
+                                <h3>Damage</h3>
+                                <p>Accidental damage is the final, and potentially most likely, reason that your phone won’t last forever. Whether it’s screen damage, water damage, or something else entirely – serious hardware damage can end your phone’s life instantly.</p>
+                                <p>Research has estimated that 66% of phone owners <a href="https://www.prnewswire.com/news-releases/mobile-myths-cost-consumers-dearly-as-americans-report-spending-3-4-billion-replacing-millions-of-smartphone-screens-last-year-300753419.html" target="_blank" rel="noopener noreferrer">damage their phones</a> in a given year, with cracked screens taking first place as the most common type of damage at 29%.</p>
+                                <h2>How to make your phone last longer</h2>
+                                <p>Looking after your phone as best as you can is the best way to extend its lifespan significantly. Our phone-care top tips for getting the most out of your handset before you have to upgrade are:</p>
+                                <h3>Get phone insurance</h3>
+                                <p>At the risk of sounding biased, we’d highly recommend not underestimating the benefits of having a <a href="{{ path('phone_insurance') }}">phone insurance</a> plan that covers you in the event of accidental damage, theft, loss, or hardware-related breakdowns.</p>
+                                <p>Even with a phone insurance policy in place, it’s still worth using protective accessories like <a href="{{ path('best_screen_protectors') }}">screen protectors</a> or hard-wearing cases.</p>
+                                <h3>Exercise battery economy</h3>
+                                <p>You can optimise your battery use on a day-to-day basis by turning off unessential services or features, like location tracking and vibration mode, using battery-saving modes or apps, and keeping your screen brightness low.</p>
+                                <p>Taking these measures should mean you use less of your battery life each day, meaning fewer charges, a longer time between draining cycles, and a longer overall battery life.</p>
+                                <h3>Keep up with software updates</h3>
+                                <p>Finally, make sure you’re keeping your phone updated with all the new software updates for as long as your handset is supported by the OS developer. This will keep it running smoothly for longer. </p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
