@@ -58,6 +58,11 @@ abstract class PhonePolicy extends Policy
     const PICSURE_STATUS_DISABLED = 'disabled';
 
     /**
+     * pic-sure should be allowed again as the policy has been upgraded
+     */
+    const PICSURE_STATUS_UPGRADED = 'upgraded';
+
+    /**
      * if phone replaced due to claim, then new phone doesn't neeed pic-sure
      */
     const PICSURE_STATUS_CLAIM_APPROVED = 'claim-approved';
@@ -181,8 +186,8 @@ abstract class PhonePolicy extends Policy
     protected $imeiCircumvention;
 
     /**
-     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled", "claim-approved", ""},
-     *     strict=true)
+     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected",
+     *     "manual", "disabled", "claim-approved", "upgraded", ""}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -778,8 +783,8 @@ abstract class PhonePolicy extends Policy
     {
         $this->picSureStatus = $picSureStatus;
 
-        if ($picSureStatus == "") {
-            // remove pic-sure files when changing pic-sure to 'Not started'
+        if ($picSureStatus == "" || $picSureStatus == self::PICSURE_STATUS_UPGRADED) {
+            // remove pic-sure files when changing pic-sure to 'Not started' or for an upgrade
             foreach ($this->getPolicyPicSureFiles() as $file) {
                 $this->removePolicyFile($file);
             }
