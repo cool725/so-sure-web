@@ -218,7 +218,6 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
             '/quote-me/'.array_keys($goCompare::$models)[2].'?aggregator=GoCompare'
         );
         $decoded = (array) json_decode($this->getClientResponseContent());
-        print_r($decoded);
         $this->assertArrayHasKey('phoneId', $decoded);
         $this->assertArrayHasKey('price', $decoded);
         $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
@@ -262,7 +261,6 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         self::$client->request('GET', '/list-phones');
         $decoded = (array) json_decode($this->getClientResponseContent());
         $this->assertGreaterThan(0, count($decoded));
-        print_r($decoded);
 
         // Check first phone in list is valid
         $this->assertArrayHasKey('id', (array) $decoded[0]);
