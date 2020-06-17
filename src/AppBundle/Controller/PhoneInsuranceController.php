@@ -783,20 +783,22 @@ class PhoneInsuranceController extends BaseController
                     'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
                     'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
                 ],
-                'productOverrides' => [
-                    'excesses' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
+                'excesses' => [
+                    'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
                         [],
-                    'picsureExcesses' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
+                    'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
                         []
-                ],
-                'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.
+                ]
+
+                // disabled temporarily to not confuse Comparison Creator
+                /*'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.
                     str_replace(
                         ' ',
                         '+',
                         $phone->getMake().'+'.$phone->getModel().'+'.$phone->getMemory()
-                    ).'GB'.$aggregator.$requester
+                    ).'GB'.$aggregator.$requester*/
             ]);
             return $response;
         }
@@ -842,6 +844,18 @@ class PhoneInsuranceController extends BaseController
                 'make'          => $phone->getMake(),
                 'model'         => $phone->getModel(),
                 'memory'        => $phone->getMemory(),
+                'price' => [
+                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
+                ],
+                'excesses' => [
+                    'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
+                        [],
+                    'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
+                        []
+                ],
                 $requester      => $aggregatorId
             ];
         }

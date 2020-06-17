@@ -202,12 +202,12 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertArrayHasKey('price', $decoded);
         $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
         $this->assertArrayHasKey('yearlyPremium', (array) $decoded['price']);
-        $this->assertArrayHasKey('productOverrides', $decoded);
-        $this->assertArrayHasKey('excesses', (array) $decoded['productOverrides']);
-        $this->assertEquals(4, count($decoded['productOverrides']->excesses));
-        $this->assertArrayHasKey('picsureExcesses', (array) $decoded['productOverrides']);
-        $this->assertEquals(4, count($decoded['productOverrides']->picsureExcesses));
-        $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
+        $this->assertArrayHasKey('excesses', $decoded);
+        $this->assertArrayHasKey('defaultExcess', (array) $decoded['excesses']);
+        $this->assertEquals(4, count($decoded['excesses']->defaultExcess));
+        $this->assertArrayHasKey('validatedExcess', (array) $decoded['excesses']);
+        $this->assertEquals(4, count($decoded['excesses']->validatedExcess));
+        //$this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
     }
 
     public function testQuoteMeGoCompare()
@@ -222,12 +222,12 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertArrayHasKey('price', $decoded);
         $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
         $this->assertArrayHasKey('yearlyPremium', (array) $decoded['price']);
-        $this->assertArrayHasKey('productOverrides', $decoded);
-        $this->assertArrayHasKey('excesses', (array) $decoded['productOverrides']);
-        $this->assertEquals(4, count($decoded['productOverrides']->excesses));
-        $this->assertArrayHasKey('picsureExcesses', (array) $decoded['productOverrides']);
-        $this->assertEquals(4, count($decoded['productOverrides']->picsureExcesses));
-        $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
+        $this->assertArrayHasKey('excesses', $decoded);
+        $this->assertArrayHasKey('defaultExcess', (array) $decoded['excesses']);
+        $this->assertEquals(4, count($decoded['excesses']->defaultExcess));
+        $this->assertArrayHasKey('validatedExcess', (array) $decoded['excesses']);
+        $this->assertEquals(4, count($decoded['excesses']->validatedExcess));
+        //$this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
     }
 
     public function testQuoteMeRequester()
@@ -242,12 +242,12 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertArrayHasKey('price', $decoded);
         $this->assertArrayHasKey('monthlyPremium', (array) $decoded['price']);
         $this->assertArrayHasKey('yearlyPremium', (array) $decoded['price']);
-        $this->assertArrayHasKey('productOverrides', $decoded);
-        $this->assertArrayHasKey('excesses', (array) $decoded['productOverrides']);
-        $this->assertEquals(4, count($decoded['productOverrides']->excesses));
-        $this->assertArrayHasKey('picsureExcesses', (array) $decoded['productOverrides']);
-        $this->assertEquals(4, count($decoded['productOverrides']->picsureExcesses));
-        $this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
+        $this->assertArrayHasKey('excesses', $decoded);
+        $this->assertArrayHasKey('defaultExcess', (array) $decoded['excesses']);
+        $this->assertEquals(4, count($decoded['excesses']->defaultExcess));
+        $this->assertArrayHasKey('validatedExcess', (array) $decoded['excesses']);
+        $this->assertEquals(4, count($decoded['excesses']->validatedExcess));
+        //$this->assertArrayHasKey('purchaseUrlRedirect', $decoded);
     }
 
     public function testQuoteMeError()
