@@ -120,14 +120,6 @@ class DefaultController extends BaseController
 
         $template = 'AppBundle:Default:indexQuickQuote.html.twig';
 
-        // A/B Email Optional
-        $homepageEmailOptionalExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_EMAIL_OPTIONAL,
-            ['email-optional', 'email'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         // A/B Exit Popup
         // Check for feature
         $exitPopupFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_EXIT_POPUP);
@@ -141,15 +133,7 @@ class DefaultController extends BaseController
             );
         }
 
-        if ($homepageEmailOptionalExp == 'email') {
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-                'page' => 'homepage-email'
-            ]);
-        } else {
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-                'page' => 'homepage-email-optional'
-            ]);
-        }
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             'referral'  => $referral,

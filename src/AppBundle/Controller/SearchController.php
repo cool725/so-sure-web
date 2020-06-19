@@ -147,14 +147,6 @@ class SearchController extends BaseController
             }
         }
 
-        // A/B Email Optional
-        $homepageEmailOptionalExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_EMAIL_OPTIONAL,
-            ['email-optional', 'email'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown'),
@@ -176,11 +168,7 @@ class SearchController extends BaseController
                     if ($email) {
                         $lead = new Lead();
                         $lead->setEmail($email);
-                        if ($homepageEmailOptionalExp == 'email') {
-                            $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME_REQUIRED);
-                        } else {
-                            $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME);
-                        }
+                        $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME_REQUIRED);
                         $leadRepo = $dm->getRepository(Lead::class);
                         $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
@@ -191,10 +179,7 @@ class SearchController extends BaseController
                         }
                         $days = new \DateTime();
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
-                        $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_optional';
-                        if ($homepageEmailOptionalExp == 'email') {
-                            $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_not_optional';
-                        }
+                        $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
                         $quoteUrl = $this->setPhoneSession($request, $phone);
                         $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                         $mailer = $this->get('app.mailer');
@@ -236,8 +221,7 @@ class SearchController extends BaseController
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
             'type' => $type,
-            'phone' => $phone,
-            'email_optional' => $homepageEmailOptionalExp
+            'phone' => $phone
         ];
     }
 

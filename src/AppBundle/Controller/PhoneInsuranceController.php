@@ -543,9 +543,6 @@ class PhoneInsuranceController extends BaseController
             );
         }
 
-        // A/B Email Optional
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EMAIL_OPTIONAL);
-
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');

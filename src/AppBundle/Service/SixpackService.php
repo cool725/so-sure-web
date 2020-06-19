@@ -26,7 +26,7 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    const EXPERIMENT_EMAIL_OPTIONAL = 'Email Optional';
+    // const EXPERIMENT_EMAIL_OPTIONAL = 'Email Optional';
 
     // Exp 2
     const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
@@ -120,12 +120,13 @@ class SixpackService
         'Quote Email Homepage',
         'Personalised Quote',
         'Personalised Quote V2',
-        'Exit Popup'
+        'Exit Popup',
+        'Email Optional'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_EMAIL_OPTIONAL,
+        // self::EXPERIMENT_EMAIL_OPTIONAL,
         // Exp 2
         self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
@@ -164,7 +165,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-         self::EXPERIMENT_EMAIL_OPTIONAL,
+        //  self::EXPERIMENT_EMAIL_OPTIONAL,
         // Exp 2
         self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
