@@ -147,6 +147,14 @@ class SearchController extends BaseController
             }
         }
 
+        // A/B Cheap vs Fair Copy
+        $cheapVsFairExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_COPY_CHEAP_VS_FAIR,
+            ['cheap', 'fair'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown'),
@@ -221,7 +229,8 @@ class SearchController extends BaseController
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
             'type' => $type,
-            'phone' => $phone
+            'phone' => $phone,
+            'cheap_vs_fair_exp' => $cheapVsFairExp,
         ];
     }
 

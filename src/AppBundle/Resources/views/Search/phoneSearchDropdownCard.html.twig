@@ -1,5 +1,7 @@
 <div class="cardbox cardbox-100 p-4 p-lg-5 pb-lg-0 🍆">
-    <div class="mb-3 h3 text-primary fit">Cheap, Fast &amp; Easy 🇬🇧</div>
+    <div class="mb-3 h3 text-primary fit">
+        {% if cheap_vs_fair_exp is defined and cheap_vs_fair_exp == 'fair' %}Fair{% else %}Cheap{% endif %}, Fast &amp; Easy 🇬🇧
+    </div>
     <ul class="list-unstyled icn-fa-list mb-4">
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>

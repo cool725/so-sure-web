@@ -34,6 +34,9 @@ class SixpackService
     // Exp 3
     const EXPERIMENT_EXIT_POPUP_MULTI = 'Exit Popup Multi';
 
+    // Exp 4
+    const EXPERIMENT_COPY_CHEAP_VS_FAIR = 'Hompage Copy Cheap vs Fair';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -131,6 +134,8 @@ class SixpackService
         self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
+        // Exp 4
+        self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
     ];
 
     public static $authExperiments = [
@@ -170,6 +175,8 @@ class SixpackService
         self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
+        // Exp 4
+        self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
     ];
 
     /** @var LoggerInterface */
