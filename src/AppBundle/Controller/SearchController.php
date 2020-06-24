@@ -147,11 +147,11 @@ class SearchController extends BaseController
             }
         }
 
-        // A/B Cheap vs Fair Copy
-        $cheapVsFairExp = $this->sixpack(
+        // A/B Cheap vs Easy Copy
+        $cheapVsEasyExp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_COPY_CHEAP_VS_FAIR,
-            ['cheap', 'fair'],
+            SixpackService::EXPERIMENT_COPY_CHEAP_VS_EASY,
+            ['cheap', 'easy'],
             SixpackService::LOG_MIXPANEL_ALL
         );
 
@@ -230,7 +230,7 @@ class SearchController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
-            'cheap_vs_fair_exp' => $cheapVsFairExp,
+            'cheap_vs_easy_exp' => $cheapVsEasyExp,
         ];
     }
 

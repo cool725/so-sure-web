@@ -35,7 +35,10 @@ class SixpackService
     const EXPERIMENT_EXIT_POPUP_MULTI = 'Exit Popup Multi';
 
     // Exp 4
-    const EXPERIMENT_COPY_CHEAP_VS_FAIR = 'Hompage Copy Cheap vs Fair';
+    // const EXPERIMENT_COPY_CHEAP_VS_FAIR = 'Hompage Copy Cheap vs Fair';
+
+    // Exp 5
+    const EXPERIMENT_COPY_CHEAP_VS_EASY = 'Homepage Copy Cheap vs Easy';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -124,7 +127,8 @@ class SixpackService
         'Personalised Quote',
         'Personalised Quote V2',
         'Exit Popup',
-        'Email Optional'
+        'Email Optional',
+        'Hompage Copy Cheap vs Fair'
     ];
 
     public static $unauthExperiments = [
@@ -135,7 +139,9 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
         // Exp 4
-        self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
+        // self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
+        // Exp 5
+        self::EXPERIMENT_COPY_CHEAP_VS_EASY,
     ];
 
     public static $authExperiments = [
@@ -176,7 +182,9 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
         // Exp 4
-        self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
+        // self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
+        // Exp 5
+        self::EXPERIMENT_COPY_CHEAP_VS_EASY,
     ];
 
     /** @var LoggerInterface */
