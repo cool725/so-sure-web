@@ -120,19 +120,6 @@ class DefaultController extends BaseController
 
         $template = 'AppBundle:Default:indexQuickQuote.html.twig';
 
-        // A/B Exit Popup
-        // Check for feature
-        $exitPopupFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_EXIT_POPUP);
-        $exitPopupExp = null;
-        if ($exitPopupFeature) {
-            $exitPopupExp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_EXIT_POPUP_MULTI,
-                ['variant-a', 'variant-b'],
-                SixpackService::LOG_MIXPANEL_ALL
-            );
-        }
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -140,77 +127,10 @@ class DefaultController extends BaseController
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $this->competitorsData(),
             'from_price' => $fromPrice,
-            'exit_popup_exp' => $exitPopupExp,
         );
 
         return $this->render($template, $data);
     }
-
-    // /**
-    //  * @Route("/free-taste-card", name="free_taste_card")
-    //  */
-    // public function freeTasteCard()
-    // {
-    //     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'tastecard']);
-
-    //     $pageType = 'tastecard';
-
-    //     $data = array(
-    //         'page_type' => $pageType,
-    //     );
-
-
-    //     $template = 'AppBundle:Default:indexPromotions.html.twig';
-
-    //     return $this->render($template, $data);
-    // }
-
-    // /**
-    //  * @Route("/free-phone-case", name="free_phone_case")
-    //  * @Route("/case", name="case")
-    //  */
-    // public function freePhoneCase()
-    // {
-    //     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'freephonecase']);
-
-    //     $pageType = 'phonecase';
-
-    //     $data = array(
-    //         'page_type' => $pageType,
-    //     );
-
-    //     $template = 'AppBundle:Default:indexPromotions.html.twig';
-
-    //     return $this->render($template, $data);
-    // }
-
-    // /**
-    //  * @Route("/marlow", name="marlow")
-    //  */
-    // public function marlowAction()
-    // {
-    //     return $this->redirectToRoute('promo', ['code' => 'MARLOW15']);
-    // }
-
-    // /**
-    //  * @Route("/valentines-day-free-phone-case", name="valentines_day_free_phone_case")
-    //  */
-    // public function valentinesDayCase()
-    // {
-    //     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
-    //         'page' => 'valentinesdayfreephonecase'
-    //     ]);
-
-    //     $pageType = 'vdayphonecase';
-
-    //     $data = array(
-    //         'page_type' => $pageType,
-    //     );
-
-    //     $template = 'AppBundle:Default:indexPromotions.html.twig';
-
-    //     return $this->render($template, $data);
-    // }
 
     /**
      * @Route("/social-insurance", name="social_insurance", options={"sitemap" = true})

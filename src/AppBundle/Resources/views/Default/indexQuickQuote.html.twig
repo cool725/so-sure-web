@@ -158,9 +158,6 @@
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
-    {% if feature_enabled('exit-popup') %}
-        {% include 'AppBundle::Components/_exitPopup.html.twig' with { 'exit_popup_exp': exit_popup_exp } %}
-    {% endif %}
 
 {% endblock %}
 
