@@ -51,6 +51,10 @@ class GoCompare
         1826 => ['make' => 'Apple', 'model' => 'iPhone SE (2020)', 'memory' => 64],
         1827 => ['make' => 'Apple', 'model' => 'iPhone SE (2020)', 'memory' => 128],
         1828 => ['make' => 'Apple', 'model' => 'iPhone SE (2020)', 'memory' => 256],
+
+        1890 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 64],
+        1891 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 128],
+        1892 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 25],
         // no longer supported by gocompare.
         // 215 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 128],
         // 216 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 32],
@@ -100,6 +104,8 @@ class GoCompare
         1801 => ['make' => 'Samsung', 'model' => 'Galaxy Xcover Pro', 'memory' => 64],
         1802 => ['make' => 'Samsung', 'model' => 'Galaxy A51', 'memory' => 128],
         1809 => ['make' => 'Samsung', 'model' => 'Galaxy A71', 'memory' => 128],
+        1894 => ['make' => 'Samsung', 'model' => 'Galaxy A41', 'memory' => 64],
+        1896 => ['make' => 'Samsung', 'model' => 'Galaxy S10 Lite', 'memory' => 128],
 
         1412 => ['make' => 'Huawei', 'model' => 'P20', 'memory' => 128],
         1413 => ['make' => 'Huawei', 'model' => 'P20 Lite', 'memory' => 64],
@@ -131,6 +137,8 @@ class GoCompare
         1420 => ['make' => 'Motorola', 'model' => 'Moto Z2 Force', 'memory' => 64],
         1421 => ['make' => 'Motorola', 'model' => 'Moto E4 Plus', 'memory' => 16],
         1799 => ['make' => 'Motorola', 'model' => 'Moto G6 Plus', 'memory' => 64],
+        1879 => ['make' => 'Motorola', 'model' => 'Moto Edge', 'memory' => 128],
+        1884 => ['make' => 'Motorola', 'model' => 'Moto G8 Plus', 'memory' => 64],
 
         1428 => ['make' => 'LG', 'model' => 'G7 ThinQ', 'memory' => 64],
 
@@ -140,6 +148,7 @@ class GoCompare
         1462 => ['make' => 'Sony', 'model' => 'Xperia XZ3', 'memory' => 64],
         1744 => ['make' => 'Sony', 'model' => 'Xperia L3', 'memory' => 32],
         1751 => ['make' => 'Sony', 'model' => 'Xperia 5', 'memory' => 128],
+        1870 => ['make' => 'Sony', 'model' => 'Xperia 1 II', 'memory' => 256],
 
         827 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 64],
         835 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 128],
@@ -177,9 +186,18 @@ class GoCompare
         1737 => ['make' => 'Oppo', 'model' => 'Reno Z', 'memory' => 128],
         1738 => ['make' => 'Oppo', 'model' => 'Find X', 'memory' => 256],
         1760 => ['make' => 'Oppo', 'model' => 'Reno 5G', 'memory' => 256],
+        1874 => ['make' => 'Oppo', 'model' => 'Find X2', 'memory' => 256],
+        1875 => ['make' => 'Oppo', 'model' => 'Find X2 Lite 5G', 'memory' => 128],
+        1876 => ['make' => 'Oppo', 'model' => 'Find X2 Pro', 'memory' => 512],
+
+        1872 => ['make' => 'Realme', 'model' => '6', 'memory' => 64],
+        1873 => ['make' => 'Realme', 'model' => '6', 'memory' => 128],
 
         1741 => ['make' => 'Xiaomi', 'model' => 'Redmi Note 7', 'memory' => 64],
         1742 => ['make' => 'Xiaomi', 'model' => 'Mi 9T', 'memory' => 64],
         1743 => ['make' => 'Xiaomi', 'model' => 'Mi 9T Pro', 'memory' => 128],
+        1878 => ['make' => 'Xiaomi', 'model' => 'Mi Mix 3', 'memory' => 128],
+        1888 => ['make' => 'Xiaomi', 'model' => 'Poco F2 Pro', 'memory' => 128],
+        1889 => ['make' => 'Xiaomi', 'model' => 'Poco F2 Pro', 'memory' => 512],
     ];
 }
