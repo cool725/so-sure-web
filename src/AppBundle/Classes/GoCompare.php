@@ -139,6 +139,9 @@ class GoCompare
         1799 => ['make' => 'Motorola', 'model' => 'Moto G6 Plus', 'memory' => 64],
         1879 => ['make' => 'Motorola', 'model' => 'Moto Edge', 'memory' => 128],
         1884 => ['make' => 'Motorola', 'model' => 'Moto G8 Plus', 'memory' => 64],
+        1881 => ['make' => 'Motorola', 'model' => 'Moto G8 Power Lite', 'memory' => 64],
+        1886 => ['make' => 'Motorola', 'model' => 'One Macro', 'memory' => 64],
+        1895 => ['make' => 'Motorola', 'model' => 'Moto G8 Power', 'memory' => 64],
 
         1428 => ['make' => 'LG', 'model' => 'G7 ThinQ', 'memory' => 64],
 
@@ -149,6 +152,7 @@ class GoCompare
         1744 => ['make' => 'Sony', 'model' => 'Xperia L3', 'memory' => 32],
         1751 => ['make' => 'Sony', 'model' => 'Xperia 5', 'memory' => 128],
         1870 => ['make' => 'Sony', 'model' => 'Xperia 1 II', 'memory' => 256],
+        1882 => ['make' => 'Sony', 'model' => 'Xperia L4', 'memory' => 64],
 
         827 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 64],
         835 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 128],
@@ -189,6 +193,9 @@ class GoCompare
         1874 => ['make' => 'Oppo', 'model' => 'Find X2', 'memory' => 256],
         1875 => ['make' => 'Oppo', 'model' => 'Find X2 Lite 5G', 'memory' => 128],
         1876 => ['make' => 'Oppo', 'model' => 'Find X2 Pro', 'memory' => 512],
+        1877 => ['make' => 'Oppo', 'model' => 'Find X2 Neo', 'memory' => 256],
+        1880 => ['make' => 'Oppo', 'model' => 'A5 2020', 'memory' => 64],
+        1885 => ['make' => 'Oppo', 'model' => 'Reno 2', 'memory' => 256],
 
         1872 => ['make' => 'Realme', 'model' => '6', 'memory' => 64],
         1873 => ['make' => 'Realme', 'model' => '6', 'memory' => 128],
