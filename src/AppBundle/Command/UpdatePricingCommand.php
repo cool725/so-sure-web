@@ -79,8 +79,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                             );
                             $output->writeln(print_r($line));
                         } else {
-                            if (
-                                $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp()
+                            if ($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp()
                                     == $line["GWPMonthly"]
                                 && $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp()
                                     == $line["GWPAnnually"]) {
