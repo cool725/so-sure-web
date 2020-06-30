@@ -120,6 +120,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                     }
                 }
             }
+            $this->dm->flush();
         } else {
             $output->writeln('Cannot open CSV');
         }
