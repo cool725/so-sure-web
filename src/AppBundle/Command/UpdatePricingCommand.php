@@ -62,6 +62,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 } else {
                     $line = array_combine($header, $row);
                     $repo = $this->dm->getRepository(Phone::class);
+                    /** @var Phone $phone */
                     $phone = $repo->findOneBy([
                         'active' => true,
                         'makeCanonical' => mb_strtolower($line["make"]),
@@ -95,7 +96,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                                     $line["GWPMonthly"],
                                     $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
                                     $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess(),
-                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSUreExcess(),
+                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess(),
                                     null,
                                     "monthly"
                                 );
@@ -103,7 +104,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                                     $line["GWPAnnually"],
                                     $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
                                     $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getExcess(),
-                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getPicSUreExcess(),
+                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getPicSureExcess(),
                                     null,
                                     "yearly"
                                 );
