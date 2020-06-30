@@ -65,11 +65,7 @@
                              data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png"
                              alt="so-sure - social insurance"
                              class="img-fluid lozad">
-                        <div class="hero__badge animated tada"
-                             {# data-toggle="modal" #}
-                             {# data-target="#covid_modal" #}
-                             {# role="button" #}
-                             >
+                        <div class="hero__badge animated tada">
                             <div class="hero__badge-inner">2 months<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
                         </div>
                     </div>
@@ -86,11 +82,7 @@
                 <div class="col-md-8 offset-md-2">
                     <div class="hero__illustration d-block d-md-none mt-4">
                         <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad">
-                        <div class="hero__badge animated tada"
-                             {# data-toggle="modal" #}
-                             {# data-target="#covid_modal" #}
-                             {# role="button" #}
-                             >
+                        <div class="hero__badge animated tada">
                             <div class="hero__badge-inner">2 months<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
                         </div>
                     </div>
@@ -166,9 +158,6 @@
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
-    {% if feature_enabled('exit-popup') %}
-        {% include 'AppBundle::Components/_exitPopup.html.twig' with { 'exit_popup_exp': exit_popup_exp } %}
-    {% endif %}
 
 {% endblock %}
 

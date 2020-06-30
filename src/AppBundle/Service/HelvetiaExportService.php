@@ -129,7 +129,7 @@ class HelvetiaExportService
                 $policy->getBrokerCommissionPaid(),
                 $policy->getCoverholderCommissionPaid(),
                 $policy->getPotValue(),
-                $policy->getPaymentMethod()->getType(),
+                $policy->getPaymentMethod() ? $policy->getPaymentMethod()->getType() : '',
                 $policy->getPromoPotValue(),
                 $policy->getHelvetiaCash(),
                 $policy->getRewardPaidIn()
