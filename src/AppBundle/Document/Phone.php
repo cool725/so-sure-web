@@ -1574,13 +1574,15 @@ class Phone
         if ($stream) {
             $price->setStream($stream);
         }
-        if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
+        // Turned off by ElliotM 30/06/20
+        // Alex and I think this is a Salva requirement that no longer applies
+        /*if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf(
                 '£%.2f is less than allowed min binder £%.2f',
                 $price->getMonthlyPremiumPrice(null, $from),
                 $this->getSalvaMiniumumBinderMonthlyPremium()
             ));
-        }
+        }*/
         if ($this->getOldestCurrentPhonePrice()) {
             if ($this->getOldestCurrentPhonePrice()->getValidFrom() > $from) {
                 throw new \Exception(sprintf(
