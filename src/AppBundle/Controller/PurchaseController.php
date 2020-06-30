@@ -714,7 +714,8 @@ class PurchaseController extends BaseController
                         true,
                         null,
                         $identityLog,
-                        $bacsConfirm->getCalculatedBillingDate()
+                        $bacsConfirm->getCalculatedBillingDate(),
+                        true
                     );
                     $paymentService->confirmBacs(
                         $policy,

@@ -61,9 +61,17 @@ class Bacs extends BankAccount
         $this->billingDate = $billingDate;
     }
 
+    /**
+     * Gets the selected billing date which if none was selected because the form bit has been skipped, will just
+     * return the first in the list of possible choices.
+     * @return \DateTime the chosen billing date.
+     */
     public function getBillingDate()
     {
-        return $this->billingDate;
+        if ($this->billingDate !== null) {
+            return $this->billingDate;
+        }
+        return static::getEligibleBillingDays()[0];
     }
 
     /**
@@ -72,7 +80,13 @@ class Bacs extends BankAccount
      */
     public function getCalculatedBillingDate()
     {
-        return DateTrait::setDayOfMonth($this->startOfMonth(), $this->billingDate);
+        $date = $this->startOfMonth();
+        $date = DateTrait::setDayOfMonth($date, $this->getBillingDate());
+        if ($date < DateTrait::startOfDay()) {
+            $date->add(new \DateInterval("P1M"));
+        }
+        $date->add(new \DateInterval("PT3H"));
+        return $date;
     }
 
     public function setBankAccount(BankAccount $bankAccount = null)
@@ -106,5 +120,29 @@ class Bacs extends BankAccount
         $bankAccount->setAnnual($this->isAnnual());
 
         return $bankAccount;
+    }
+
+    /**
+     * Gets a list of dates of the month upon which a user could validly set their billing to occur.
+     * @param \DateTime $date is the date that we are checking this on, with null defaulting to now.
+     * @return array containing dates of this month on which recurring payments could come in the next months on the
+     *               same day of the month.
+     */
+    public static function getEligibleBillingDays($date = null)
+    {
+        $date = $date ?: new \DateTime();
+        // wait 4 business days. first payment is scheduled 2 days later, and 2 days for payment to be run.
+        $initialDone = DateTrait::addDays(DateTrait::addBusinessDays($date, 2), 2);
+        $endOfMonth = DateTrait::endOfMonth($date);
+        if ($initialDone > $endOfMonth) {
+            $i = (int) $initialDone->format("d");
+        } else {
+            $i = 1;
+        }
+        $days = [];
+        for ($i; $i <= 28; $i++) {
+            $days[] = $i;
+        }
+        return $days;
     }
 }

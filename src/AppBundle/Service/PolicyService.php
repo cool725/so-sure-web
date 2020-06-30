@@ -514,7 +514,8 @@ class PolicyService
         $setActive = false,
         $numPayments = null,
         IdentityLog $identityLog = null,
-        $billing = null
+        $billing = null,
+        $bacs = false
     ) {
         $this->statsd->startTiming("policy.create");
         try {
@@ -550,7 +551,7 @@ class PolicyService
                 if ($billing) {
                     $dateToBill = $billing;
                 }
-                $this->generateScheduledPayments($policy, $dateToBill, $date, $numPayments);
+                $this->generateScheduledPayments($policy, $dateToBill, $date, $numPayments, null, false, $bacs);
                 $policy->arePolicyScheduledPaymentsCorrect(true);
             } else {
                 $policy->setPremiumInstallments($numPayments);
@@ -1049,7 +1050,8 @@ class PolicyService
         \DateTime $now = null,
         $numPayments = null,
         $billingOffset = null,
-        $renewal = false
+        $renewal = false,
+        $bacs = false
     ) {
         if (!$now) {
             $now = new \DateTime();
@@ -1101,7 +1103,7 @@ class PolicyService
             }
             $numPaidPayments = 0;
         }
-        $isBacs = $policy->getPaymentMethod() instanceof BacsPaymentMethod;
+        $isBacs = $bacs || $policy->getPaymentMethod() instanceof BacsPaymentMethod;
         $numScheduledPayments = $numPayments;
         for ($i = $numPaidPayments; $i < $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;

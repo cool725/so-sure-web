@@ -1,18 +1,39 @@
 <div class="cardbox cardbox-100 p-4 p-lg-5 pb-lg-0 🍆">
-    <div class="mb-3 h3 text-primary fit">Cheap, Fast &amp; Easy 🇬🇧</div>
+    <div class="mb-3 h3 text-primary fit">
+        {% if cheap_vs_easy_exp is defined and cheap_vs_easy_exp == 'easy' %}
+            Easy, Fast &amp; Great Value 🇬🇧
+        {% else %}
+            Cheap, Fast &amp; Easy 🇬🇧
+        {% endif %}
+    </div>
     <ul class="list-unstyled icn-fa-list mb-4">
-        <li class="mb-2">
-            <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Low price and excess from &pound;50
-        </li>
-        <li class="mb-2">
-            <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Fast replace and repair service
-        </li>
-        <li class="mb-2">
-            <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Easy cashback scheme
-        </li>
+        {% if cheap_vs_easy_exp is defined and cheap_vs_easy_exp == 'easy' %}
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Fast replace and repair service
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Easy cashback scheme
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Low price and excess from &pound;50
+            </li>
+        {% else %}
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Low price and excess from &pound;50
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Fast replace and repair service
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Easy cashback scheme
+            </li>
+        {% endif %}
     </ul>
     {{ form_start(form_phone, { 'attr': {
         'data-toggle': 'validator',
@@ -41,19 +62,13 @@
                     'disabled': 'disabled'
             }}) }}
         </div>
-        {% set email_required = 'false' %}
-        {% set email_text = '' %}
-        {% if email_optional is defined and email_optional == 'email' %}
-            {% set email_required = 'true' %}
-            {% set email_text = '*' %}
-        {% endif %}
         <div class="form-group">
             <input type="email"
                    class="form-control phone-search-dropdown-card__text phone-search-email"
-                   placeholder="Enter Email for Quote{{ email_text }}"
+                   placeholder="Enter Email for Quote*"
                    disabled="disabled"
                    name="launch_phone[email]"
-                   data-required="{{ email_required }}">
+                   data-required="true">
         </div>
         <div class="form-group">
             {{ form_widget(form_phone.next, {

@@ -144,7 +144,15 @@ class UpgradeService
                         /** @var CheckoutPayment $refundPayment */
                         $refundPayment = $policy->findPaymentForRefund($amount);
                         if ($refundPayment) {
-                            $this->checkoutService->refund($refundPayment, 0 - $amount);
+                            $proportion = $amount / $refundPayment->getAmount();
+                            $coverholderCommission = $proportion * $refundPayment->getCoverholderCommission();
+                            $brokerCommission = $proportion * $refundPayment->getBrokerCommission();
+                            $this->checkoutService->refund(
+                                $refundPayment,
+                                0 - $amount,
+                                0 - $coverholderCommission,
+                                0 - $brokerCommission
+                            );
                         } else {
                             throw new CannotRefundException('Cannot refund. No eligible payments');
                         }

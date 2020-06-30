@@ -1,0 +1,5 @@
+Make,Model,Details,Storage,Device,Monthly Policy Price,Replacement Price,Release Price,Release Price url,Os,InitialVersion,MaxVersion,Processor,Cores,Memory,SSD,Physical Screen,Resolution,Camera,4G,Frequency,Release Date,Picture,Urls,Replacement Make,Replacement Model,Replacement Memory
+Xiaomi,Mi A2,Xiaomi Mi A2,32,'jasmine_sprout',3.99,,£200 ,https://www.amazon.co.uk/Xiaomi-Mi-64GB-4GB-RAM-Black/dp/B07FMPVBQR,Android,8.1,,2200,8,4096,N,158.7,1080 x 2160,20,Y,,7/18,,,,,
+Xiaomi,Mi A2,Xiaomi Mi A2,64,'jasmine_sprout',5.49,,£260 ,https://www.amazon.co.uk/Xiaomi-Mi-64GB-4GB-RAM-Black/dp/B07FMPVBQR,Android,8.1,,2200,8,4096,N,158.7,1080 x 2160,20,Y,,7/18,,,,,
+Realme,6,Realme 6,64,"'RMX2001L1','RMX2003L1'",4.99,,£219 ,https://buy.realme.com/uk/goods/138,Android,10.0,,2050,8,4096,Y,162.1,1080 x 2400,64,Y,,3/20,,,,,
+Realme,6,Realme 6,128,"'RMX2001L1','RMX2003L1'",5.49,,£269 ,https://buy.realme.com/uk/goods/138,Android,10.0,,2050,8,8192,Y,162.1,1080 x 2400,64,Y,,3/20,,,,,
