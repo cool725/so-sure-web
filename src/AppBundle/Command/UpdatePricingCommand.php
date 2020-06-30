@@ -70,12 +70,27 @@ class UpdatePricingCommand extends ContainerAwareCommand
                     ]);
                     if ($phone) {
                         if (!$wet) {
-                            $output->writeln('New price - "'.mb_strtolower($line["make"].'" "'.$line["model"].'" "'.$line["memory"]).'"');
+                            $output->writeln(
+                                'New price - "'.mb_strtolower(
+                                    $line["make"].'" "'.
+                                    $line["model"].'" "'.
+                                    $line["memory"]
+                                ).'"'
+                            );
                             $output->writeln(print_r($line));
                         } else {
-                            if ($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp() == $line["GWPMonthly"]
-                                && $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp() == $line["GWPAnnually"]) {
-                                $output->writeln('Price unchanged - "'.mb_strtolower($line["make"].'" "'.$line["model"].'" "'.$line["memory"]).'"');
+                            if (
+                                $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp()
+                                    == $line["GWPMonthly"]
+                                && $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp()
+                                    == $line["GWPAnnually"]) {
+                                $output->writeln(
+                                    'Price unchanged - "'.mb_strtolower(
+                                        $line["make"].'" "'.
+                                        $line["model"].'" "'.
+                                        $line["memory"]
+                                    ).'"'
+                                );
                             } else {
                                 $phone->changePrice(
                                     $line["GWPMonthly"],
@@ -96,7 +111,13 @@ class UpdatePricingCommand extends ContainerAwareCommand
                             }
                         }
                     } else {
-                        $output->writeln('Phone NOT found - "'.mb_strtolower($line["make"].'" "'.$line["model"].'" "'.$line["memory"]).'"');
+                        $output->writeln(
+                            'Phone NOT found - "'.mb_strtolower(
+                                $line["make"].'" "'.
+                                $line["model"].'" "'.
+                                $line["memory"]
+                            ).'"'
+                        );
                     }
                 }
             }
