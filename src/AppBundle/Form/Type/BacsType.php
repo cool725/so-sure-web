@@ -51,14 +51,11 @@ class BacsType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
-        $days = $this->getEligibleBillingDays();
+        $days = Bacs::getEligibleBillingDays();
         $indexedDays = [];
         foreach ($days as $day) {
             $indexedDays[$day] = $day;
         }
-        $today = min($this->adjustDayForBilling(new \DateTime())->format("d"), 28);
-
         $builder
             ->add('accountName', TextType::class, ['required' => $this->required])
             ->add('validateName', HiddenType::class)
@@ -68,7 +65,7 @@ class BacsType extends AbstractType
                 'placeholder' => 'Select date...',
                 'required' => $this->required,
                 'choices' => $indexedDays,
-                'data' => $today,
+                'data' => reset($indexedDays)
             ])
             ->add('soleSignature', CheckboxType::class, [
                 'label' => 'I am the sole signature on the account',
@@ -105,29 +102,5 @@ class BacsType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => 'AppBundle\Document\Form\Bacs',
         ));
-    }
-
-    /**
-     * Gets a list of dates of the month upon which a user could validly set their billing to occur.
-     * @param \DateTime $date is the date that we are checking this on, with null defaulting to now.
-     * @return array containing dates of this month on which recurring payments could come in the next months on the
-     *               same day of the month.
-     */
-    private function getEligibleBillingDays($date = null)
-    {
-        $date = $date ?: new \DateTime();
-        // wait 4 business days. first payment is scheduled 2 days later, and 2 days for payment to be run.
-        $initialDone = $this->addDays($this->addBusinessDays($date, 2), 2);
-        $endOfMonth = $this->endOfMonth($date);
-        if ($initialDone > $endOfMonth) {
-            $i = (int)$initialDone->format("d");
-        } else {
-            $i = 1;
-        }
-        $days = [];
-        for ($i; $i <= 28; $i++) {
-            $days[] = $i;
-        }
-        return $days;
     }
 }
