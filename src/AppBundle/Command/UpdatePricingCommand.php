@@ -332,8 +332,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                     && $header != "model"
                     && $header != "memory"
                     && $header != "monthlyPrice"
-                    && $header != "annualPrice")
-            {
+                    && $header != "annualPrice") {
                 $overview .= "$header: ".$currentValues[$header]." -> ".$update[$header]."\n";
             }
         }
