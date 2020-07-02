@@ -347,7 +347,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
             $this->output->writeln($error);
         }
         if (count($this->errors) > 0) {
-            $this->output->writeln("Fix the above ".count($this->errors)." errors");
+            $this->output->writeln("Please fix the above ".count($this->errors)." errors");
             exit(1);
         }
     }
