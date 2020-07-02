@@ -25,7 +25,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
     protected $excessOnly;
     /** @var boolean $ignoreMissing */
     protected $ignoreMissing;
-    protected $hearers;
+    protected $headers;
     protected $output;
     protected $errors;
     protected $updates;
@@ -295,7 +295,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 null,
                 "yearly"
             );
-            //$this->dm->flush();
+            $this->dm->flush();
         } else {
             $this->output->writeln("This was a dry run. No changes were made.");
         }
