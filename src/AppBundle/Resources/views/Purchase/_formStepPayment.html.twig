@@ -14,7 +14,7 @@
     {% set yearlyMonthly = phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) / 12 %}
     {% set saving = withoutDiscount - phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
     <h2 class="text-dodger-blue text-center">How would you like to pay?</h2>
-    <p class="text-center mb-4">Get {{ free_months }} free when you pay yearly 🤑</p>    
+    <p class="text-center mb-4">Get {{ free_months }} free when you pay yearly 🤑</p>
     <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
         <div class="radio-btn-original">
             {{ form_label(purchase_form.amount, 'Payment options') }}

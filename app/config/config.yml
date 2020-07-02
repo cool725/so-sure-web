@@ -104,7 +104,7 @@ twig:
         support_number: "03450744839"
         broker_name: "Shepherd Compello Ltd"
         policy_doc_version: 15,
-        free_months: "two months"
+        free_months: "one month"
 
 doctrine_mongodb:
     connections:

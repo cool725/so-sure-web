@@ -206,12 +206,8 @@
                                  alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
                                  class="lozad img-fluid hero-generic">
                         {% endif %}
-                        <div class="hero__badge animated tada"
-                             {# data-toggle="modal" #}
-                             {# data-target="#covid_modal" #}
-                             {# role="button" #}
-                             >
-                            <div class="hero__badge-inner">2 months<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
+                        <div class="hero__badge animated tada">
+                            <div class="hero__badge-inner">{{ free_months|capitalize }}<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
                         </div>
                     </div>
                 </div>
