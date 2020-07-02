@@ -150,6 +150,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
         if(count(array_diff($this->updates[0], $this->headers))) {
             $this->errors[] = "Incorrect headers";
             $this->errors[] = print_r(array_diff($this->updates[0], $this->headers));
+            $this->errors();
         }
 
         foreach ($this->updates as $key => $update) {
