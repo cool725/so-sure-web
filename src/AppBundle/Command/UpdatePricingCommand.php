@@ -127,14 +127,15 @@ class UpdatePricingCommand extends ContainerAwareCommand
             }
         }
 
-        if(!$this->wet) {
+        if (!$this->wet) {
             $this->output->writeln("THIS WAS A DRY RUN. NO CHANGES WERE MADE.");
         }
 
         $output->writeln('Finished. If prices were changed, it will take effect in 2 hours.');
     }
 
-    private function readCsv($csv) {
+    private function readCsv($csv)
+    {
         if (($handle = fopen($csv, 'r')) !== false) {
             while (($row = fgetcsv($handle)) !== false) {
                 $this->updates[] = $row;
@@ -147,7 +148,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
 
     private function validateUpdates()
     {
-        if(count(array_diff($this->updates[0], $this->headers))) {
+        if (count(array_diff($this->updates[0], $this->headers))) {
             $this->errors[] = "Incorrect headers";
             $this->errors[] = print_r(array_diff($this->updates[0], $this->headers));
             $this->errors();
@@ -180,9 +181,9 @@ class UpdatePricingCommand extends ContainerAwareCommand
 
                     if (!$phone) {
                         $this->errors[] = 'Phone not found in DB or is inactive - "'.mb_strtolower(
-                        $update["make"].'" "'.
-                        $update["model"].'" "'.
-                        $update["memory"]
+                            $update["make"].'" "'.
+                            $update["model"].'" "'.
+                            $update["memory"]
                         ).'"';
                     }
                 }
@@ -214,7 +215,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
                             $this->errors[] = "$premium is blank";
                         } elseif (!is_numeric((float) $update[$premium])) {
                             $this->errors[] = $update[$premium]." $premium not a number";
-                        } elseif (strlen(substr(strrchr($update[$premium], "."), 1)) != 2) {
+                        } elseif (mb_strlen(mb_substr(mb_strrchr($update[$premium], "."), 1)) != 2) {
                             $this->errors[] = $update[$premium]." $premium must be to 2 decimal places";
                         }
                     }
@@ -236,7 +237,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
         }
 
         $this->errors();
-        if(count($this->errors) == 0) {
+        if (count($this->errors) == 0) {
             return true;
         } else {
             return false;
@@ -251,18 +252,30 @@ class UpdatePricingCommand extends ContainerAwareCommand
         $monthlyPicSureExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess();
 
         $currentValues = [
-            'monthlyGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp(),
-            'annualGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp(),
-            'damage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getDamage(),
-            'warranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getWarranty(),
-            'extendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getExtendedWarranty(),
-            'loss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getLoss(),
-            'theft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getTheft(),
-            'validatedDamage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()->getDamage(),
-            'validatedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()->getWarranty(),
-            'validatedExtendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()->getExtendedWarranty(),
-            'validatedLoss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()->getLoss(),
-            'validatedTheft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()->getTheft()
+            'monthlyGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)
+                ->getGwp(),
+            'annualGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)
+                ->getGwp(),
+            'damage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getDamage(),
+            'warranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getWarranty(),
+            'extendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getExtendedWarranty(),
+            'loss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getLoss(),
+            'theft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getTheft(),
+            'validatedDamage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getDamage(),
+            'validatedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getWarranty(),
+            'validatedExtendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getExtendedWarranty(),
+            'validatedLoss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getLoss(),
+            'validatedTheft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getTheft()
         ];
 
         if ($this->premiumOnly || (!$this->premiumOnly && !$this->excessOnly)) {
