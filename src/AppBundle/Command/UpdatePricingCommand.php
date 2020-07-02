@@ -11,19 +11,50 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use AppBundle\Document\PolicyTerms;
-use AppBundle\Repository\PolicyTermsRepository;
 use AppBundle\Document\PhonePrice;
 
 class UpdatePricingCommand extends ContainerAwareCommand
 {
     /** @var DocumentManager  */
     protected $dm;
+    /** @var boolean $wet */
+    protected $wet;
+    /** @var boolean $premiumOnly */
+    protected $premiumOnly;
+    /** @var boolean $excessOnly */
+    protected $excessOnly;
+    /** @var boolean $ignoreMissing */
+    protected $ignoreMissing;
+    protected $headers;
+    protected $output;
+    protected $errors;
+    protected $updates;
 
     public function __construct(DocumentManager $dm)
     {
         parent::__construct();
         $this->dm = $dm;
+        $this->headers = [
+            'make',
+            'model',
+            'memory',
+            'monthlyPrice',
+            'annualPrice',
+            'monthlyGwp',
+            'annualGwp',
+            'damage',
+            'warranty',
+            'extendedWarranty',
+            'loss',
+            'theft',
+            'validatedDamage',
+            'validatedWarranty',
+            'validatedExtendedWarranty',
+            'validatedLoss',
+            'validatedTheft'
+        ];
+        $this->errors = [];
+        $this->updates = [];
     }
 
     protected function configure()
@@ -38,6 +69,24 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 'Full path to new prices CSV'
             )
             ->addOption(
+                'premiumOnly',
+                null,
+                InputOption::VALUE_NONE,
+                'Only update the premium from the CSV'
+            )
+            ->addOption(
+                'excessOnly',
+                null,
+                InputOption::VALUE_NONE,
+                'Only update the excesses from the CSV'
+            )
+            ->addOption(
+                'ignoreMissing',
+                null,
+                InputOption::VALUE_NONE,
+                'Surpress the error for phones not found in DB or inactive'
+            )
+            ->addOption(
                 'wet',
                 null,
                 InputOption::VALUE_NONE,
@@ -48,84 +97,257 @@ class UpdatePricingCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var boolean $wet */
-        $wet = $input->getOption('wet') == true;
         $csv = $input->getOption('csv');
+        $this->output = $output;
+        /** @var boolean $wet */
+        $this->wet = $input->getOption('wet') == true;
+        /** @var boolean $premiumOnly */
+        $this->premiumOnly = $input->getOption('premiumOnly') == true;
+        /** @var boolean $excessOnly */
+        $this->excessOnly = $input->getOption('excessOnly') == true;
+        /** @var boolean $ignoreMissing */
+        $this->ignoreMissing = $input->getOption('ignoreMissing') == true;
 
-        if (($handle = fopen($csv, 'r')) !== false) {
-            $output->writeln('file opened successfully');
-            $header = null;
-            while (($row = fgetcsv($handle, 1000)) !== false) {
-                if (!$header) {
-                    $header = $row;
-                    $output->writeln('make, model, memory, priceMonthly, priceAnnually, GWPMonthly, GWPAnnually');
-                } else {
-                    $line = array_combine($header, $row);
+        $this->readCsv($csv);
+        if ($this->validateUpdates()) {
+            foreach ($this->updates as $key => $update) {
+                if ($key != 0) {
                     $repo = $this->dm->getRepository(Phone::class);
                     /** @var Phone $phone */
                     $phone = $repo->findOneBy([
                         'active' => true,
-                        'makeCanonical' => mb_strtolower($line["make"]),
-                        'modelCanonical' => mb_strtolower($line["model"]),
-                        'memory' => (int) $line["memory"]
+                        'makeCanonical' => mb_strtolower($update["make"]),
+                        'modelCanonical' => mb_strtolower($update["model"]),
+                        'memory' => (int) $update["memory"]
                     ]);
                     if ($phone) {
-                        if (!$wet) {
-                            $output->writeln(
-                                'New price - "'.mb_strtolower(
-                                    $line["make"].'" "'.
-                                    $line["model"].'" "'.
-                                    $line["memory"]
-                                ).'"'
-                            );
-                            $output->writeln(print_r($line));
-                        } else {
-                            if ($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp()
-                                    == $line["GWPMonthly"]
-                                && $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp()
-                                    == $line["GWPAnnually"]) {
-                                $output->writeln(
-                                    'Price unchanged - "'.mb_strtolower(
-                                        $line["make"].'" "'.
-                                        $line["model"].'" "'.
-                                        $line["memory"]
-                                    ).'"'
-                                );
-                            } else {
-                                $phone->changePrice(
-                                    $line["GWPMonthly"],
-                                    $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
-                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess(),
-                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess(),
-                                    null,
-                                    "monthly"
-                                );
-                                $phone->changePrice(
-                                    $line["GWPAnnually"],
-                                    $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
-                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getExcess(),
-                                    $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getPicSureExcess(),
-                                    null,
-                                    "yearly"
-                                );
-                            }
-                        }
-                    } else {
-                        $output->writeln(
-                            'Phone NOT found - "'.mb_strtolower(
-                                $line["make"].'" "'.
-                                $line["model"].'" "'.
-                                $line["memory"]
-                            ).'"'
-                        );
+                        $this->newValues($phone, $update);
                     }
                 }
             }
-            $this->dm->flush();
-        } else {
-            $output->writeln('Cannot open CSV');
+        }
+
+        if (!$this->wet) {
+            $this->output->writeln("THIS WAS A DRY RUN. NO CHANGES WERE MADE.");
         }
 
         $output->writeln('Finished. If prices were changed, it will take effect in 2 hours.');
+    }
+
+    private function readCsv($csv)
+    {
+        if (($handle = fopen($csv, 'r')) !== false) {
+            while (($row = fgetcsv($handle)) !== false) {
+                $this->updates[] = $row;
+            }
+        } else {
+            $this->errors[] = "Unable to open CSV";
+            $this->errors();
+        }
+    }
+
+    private function validateUpdates()
+    {
+        if (count(array_diff($this->updates[0], $this->headers))) {
+            $this->errors[] = "Incorrect headers";
+            $this->errors[] = print_r(array_diff($this->updates[0], $this->headers));
+            $this->errors();
+        }
+
+        foreach ($this->updates as $key => $update) {
+            if ($key != 0) {
+                $update = array_combine($this->headers, $update);
+                $this->updates[$key] = $update;
+
+                if ($update['make'] == '') {
+                    $this->errors[] = "make is blank";
+                }
+                if ($update['model'] == '') {
+                    $this->errors[] = "model is blank";
+                }
+                if ($update['memory'] == '') {
+                    $this->errors[] = "memory is blank";
+                }
+
+                if (!$this->ignoreMissing) {
+                    $repo = $this->dm->getRepository(Phone::class);
+                    /** @var Phone $phone */
+                    $phone = $repo->findOneBy([
+                        'active' => true,
+                        'makeCanonical' => mb_strtolower($update["make"]),
+                        'modelCanonical' => mb_strtolower($update["model"]),
+                        'memory' => (int) $update["memory"]
+                    ]);
+
+                    if (!$phone) {
+                        $this->errors[] = 'Phone not found in DB or is inactive - "'.mb_strtolower(
+                            $update["make"].'" "'.
+                            $update["model"].'" "'.
+                            $update["memory"]
+                        ).'"';
+                    }
+                }
+
+                $premiums = [
+                    'monthlyPrice', // not actually used
+                    'annualPrice', // not actually used
+                    'monthlyGwp',
+                    'annualGwp'
+                ];
+
+                $excesses = [
+                    'damage',
+                    'warranty',
+                    'extendedWarranty',
+                    'loss',
+                    'theft',
+                    'validatedDamage',
+                    'validatedWarranty',
+                    'validatedExtendedWarranty',
+                    'validatedLoss',
+                    'validatedTheft'
+                ];
+
+                if ($this->premiumOnly || (!$this->premiumOnly && !$this->excessOnly)) {
+                    // validate the premium values
+                    foreach ($premiums as $premium) {
+                        if ($update[$premium] == '') {
+                            $this->errors[] = "$premium is blank";
+                        } elseif (!is_numeric((float) $update[$premium])) {
+                            $this->errors[] = $update[$premium]." $premium not a number";
+                        } elseif (mb_strlen(mb_substr(mb_strrchr($update[$premium], "."), 1)) != 2) {
+                            $this->errors[] = $update[$premium]." $premium must be to 2 decimal places";
+                        }
+                    }
+                }
+
+                if ($this->excessOnly || (!$this->premiumOnly && !$this->excessOnly)) {
+                    // validate the excess values
+                    foreach ($excesses as $excess) {
+                        if ($update[$excess] == '') {
+                            $this->errors[] = "$excess is blank";
+                        } elseif (!is_numeric($update[$excess])) {
+                            $this->errors[] = $update[$excess]." $excess not a number";
+                        } elseif (!ctype_digit($update[$excess])) {
+                            $this->errors[] = $update[$excess]." $excess can only be an integer";
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->errors();
+        if (count($this->errors) == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private function newValues($phone, $update)
+    {
+        $monthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp();
+        $yearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp();
+        $monthlyExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess();
+        $monthlyPicSureExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess();
+
+        $currentValues = [
+            'monthlyGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)
+                ->getGwp(),
+            'annualGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)
+                ->getGwp(),
+            'damage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getDamage(),
+            'warranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getWarranty(),
+            'extendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getExtendedWarranty(),
+            'loss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getLoss(),
+            'theft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
+                ->getTheft(),
+            'validatedDamage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getDamage(),
+            'validatedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getWarranty(),
+            'validatedExtendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getExtendedWarranty(),
+            'validatedLoss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getLoss(),
+            'validatedTheft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
+                ->getTheft()
+        ];
+
+        if ($this->premiumOnly || (!$this->premiumOnly && !$this->excessOnly)) {
+            $monthlyGwp = $update["monthlyGwp"];
+            $yearlyGwp = $update["annualGwp"];
+        } elseif ($this->excessOnly || (!$this->premiumOnly && !$this->excessOnly)) {
+            $monthlyExcess->setDamage((int) $update["damage"]);
+            $monthlyExcess->setWarranty((int) $update["warranty"]);
+            $monthlyExcess->setExtendedWarranty((int) $update["extendedWarranty"]);
+            $monthlyExcess->setLoss((int) $update["loss"]);
+            $monthlyExcess->setTheft((int) $update["theft"]);
+            $monthlyPicSureExcess->setDamage((int) $update["validatedDamage"]);
+            $monthlyPicSureExcess->setWarranty((int) $update["validatedWarranty"]);
+            $monthlyPicSureExcess->setExtendedWarranty((int) $update["validatedExtendedWarranty"]);
+            $monthlyPicSureExcess->setLoss((int) $update["validatedLoss"]);
+            $monthlyPicSureExcess->setTheft((int) $update["validatedTheft"]);
+        }
+
+        $this->outputChanges($phone, $currentValues, $update);
+
+        if ($this->wet) {
+            $phone->changePrice(
+                $monthlyGwp,
+                $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
+                $monthlyExcess,
+                $monthlyPicSureExcess,
+                null,
+                "monthly"
+            );
+            $phone->changePrice(
+                $yearlyGwp,
+                $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
+                $monthlyExcess,
+                $monthlyPicSureExcess,
+                null,
+                "yearly"
+            );
+            $this->dm->flush();
+        }
+
+        return $phone;
+    }
+
+    private function outputChanges($phone, $currentValues, $update)
+    {
+        $overview = 'Update - "'.mb_strtolower(
+            $update["make"].'" "'.
+            $update["model"].'" "'.
+            $update["memory"]
+        ).'"'."\n";
+
+        foreach ($this->headers as $header) {
+            if ($header != "make"
+                    && $header != "model"
+                    && $header != "memory"
+                    && $header != "monthlyPrice"
+                    && $header != "annualPrice") {
+                $overview .= "$header: ".$currentValues[$header]." -> ".$update[$header]."\n";
+            }
+        }
+
+        $this->output->writeln($overview);
+    }
+
+    private function errors()
+    {
+        foreach ($this->errors as $error) {
+            $this->output->writeln($error);
+        }
+        if (count($this->errors) > 0) {
+            $this->output->writeln("Please fix the above ".count($this->errors)." errors");
+            exit(1);
+        }
     }
 }
