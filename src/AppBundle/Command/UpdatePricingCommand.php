@@ -127,6 +127,10 @@ class UpdatePricingCommand extends ContainerAwareCommand
             }
         }
 
+        if(!$this->wet) {
+            $this->output->writeln("THIS WAS A DRY RUN. NO CHANGES WERE MADE.");
+        }
+
         $output->writeln('Finished. If prices were changed, it will take effect in 2 hours.');
     }
 
@@ -296,8 +300,6 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 "yearly"
             );
             $this->dm->flush();
-        } else {
-            $this->output->writeln("This was a dry run. No changes were made.");
         }
 
         return $phone;
