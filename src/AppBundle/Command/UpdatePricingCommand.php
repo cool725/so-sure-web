@@ -276,6 +276,8 @@ class UpdatePricingCommand extends ContainerAwareCommand
             $monthlyPicSureExcess->setTheft((int) $update["validatedTheft"]);
         }
 
+        $this->outputChanges($phone, $currentValues, $update);
+
         if ($this->wet) {
             $phone->changePrice(
                 $monthlyGwp,
@@ -294,14 +296,14 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 "yearly"
             );
             //$this->dm->flush();
+        } else {
+            $this->output->writeln("This was a dry run. No changes were made.");
         }
-
-        $this->dryRun($phone, $currentValues, $update);
 
         return $phone;
     }
 
-    private function dryRun($phone, $currentValues, $update)
+    private function outputChanges($phone, $currentValues, $update)
     {
         $overview = 'Update - "'.mb_strtolower(
             $update["make"].'" "'.
