@@ -1132,7 +1132,7 @@ class PolicyService
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates) && $isBacs) {
                     continue;
                 }
-                $scheduledDate->add(new \DateInterval(sprintf('P%dM', $i)));
+                $scheduledDate->add(new \DateInterval(sprintf('P%dM', $isBacs ? $i - 1 : $i)));
             }
             if ($isBacs) {
                 try {

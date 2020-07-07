@@ -2668,6 +2668,7 @@ abstract class Policy
 
     public function getNextBillingDate($date, $filtered = true)
     {
+        $date = DateTrait::startOfDay($date);
         $nextDate = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $this->clearTime($nextDate);
         if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {

@@ -729,17 +729,9 @@ class BankAccount
         }
 
         $bacsPaymentDate = $this->getPaymentDate($date);
-        /*
-        print sprintf(
-            'c: %s bacs: %s next: %s',
-            $useClosestPaymentDate ? 'y' : 'n',
-            $bacsPaymentDate->format('y-m-d'),
-            $nextPolicyPaymentDate->format('y-m-d')
-        );
-        */
         if (!$nextPolicyPaymentDate) {
             return $bacsPaymentDate;
-        } elseif ($useClosestPaymentDate || $nextPolicyPaymentDate < $bacsPaymentDate) {
+        } elseif ($useClosestPaymentDate || $nextPolicyPaymentDate > $bacsPaymentDate) {
             return $bacsPaymentDate;
         } else {
             return $nextPolicyPaymentDate;

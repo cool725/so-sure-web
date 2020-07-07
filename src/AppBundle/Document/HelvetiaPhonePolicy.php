@@ -157,14 +157,13 @@ class HelvetiaPhonePolicy extends PhonePolicy
      */
     public function getTotalExpectedPaidToDate(\DateTime $date = null, $firstDayIsUnpaid = false)
     {
-        NoOp::ignore($firstDayIsUnpaid);
         if (!$this->isPolicy() || !$this->getStart()) {
             return null;
         }
-        $date = DateTrait::adjustDayForBilling($date ?: new \DateTime(), true);
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             return $this->getYearlyPremiumPrice();
         } else {
+            $date = DateTrait::adjustDayForBilling($date ?: new \DateTime(), true);
             $futurePayments = count($this->getInvoiceSchedule($date));
             $upgradePrice = $this->getUpgradedStandardMonthlyPrice();
             return $this->getYearlyPremiumPrice() - $futurePayments * $upgradePrice;
