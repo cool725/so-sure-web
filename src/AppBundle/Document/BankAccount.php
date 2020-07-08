@@ -727,7 +727,6 @@ class BankAccount
         } else {
             $nextPolicyPaymentDate = $policy->getNextBillingDate($date);
         }
-
         $bacsPaymentDate = $this->getPaymentDate($date);
         if (!$nextPolicyPaymentDate) {
             return $bacsPaymentDate;
