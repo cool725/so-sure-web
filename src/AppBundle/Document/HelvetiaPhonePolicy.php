@@ -165,9 +165,6 @@ class HelvetiaPhonePolicy extends PhonePolicy
         } else {
             $date = DateTrait::adjustDayForBilling($date ?: new \DateTime(), true);
             $futurePayments = count($this->getInvoiceSchedule($date));
-            if (DateTrait::startOfDay($date) == DateTrait::startOfDay($this->getStart())) {
-                $futurePayments++;
-            }
             $upgradePrice = $this->getUpgradedStandardMonthlyPrice();
             return $this->getYearlyPremiumPrice() - $futurePayments * $upgradePrice;
         }

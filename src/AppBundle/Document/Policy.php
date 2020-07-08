@@ -970,7 +970,8 @@ abstract class Policy
         // Monthly.
         $invoiceDates = [];
         $invoiceDate = clone $this->getBilling();
-        for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
+        $invoiceDates[] = DateTrait::startOfDay($this->getStart());
+        for ($i = 1; $i < $this->getPremiumInstallments(); $i++) {
             if ($invoiceDate <= $this->getEnd() && (!$date || $invoiceDate >= $date)) {
                 $invoiceDates[] = clone $invoiceDate;
             }
