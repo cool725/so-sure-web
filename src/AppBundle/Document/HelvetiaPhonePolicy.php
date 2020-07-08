@@ -163,12 +163,12 @@ class HelvetiaPhonePolicy extends PhonePolicy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             return $this->getYearlyPremiumPrice();
         } else {
-            $date = DateTrait::adjustDayForBilling($date ?: new \DateTime(), true);
-            $futurePayments = count($this->getInvoiceSchedule($date));
-            $upgradePrice = $this->getUpgradedStandardMonthlyPrice();
-            return $this->getYearlyPremiumPrice() - $futurePayments * $upgradePrice;
+            $months = $this->dateDiffMonths($date, $this->getBilling(), true, $firstDayIsUnpaid);
+            if ($months > 12) {
+                $months = 12;
+            }
+            return $this->getUpgradedStandardMonthlyPrice() * $months;
         }
-
     }
 
     /**

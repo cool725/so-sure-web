@@ -730,7 +730,7 @@ class BankAccount
         $bacsPaymentDate = $this->getPaymentDate($date);
         if (!$nextPolicyPaymentDate) {
             return $bacsPaymentDate;
-        } elseif ($useClosestPaymentDate || $nextPolicyPaymentDate > $bacsPaymentDate) {
+        } elseif ($useClosestPaymentDate || $nextPolicyPaymentDate < $bacsPaymentDate) {
             return $bacsPaymentDate;
         } else {
             return $nextPolicyPaymentDate;
