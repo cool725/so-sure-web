@@ -970,8 +970,7 @@ abstract class Policy
         // Monthly.
         $invoiceDates = [];
         $invoiceDate = clone $this->getBilling();
-        $invoiceDates[] = DateTrait::startOfDay($this->getStart());
-        for ($i = 1; $i < $this->getPremiumInstallments(); $i++) {
+        for ($i = 0; $i < $this->getPremiumInstallments(); $i++) {
             if ($invoiceDate <= $this->getEnd() && (!$date || $invoiceDate >= $date)) {
                 $invoiceDates[] = clone $invoiceDate;
             }
@@ -2669,7 +2668,6 @@ abstract class Policy
 
     public function getNextBillingDate($date, $filtered = true)
     {
-        $date = DateTrait::startOfDay($date);
         $nextDate = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $this->clearTime($nextDate);
         if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
