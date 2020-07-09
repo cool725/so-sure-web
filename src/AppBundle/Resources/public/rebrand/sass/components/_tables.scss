@@ -8,7 +8,7 @@
                 0 5px 15px 0 rgba(8,27,154,0.08);
 
     &__header {
-        padding: 1.4rem;
+        height: 60px;
         text-align: center;
         background-color: $jacarta;
         @include border-top-radius(15px);
