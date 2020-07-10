@@ -240,7 +240,6 @@ class PCAService
         $redisKey = sprintf(self::REDIS_ADDRESS_KEY_FORMAT, $postcode, $number);
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($address));
         $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
-
     }
 
     protected function cacheBankAccountResults($sortCode, $accountNumber, $bankAccount)
