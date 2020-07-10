@@ -240,6 +240,7 @@ class PCAService
         $redisKey = sprintf(self::REDIS_ADDRESS_KEY_FORMAT, $postcode, $number);
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($address));
         $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
+
     }
 
     protected function cacheBankAccountResults($sortCode, $accountNumber, $bankAccount)
@@ -280,19 +281,11 @@ class PCAService
         }
 
         foreach ($results as $id => $line) {
-            $items = explode(',', $line);
-            // prior to 3/7/18, find would return "postcode, address"
-            // $found = $this->normalizePostcodeForDb($items[0]);
-            // from 3/7/18, find returns "address, postcode"
-            $found = $this->normalizePostcodeForDb($items[count($items) - 1]);
-
-            if ($postcode == $found) {
+            if (PostcodeTrait::findPostcode($line, $postcode)) {
                 $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
-
                 return true;
             }
         }
-
         return false;
     }
 
