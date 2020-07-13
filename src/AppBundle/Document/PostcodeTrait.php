@@ -36,4 +36,17 @@ trait PostcodeTrait
             return null;
         }
     }
+
+    /**
+     * Searches the given string for a given postcode, even if there is a difference of case or spacing.
+     * @param string $haystack is the string to search.
+     * @param string $needle   is the postcode to find.
+     * @return boolean true iff found.
+     */
+    public static function findPostcode($haystack, $needle)
+    {
+        $norm = static::normalizePostcode($needle);
+        $flatHaystack = mb_ereg_replace('\s+', '', $haystack);
+        return mb_stripos($flatHaystack, $norm) !== false;
+    }
 }
