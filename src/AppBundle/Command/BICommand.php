@@ -994,19 +994,19 @@ class BICommand extends ContainerAwareCommand
         foreach ($data as $line) {
             foreach ($line as $key => $val) {
                 if (!$key==0) {
-                    $line[$key] = "£" . number_format(floatval($val), 2, '.', ',');
+                    $line[$key] = number_format(floatval($val), 2, '.', ',');
                 }
             }
             $lines[] = CsvHelper::line(...$line);
         }
         foreach ($monthBudget as $key => $val) {
             if (!$key==0) {
-                $monthBudget[$key] = "£" . number_format(floatval($val), 2, '.', ',');
+                $monthBudget[$key] = number_format(floatval($val), 2, '.', ',');
             }
         }
         foreach ($cpa as $key => $val) {
             if (!$key==0) {
-                $cpa[$key] = "£" . number_format(floatval($val), 2, '.', ',');
+                $cpa[$key] = number_format(floatval($val), 2, '.', ',');
             }
         }
         $lines[] = CsvHelper::line(...$monthBudget);
