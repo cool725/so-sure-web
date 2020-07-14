@@ -30,14 +30,6 @@ $(function(){
         }
     });
 
-    $('.btn-confirm').on('click', function(e) {
-        confirm('Are you sure you want to approve this device? If it\'s too far away cracks might not show up');
-    });
-
-    $('.btn-reject').on('click', function(e) {
-        confirm('Are you sure you want to reject this device as broken? Potentially it\'s a broken screen protector - should give the customer the benefit of the doubt');
-    });
-
     // Prepop
     $('#invalid_picsure_options').on('change', function(e) {
         e.preventDefault();
