@@ -301,6 +301,8 @@ class DirectGroupHandlerClaim extends HandlerClaim
             $this->nullIfBlank($data[++$i]);
             // todo: Latest Claim handling team touch point date
             $this->excelDate($data[++$i]);
+            // todo: Last contact date
+            $this->excelDate($data[++$i]);
             $this->replacementSupplier = $this->nullIfBlank($data[++$i]);
             $this->repairSupplier = $this->nullIfBlank($data[++$i]);
             $this->supplierStatus = $this->nullIfBlank($data[++$i]);
