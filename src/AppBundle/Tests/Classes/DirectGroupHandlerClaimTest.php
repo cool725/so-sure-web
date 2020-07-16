@@ -46,6 +46,7 @@ class DirectGroupHandlerClaimTest extends \PHPUnit\Framework\TestCase
             '',
             '',
             '',
+            '',
             '42794',
             '42794',
             '42794',

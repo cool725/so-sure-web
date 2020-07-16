@@ -14,7 +14,7 @@ class DirectGroupHandlerClaim extends HandlerClaim
     use ExcelTrait;
 
     const SHEET_NAME_V1 = 'Report';
-    const COLUMN_COUNT_V1 = 43;
+    const COLUMN_COUNT_V1 = 44;
     const SALVA_NAME = 'SO-SURE';
     const HELVETIA_NAME = 'HE SO-SURE';
 
