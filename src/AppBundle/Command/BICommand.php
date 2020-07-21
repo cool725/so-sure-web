@@ -317,13 +317,14 @@ class BICommand extends ContainerAwareCommand
                 continue;
             }
             $user = $policy->getUser();
-            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $billing = $user->getBillingAddress();
+            $census = $billing ? $this->searchService->findNearest($billing->getPostcode()) : null;
+            $income = $billing ? $this->searchService->findIncome($billing->getPostcode()) : null;
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $this->timezoneFormat($claim->getNotificationDate(), $timezone, 'Y-m-d H:i:s')),
-                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $billing ? $billing->getPostcode() : ''),
                 sprintf('"%s"', $claim->getNumber()),
                 sprintf('"%s"', $claim->getType()),
                 sprintf('"%s"', $claim->getStatus()),
@@ -459,8 +460,9 @@ class BICommand extends ContainerAwareCommand
             $previous = $policy->getPreviousPolicy();
             $next = $policy->getNextPolicy();
             $phone = $policy->getPhone();
-            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $billing = $user->getBillingAddress();
+            $census = $billing ? $this->searchService->findNearest($billing->getPostcode()) : null;
+            $income = $billing ? $this->searchService->findIncome($billing->getPostcode()) : null;
             $attribution = $user->getAttribution();
             $latestAttribution = $user->getLatestAttribution();
             $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
@@ -476,7 +478,7 @@ class BICommand extends ContainerAwareCommand
                 $policy->getPolicyNumber(),
                 $user->getId(),
                 $user->getAge(),
-                $user->getBillingAddress()->getPostcode(),
+                $billing->getPostcode(),
                 $census ? $census->getSubgrp() : '',
                 $user->getGender() ?: '',
                 $income ? sprintf('%0.0f', $income->getTotal()->getIncome()) : '',
@@ -570,14 +572,15 @@ class BICommand extends ContainerAwareCommand
             '"Latest Campaign Source"',
         ]);
         foreach ($users as $user) {
+            $billing = $user->getBillingAddress();
             /** @var User $user */
-            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $billing ? $this->searchService->findNearest($billing->getPostcode()) : null;
+            $income = $billing ? $this->searchService->findIncome($billing->getPostcode()) : null;
             /** @var PhonePolicy $policy */
             $policy = $user->getFirstPolicy();
             $lines[] = implode(',', [
                 sprintf('"%d"', $user->getAge()),
-                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $billing ? $billing->getPostcode() : ''),
                 sprintf('"%s"', $user->getId()),
                 sprintf('"%s"', $this->timezoneFormat($user->getCreated(), $timezone, 'Y-m-d')),
                 sprintf('"%s"', count($user->getCreatedPolicies()) > 0 ? 'yes' : 'no'),
