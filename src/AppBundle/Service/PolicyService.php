@@ -1106,7 +1106,6 @@ class PolicyService
             $numPaidPayments = 0;
         }
         $isBacs = $bacs || $policy->getPaymentMethod() instanceof BacsPaymentMethod;
-        $lowBacs = $isBacs && $date < $policy->getStart();
         $numScheduledPayments = $numPayments;
         for ($i = $numPaidPayments; $i < $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
@@ -1135,7 +1134,7 @@ class PolicyService
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates) && $isBacs) {
                     continue;
                 }
-                $scheduledDate->add(new DateInterval(sprintf('P%dM', $lowBacs ? $i - 1 : $i)));
+                $scheduledDate->add(new DateInterval(sprintf('P%dM', $i)));
             }
             if ($isBacs) {
                 try {
