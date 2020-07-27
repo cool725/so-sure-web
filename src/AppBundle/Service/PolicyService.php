@@ -22,6 +22,8 @@ use Aws\S3\S3Client;
 use CensusBundle\Service\SearchService;
 use AppBundle\Document\LogEntry;
 use AppBundle\Repository\LogEntryRepository;
+use DateInterval;
+use DateTime;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
@@ -375,7 +377,7 @@ class PolicyService
                 $checkmend = $this->checkImeiSerial($user, $phone, $imei, $serialNumber, $identityLog);
             }
 
-            $date = new \DateTime();
+            $date = new DateTime();
             $policy = null;
             if ($date > Salva::getSalvaBinderEndDate()) {
                 $policy = new HelvetiaPhonePolicy();
@@ -510,7 +512,7 @@ class PolicyService
 
     public function create(
         Policy $policy,
-        \DateTime $date = null,
+        DateTime $date = null,
         $setActive = false,
         $numPayments = null,
         IdentityLog $identityLog = null,
@@ -520,7 +522,7 @@ class PolicyService
         $this->statsd->startTiming("policy.create");
         try {
             if (!$date) {
-                $date = \DateTime::createFromFormat('U', time());
+                $date = DateTime::createFromFormat('U', time());
             }
             $user = $policy->getUser();
 
@@ -958,7 +960,7 @@ class PolicyService
                 'For Policy %s, cancelled scheduled payment %s on %s for £%0.2f',
                 $policy->getPolicyNumber(),
                 $scheduledPayment->getId(),
-                $scheduledPayment->getScheduled() ? $scheduledPayment->getScheduled()->format(\DateTime::ATOM) : '?',
+                $scheduledPayment->getScheduled() ? $scheduledPayment->getScheduled()->format(DateTime::ATOM) : '?',
                 $scheduledPayment->getAmount()
             );
             $i++;
@@ -1015,17 +1017,17 @@ class PolicyService
     /**
      * Cancels a policy's existing schedule of scheduled payments and creates a new schedule based on the current
      * state of the policy.
-     * @param Policy    $policy        is the policy to regenerate the schedule for.
-     * @param \DateTime $date          is the point from which to begin regenerating the schedule, with null being the
+     * @param Policy   $policy        is the policy to regenerate the schedule for.
+     * @param DateTime $date          is the point from which to begin regenerating the schedule, with null being the
      *                                 policy start of billing.
-     * @param \DateTime $now           is to be considered the current date, with null being the system time.
-     * @param int       $numPayments   is the number of payments desired.
+     * @param DateTime $now           is to be considered the current date, with null being the system time.
+     * @param int      $numPayments   is the number of payments desired.
      * @param float     $billingOffset is the amount of apparently owed money not to factor into schedule.
      */
     public function regenerateScheduledPayments(
         Policy $policy,
-        \DateTime $date = null,
-        \DateTime $now = null,
+        DateTime $date = null,
+        DateTime $now = null,
         $numPayments = null,
         $billingOffset = null
     ) {
@@ -1035,26 +1037,26 @@ class PolicyService
 
     /**
      * Creates a schedule of payments for the given policy.
-     * @param Policy    $policy        is the policy to create the scheduled payments for.
-     * @param \DateTime $date          is the date at which to start the payments, null being the policy billing start.
-     * @param \DateTime $now           is the date to be considered the current date, which payments should not be able
+     * @param Policy   $policy        is the policy to create the scheduled payments for.
+     * @param DateTime $date          is the date at which to start the payments, null being the policy billing start.
+     * @param DateTime $now           is the date to be considered the current date, which payments should not be able
      *                                 to scheduled more than a few business days before, null being system time.
-     * @param int       $numPayments   is the number of payments desired or null for this to be deduced.
+     * @param int      $numPayments   is the number of payments desired or null for this to be deduced.
      * @param float     $billingOffset is the amount of owed money not to add into the payment schedule.
-     * @param boolean   $renewal       is whether this policy is a renewal and thus should have a scheduled payment
+     * @param boolean  $renewal       is whether this policy is a renewal and thus should have a scheduled payment
      *                                 right at their beginning.
      */
     public function generateScheduledPayments(
         Policy $policy,
-        \DateTime $date = null,
-        \DateTime $now = null,
+        DateTime $date = null,
+        DateTime $now = null,
         $numPayments = null,
         $billingOffset = null,
         $renewal = false,
         $bacs = false
     ) {
         if (!$now) {
-            $now = new \DateTime();
+            $now = new DateTime();
         }
         if ($policy->getBilling()) {
             $date = clone $policy->getBilling();
@@ -1104,6 +1106,7 @@ class PolicyService
             $numPaidPayments = 0;
         }
         $isBacs = $bacs || $policy->getPaymentMethod() instanceof BacsPaymentMethod;
+        $lowBacs = $isBacs && $date < $policy->getStart();
         $numScheduledPayments = $numPayments;
         for ($i = $numPaidPayments; $i < $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
@@ -1121,7 +1124,7 @@ class PolicyService
              * Unless it is a renewal policy
              */
             if ($numPaidPayments == 0 && $isBacs && $i == 0 && !$renewal) {
-                $scheduledDate = (clone $now)->add(new \DateInterval("P7D"));
+                $scheduledDate = (clone $now)->add(new DateInterval("P7D"));
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates)) {
                     continue;
                 }
@@ -1132,7 +1135,7 @@ class PolicyService
                 if (in_array($scheduledDate->format('Ymd'), $pendingDates) && $isBacs) {
                     continue;
                 }
-                $scheduledDate->add(new \DateInterval(sprintf('P%dM', $isBacs ? $i - 1 : $i)));
+                $scheduledDate->add(new DateInterval(sprintf('P%dM', $lowBacs ? $i - 1 : $i)));
             }
             if ($isBacs) {
                 try {
@@ -1175,11 +1178,11 @@ class PolicyService
      * Add two days and move to bank holiday Monday - recurse
      * Add one day and move to Tuesday.
      *
-     * @param \DateTime $date
-     * @return \DateTime
+     * @param DateTime $date
+     * @return DateTime
      * @throws \Exception
      */
-    public function adjustPaymentForBankHolidayAndWeekend(\DateTime $date)
+    public function adjustPaymentForBankHolidayAndWeekend(DateTime $date)
     {
         /**
          * If the scheduled date is a weekend, we want to move it to the next Monday.
@@ -1188,7 +1191,7 @@ class PolicyService
          */
         if (!static::isWeekDay($date)) {
             $weekendInterval = $date->format('w') == 0 ? 1 : 2;
-            $date->add(new \DateInterval(sprintf('P%dD', $weekendInterval)));
+            $date->add(new DateInterval(sprintf('P%dD', $weekendInterval)));
         }
 
         /**
@@ -1196,7 +1199,7 @@ class PolicyService
          * we need to check if we have moved from a weekend to a bank holiday and adjust again.
          */
         if (static::isBankHoliday($date)) {
-            $date->add(new \DateInterval('P1D'));
+            $date->add(new DateInterval('P1D'));
         }
 
         /**
@@ -1217,7 +1220,7 @@ class PolicyService
      * @param string    $reason                      The reason for cancellation. Must be one of Policy::CANCELLED_*.
      * @param boolean   $closeOpenClaims             Where we are required to cancel the policy (binder), we need to
      *                                               close out claims
-     * @param \DateTime $date                        The date to say the policy is being cancelled at.
+     * @param DateTime $date                        The date to say the policy is being cancelled at.
      * @param boolean   $skipUnpaidMinTimeframeCheck Require at least 15 days from last unpaid status change
      * @param boolean   $fullRefund                  Provide a full refund to the customer
      */
@@ -1225,7 +1228,7 @@ class PolicyService
         Policy $policy,
         $reason,
         $closeOpenClaims = false,
-        \DateTime $date = null,
+        DateTime $date = null,
         $skipUnpaidMinTimeframeCheck = false,
         $fullRefund = false
     ) {
@@ -1238,9 +1241,9 @@ class PolicyService
             $history = $logRepo->findRecentStatus($policy);
             $now = $date;
             if (!$now) {
-                $now = \DateTime::createFromFormat('U', time());
+                $now = DateTime::createFromFormat('U', time());
             }
-            $loggedAt = \DateTime::createFromFormat('U', time());
+            $loggedAt = DateTime::createFromFormat('U', time());
             if ($history) {
                 $loggedAt = $history->getLoggedAt();
             }
@@ -1332,7 +1335,7 @@ class PolicyService
                 ['policy' => $policy]
             );
 
-            $policy->setLastEmailed(\DateTime::createFromFormat('U', time()));
+            $policy->setLastEmailed(DateTime::createFromFormat('U', time()));
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending bacs payment request email to %s', $policy->getUser()->getEmail()),
@@ -1380,7 +1383,7 @@ class PolicyService
                 $attachmentFiles,
                 $bcc
             );
-            $policy->setLastEmailed(new \DateTime());
+            $policy->setLastEmailed(new DateTime());
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()),
@@ -1417,7 +1420,7 @@ class PolicyService
                 $attachmentFiles,
                 $bcc
             );
-            $policy->setLastEmailed(\DateTime::createFromFormat('U', time()));
+            $policy->setLastEmailed(DateTime::createFromFormat('U', time()));
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()),
@@ -1732,7 +1735,7 @@ class PolicyService
 
     public function getBreakdownPdf($file = null)
     {
-        $now = \DateTime::createFromFormat('U', time());
+        $now = DateTime::createFromFormat('U', time());
         $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('page-size', 'A4');
         $html = $this->templating->render('AppBundle:Pdf:policyBreakdown.html.twig', [
@@ -1751,14 +1754,14 @@ class PolicyService
         }
     }
 
-    public function getPoliciesPendingCancellation($includeFuture = false, \DateTime $date = null)
+    public function getPoliciesPendingCancellation($includeFuture = false, DateTime $date = null)
     {
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
         return $repo->findPoliciesForPendingCancellation($includeFuture, $date);
     }
 
-    public function getPoliciesForUnRenew(\DateTime $date = null)
+    public function getPoliciesForUnRenew(DateTime $date = null)
     {
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
@@ -1766,7 +1769,7 @@ class PolicyService
         return $repo->findDeclinedRenewalPoliciesForUnRenewed($date);
     }
 
-    public function getPoliciesForRenew(\DateTime $date = null)
+    public function getPoliciesForRenew(DateTime $date = null)
     {
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
@@ -1774,7 +1777,7 @@ class PolicyService
         return $repo->findPendingRenewalPoliciesForRenewed($date);
     }
 
-    public function cancelPoliciesPendingCancellation($dryRun = false, \DateTime $date = null)
+    public function cancelPoliciesPendingCancellation($dryRun = false, DateTime $date = null)
     {
         $cancelled = [];
         $policies = $this->getPoliciesPendingCancellation(false, $date);
@@ -1797,7 +1800,7 @@ class PolicyService
         return $cancelled;
     }
 
-    public function unrenewPolicies($dryRun = false, \DateTime $date = null)
+    public function unrenewPolicies($dryRun = false, DateTime $date = null)
     {
         $expired = [];
         $policies = $this->getPoliciesForUnRenew($date);
@@ -1819,7 +1822,7 @@ class PolicyService
         return $expired;
     }
 
-    public function renewPolicies($dryRun = false, \DateTime $date = null)
+    public function renewPolicies($dryRun = false, DateTime $date = null)
     {
         $renewed = [];
         $policies = $this->getPoliciesForRenew($date);
@@ -1885,7 +1888,7 @@ class PolicyService
     {
         /** @var LogEntryRepository $logEntryRepo */
         $logEntryRepo = $this->dm->getRepository(LogEntry::class);
-        $cutoffDate = (new \DateTime())->sub(new \DateInterval("P14D"));
+        $cutoffDate = (new DateTime())->sub(new DateInterval("P14D"));
         $cancelled = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_PICSURE_REQUIRED]);
@@ -1909,7 +1912,7 @@ class PolicyService
         return $cancelled;
     }
 
-    public function activateRenewalPolicies($dryRun = false, \DateTime $date = null)
+    public function activateRenewalPolicies($dryRun = false, DateTime $date = null)
     {
         $renewals = [];
         /** @var PolicyRepository $policyRepo */
@@ -1935,7 +1938,7 @@ class PolicyService
         return $renewals;
     }
 
-    public function expireEndingPolicies($dryRun = false, \DateTime $date = null)
+    public function expireEndingPolicies($dryRun = false, DateTime $date = null)
     {
         $expired = [];
         /** @var PolicyRepository $policyRepo */
@@ -1961,10 +1964,10 @@ class PolicyService
         return $expired;
     }
 
-    public function setUnpaidForCancelledMandate($dryRun = false, \DateTime $date = null)
+    public function setUnpaidForCancelledMandate($dryRun = false, DateTime $date = null)
     {
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = DateTime::createFromFormat('U', time());
         }
         $unpaid = [];
         /** @var PolicyRepository $policyRepo */
@@ -1995,10 +1998,10 @@ class PolicyService
         return $unpaid;
     }
 
-    public function fullyExpireExpiredClaimablePolicies($dryRun = false, \DateTime $date = null)
+    public function fullyExpireExpiredClaimablePolicies($dryRun = false, DateTime $date = null)
     {
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = DateTime::createFromFormat('U', time());
         }
         $fullyExpired = [];
         /** @var PolicyRepository $policyRepo */
@@ -2051,9 +2054,9 @@ class PolicyService
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
 
-        $activationDate = \DateTime::createFromFormat('U', time());
+        $activationDate = DateTime::createFromFormat('U', time());
         $activationDate = $activationDate->sub(SoSure::getActivationInterval());
-        $hardActivationDate = \DateTime::createFromFormat('U', time());
+        $hardActivationDate = DateTime::createFromFormat('U', time());
         $hardActivationDate = $hardActivationDate->sub(SoSure::getHardActivationInterval());
 
         $metrics = [
@@ -2084,7 +2087,7 @@ class PolicyService
 
     public function cashbackMissingReminder($dryRun)
     {
-        $now = \DateTime::createFromFormat('U', time());
+        $now = DateTime::createFromFormat('U', time());
         $cashback = [];
         /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
@@ -2142,9 +2145,9 @@ class PolicyService
 
     /**
      * @param Policy    $policy
-     * @param \DateTime $date
+     * @param DateTime $date
      */
-    public function expire(Policy $policy, \DateTime $date = null)
+    public function expire(Policy $policy, DateTime $date = null)
     {
         $policy->expire($date);
         // TODO: consider if we need to handle the pending renewal cancellation here at the same time
@@ -2158,9 +2161,9 @@ class PolicyService
 
     /**
      * @param Policy    $policy
-     * @param \DateTime $date
+     * @param DateTime $date
      */
-    public function fullyExpire(Policy $policy, \DateTime $date = null)
+    public function fullyExpire(Policy $policy, DateTime $date = null)
     {
         $initialStatus = $policy->getStatus();
         $policy->fullyExpire($date);
@@ -2188,19 +2191,19 @@ class PolicyService
 
         if ($policy->isRenewed() && $policy->hasAdjustedRewardPotPayment()) {
             $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate(
-                $date ? $date : \DateTime::createFromFormat('U', time()),
+                $date ? $date : DateTime::createFromFormat('U', time()),
                 true
             );
             $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, $date, null, $outstanding);
 
             // bill for outstanding payments due
             $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate(
-                $date ? $date : \DateTime::createFromFormat('U', time())
+                $date ? $date : DateTime::createFromFormat('U', time())
             );
             if ($policy->hasCheckoutPaymentMethod()) {
                 $scheduledPayment = new ScheduledPayment();
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-                $scheduledPayment->setScheduled($date ? $date : \DateTime::createFromFormat('U', time()));
+                $scheduledPayment->setScheduled($date ? $date : DateTime::createFromFormat('U', time()));
                 $scheduledPayment->setAmount($outstanding);
                 $scheduledPayment->setNotes(sprintf(
                     'Claw-back applied discount (discount was removed following success claim for previous policy)'
@@ -2262,10 +2265,10 @@ class PolicyService
 
     /**
      * @param Policy         $policy
-     * @param \DateTime|null $date
+     * @param DateTime|null $date
      * @throws \Exception
      */
-    public function activate(Policy $policy, \DateTime $date = null)
+    public function activate(Policy $policy, DateTime $date = null)
     {
         $policy->activate($date);
         $this->dm->flush();
@@ -2278,7 +2281,7 @@ class PolicyService
     /**
      * @param Policy $policy
      */
-    public function unrenew(Policy $policy, \DateTime $date = null)
+    public function unrenew(Policy $policy, DateTime $date = null)
     {
         $policy->unrenew($date);
         $this->dm->flush();
@@ -2287,7 +2290,7 @@ class PolicyService
         // although the policy end status is probably set at the same time
     }
 
-    public function createPendingRenewalPolicies($dryRun = false, \DateTime $date = null)
+    public function createPendingRenewalPolicies($dryRun = false, DateTime $date = null)
     {
         $pendingRenewal = [];
         /** @var PolicyRepository $policyRepo */
@@ -2323,8 +2326,8 @@ class PolicyService
         }
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $date = \DateTime::createFromFormat('U', time());
-        $date = $date->add(new \DateInterval(sprintf('P%dD', $days)));
+        $date = DateTime::createFromFormat('U', time());
+        $date = $date->add(new DateInterval(sprintf('P%dD', $days)));
 
         $pendingCancellationPolicies = $policyRepo->findPoliciesForPendingCancellation(false, $date);
         foreach ($pendingCancellationPolicies as $policy) {
@@ -2384,13 +2387,13 @@ class PolicyService
 
     /**
      * @param Policy         $policy
-     * @param \DateTime|null $date
+     * @param DateTime|null $date
      * @return Policy
      * @throws \Exception
      */
-    public function createPendingRenewal(Policy $policy, \DateTime $date = null)
+    public function createPendingRenewal(Policy $policy, DateTime $date = null)
     {
-        $date = $date ?: new \DateTime();
+        $date = $date ?: new DateTime();
         /** @var PolicyTermsRepository $policyTermsRepo */
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         /** @var PolicyTerms $latestTerms */
@@ -2481,7 +2484,7 @@ class PolicyService
         );
     }
 
-    public function autoRenew(Policy $policy, \DateTime $date = null)
+    public function autoRenew(Policy $policy, DateTime $date = null)
     {
         if ($policy->getStatus() == Policy::STATUS_CANCELLED ||
             $policy->getOutstandingPremium() - $policy->getPendingBacsPaymentsTotal() >= 0.01
@@ -2507,10 +2510,10 @@ class PolicyService
         $numPayments,
         Cashback $cashback = null,
         $autoRenew = false,
-        \DateTime $date = null
+        DateTime $date = null
     ) {
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = DateTime::createFromFormat('U', time());
         }
 
         $newPolicy = $policy->getNextPolicy();
@@ -2554,7 +2557,7 @@ class PolicyService
 
         $billing = $startDate;
         if ($policy->getBilling()) {
-            $billing = new \DateTime(
+            $billing = new DateTime(
                 sprintf(
                     "%s-%s-%s",
                     $startDate->format("Y"),
@@ -2599,10 +2602,10 @@ class PolicyService
         return $newPolicy;
     }
 
-    public function declineRenew(Policy $policy, Cashback $cashback = null, \DateTime $date = null)
+    public function declineRenew(Policy $policy, Cashback $cashback = null, DateTime $date = null)
     {
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = DateTime::createFromFormat('U', time());
         }
 
         $newPolicy = $policy->getNextPolicy();
@@ -2627,10 +2630,10 @@ class PolicyService
         return $newPolicy;
     }
 
-    public function repurchase(Policy $policy, \DateTime $date = null)
+    public function repurchase(Policy $policy, DateTime $date = null)
     {
         if (!$date) {
-            $date = \DateTime::createFromFormat('U', time());
+            $date = DateTime::createFromFormat('U', time());
         }
 
         if (!$policy->canRepurchase()) {
@@ -2703,7 +2706,7 @@ class PolicyService
             return;
         }
 
-        $cashback->setDate(\DateTime::createFromFormat('U', time()));
+        $cashback->setDate(DateTime::createFromFormat('U', time()));
         $cashback->setStatus($status);
         $this->dm->flush();
 
@@ -2774,7 +2777,7 @@ class PolicyService
      * then it does nothing. It persists the new participation but it does not flush the database.
      * @param Policy         $policy    is the policy to enter in the promotion.
      * @param Promotion      $promotion is the promotion to enter the policy into.
-     * @param \DateTime|null $date      is the date to set the participation as having started at.
+     * @param DateTime|null $date      is the date to set the participation as having started at.
      * @return Participation the new particpation that was created.
      */
     public function enterPromotion(Policy $policy, Promotion $promotion, $date = null)
@@ -2788,7 +2791,7 @@ class PolicyService
                 $policy->getPolicyNumber()." is already participating in ".$promotion->getName()
             );
         }
-        $date = $date ? clone $date : new \DateTime();
+        $date = $date ? clone $date : new DateTime();
         $participation = new Participation();
         $promotion->addParticipating($participation);
         $policy->addParticipation($participation);
@@ -2803,10 +2806,10 @@ class PolicyService
      * it has no owed calculation but some rescheduled payments it returns the sum of them, and if there is really no
      * source of owed money it sets the policy from unpaid to active.
      * @param Policy    $policy is the policy to check.
-     * @param \DateTime $date   is the date at which the amount is owed.
+     * @param DateTime $date   is the date at which the amount is owed.
      * @return float the owed amount.
      */
-    public function checkOwedPremium(Policy $policy, \DateTime $date)
+    public function checkOwedPremium(Policy $policy, DateTime $date)
     {
         if ($policy->getStatus() != Policy::STATUS_UNPAID) {
             return 0;
