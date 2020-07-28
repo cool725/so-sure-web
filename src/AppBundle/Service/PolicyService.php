@@ -1022,7 +1022,7 @@ class PolicyService
      *                                policy start of billing.
      * @param DateTime $now           is to be considered the current date, with null being the system time.
      * @param int      $numPayments   is the number of payments desired.
-     * @param float     $billingOffset is the amount of apparently owed money not to factor into schedule.
+     * @param number   $billingOffset is the amount of apparently owed money not to factor into schedule.
      */
     public function regenerateScheduledPayments(
         Policy $policy,
@@ -1040,11 +1040,11 @@ class PolicyService
      * @param Policy   $policy        is the policy to create the scheduled payments for.
      * @param DateTime $date          is the date at which to start the payments, null being the policy billing start.
      * @param DateTime $now           is the date to be considered the current date, which payments should not be able
-     *                                 to scheduled more than a few business days before, null being system time.
+     *                                to scheduled more than a few business days before, null being system time.
      * @param int      $numPayments   is the number of payments desired or null for this to be deduced.
-     * @param float     $billingOffset is the amount of owed money not to add into the payment schedule.
+     * @param number   $billingOffset is the amount of owed money not to add into the payment schedule.
      * @param boolean  $renewal       is whether this policy is a renewal and thus should have a scheduled payment
-     *                                 right at their beginning.
+     *                                right at their beginning.
      */
     public function generateScheduledPayments(
         Policy $policy,
@@ -1215,13 +1215,13 @@ class PolicyService
 
     /**
      * Cancels a policy.
-     * @param Policy    $policy                      The policy to cancel.
-     * @param string    $reason                      The reason for cancellation. Must be one of Policy::CANCELLED_*.
-     * @param boolean   $closeOpenClaims             Where we are required to cancel the policy (binder), we need to
-     *                                               close out claims
+     * @param Policy   $policy                      The policy to cancel.
+     * @param string   $reason                      The reason for cancellation. Must be one of Policy::CANCELLED_*.
+     * @param boolean  $closeOpenClaims             Where we are required to cancel the policy (binder), we need to
+     *                                              close out claims
      * @param DateTime $date                        The date to say the policy is being cancelled at.
-     * @param boolean   $skipUnpaidMinTimeframeCheck Require at least 15 days from last unpaid status change
-     * @param boolean   $fullRefund                  Provide a full refund to the customer
+     * @param boolean  $skipUnpaidMinTimeframeCheck Require at least 15 days from last unpaid status change
+     * @param boolean  $fullRefund                  Provide a full refund to the customer
      */
     public function cancel(
         Policy $policy,
@@ -2143,7 +2143,7 @@ class PolicyService
     }
 
     /**
-     * @param Policy    $policy
+     * @param Policy   $policy
      * @param DateTime $date
      */
     public function expire(Policy $policy, DateTime $date = null)
@@ -2159,7 +2159,7 @@ class PolicyService
     }
 
     /**
-     * @param Policy    $policy
+     * @param Policy   $policy
      * @param DateTime $date
      */
     public function fullyExpire(Policy $policy, DateTime $date = null)
@@ -2263,7 +2263,7 @@ class PolicyService
     }
 
     /**
-     * @param Policy         $policy
+     * @param Policy        $policy
      * @param DateTime|null $date
      * @throws \Exception
      */
@@ -2385,7 +2385,7 @@ class PolicyService
     }
 
     /**
-     * @param Policy         $policy
+     * @param Policy        $policy
      * @param DateTime|null $date
      * @return Policy
      * @throws \Exception
@@ -2774,8 +2774,8 @@ class PolicyService
     /**
      * Enters a policy into a promotion if they are not already participating in it. If they are already participating
      * then it does nothing. It persists the new participation but it does not flush the database.
-     * @param Policy         $policy    is the policy to enter in the promotion.
-     * @param Promotion      $promotion is the promotion to enter the policy into.
+     * @param Policy        $policy    is the policy to enter in the promotion.
+     * @param Promotion     $promotion is the promotion to enter the policy into.
      * @param DateTime|null $date      is the date to set the participation as having started at.
      * @return Participation the new particpation that was created.
      */
@@ -2804,7 +2804,7 @@ class PolicyService
      * Calculates the amount of money owed by an unpaid policy. If it has a normal owed amount that is returned, but if
      * it has no owed calculation but some rescheduled payments it returns the sum of them, and if there is really no
      * source of owed money it sets the policy from unpaid to active.
-     * @param Policy    $policy is the policy to check.
+     * @param Policy   $policy is the policy to check.
      * @param DateTime $date   is the date at which the amount is owed.
      * @return float the owed amount.
      */
