@@ -1019,7 +1019,7 @@ class PolicyService
      * state of the policy.
      * @param Policy   $policy        is the policy to regenerate the schedule for.
      * @param DateTime $date          is the point from which to begin regenerating the schedule, with null being the
-     *                                 policy start of billing.
+     *                                policy start of billing.
      * @param DateTime $now           is to be considered the current date, with null being the system time.
      * @param int      $numPayments   is the number of payments desired.
      * @param float     $billingOffset is the amount of apparently owed money not to factor into schedule.
