@@ -543,9 +543,6 @@ class PhoneInsuranceController extends BaseController
             );
         }
 
-        // A/B Cheap vs Easy Copy
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_COPY_CHEAP_VS_EASY);
-
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
