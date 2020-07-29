@@ -10,7 +10,7 @@
 
 .hero {
     position: relative;
-    padding-top: 4.8rem;
+    padding-top: 5.8rem;
     padding-bottom: 4rem;
     overflow: hidden;
 
@@ -149,8 +149,11 @@
         background-size: cover;
     }
 
+    @include media-breakpoint-up(md) {
+        padding-top: 7rem;
+    }
+
     @include media-breakpoint-up(lg) {
-        padding-top: 3.5rem;
 
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-quote.svg');

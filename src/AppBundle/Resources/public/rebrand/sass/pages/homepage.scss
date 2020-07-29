@@ -74,7 +74,7 @@
     }
 
     @include media-breakpoint-up(lg) {
-        padding-top: 3.5rem;
+        padding-top: 5.8rem;
 
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');

@@ -9,7 +9,6 @@ final class Experiments
     private static $unauthExperiments = [
         SixpackService::EXPERIMENT_PRICING_MESSAGING, ['copy-c', 'copy-d'],
         SixpackService::EXPERIMENT_EXIT_POPUP_MULTI, ['variant-a', 'variant-b'],
-        SixpackService::EXPERIMENT_COPY_CHEAP_VS_EASY, ['cheap', 'easy'],
     ];
 
     private static $authExperiments = [

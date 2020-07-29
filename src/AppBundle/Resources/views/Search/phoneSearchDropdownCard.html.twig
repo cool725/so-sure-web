@@ -1,39 +1,20 @@
 <div class="cardbox cardbox-100 p-4 p-lg-5 pb-lg-0 🍆">
-    <div class="mb-3 h3 text-primary fit">
-        {% if cheap_vs_easy_exp is defined and cheap_vs_easy_exp == 'easy' %}
-            Easy, Fast &amp; Great Value 🇬🇧
-        {% else %}
-            Cheap, Fast &amp; Easy 🇬🇧
-        {% endif %}
+    <div class="mb-3 h4 text-primary fit">
+        Easy, Fast &amp; Great Value 🇬🇧
     </div>
     <ul class="list-unstyled icn-fa-list mb-4">
-        {% if cheap_vs_easy_exp is defined and cheap_vs_easy_exp == 'easy' %}
-            <li class="mb-2">
-                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                Fast replace and repair service
-            </li>
-            <li class="mb-2">
-                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                Easy cashback scheme
-            </li>
-            <li class="mb-2">
-                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                Low price and excess from &pound;50
-            </li>
-        {% else %}
-            <li class="mb-2">
-                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                Low price and excess from &pound;50
-            </li>
-            <li class="mb-2">
-                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                Fast replace and repair service
-            </li>
-            <li class="mb-2">
-                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                Easy cashback scheme
-            </li>
-        {% endif %}
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            Fast replace and repair service
+        </li>
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            Easy cashback scheme
+        </li>
+        <li class="mb-2">
+            <i class="far fa-check fa-lg fa-fw text-success"></i>
+            Low price and excess from &pound;50
+        </li>
     </ul>
     {{ form_start(form_phone, { 'attr': {
         'data-toggle': 'validator',
