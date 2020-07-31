@@ -1253,7 +1253,7 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Uploads an array of data to s3 as lines in a file.
-     * @param string  $data     is the data to write to the file.
+     * @param string $data     is the data to write to the file.
      * @param string $filename is the name of the file to write it to.
      * @return string the key to the file on s3.
      */
