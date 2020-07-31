@@ -522,6 +522,9 @@ class PhoneInsuranceController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
+        // A/B Greeting Homepage Experiment
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_GREETING);
+
         // A/B Pricing Messaging Experiment
         $pricingMessagingExperiment = $this->sixpack(
             $request,
