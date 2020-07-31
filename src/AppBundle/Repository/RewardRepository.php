@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Reward;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
@@ -36,5 +37,22 @@ class RewardRepository extends DocumentRepository
         /** @var Reward|null $reward */
         $reward =  $qb->getQuery()->getSingleResult();
         return $reward;
+    }
+
+    /**
+     * Tells you if the user on the given connection has any rewards that have an scode.
+     * @param Connection $connection
+     * @return bool true iff it is a sign up bonus scode.
+     */
+    public function isSignUpBonusSCode($connection)
+    {
+        $rewards = $this->findBy(['user.id' => $connection->getLinkedUser()->getId()]);
+        /** @var Reward $reward */
+        foreach ($rewards as $reward) {
+            if ($reward->getSCode()) {
+                return false;
+            }
+        }
+        return true;
     }
 }
