@@ -3,9 +3,12 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Document\Payment\BacsPayment;
+use DateInterval;
+use DateTime;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
+use Doctrine\ODM\MongoDB\MongoDBException;
 
 class BacsPaymentRepository extends PaymentRepository
 {
@@ -54,7 +57,7 @@ class BacsPaymentRepository extends PaymentRepository
     public function findPaymentsIncludingPreviousNextMonth(\DateTime $month)
     {
         $previousMonth = clone $month;
-        $previousMonth = $previousMonth->sub(new \DateInterval('P1M'));
+        $previousMonth = $previousMonth->sub(new DateInterval('P1M'));
         $startDay = $this->startOfMonth($previousMonth);
         $nextDay = $this->endOfMonth($this->endOfMonth($month));
 
@@ -102,5 +105,28 @@ class BacsPaymentRepository extends PaymentRepository
             'amount' => 0 - $payment->getAmount()
         ]);
         return $reversed;
+    }
+
+    /**
+     * Finds the payments that should go into the bacs payments report which is all payments that have a higher effect
+     * date than three weeks ago or they are pending, generated, or submitted with any date.
+     * @param DateTime $date is the date which should be thought of as the current date.
+     * @return array containing all the found payments.
+     */
+    public function findBacsPaymentsForReport(DateTime $date)
+    {
+        $cutoff = (clone $date)->sub(new DateInterval('P3W'));
+        try {
+            $query = $this->createQueryBuilder();
+            $query->addOr($query->expr()->field('date')->gt($cutoff));
+            $query->addOr($query->expr()->field('status')->in([
+                BacsPayment::STATUS_PENDING,
+                BacsPayment::STATUS_GENERATED,
+                BacsPayment::STATUS_SUBMITTED
+            ]));
+            return $query->getQuery()->execute();
+        } catch (MongoDBException $e) {
+            return [];
+        }
     }
 }
