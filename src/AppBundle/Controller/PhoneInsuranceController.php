@@ -522,6 +522,9 @@ class PhoneInsuranceController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
+        // A/B Greeting Homepage Experiment
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_GREETING);
+
         // A/B Pricing Messaging Experiment
         $pricingMessagingExperiment = $this->sixpack(
             $request,
@@ -542,9 +545,6 @@ class PhoneInsuranceController extends BaseController
                 SixpackService::LOG_MIXPANEL_ALL
             );
         }
-
-        // A/B Cheap vs Easy Copy
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_COPY_CHEAP_VS_EASY);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');

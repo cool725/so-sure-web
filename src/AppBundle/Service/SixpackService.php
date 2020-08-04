@@ -26,19 +26,13 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    // const EXPERIMENT_EMAIL_OPTIONAL = 'Email Optional';
+    const EXPERIMENT_HOMEPAGE_GREETING = 'Homepage Greeting';
 
     // Exp 2
     const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
 
     // Exp 3
     const EXPERIMENT_EXIT_POPUP_MULTI = 'Exit Popup Multi';
-
-    // Exp 4
-    // const EXPERIMENT_COPY_CHEAP_VS_FAIR = 'Hompage Copy Cheap vs Fair';
-
-    // Exp 5
-    const EXPERIMENT_COPY_CHEAP_VS_EASY = 'Homepage Copy Cheap vs Easy';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -128,12 +122,13 @@ class SixpackService
         'Personalised Quote V2',
         'Exit Popup',
         'Email Optional',
-        'Hompage Copy Cheap vs Fair'
+        'Hompage Copy Cheap vs Fair',
+        'Homepage Copy Cheap vs Easy'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        // self::EXPERIMENT_EMAIL_OPTIONAL,
+        self::EXPERIMENT_HOMEPAGE_GREETING,
         // Exp 2
         self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
@@ -141,7 +136,7 @@ class SixpackService
         // Exp 4
         // self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
         // Exp 5
-        self::EXPERIMENT_COPY_CHEAP_VS_EASY,
+        // self::EXPERIMENT_COPY_CHEAP_VS_EASY,
     ];
 
     public static $authExperiments = [
@@ -176,7 +171,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        //  self::EXPERIMENT_EMAIL_OPTIONAL,
+         self::EXPERIMENT_HOMEPAGE_GREETING,
         // Exp 2
         self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
@@ -184,7 +179,7 @@ class SixpackService
         // Exp 4
         // self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
         // Exp 5
-        self::EXPERIMENT_COPY_CHEAP_VS_EASY,
+        // self::EXPERIMENT_COPY_CHEAP_VS_EASY,
     ];
 
     /** @var LoggerInterface */

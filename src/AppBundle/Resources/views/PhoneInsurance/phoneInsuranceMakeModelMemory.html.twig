@@ -66,9 +66,9 @@
 {% block body %}
 
     <section class="hero">
-        <div class="alert-strip alert-strip-green h6 p-3 pt-0 mb-4">
+        {# <div class="alert-strip alert-strip-green h6 p-3 pt-0 mb-4">
             <div class="container-large">🙂 During the lockdown we can still get your phone fixed in just 72 hours</div>
-        </div>
+        </div> #}
         <div class="container-large">
             <div class="row">
                 <div class="col-md-6 order-md-2">
@@ -114,9 +114,9 @@
                             </ul>
                         </div>
                         {% if app.user is not null and app.user %}
-                            {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 12) %}
+                            {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
                                 {% set greeting = 'Good morning' %}
-                            {% elseif ('now'|date('G') > 12) and ('now'|date('G') <= 18)  %}
+                            {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
                                 {% set greeting = 'Good afternoon' %}
                             {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
                                 {% set greeting = 'Good evening' %}
@@ -169,15 +169,15 @@
                         <ul class="list-unstyled icn-fa-list mb-4">
                             <li class="mb-3 h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">Low excess from &pound;50</span>
+                                <span class="sub">Fast replace and repair service</span>
                             </li>
                             <li class="mb-3 h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">Fast replace and repair service</span>
+                                <span class="sub">FREE month when you refer a friend</span>
                             </li>
                             <li class="h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">Easy cashback scheme</span>
+                                <span class="sub">Low price and excess from &pound;50</span>
                             </li>
                         </ul>
                         {{ form_start(buy_form, {'attr': { 'class': 'mb-3'}}) }}

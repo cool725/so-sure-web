@@ -6,8 +6,6 @@ use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
-use AppBundle\Document\Payment\CheckoutPayment;
-use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Reward;
@@ -17,14 +15,11 @@ use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 use AppBundle\Document\BankAccount;
-use AppBundle\Document\Lead;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\ReferralBonus;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Repository\ClaimRepository;
-use AppBundle\Repository\Invitation\InvitationRepository;
-use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
@@ -34,14 +29,15 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
 use CensusBundle\Service\SearchService;
+use DateTimeZone;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Exception;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\SoSure;
 use AppBundle\Helpers\CsvHelper;
 
@@ -59,7 +55,6 @@ class BICommand extends ContainerAwareCommand
         'invitations',
         'connections',
         'phones',
-        'scodes',
         'unpaidCalls',
         'rewards',
         'rewardsBudget',
@@ -162,7 +157,7 @@ class BICommand extends ContainerAwareCommand
         $exclude = $input->getOption('exclude');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
-        $timezone = new \DateTimeZone($input->getOption('timezone') ?: 'UTC');
+        $timezone = new DateTimeZone($input->getOption('timezone') ?: 'UTC');
         // Figure out exports to run.
         $exports = [];
         foreach (self::EXPORT_OPTIONS as $export) {
@@ -175,9 +170,6 @@ class BICommand extends ContainerAwareCommand
             $output->writeln($export);
             $lines = [];
             switch ($export) {
-                case 'policies':
-                    $lines = $this->exportPolicies($skipS3, $timezone);
-                    break;
                 case 'claims':
                     $lines = $this->exportClaims($skipS3, $timezone);
                     break;
@@ -189,9 +181,6 @@ class BICommand extends ContainerAwareCommand
                     break;
                 case 'phones':
                     $lines = $this->exportPhones($skipS3, $timezone);
-                    break;
-                case 'scodes':
-                    $lines = $this->exportScodes($skipS3, $timezone);
                     break;
                 case 'rewards':
                     $lines = $this->exportRewards($skipS3);
@@ -219,11 +208,11 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on phones.
-     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTimeZone $timezone is the timezone to give dates in.
+     * @param boolean      $skipS3   says whether we should upload the created array to S3 storage.
+     * @param DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of phone data.
      */
-    private function exportPhones($skipS3, \DateTimeZone $timezone)
+    private function exportPhones($skipS3, DateTimeZone $timezone)
     {
         /** @var PhoneRepository $repo */
         $repo = $this->dm->getRepository(Phone::class);
@@ -260,11 +249,11 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on claims.
-     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTimeZone $timezone is the timezone to give dates in.
+     * @param boolean      $skipS3   says whether we should upload the created array to S3 storage.
+     * @param DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of claim data.
      */
-    private function exportClaims($skipS3, \DateTimeZone $timezone)
+    private function exportClaims($skipS3, DateTimeZone $timezone)
     {
         /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
@@ -317,13 +306,14 @@ class BICommand extends ContainerAwareCommand
                 continue;
             }
             $user = $policy->getUser();
-            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $billing = $user->getBillingAddress();
+            $census = $billing ? $this->searchService->findNearest($billing->getPostcode()) : null;
+            $income = $billing ? $this->searchService->findIncome($billing->getPostcode()) : null;
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $this->timezoneFormat($claim->getNotificationDate(), $timezone, 'Y-m-d H:i:s')),
-                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $billing ? $billing->getPostcode() : ''),
                 sprintf('"%s"', $claim->getNumber()),
                 sprintf('"%s"', $claim->getType()),
                 sprintf('"%s"', $claim->getStatus()),
@@ -375,180 +365,12 @@ class BICommand extends ContainerAwareCommand
     }
 
     /**
-     * Creates an array in the style of a csv file containing the current data on policies.
-     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTimeZone $timezone is the timezone to give dates in.
-     * @return array containing first a row of column names and then rows of policy data.
-     */
-    private function exportPolicies($skipS3, \DateTimeZone $timezone)
-    {
-        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
-        $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
-        /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        /** @var RewardRepository $rewardRepo */
-        $rewardRepo = $this->dm->getRepository(Reward::class);
-        $policies = $phonePolicyRepo->findAllStartedPolicies(new \DateTime(SoSure::POLICY_START))->toArray();
-        $lines = [];
-        $lines[] = CsvHelper::line(
-            'Policy Number',
-            'Policy Holder Id',
-            'Age of Policy Holder',
-            'Postcode of Policy Holder',
-            'Pen Portrait',
-            'Gender',
-            'Total Weekly Income',
-            'Make',
-            'Make/Model',
-            'Make/Model/Memory',
-            'Policy Start Date',
-            'Policy End Date',
-            'Premium Installments',
-            'First Time Policy',
-            'Policy Number Prior Renewal',
-            'Policy Number Renewal',
-            'Policy Result of Upgrade',
-            'This Policy is the X renewal',
-            'Policy Status',
-            'Expected Unpaid Cancellation Date',
-            'Policy Cancellation Reason',
-            'Requested Cancellation (Phone Damaged Prior to Policy)',
-            'Requested Cancellation Reason (Phone Damaged Prior to Policy)',
-            'Invitations',
-            'Connections',
-            'Reward Pot',
-            'Pic-Sure Status',
-            'Total Number of Claims',
-            'Number of Approved/Settled Claims',
-            'Number of Withdrawn/Declined Claims',
-            'Policy Purchase Time',
-            'Lead Source',
-            'First Scode Type',
-            'First Scode Name',
-            'All SCodes Used',
-            'Promo Codes',
-            'Has Sign-up Bonus?',
-            'Latest Campaign Source (user)',
-            'Latest Campaign Name (user)',
-            'Latest referer (user)',
-            'First Campaign Source (user)',
-            'First Campaign Name (user)',
-            'First referer (user)',
-            'Purchase SDK',
-            'Payment Method',
-            'Bacs Mandate Status',
-            'Bacs Mandate Cancelled Reason',
-            'Successful Payment',
-            'Latest Payment Failed Without Reschedule',
-            'Yearly Premium',
-            'Premium Paid',
-            'Premium Outstanding',
-            'Past Due Amount (Bad Debt Only)',
-            'Company of Policy',
-            'Referrals made',
-            'Referrals made amount',
-            'Referrals received',
-            'Referrals received amount'
-        );
-        foreach ($policies as $policy) {
-            if ($policy->getEnd() <= $policy->getStart()) {
-                continue;
-            }
-            $connections = $policy->getConnections();
-            $user = $policy->getUser();
-            $previous = $policy->getPreviousPolicy();
-            $next = $policy->getNextPolicy();
-            $phone = $policy->getPhone();
-            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
-            $attribution = $user->getAttribution();
-            $latestAttribution = $user->getLatestAttribution();
-            $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
-            $scodeType = $this->getFirstSCodeUsedType($rewardRepo, $connections);
-            $scodeName = $this->getFirstSCodeUsedCode($connections);
-            $reschedule = null;
-            $lastReverted = $policy->getLastRevertedScheduledPayment();
-            if ($lastReverted) {
-                $reschedule = $scheduledPaymentRepo->getRescheduledBy($lastReverted);
-            }
-            $company = $policy->getCompany();
-            $lines[] = CsvHelper::line(
-                $policy->getPolicyNumber(),
-                $user->getId(),
-                $user->getAge(),
-                $user->getBillingAddress()->getPostcode(),
-                $census ? $census->getSubgrp() : '',
-                $user->getGender() ?: '',
-                $income ? sprintf('%0.0f', $income->getTotal()->getIncome()) : '',
-                $phone->getMake(),
-                sprintf('%s %s', $phone->getMake(), $phone->getModel()),
-                $phone,
-                $this->timezoneFormat($policy->getStart(), $timezone, 'Y-m-d'),
-                $this->timezoneFormat($policy->getEnd(), $timezone, 'Y-m-d'),
-                $policy->getPremiumInstallments(),
-                $policy->useForAttribution() ? 'yes' : 'no',
-                $previous ? $previous->getPolicyNumber() : '',
-                $next ? $next->getPolicyNumber() : '',
-                $this->getPreviousPolicyIsUpgrade($policy),
-                $policy->getGeneration(),
-                $policy->getStatus(),
-                $policy->getStatus() == Policy::STATUS_UNPAID ?
-                    $this->timezoneFormat($policy->getPolicyExpirationDate(), $timezone, 'Y-m-d') : '',
-                $policy->getStatus() == Policy::STATUS_CANCELLED ? $policy->getCancelledReason() : '',
-                $policy->hasRequestedCancellation() ? 'yes' : 'no',
-                $policy->getRequestedCancellationReason() ?: '',
-                count($policy->getInvitations()),
-                count($policy->getStandardConnections()),
-                $policy->getPotValue(),
-                $policy->getPicsureStatus() ?: 'unstarted',
-                count($policy->getClaims()),
-                count($policy->getApprovedClaims()),
-                count($policy->getWithdrawnDeclinedClaims()),
-                $this->timezoneFormat($policy->getStart(), $timezone, 'H:i'),
-                $policy->getLeadSource(),
-                $scodeType,
-                $scodeName,
-                $this->getSCodesUsed($connections),
-                $this->getPromoCodesUsed($rewardRepo, $connections),
-                $this->policyHasSignUpBonus($rewardRepo, $connections) ? 'yes' : 'no',
-                $latestAttribution ? $latestAttribution->getCampaignSource() : '',
-                $latestAttribution ? $latestAttribution->getCampaignName() : '',
-                $latestAttribution ? $latestAttribution->getReferer() : '',
-                $attribution ? $attribution->getCampaignSource() : '',
-                $attribution ? $attribution->getCampaignName() : '',
-                $attribution ? $attribution->getReferer() : '',
-                $policy->getPurchaseSdk(),
-                $policy->getUsedPaymentType(),
-                ($bankAccount && $policy->isActive()) ? $bankAccount->getMandateStatus() : '',
-                ($bankAccount && $policy->isActive() &&
-                    $bankAccount->getMandateStatus() == BankAccount::MANDATE_CANCELLED) ?
-                    $bankAccount->getMandateCancelledExplanation() : '',
-                count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no',
-                ($lastReverted && !$reschedule) ? 'yes' : 'no',
-                $policy->getPremium()->getYearlyPremiumPrice(),
-                $policy->getPremiumPaid(),
-                $policy->getUnderwritingOutstandingPremium(),
-                $policy->getBadDebtAmount(),
-                $company ? $company->getName() : '',
-                count($policy->getInviterReferralBonuses()),
-                $policy->getPaidInviterReferralBonusAmount(),
-                count($policy->getInviteeReferralBonuses()),
-                $policy->getPaidInviteeReferralBonusAmount()
-            );
-        }
-        if (!$skipS3) {
-            $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
-        }
-        return $lines;
-    }
-
-    /**
      * Creates an array in the style of a csv file containing the current data on users.
-     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTimeZone $timezone is the timezone to give dates in.
+     * @param boolean      $skipS3   says whether we should upload the created array to S3 storage.
+     * @param DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of user data.
      */
-    private function exportUsers($skipS3, \DateTimeZone $timezone)
+    private function exportUsers($skipS3, DateTimeZone $timezone)
     {
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
@@ -570,14 +392,15 @@ class BICommand extends ContainerAwareCommand
             '"Latest Campaign Source"',
         ]);
         foreach ($users as $user) {
+            $billing = $user->getBillingAddress();
             /** @var User $user */
-            $census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
-            $income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode());
+            $census = $billing ? $this->searchService->findNearest($billing->getPostcode()) : null;
+            $income = $billing ? $this->searchService->findIncome($billing->getPostcode()) : null;
             /** @var PhonePolicy $policy */
             $policy = $user->getFirstPolicy();
             $lines[] = implode(',', [
                 sprintf('"%d"', $user->getAge()),
-                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $billing ? $billing->getPostcode() : ''),
                 sprintf('"%s"', $user->getId()),
                 sprintf('"%s"', $this->timezoneFormat($user->getCreated(), $timezone, 'Y-m-d')),
                 sprintf('"%s"', count($user->getCreatedPolicies()) > 0 ? 'yes' : 'no'),
@@ -599,11 +422,11 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on invitations.
-     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTimeZone $timezone is the timezone to give dates in.
+     * @param boolean      $skipS3   says whether we should upload the created array to S3 storage.
+     * @param DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of invitation data.
      */
-    private function exportInvitations($skipS3, \DateTimeZone $timezone)
+    private function exportInvitations($skipS3, DateTimeZone $timezone)
     {
         $repo = $this->dm->getRepository(Invitation::class);
         $invitations = $repo->findAll();
@@ -631,11 +454,11 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on connections.
-     * @param boolean       $skipS3   says whether we should upload the created array to S3 storage.
-     * @param \DateTimeZone $timezone is the timezone to give dates in.
+     * @param boolean      $skipS3   says whether we should upload the created array to S3 storage.
+     * @param DateTimeZone $timezone is the timezone to give dates in.
      * @return array containing first a row of column names and then rows of connection data.
      */
-    private function exportConnections($skipS3, \DateTimeZone $timezone)
+    private function exportConnections($skipS3, DateTimeZone $timezone)
     {
         $repo = $this->dm->getRepository(StandardConnection::class);
         $connections = $repo->findAll();
@@ -680,11 +503,11 @@ class BICommand extends ContainerAwareCommand
 
     /**
      * Creates an array in the style of a csv file containing the current data on unpaid calls.
-     * @param boolean       $skipS3   determines whether the created csv should be uploaded to S3 storage.
-     * @param \DateTimeZone $timezone is the timezone in which dates should be given.
+     * @param boolean      $skipS3   determines whether the created csv should be uploaded to S3 storage.
+     * @param DateTimeZone $timezone is the timezone in which dates should be given.
      * @return array containing first a row of column names, and then rows of unpaid call data.
      */
-    private function exportUnpaidCalls($skipS3, \DateTimeZone $timezone)
+    private function exportUnpaidCalls($skipS3, DateTimeZone $timezone)
     {
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
@@ -761,56 +584,9 @@ class BICommand extends ContainerAwareCommand
     }
 
     /**
-     * Gives you a list of lines in a csv containing all scodes used by all users.
-     * @param boolean       $skipS3   tells you whether to skip uploading the file to s3.
-     * @param \DateTimeZone $timezone is the timezone we are getting dates in.
-     */
-    private function exportScodes($skipS3, \DateTimeZone $timezone)
-    {
-        /** @var PolicyRepository */
-        $policyRepo = $this->dm->getRepository(Policy::class);
-        /** @var ConnectionRepository */
-        $connectionRepo = $this->dm->getRepository(Connection::class);
-        $policies = $policyRepo->findScodePolicies();
-        $lines = [];
-        $lines[] = CsvHelper::line(
-            "Scode",
-            "Scode Type",
-            "User Id",
-            "Policy Number",
-            "Date"
-        );
-        foreach ($policies as $policy) {
-            foreach ($policy->getScodes() as $scode) {
-                $type = $scode->getType();
-                $connection = null;
-                if ($type == Scode::TYPE_REWARD) {
-                    $rewardUser = $scode->getReward()->getUser();
-                    $connection = $connectionRepo->findByUser($rewardUser, $policy);
-                } elseif ($type == Scode::TYPE_STANDARD) {
-                    $other = $scode->getPolicy();
-                    $connection = $connectionRepo->connectedByPolicy($policy, $other);
-                }
-                if ($connection) {
-                    $lines[] = CsvHelper::line(
-                        $scode->getCode(),
-                        $scode->getType(),
-                        $policy->getUser()->getId(),
-                        $policy->getPolicyNumber(),
-                        $connection->getDate()->format("Y-m-d H:i")
-                    );
-                }
-            }
-        }
-        if (!$skipS3) {
-            $this->uploadS3(implode(PHP_EOL, $lines), 'scodes.csv');
-        }
-        return $lines;
-    }
-
-    /**
      * Exports rewards distribution data per month
      * @param boolean $skipS3 tells you whether to skip uploading the file to s3.
+     * @return array list of generated lines.
      */
     private function exportRewards($skipS3)
     {
@@ -892,6 +668,7 @@ class BICommand extends ContainerAwareCommand
     /**
      * Exports rewards previsionnal budget data as well as reward code use analytics to a csv file.
      * @param boolean $skipS3 tells you whether to skip uploading the file to s3.
+     * @return array list of generated lines.
      */
     private function exportRewardsBudget($skipS3)
     {
@@ -1023,6 +800,7 @@ class BICommand extends ContainerAwareCommand
     /**
      * Exports the referral bonuses
      * @param boolean $skipS3 tells you whether to skip uploading the file to s3.
+     * @return array list of generated lines.
      */
     private function exportReferrals($skipS3)
     {
@@ -1071,141 +849,9 @@ class BICommand extends ContainerAwareCommand
 
     }
 
-    private function getFirstSCodeUsedType(RewardRepository $rewardRepo, $connections)
-    {
-        $oldest = new \DateTime();
-        $firstConnection = new \stdClass();
-        /** @var Connection $connection */
-        foreach ($connections as $connection) {
-            $signUp = false;
-            if ($connection instanceof RewardConnection) {
-                $signUp = $this->isSignUpBonusSCode($rewardRepo, $connection);
-            }
-
-            if (($connection->getDate() < $oldest) && !$signUp) {
-                $oldest = $connection->getDate();
-                $firstConnection = $connection;
-            }
-        }
-        $retVal = "";
-        if ($firstConnection instanceof RewardConnection) {
-            $retVal = "reward";
-        } elseif ($firstConnection instanceof StandardConnection) {
-            $retVal = "virality";
-        } elseif ($firstConnection instanceof RenewalConnection) {
-            $retVal = "renewal";
-        }
-        return $retVal;
-    }
-
-    private function getSCodesUsed($connections)
-    {
-        $retVal = "";
-        /** @var Connection $connection */
-        foreach ($connections as $connection) {
-            if (!$connection instanceof RewardConnection) {
-                if ($connection->getLinkedPolicy() instanceof Policy) {
-                    $retVal .= $connection->getLinkedPolicy()->getStandardSCode()->getCode() . ';';
-                }
-            }
-        }
-        return $retVal;
-    }
-
-    private function getPromoCodesUsed(RewardRepository $rewardRepo, $connections)
-    {
-        $retVal = "";
-        /** @var Connection $connection */
-        foreach ($connections as $connection) {
-            if ($connection instanceof RewardConnection) {
-                $rewards = $rewardRepo->findBy(['user.id' => $connection->getLinkedUser()->getId()]);
-                /** @var Reward $reward */
-                foreach ($rewards as $reward) {
-                    if ($reward->getSCode()) {
-                        $retVal .= $reward->getSCode()->getCode() . ';';
-                    } else {
-                        $retVal .= 'BONUS;';
-                    }
-                }
-            }
-        }
-        return $retVal;
-    }
-
-    private function isSignUpBonusSCode(RewardRepository $rewardRepo, $connection)
-    {
-        $rewards = $rewardRepo->findBy(['user.id' => $connection->getLinkedUser()->getId()]);
-        /** @var Reward $reward */
-        foreach ($rewards as $reward) {
-            if ($reward->getSCode()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private function getFirstSCodeUsedCode($connections)
-    {
-        $oldest = new \DateTime();
-        $firstConnection = new \stdClass();
-        /** @var Connection $connection */
-        foreach ($connections as $connection) {
-            if ($connection->getDate() < $oldest) {
-                $oldest = $connection->getDate();
-                $firstConnection = $connection;
-            }
-        }
-        if ($firstConnection instanceof Connection) {
-            /** @var Policy $linkedPolicy */
-            $linkedPolicy = $firstConnection->getLinkedPolicy();
-            if ($linkedPolicy instanceof Policy) {
-                $scode = $linkedPolicy->getStandardSCode();
-                if ($scode instanceof SCode) {
-                    return $linkedPolicy->getStandardSCode()->getCode();
-                }
-            }
-        }
-        return "";
-    }
-
-    public function policyHasSignUpBonus(RewardRepository $rewardRepo, $connections)
-    {
-        foreach ($connections as $connection) {
-            if ($connection instanceof RewardConnection && $this->isSignUpBonusSCode($rewardRepo, $connection)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function getPreviousPolicyIsUpgrade(Policy $policy)
-    {
-        $user = $policy->getUser();
-        $previousPolicies = $user->getPolicies();
-        $startWithoutTime = '';
-        if ($policy->getStart()) {
-            $startWithoutTime = $policy->getStart()->format('Ymd');
-        }
-        /** @var Policy $previousPolicy */
-        foreach ($previousPolicies as $previousPolicy) {
-            $previousEndWithoutTime = '';
-            if ($previousPolicy->getEnd()) {
-                $previousEndWithoutTime = $previousPolicy->getEnd()->format('Ymd');
-            }
-            if ($previousEndWithoutTime == $startWithoutTime) {
-                $cancelled = $previousPolicy->isCancelled();
-                $isUpgrade = $previousPolicy->getCancelledReason() == Policy::CANCELLED_UPGRADE;
-                if ($cancelled && $isUpgrade) {
-                    return 'Yes';
-                }
-            }
-        }
-        return 'No';
-    }
-
     /**
      * Uploads an array of data to s3 as lines in a file.
-     * @param array  $data     is the data to write to the file.
+     * @param string $data     is the data to write to the file.
      * @param string $filename is the name of the file to write it to.
      * @return string the key to the file on s3.
      */
@@ -1226,14 +872,14 @@ class BICommand extends ContainerAwareCommand
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $tmpFilename);
         $result = file_put_contents($tmpFile, $data);
         if (!$result) {
-            throw new \Exception($filename . ' could not be processed into a tmp file.');
+            throw new RuntimeException($filename . ' could not be processed into a tmp file.');
         }
         $s3Key = sprintf('%s/bi/%s', $this->environment, $filename);
-        $result = $this->s3->putObject(array(
+        $result = $this->s3->putObject([
             'Bucket' => SoSure::S3_BUCKET_ADMIN,
-            'Key'    => $s3Key,
+            'Key' => $s3Key,
             'SourceFile' => $tmpFile,
-        ));
+        ]);
         unlink($tmpFile);
         return $s3Key;
     }
