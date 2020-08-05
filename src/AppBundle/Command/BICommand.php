@@ -6,6 +6,9 @@ use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Note\Note;
 use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Reward;
@@ -19,6 +22,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\ReferralBonus;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\ConnectionRepository;
 use AppBundle\Repository\RewardRepository;
@@ -29,6 +33,7 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
 use CensusBundle\Service\SearchService;
+use DateTime;
 use DateTimeZone;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Exception;
@@ -58,6 +63,7 @@ class BICommand extends ContainerAwareCommand
         'unpaidCalls',
         'rewards',
         'rewardsBudget',
+        'bacsPayments',
         'referrals'
     ];
 
@@ -187,6 +193,9 @@ class BICommand extends ContainerAwareCommand
                     break;
                 case 'rewardsBudget':
                     $lines = $this->exportRewardsBudget($skipS3);
+                    break;
+                case 'bacsPayments':
+                    $lines = $this->exportBacsPayments($skipS3);
                     break;
                 case 'referrals':
                     $lines = $this->exportReferrals($skipS3);
@@ -798,6 +807,43 @@ class BICommand extends ContainerAwareCommand
     }
 
     /**
+     * Exports currently relevant bacs payments. The definition of relevant is that their effect date is greater than
+     * three weeks ago or their status is pending.
+     * @param boolean $skipS3 is whether to skip uploading the results to s3.
+     * @return array containing all the generated lines.
+     */
+    private function exportBacsPayments($skipS3)
+    {
+        /** @var BacsPaymentRepository $bacsPaymentRepo */
+        $bacsPaymentRepo = $this->dm->getRepository(BacsPayment::class);
+        $payments = $bacsPaymentRepo->findBacsPaymentsForReport(new DateTime());
+        $lines = [];
+        $lines[] = CsvHelper::line(
+            'policyNumber',
+            'id',
+            'date',
+            'created',
+            'amount',
+            'status',
+            'notes'
+        );
+        foreach ($payments as $payment) {
+            $lines[] = CsvHelper::line(
+                $payment->getPolicy()->getPolicyNumber(),
+                $payment->getDate()->format('Ymd H:i'),
+                $payment->getCreated()->format('Ymd H:i'),
+                $payment->getAmount(),
+                $payment->getStatus(),
+                $payment->getNotes()
+            );
+        }
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'bacsPayments.csv');
+        }
+        return $lines;
+    }
+
+    /**
      * Exports the referral bonuses
      * @param boolean $skipS3 tells you whether to skip uploading the file to s3.
      * @return array list of generated lines.
@@ -872,13 +918,14 @@ class BICommand extends ContainerAwareCommand
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $tmpFilename);
         $result = file_put_contents($tmpFile, $data);
         if (!$result) {
-            throw new RuntimeException($filename . ' could not be processed into a tmp file.');
+            $this->logger->error($filename.' could not be processed into a tmp file.');
+            return '';
         }
         $s3Key = sprintf('%s/bi/%s', $this->environment, $filename);
-        $result = $this->s3->putObject([
+        $this->s3->putObject([
             'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key' => $s3Key,
-            'SourceFile' => $tmpFile,
+            'SourceFile' => $tmpFile
         ]);
         unlink($tmpFile);
         return $s3Key;
