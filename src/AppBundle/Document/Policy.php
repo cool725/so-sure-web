@@ -5,9 +5,7 @@ namespace AppBundle\Document;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
-use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
-use AppBundle\Document\Participation;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
@@ -19,10 +17,8 @@ use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Exception\DuplicatePaymentException;
-use AppBundle\Service\InvitationService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -39,7 +35,6 @@ use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\Payment\SoSurePayment;
-use AppBundle\Exception\ClaimException;
 use AppBundle\Annotation\DataChange;
 
 /**

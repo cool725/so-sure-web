@@ -1324,8 +1324,8 @@ class UserController extends BaseController
         // A/B On popup text
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EXIT_POPUP_MULTI);
 
-        // A/B Cheap vs Easy Copy
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_COPY_CHEAP_VS_EASY);
+        // A/B Greeting Homepage Experiment
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_GREETING);
 
         if ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
             // A/B Pricing Messaging Experiment

@@ -25,7 +25,7 @@ class ReceperioService extends BaseImeiService
     const TEST_INVALID_SERIAL = "111111111111";
     const TEST_MANUAL_PROCESS_SERIAL = "111112";
     const PARTNER_ID = 415;
-    const BASE_URL = "http://gapi.checkmend.com";
+    const BASE_URL = "https://gapi.checkmend.com";
 
     const KEY_RECEPERIO_QUEUE = "receperio:queue";
     const KEY_DUEDILIGENCE_FORMAT = "receperio:duediligence:%s";
@@ -988,12 +988,12 @@ class ReceperioService extends BaseImeiService
 
     public function isSameApplePhone(Phone $phone, $serialNumber, $modelData, $data, $warnMismatch = true)
     {
-
-        if (mb_strtolower($modelData['name']) != mb_strtolower($phone->getModel())) {
+        $conformed = mb_strtolower(mb_ereg_replace('[()]', '', $phone->getModel()));
+        if (mb_strtolower($modelData['name']) != $conformed) {
             $this->statsd->increment('recipero.makeModelMismatch');
             $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
-                $phone->getModel(),
+                $conformed,
                 $serialNumber,
                 json_encode($data)
             );
