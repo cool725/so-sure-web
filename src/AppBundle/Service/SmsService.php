@@ -144,7 +144,7 @@ class SmsService
                 'src' => $this->sending_number, // Sender's phone number with country code
                 'dst' => $number, // Receiver's phone number with country code
                 'text' => $message, // Your SMS text message
-                'log' => false, // False: message not logged on infrastructure and the dst value will be masked
+                'log' => true, // False: message not logged on infrastructure and the dst value will be masked
                 //'url' => 'http://example.com/report/', // The URL to which with the status of the message is sent
                 //'method' => 'POST' // The method used to call the url
             );
