@@ -2,6 +2,8 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
+use AppBundle\Classes\Helvetia;
+use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
@@ -16,6 +18,7 @@ use AppBundle\Document\File\S3File;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\PolicyTermsRepository;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
@@ -215,14 +218,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         // Sample user for apple
         $user = $this->newUser('julien+apple@so-sure.com');
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
         $this->newPolicy($manager, $user, $count++);
 
         // claimed user test data
         $networkUser = $this->newUser('user-network-claimed@so-sure.net');
-        $networkUser->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $networkUser->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $networkUser->setEnabled(true);
         $manager->persist($networkUser);
         $this->newPolicy($manager, $networkUser, $count++, self::CLAIM_SETTLED_LOSS);
@@ -230,14 +233,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         //\Doctrine\Common\Util\Debug::dump($networkUser);
 
         $user = $this->newUser('user-claimed@so-sure.net');
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
         $this->newPolicy($manager, $user, $count++, self::CLAIM_SETTLED_LOSS);
         $this->addConnections($manager, $user, [$networkUser], 1);
 
         $user = $this->newUser('non-picsure@so-sure.net');
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy(
@@ -259,21 +262,21 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         // Users for iOS Testing
         $iphoneUI = $this->getIPhoneUI($manager);
         $userInviter = $this->newUser('ios-testing+inviter@so-sure.org', false, false);
-        $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInviter->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $userInviter->setEnabled(true);
         $userInviter->setMobileNumberVerified(true);
         $manager->persist($userInviter);
         $this->newPolicy($manager, $userInviter, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true);
 
         $userInvitee = $this->newUser('ios-testing+invitee@so-sure.org', false, false);
-        $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInvitee->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $userInvitee->setMobileNumberVerified(true);
         $manager->persist($userInvitee);
         $this->newPolicy($manager, $userInvitee, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false);
 
         $user = $this->newUser('ios-testing+scode@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -283,7 +286,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
 
         $user = $this->newUser('ios-testing+renew+pot@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -298,8 +301,88 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $manager->flush();
 
+        /** @var PolicyTermsRepository $policyTermsRepo */
+        $policyTermsRepo = $manager->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $aggregatorTerms */
+        $aggregatorTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $user = $this->newUser('ios-testing+aggregator@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $iphoneUI,
+            true,
+            false,
+            5,
+            null,
+            null,
+            self::PICSURE_RANDOM,
+            false,
+            Helvetia::NAME
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
+        $policy->setPolicyTerms($aggregatorTerms);
+        $user = $this->newUser('ios-testing+salva-upgrade@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $iphoneUI,
+            true,
+            false,
+            31,
+            null,
+            null,
+            self::PICSURE_RANDOM,
+            false,
+            Salva::NAME
+        );
+        $user = $this->newUser('ios-testing+helvetia-upgrade@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $iphoneUI,
+            true,
+            false,
+            31,
+            null,
+            null,
+            self::PICSURE_RANDOM,
+            false,
+            Helvetia::NAME
+        );
+        $user = $this->newUser('ios-testing+direct-connection@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 21);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 18);
+
         $user = $this->newUser('ios-testing+renew+nopot@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -315,7 +398,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
 
         $user = $this->newUser('ios-testing+cashback@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -333,21 +416,97 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         // Users for Android Testing
         $androidUI = $this->getAndroidUI($manager);
         $userInviter = $this->newUser('android-testing+inviter@so-sure.org', false, false);
-        $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInviter->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $userInviter->setEnabled(true);
         $userInviter->setMobileNumberVerified(true);
         $manager->persist($userInviter);
         $this->newPolicy($manager, $userInviter, $count++, self::CLAIM_NONE, null, null, $androidUI, true);
 
         $userInvitee = $this->newUser('android-testing+invitee@so-sure.org', false, false);
-        $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInvitee->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $userInvitee->setMobileNumberVerified(true);
         $manager->persist($userInvitee);
         $this->newPolicy($manager, $userInvitee, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false);
 
+        $user = $this->newUser('android-testing+aggregator@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $androidUI,
+            true,
+            false,
+            5,
+            null,
+            null,
+            self::PICSURE_RANDOM,
+            false,
+            Helvetia::NAME
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
+        $policy->setPolicyTerms($aggregatorTerms);
+        $user = $this->newUser('android-testing+salva-upgrade@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $androidUI,
+            true,
+            false,
+            31,
+            null,
+            null,
+            self::PICSURE_RANDOM,
+            false,
+            Salva::NAME
+        );
+        $user = $this->newUser('android-testing+helvetia-upgrade@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $androidUI,
+            true,
+            false,
+            31,
+            null,
+            null,
+            self::PICSURE_RANDOM,
+            false,
+            Helvetia::NAME
+        );
+        $user = $this->newUser('android-testing+direct-connection@so-sure.org', false, false);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $user->setMobileNumberVerified(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 21);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 18);
+
         $user = $this->newUser('android-testing+scode@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -356,7 +515,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->invite($manager, $userInviter, $userInvitee, false);
 
         $user = $this->newUser('android-testing+renew+pot@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -372,7 +531,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
 
         $user = $this->newUser('android-testing+renew+nopot@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -388,7 +547,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
 
         $user = $this->newUser('android-testing+cashback@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -416,7 +575,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         // cancelled policy with outstanding payment due
         $user = $this->newUser('cancelled-policy-unpaid@so-sure.com', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_SETTLED_LOSS, null, null, null, false);
@@ -456,7 +615,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         // unpaid policy with discount
         $user = $this->newUser('ios-testing+unpaid+discount@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -476,7 +635,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         );
 
         $user = $this->newUser('android-testing+unpaid+discount@so-sure.org', false, false);
-        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setPlainPassword(LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $user->setMobileNumberVerified(true);
         $manager->persist($user);
@@ -647,6 +806,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
      * @param integer|null  $paidMonths
      * @param string        $picSure
      * @param boolean       $isPaymentMethodBacs
+     * @param string|null   $underwriter         Lets you determine the underwriter.
      * @return PhonePolicy
      * @throws \AppBundle\Exception\InvalidPremiumException
      */
@@ -664,7 +824,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policyDiscount = null,
         $paidMonths = null,
         $picSure = self::PICSURE_RANDOM,
-        $isPaymentMethodBacs = null
+        $isPaymentMethodBacs = null,
+        $underwriter = null
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -694,7 +855,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $days = sprintf("P%dD", $days);
         }
         $startDate->sub(new \DateInterval($days));
-        $policy = (rand(0, 1)) ? new SalvaPhonePolicy() : new HelvetiaPhonePolicy();
+        $policy = $underwriter === Salva::NAME ? new SalvaPhonePolicy() :
+            $underwriter === Helvetia::NAME ? new HelvetiaPhonePolicy() :
+            rand(0, 1) ? new SalvaPhonePolicy() : new HelvetiaPhonePolicy();
         $policy->setPaymentMethod(
             $this->getPaymentMethod($policy, ($isPaymentMethodBacs !== null) ? $isPaymentMethodBacs : (rand(0, 1) == 0))
         );

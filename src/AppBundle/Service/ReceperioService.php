@@ -988,12 +988,12 @@ class ReceperioService extends BaseImeiService
 
     public function isSameApplePhone(Phone $phone, $serialNumber, $modelData, $data, $warnMismatch = true)
     {
-
-        if (mb_strtolower($modelData['name']) != mb_strtolower($phone->getModel())) {
+        $conformed = mb_strtolower(mb_ereg_replace('[()]', '', $phone->getModel()));
+        if (mb_strtolower($modelData['name']) != $conformed) {
             $this->statsd->increment('recipero.makeModelMismatch');
             $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
-                $phone->getModel(),
+                $conformed,
                 $serialNumber,
                 json_encode($data)
             );
