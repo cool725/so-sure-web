@@ -1,4 +1,4 @@
-<section class="mini-faq py-lg-5">
+ß<section class="mini-faq py-lg-5">
     <div class="container-large py-5">
         <div class="row">
             <div class="col-md-4">
@@ -20,7 +20,11 @@
                                 <li class="mb-2">Instant cover from purchase</li>
                                 <li class="mb-2">We aim for 24-72 hour replacement or repair once your claim is approved</li>
                                 <li class="mb-2">Hassle-Free Claims</li>
-                                <li class="mb-2">Low excess from just &pound;50 when validated with our anti-fraud technology. If not validated then excess is &pound;150</li>
+                                {% set excessDefined = lowest_excess %}
+                                {% if prices['monthly'].picsureexcess.damage is defined %}
+                                    {% set excessDefined = '£' ~ prices['monthly'].picsureexcess.damage %}
+                                {% endif %}
+                                <li class="mb-2">Low excess from just {{ excessDefined }} when validated with our anti-fraud technology. If not validated then excess is &pound;150</li>
                                 <li class="mb-2">Insure mobiles up to 3 years old</li>
                                 <li class="mb-2">No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
                                 <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
@@ -56,12 +60,12 @@
                         </h3>
                         <div class="expanding-cardbox__expand text-zaffre mt-4">
                             {% if instore is defined and instore is null %}
-                                <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss &amp; theft when you validate your phone with our app.</p>
+                                <p>Our excess is as low as {{ excessDefined }} when you validate your phone with our app.</p>
                                 <p>Download our app and prove to us your device is in good working order and the screen isn't cracked by taking a selfie of your phone!</p>
                                 <p><strong>Depending on your policy, validating your phone may be mandatory.</strong></p>
                                 <p class="mb-0">Excess levels vary by make, model and memory size and might be higher for latest, most-expensive new handsets.</p>
                             {% else %}
-                                <p>Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss and theft.</p>
+                                <p class="mb-0">Our excess is as low as {{ excessDefined }} when you validate your phone with our app.</p>
                             {% endif %}
                         </div>
                     </div>

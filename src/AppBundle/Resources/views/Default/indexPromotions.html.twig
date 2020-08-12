@@ -9,7 +9,7 @@
 
 {# Set Meta #}
 {% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
 {% endblock %}
 
 {% block cssPage %}
@@ -125,7 +125,7 @@
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px" class="lozad">
-                    <h5 class="text-primary">Low excess from just &pound;50</h5>
+                    <h5 class="text-primary">Low excess from just {{ lowest_excess }}</h5>
                     <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess</p>
                 </div>
             </div>

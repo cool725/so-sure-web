@@ -444,10 +444,14 @@ class PhoneInsuranceController extends BaseController
             $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
         }
 
+        // Get the price service
+        $priceService = $this->get('app.price');
+
         $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'phone' => $phone,
+            'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),
             'phone_price' => $fromPrice,
             'img_url' => $modelHyph,
             'available_images' => $availableImages,

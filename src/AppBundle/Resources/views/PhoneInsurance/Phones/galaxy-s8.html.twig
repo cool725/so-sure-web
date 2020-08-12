@@ -1,7 +1,7 @@
 {% extends 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig' %}
 
 {% block phone_hero_text %}
-    <p class="mb-4">We believe insurance should be easy, clear and affordable; that's why we provide comprehensive <strong>Samsung Galaxy S8 insurance</strong> against theft, loss and a host of other situations and also offer an excess as low as &pound;50 for accidental damage when you validate your phone with our app. Let's get started!</p>
+    <p class="mb-4">We believe insurance should be easy, clear and affordable; that's why we provide comprehensive <strong>Samsung Galaxy S8 insurance</strong> against theft, loss and a host of other situations and also offer an excess as low as {{ lowest_excess }} for accidental damage when you validate your phone with our app. Let's get started!</p>
 {% endblock %}
 
 {% block phone_why_insure_text %}

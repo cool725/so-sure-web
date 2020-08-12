@@ -49,7 +49,7 @@
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Low excess from just &pound;50
+                                Low excess from just {{ lowest_excess }}
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
@@ -154,13 +154,13 @@
                     <div class="expanding-cardbox expanding-cardbox__icon mb-4">
                         <div class="expanding-cardbox__body">
                             <h3 class="h5 expanding-cardbox__title mb-0">
-                                Low excess from just &pound;50 with our app <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                                Low excess from just {{ lowest_excess }} with our app <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
                             </h3>
                             <div class="expanding-cardbox__expand mt-4">
                                 {% if store is not null %}
                                     <div class="h6">{{ store|capitalize }} customers - phones insured in-store are exempt from verifying their device.</div>
                                 {% endif %}
-                                Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss &amp; theft when you validate your phone with our app.
+                                Our excess is as low as {{ lowest_excess }} for accidental damage and &pound;70 for loss &amp; theft when you validate your phone with our app.
                                 <br><br>
                                 Download our app and prove to us your device is in good working order and the screen isn't cracked by taking a selfie of your phone!
                                 <br><br>
