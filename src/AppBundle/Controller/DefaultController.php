@@ -376,7 +376,7 @@ class DefaultController extends BaseController
             ];
         }
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
             'page' => $data['affiliate_page']]);
 
         return $this->render($template, $data);
