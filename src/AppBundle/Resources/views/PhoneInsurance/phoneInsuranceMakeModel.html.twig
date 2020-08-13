@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
 {% set intercom_enabled = false %}
+{% set include_get_a_quote = true %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
@@ -460,6 +461,7 @@
 
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 

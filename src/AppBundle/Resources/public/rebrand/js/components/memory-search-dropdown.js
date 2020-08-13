@@ -1,4 +1,5 @@
 // memory-search-dropdown.js
+require('./select.js');
 
 $(function() {
 
@@ -10,8 +11,7 @@ $(function() {
             model   = $('.memory-search-dropdown__model'),
             device  = model.data('model'),
             memory  = $('.memory-search-dropdown__memory'),
-            button  = $('.memory-search-dropdown__button'),
-            sizeTxt = $('#size_rule');
+            button  = $('.memory-search-dropdown__button');
 
         const updateModels = () => {
 
