@@ -49,6 +49,16 @@ class BacsTest extends \PHPUnit\Framework\TestCase
             5,
             28
         ));
+        $this->assertTrue(static::checkNumbers(
+            Bacs::getEligibleBillingDays(new \DateTime('2020-07-30')),
+            10,
+            28
+        ));
+        $this->assertTrue(static::checkNumbers(
+            Bacs::getEligibleBillingDays(new \DateTime('2020-08-01')),
+            1,
+            28
+        ));
     }
 
     /**
