@@ -56,7 +56,7 @@ class BacsTest extends \PHPUnit\Framework\TestCase
      * @param array $numbers is the array to check.
      * @param int   $min     is the first number.
      * @param int   $max     is the last number.
-     * @return true if the array is all good and false if not.
+     * @return boolean true if the array is all good and false if not.
      * @throws \RuntimeException if you give a max lower than the min which would make no sense.
      */
     private static function checkNumbers($numbers, $min, $max)
@@ -75,4 +75,4 @@ class BacsTest extends \PHPUnit\Framework\TestCase
         }
         return true;
     }
-};
+}
