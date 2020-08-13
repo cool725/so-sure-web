@@ -322,8 +322,6 @@ class DefaultController extends BaseController
             $data = [
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'starling-bank',
-                // 'affiliate_company' => 'Starling Bank',
-                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',
@@ -334,8 +332,6 @@ class DefaultController extends BaseController
             $data = [
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'starling-business',
-                // 'affiliate_company' => 'Starling Bank',
-                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',

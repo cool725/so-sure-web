@@ -4,7 +4,6 @@ require('../../../sass/pages/user/user-referral.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/tooltip');
-require('bootstrap/js/dist/modal');
 
 // Require components
 require('jquery-validation');
@@ -17,11 +16,6 @@ let Clipboard = require('clipboard');
 import tracking from '../../common/track-data.js';
 
 $(function() {
-
-    // Starling
-    if ($('#starling_modal').length) {
-        $('#starling_modal').modal('show');
-    }
 
     // Use textfit plugin for h1 tag
     textFit($('.fit'), {detectMultiLine: true});

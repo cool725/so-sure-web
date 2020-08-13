@@ -196,6 +196,14 @@ class UserController extends BaseController
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
         }
 
+        $oauth2FlowParams = null;
+        $session = $request->getSession();
+        if ($session && $session->has('oauth2Flow')) {
+            $url = $session->get('oauth2Flow.targetPath');
+            $query = parse_url($url, PHP_URL_QUERY);
+            parse_str($query, $oauth2FlowParams);
+        }
+
         /** @var InvitationService $invitationService */
         $invitationService = $this->get('app.invitation');
         $emailInvitiation = new EmailInvitation();
@@ -420,7 +428,8 @@ class UserController extends BaseController
             'scode_form_two' => $scodeFormTwo->createView(),
             'scode' => $scode,
             'friends' => $fbFriends,
-            'max_connections' => $maxConnections
+            'max_connections' => $maxConnections,
+            'oauth2FlowParams' => $oauth2FlowParams
         );
     }
 
@@ -1354,14 +1363,6 @@ class UserController extends BaseController
             $this->addFlash('success-raw', $message);
         }
 
-        $oauth2FlowParams = null;
-        $session = $request->getSession();
-        if ($session && $session->has('oauth2Flow')) {
-            $url = $session->get('oauth2Flow.targetPath');
-            $query = parse_url($url, PHP_URL_QUERY);
-            parse_str($query, $oauth2FlowParams);
-        }
-
         // In-store
         $instore = $this->get('session')->get('store');
 
@@ -1385,7 +1386,6 @@ class UserController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $policy,
             'has_visited_welcome_page' => $pageVisited,
-            'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
             'instore' => $instore,
         ]);
