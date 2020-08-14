@@ -17,11 +17,6 @@ import tracking from '../../common/track-data.js';
 
 $(function() {
 
-    // Starling
-    if ($('#starling_modal').length) {
-        $('#starling_modal').modal('show');
-    }
-
     // Use textfit plugin for h1 tag
     textFit($('.fit'), {detectMultiLine: true});
 

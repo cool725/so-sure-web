@@ -6,7 +6,7 @@
 
 {% block title %}Welcome to Social Insurance with Starling Bank | so-sure{% endblock %}
 {% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
+    <meta name="description" content="Mobile Insurance in partnership with Starling Bank that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
 {% endblock %}
 
 {% block cssPage %}
@@ -15,7 +15,7 @@
 
 {% block body %}
 
-    <section class="hero">
+    <section class="hero-starling">
         <div class="container-large">
             <div class="hero__intro">
                 <div class="breadcrumbs">
@@ -44,13 +44,13 @@
                         </li>
                     </ul>
                 </div>
-                <h1 class="mb-2 text-white h2">Mobile Phone Insurance that's Simply Better</h1>
+                <h1 class="mb-2 text-white h2">Simply better mobile phone insurance</h1>
                 <p class="lead text-columbia-blue-e mb-4">in partnership with</p>
-                <img data-src="{{ cdn_url }}/images/logo/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="280px" class="d-block mb-4 mx-auto lozad">
+                <img data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_starling_bank_logo_alt_white.svg" alt="Starling Bank" width="200px" class="d-block mb-4 mx-auto lozad">
             </div>
             <div class="hero__controls mb-4">
-                <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a>
-                <a href="{{ path('fos_user_security_login') }}" class="btn btn-outline-columbia-blue-e btn-block-xs ml-md-2">Link Starling Account</a>
+                <a href="#" class="btn btn-starling btn-block-xs get-a-quote disabled mb-3">Get Insured <i class="far fa-arrow-right fa-sm ml-2"></i></a><br />
+                <a href="{{ path('fos_user_security_login') }}" class="text-columbia-blue-e"><u>Link Starling Account</u></a>
             </div>
             {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
         </div>
@@ -71,8 +71,8 @@
         </div>
     </section>
 
-    <section class="why py-lg-5">
-        <div class="container-large py-5">
+    <section class="why py-lg-5 mt-lg-5">
+        <div class="container-large py-5 mt-lg-5">
             <div class="row">
                 <div class="col-md-4">
                     <div class="why__container">
@@ -89,7 +89,7 @@
                 <div class="col-md-4">
                     <div class="why__container">
                         <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px" class="lozad">
-                        <h4 class="text-dodger-blue">Low excess from just &pound;50</h4>
+                        <h4 class="text-dodger-blue">Low excess from just {{ lowest_excess }}</h4>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 // phone-search-dropdown.js
+require('./select.js');
 
 $(function() {
 

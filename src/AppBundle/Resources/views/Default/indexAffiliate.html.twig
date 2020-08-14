@@ -7,7 +7,7 @@
 
 {% block title %}Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %} | so-sure{% endblock %}
 {% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
@@ -47,8 +47,8 @@
                     </ul>
                 </div>
                 {% if affiliate_page == 'comparison' %}
-                    <h1 class="mb-2 text-white h2">{{ titleH1 }}</h1>
-                    <h2 class="h4 text-zaffre mb-4">{{ leadP|raw }}</h2>
+                    <h1 class="mb-2 text-columbia-blue-e h2">{{ titleH1 }}</h1>
+                    <p class="lead text-white mb-4">{{ leadP|raw }}</p>
                 {% elseif affiliate_page == 'so-sure-compared' or affiliate_page == 'reward-gateway' %}
                     <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
                     <h2 class="h4 text-zaffre">Simple terms, pain-free claims, premium cover</h2>
@@ -105,7 +105,7 @@
                 <div class="col-md-4">
                     <div class="why__container">
                         <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px" class="lozad">
-                        <h3 class="h4 text-dodger-blue">Low excess from just &pound;50</h3>
+                        <h3 class="h4 text-dodger-blue">Low excess from just {{ lowest_excess }}</h3>
                     </div>
                 </div>
             </div>

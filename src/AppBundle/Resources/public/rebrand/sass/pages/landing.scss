@@ -59,6 +59,57 @@
     }
 }
 
+.hero-starling {
+    position: relative;
+    padding-top: 6rem;
+    padding-bottom: 8rem;
+    text-align: center;
+    background-color: $starling-dark;
+
+    h1 {
+        @include media-breakpoint-down(xs) {
+            font-size: 1.8rem;
+        }
+    }
+
+    svg {
+        position: absolute;
+        bottom: -1px; left: 0;
+        z-index: 1;
+    }
+
+    .table-comparison {
+        position: relative;
+        z-index: 4;
+
+        @include media-breakpoint-down(xs) {
+            max-width: 300px;
+        }
+    }
+
+    .updated-text {
+        position: relative;
+        z-index: 6;
+    }
+
+    &__partner-logo {
+        position: relative;
+        z-index: 4;
+    }
+
+    // Height so table overlaps
+    height: 560px;
+
+    @include media-breakpoint-up(sm) {
+        height: 600px;
+    }
+
+    @include media-breakpoint-up(md) {
+        padding-top: 8rem;
+        height: 650px;
+    }
+}
+
 .comparison {
     background-color: $white;
     position: relative;

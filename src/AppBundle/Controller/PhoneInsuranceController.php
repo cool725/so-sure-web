@@ -313,6 +313,9 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('phone_insurance'));
         }
 
+        // Track Page
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MANUFACTURER_PAGE);
+
         // To display in Popular Models sections
         $topPhones = $repo->findBy([
             'active' => true,
@@ -413,6 +416,9 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('phone_insurance'));
         }
 
+        // Track Page
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE);
+
         // Model template control
         // Hyphenate Model for images/template
         $modelHyph = str_replace('+', '-', $model);
@@ -444,10 +450,14 @@ class PhoneInsuranceController extends BaseController
             $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
         }
 
+        // Get the price service
+        $priceService = $this->get('app.price');
+
         $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'phone' => $phone,
+            'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),
             'phone_price' => $fromPrice,
             'img_url' => $modelHyph,
             'available_images' => $availableImages,

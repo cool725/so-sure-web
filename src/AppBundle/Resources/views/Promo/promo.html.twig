@@ -17,7 +17,7 @@
 
 {# Set Meta #}
 {% block meta %}
-    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just £50 - New, second hand & refurbished phones, Up to 80% money back"/>
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
 {% endblock %}
 
 {% if scode is defined and scode and scode.user and scode.reward and not custom %}
@@ -64,7 +64,7 @@
                                 </div>
                                 <div class="hero__step mb-5">
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">3</div></span>
-                                    <div class="h4 text-white">Use code <span class="promo-code">{{ scode.code }}</span> to claim your voucher 😎</div>
+                                    <div class="h4 text-white">Enter <span class="promo-code">{{ scode.code }}</span> before checkout to claim your voucher 😎</div>
                                 </div>
                             </div>
                         {% elseif custom == 'pizzaexpress' %}
@@ -145,7 +145,7 @@
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
-                                Low excess from just &pound;50
+                                Low excess from just {{ lowest_excess }}
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>

@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set body_class = 'phone-insurance-make-model' %}
 {% set intercom_enabled = false %}
+{% set include_get_a_quote = true %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
@@ -179,11 +180,11 @@
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px" class="lozad">
-                    <h3 class="h5 text-primary">Low excess from just &pound;50</h3>
+                    <h3 class="h5 text-primary">Low excess from just &pound;{{ prices['monthly'].picsureexcess.damage }}</h3>
                     <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess</p>
                 </div>
             </div>
-            <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Insure your phone in minutes</a>
+            {# <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Insure your phone in minutes</a> #}
         </div>
     </section>
 
@@ -410,7 +411,7 @@
                     <h2 class="h3 mb-4 text-primary">With great {{ make_desc }} {{ with_phone }} Insurance, comes great responsibility</h2>
                     <p>Worried about losing your {{ phone.make }} {{ phone.model }}? We're here to help. Our hassle-free claims process (and our UK-based claims team) makes it fast and easy to get a replacement if your {{ make_desc }} {{ phone.model }} goes missing or is stolen while you’re out and about, running errands or traveling abroad.</p>
                     <p class="mb-5">We aim to provide a replacement or perform a complete repair for your handset in 24-72 hours after approving your claim. Our fast, efficient team completes 74% of claims in 24 hours or less, meaning you’ll have a new or repaired phone in your hand without having to wait.</p>
-                    <a href="#" class="btn btn-success btn-block-xs mx-auto mb-5 get-a-quote disabled">Get a Quote</a>
+                    {# <a href="#" class="btn btn-success btn-block-xs mx-auto mb-5 get-a-quote disabled">Get a Quote</a> #}
                 </div>
             </div>
         </div>
@@ -460,6 +461,7 @@
 
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 

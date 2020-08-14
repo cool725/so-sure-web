@@ -1,7 +1,6 @@
 // reviews.scss
 
 .review {
-    // min-height: 330px;
     background-color: $white;
     text-align: center;
     opacity: 0.6;
@@ -51,13 +50,8 @@
         @include border-bottom-radius(12px);
     }
 
-    &__rating {
-
-    }
-
     &__controls {
         display: none;
-        // width: 96px; height: 48px;
         position: absolute;
         top: 0; right: 0;
         z-index: 2000;
@@ -117,7 +111,7 @@
 
     @include media-breakpoint-up(lg) {
         // min-height: none;
-        height: 275px;
+        // height: 275px;
         text-align: left;
         // Remove Push down
         margin-top: 0;
@@ -125,11 +119,12 @@
 }
 
 .rewiew-slide {
-    width: 80%; height: 400px;
+    width: 80%;
     margin-right: 1rem;
+    padding-bottom: 2rem;
 
     @include media-breakpoint-up(lg) {
-        width: 40%; height: 300px;
+        width: 40%;
         margin-right: 70px;
     }
 
