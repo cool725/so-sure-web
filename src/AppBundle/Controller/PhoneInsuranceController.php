@@ -349,7 +349,7 @@ class PhoneInsuranceController extends BaseController
             'competitor' => $this->competitorsData(),
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
-            'competitor3' => 'O2',
+            'competitor3' => 'O2'
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -384,7 +384,7 @@ class PhoneInsuranceController extends BaseController
      * @Route("/phone-insurance/{make}/{model}", name="phone_insurance_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      */
-    public function phoneInsuranceMakeModelAction($make = null, $model = null)
+    public function phoneInsuranceMakeModelAction(Request $request, $make = null, $model = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -418,6 +418,14 @@ class PhoneInsuranceController extends BaseController
 
         // Track Page
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE);
+
+        // A/B Pricing Messaging Experiment
+        $manufacturerLandingUsps = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS,
+            ['current', 'same-as-homepage'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         // Model template control
         // Hyphenate Model for images/template
@@ -466,6 +474,7 @@ class PhoneInsuranceController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'O2',
+            'manufacturer_landing_usps' => $manufacturerLandingUsps
         ];
 
         return $this->render($template, $data);
@@ -534,6 +543,9 @@ class PhoneInsuranceController extends BaseController
 
         // A/B Greeting Homepage Experiment
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_GREETING);
+
+        // A/B Manufacturers Landing Pages USPs
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
         // A/B Pricing Messaging Experiment
         $pricingMessagingExperiment = $this->sixpack(

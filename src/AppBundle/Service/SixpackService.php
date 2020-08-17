@@ -34,6 +34,9 @@ class SixpackService
     // Exp 3
     const EXPERIMENT_EXIT_POPUP_MULTI = 'Exit Popup Multi';
 
+    // Exp 4
+    const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -134,7 +137,7 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
         // Exp 4
-        // self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
+        self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 5
         // self::EXPERIMENT_COPY_CHEAP_VS_EASY,
     ];
@@ -177,7 +180,7 @@ class SixpackService
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
         // Exp 4
-        // self::EXPERIMENT_COPY_CHEAP_VS_FAIR,
+        self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 5
         // self::EXPERIMENT_COPY_CHEAP_VS_EASY,
     ];
