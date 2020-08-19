@@ -106,6 +106,10 @@ class GoCompare
         1809 => ['make' => 'Samsung', 'model' => 'Galaxy A71', 'memory' => 128],
         1894 => ['make' => 'Samsung', 'model' => 'Galaxy A41', 'memory' => 64],
         1896 => ['make' => 'Samsung', 'model' => 'Galaxy S10 Lite', 'memory' => 128],
+        1934 => ['make' => 'Samsung', 'model' => 'Galaxy Note20', 'memory' => 256],
+        1935 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 5G', 'memory' => 256],
+        1936 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 256],
+        1937 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 512],
 
         1412 => ['make' => 'Huawei', 'model' => 'P20', 'memory' => 128],
         1413 => ['make' => 'Huawei', 'model' => 'P20 Lite', 'memory' => 64],
