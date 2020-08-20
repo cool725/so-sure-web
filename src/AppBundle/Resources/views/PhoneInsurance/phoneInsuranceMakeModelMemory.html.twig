@@ -113,20 +113,18 @@
                                 </li>
                             </ul>
                         </div>
-                        {% if app.user is not null and app.user %}
-                            {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
-                                {% set greeting = 'Good morning' %}
-                            {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
-                                {% set greeting = 'Good afternoon' %}
-                            {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
-                                {% set greeting = 'Good evening' %}
-                            {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
-                                {% set greeting = 'Hello night owl 🦉' %}
-                            {% endif %}
-                            <div class="personalised mb-2 lead">
-                                {{ greeting|raw }} here's your quote:
-                            </div>                        
-                        {% endif %}                        
+                        {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
+                            {% set greeting = 'Good morning' %}
+                        {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
+                            {% set greeting = 'Good afternoon' %}
+                        {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
+                            {% set greeting = 'Good evening' %}
+                        {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
+                            {% set greeting = 'Hello night owl 🦉' %}
+                        {% endif %}
+                        <div class="personalised mb-2 lead">
+                            {{ greeting|raw }}{% if app.user is not null and app.user %} {{ app.user.firstName }}{% endif %}, here's your quote:
+                        </div>
                         <h1 class="h1b fit">
                             <a href="#mem_sizes"
                                class=""
