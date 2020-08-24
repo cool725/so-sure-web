@@ -679,6 +679,7 @@ abstract class PhonePolicy extends Policy
         $phonePolicy->setImei($this->getImei());
         $phonePolicy->setSerialNumber($this->getSerialNumber());
         $phonePolicy->setPremiumInstallments($this->getPremiumInstallments());
+        $phonePolicy->setSubvariant($this->getSubvariant());
         // make sure ipt rate is set to ipt rate at the start of the policy
         if ($terms->isPicSureEnabled()) {
             $phonePolicy->setPicSureStatus(self::PICSURE_STATUS_PREAPPROVED);
@@ -693,6 +694,7 @@ abstract class PhonePolicy extends Policy
         $phonePolicy->setPhone($this->getPhone());
         $phonePolicy->setImei($this->getImei());
         $phonePolicy->setSerialNumber($this->getSerialNumber());
+        $phonePolicy->setSubvariant($this->getSubvariant());
     }
 
     public function getPolicyNumberPrefix()

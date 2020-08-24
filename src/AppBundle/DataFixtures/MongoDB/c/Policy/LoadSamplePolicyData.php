@@ -4,6 +4,7 @@ namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
 use AppBundle\Classes\Helvetia;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
@@ -19,6 +20,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PolicyTermsRepository;
+use AppBundle\Repository\SubvariantRepository;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
@@ -93,7 +95,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $preExpireYearlyUsers = $this->newUsers($manager, 10, true);
         $expiredUsers = $this->newUsers($manager, 10);
         $fullyExpiredUsers = $this->newUsers($manager, 10);
+        $damageUsers = $this->newUsers($manager, 5);
+        $essentialsUsers = $this->newUsers($manager, 5);
         $manager->flush();
+        /** @var SubvariantRepository $subvariantRepo */
+        $subvariantRepo = $manager->getRepository(Subvariant::class);
+        $damage = $subvariantRepo->getSubvariantByName('damage');
+        $essentials = $subvariantRepo->getSubvariantByName('essentials');
 
         $count = 0;
         foreach ($users as $user) {
@@ -151,6 +159,17 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
         foreach ($fullyExpiredUsers as $user) {
             $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, null, true, 396);
+            $user->setEnabled(true);
+            $count++;
+        }
+        $manager->flush();
+        foreach ($damageUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, null, true, null, null, null, self::PICSURE_RANDOM, null, Helvetia::NAME, $damage);
+            $user->setEnabled(true);
+            $count++;
+        }
+        foreach ($essentialsUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, null, true, null, null, null, self::PICSURE_RANDOM, null, Helvetia::NAME, $essentials);
             $user->setEnabled(true);
             $count++;
         }
@@ -825,7 +844,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $paidMonths = null,
         $picSure = self::PICSURE_RANDOM,
         $isPaymentMethodBacs = null,
-        $underwriter = null
+        $underwriter = null,
+        $subvariant = null
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -1072,6 +1092,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         } else {
             $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
+        }
+
+        if ($subvariant) {
+            $policy->setSubvariant($subvariant);
         }
 
         return $policy;

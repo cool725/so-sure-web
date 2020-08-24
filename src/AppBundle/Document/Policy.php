@@ -652,6 +652,13 @@ abstract class Policy
      */
     protected $inviteeReferralBonuses;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Subvariant")
+     * @Gedmo\Versioned
+     * @var Subvariant|null
+     */
+    protected $subvariant = null;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -1843,9 +1850,8 @@ abstract class Policy
     public function addClaim(Claim $claim)
     {
         if (!$this->isClaimAllowed($claim)) {
-            throw new \Exception(sprintf('This policy can not have any additional lost/theft claims'));
+            throw new \Exception("This policy can not have any additional {$claim->getType()} claims");
         }
-
         $claim->setPolicy($this);
         $this->claims[] = $claim;
     }
@@ -1967,13 +1973,19 @@ abstract class Policy
         return $this->linkedClaims;
     }
 
+    /**
+     * Tells you if the policy is allowed to make the given claim.
+     * @param Claim $claim is the the claim that they may or may not be allowed to make.
+     * @return boolean true iff the claim can be made.
+     */
     public function isClaimAllowed($claim)
     {
-        if (!$claim->isLostTheft()) {
-            return true;
+        $subvariant = $this->getSubvariant();
+        if ($subvariant) {
+            return $subvariant->allows($claim->getType(), $this);
+        } else {
+            return (!$claim->isLostTheft()) ? true : $this->isAdditionalClaimLostTheftApprovedAllowed();
         }
-
-        return $this->isAdditionalClaimLostTheftApprovedAllowed();
     }
 
     public function isAdditionalClaimLostTheftApprovedAllowed()
@@ -2980,6 +2992,24 @@ abstract class Policy
             }
         }
         return $total;
+    }
+
+    /**
+     * gives you the policy's subvariant if it has one.
+     * @return Subvariant|null the policy's subvariant should it have one.
+     */
+    public function getSubvariant()
+    {
+        return $this->subvariant;
+    }
+
+    /**
+     * Sets the policy's subvariant.
+     * @param Subvariant $subvariant is the subvariant to set it to.
+     */
+    public function setSubvariant($subvariant)
+    {
+        $this->subvariant = $subvariant;
     }
 
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)
@@ -4916,11 +4946,7 @@ abstract class Policy
             throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $this->getId()));
         }
 
-        if ($this instanceof SalvaPhonePolicy) {
-            $newPolicy = new HelvetiaPhonePolicy();
-        } else {
-            $newPolicy = new static();
-        }
+        $newPolicy = new HelvetiaPhonePolicy();
         $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd(), $terms);
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
@@ -4943,7 +4969,7 @@ abstract class Policy
             throw new \Exception(sprintf('Unable to repurchase for policy %s', $this->getId()));
         }
 
-        $newPolicy = new static();
+        $newPolicy = new HelvetiaPhonePolicy();
         $this->setPolicyDetailsForRepurchase($newPolicy, $date);
         $newPolicy->setStatus(null);
 
@@ -5229,6 +5255,20 @@ abstract class Policy
     public function getUpgradedYearlyPrice()
     {
         return $this->getPremium()->getAdjustedYearlyPremiumPrice();
+    }
+
+    /**
+     * Gives you this policy's subvariant name, with a default name if there is no subvariant so that they do not cause
+     * a crash or require logic everywhere.
+     * @return string the name of the subvariant type of this policy.
+     */
+    public function getSubvariantName()
+    {
+        $subvariant = $this->getSubvariant();
+        if ($subvariant) {
+            return $subvariant->getName();
+        }
+        return SoSure::FULL_POLICY_NAME;
     }
 
     /**

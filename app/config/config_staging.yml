@@ -106,3 +106,7 @@ nelmio_security:
     forced_ssl:
         hsts_max_age: 3600 # 30 days
         hsts_subdomains: true
+    external_redirects:
+        abort: true
+        whitelist:
+            - purchase.staging.wearesosure.com

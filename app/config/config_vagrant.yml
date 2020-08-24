@@ -81,9 +81,8 @@ snc_redis:
 #            bin:        /usr/local/bin/uglifycss
 #            apply_to:   '\.css$'
 
-#nelmio_security:
-#    forced_ssl:
-#        hsts_max_age: 3600 # 30 days
-#        hsts_subdomains: true
-#        whitelist:
-#            - ^/ops/status
+nelmio_security:
+   external_redirects:
+       abort: true
+       whitelist:
+           - purchase.staging.wearesosure.com

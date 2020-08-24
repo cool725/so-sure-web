@@ -30,7 +30,7 @@
 
 {% block body %}
 
-    {% if policy.policyTerms.isPicSureRequired and policy.picSureStatus != 'approved' %}
+    {% if policy.status == 'picsure-required' %}
         <section class="hero hero-invalid">
             <div class="container-large">
                 <h1 class="h2 mb-4 text-white">Almost there 👍</h1>

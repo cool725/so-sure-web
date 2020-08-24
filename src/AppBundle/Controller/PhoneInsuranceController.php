@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\Subvariant;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\ValidationException;
@@ -761,6 +762,8 @@ class PhoneInsuranceController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $subvariantRepo = $dm->getRepository(Subvariant::class);
+        $subvariants = $subvariantRepo->findAll();
         $decodedModel = Phone::decodeModel($model);
         $phone = null;
         $aggregator = '';
@@ -799,12 +802,25 @@ class PhoneInsuranceController extends BaseController
             ]);
         }
         if ($phone) {
+            $prices = [[
+                'subvariant' => 'standard',
+                'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
+            ]];
+            foreach ($subvariants as $subvariant) {
+                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
+                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvariant->getName());
+                if ($monthly && $yearly) {
+                    $prices[] = [
+                        'subvariant' => $subvariant->getName(),
+                        'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
+                        'yearlyPremium' => $yearly->getYearlyPremiumPrice()
+                    ];
+                }
+            }
             $response = new JsonResponse([
                 'phoneId' => $phone->getId(),
-                'price' => [
-                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
-                ],
+                'price' => $prices,
                 'excesses' => [
                     'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
@@ -836,6 +852,8 @@ class PhoneInsuranceController extends BaseController
         // For generic use by insurance aggregator sites
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
+        $subvariantRepo = $dm->getRepository(Subvariant::class);
+        $subvariants = $subvariantRepo->findAll();
         $phones = $repo->findActive()->getQuery()->execute();
         $list = [];
 
@@ -861,15 +879,29 @@ class PhoneInsuranceController extends BaseController
                 // Placeholder for generic use with partners
                 $requester = 'requesterId';
             }
+            $prices = [[
+                'subvariant' => 'standard',
+                'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
+            ]];
+            foreach ($subvariants as $subvariant) {
+                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
+                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvariant->getName());
+                if ($monthly && $yearly) {
+                    $prices[] = [
+                        'subvariant' => $subvariant->getName(),
+                        'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
+                        'yearlyPremium' => $yearly->getYearlyPremiumPrice()
+                    ];
+                }
+            }
             $list[] = [
                 'id'            => $phone->getId(),
                 'make'          => $phone->getMake(),
                 'model'         => $phone->getModel(),
                 'memory'        => $phone->getMemory(),
-                'price' => [
-                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
-                ],
+                'devices' => $phone->getDevices(),
+                'price' => $prices,
                 'excesses' => [
                     'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
@@ -882,6 +914,7 @@ class PhoneInsuranceController extends BaseController
             ];
         }
         $response = new JsonResponse($list);
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
 

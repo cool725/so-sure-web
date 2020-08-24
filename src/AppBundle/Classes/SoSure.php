@@ -24,6 +24,8 @@ class SoSure
     const PAYMENT_PROVIDER_JUDO = 'judo';
     const PAYMENT_PROVIDER_CHECKOUT = 'checkout';
 
+    const FULL_POLICY_NAME = 'standard';
+
     public static function getSoSureTimezone()
     {
         return new \DateTimeZone(self::TIMEZONE);

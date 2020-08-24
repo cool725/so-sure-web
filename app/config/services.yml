@@ -1627,6 +1627,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.validator.policyclaimallowed:
+        class: AppBundle\Validator\Constraints\PolicyClaimAllowedValidator
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: validator.constraint_validator }
+
     app.validator.age:
         class: AppBundle\Validator\Constraints\AgeValidator
         tags:

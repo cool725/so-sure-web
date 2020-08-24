@@ -145,6 +145,7 @@ $(function(){
                 columns: [
                     { title: 'Valid From', data: 'valid_from' },
                     { title: 'Pricing Stream', data: 'stream' },
+                    { title: 'Subvariant', data: 'subvariant', defaultContent: '' },
                     { title: 'GWP', data: 'gwp' },
                     { title: 'Premium (current ipt rate)', data: 'premium' },
                     { title: 'Premium (ipt rate @ from date)', data: 'initial_premium' },

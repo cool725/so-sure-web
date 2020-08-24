@@ -726,6 +726,8 @@ class ApiController extends BaseController
                 $mobileNumber,
                 $googleId
             );
+            /** @var User $user */
+            $user = null;
             if ($userExists) {
                 // Special case for prelaunch users - allow them to 'create' an account without
                 // being recreated in account in the db.  This is only allowed once per user
@@ -735,13 +737,27 @@ class ApiController extends BaseController
                     $user->resetToken();
                     $user->setLastLogin(\DateTime::createFromFormat('U', time()));
                 } else {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_USER_EXISTS,
-                        'User already exists',
-                        422
-                    );
+                    if (!$user->canDelete()) {
+                        return $this->getErrorJsonResponse(
+                            ApiErrorCode::ERROR_USER_EXISTS,
+                            'User already exists',
+                            422
+                        );
+                    } else {
+                        // fix for same person getting quote multiple times
+                        $policies = $user->getPolicies();
+                        foreach ($policies as $policy) {
+                            $dm->remove($policy);
+                            $dm->flush();
+                        }
+                        $dm->remove($user);
+                        $dm->flush();
+                        $userExists = false;
+                    }
                 }
-            } else {
+            }
+
+            if (!$userExists) {
                 if ($facebookId !== null) {
                     $facebookService = $this->get('app.facebook');
                     if (!$facebookService->validateTokenId(

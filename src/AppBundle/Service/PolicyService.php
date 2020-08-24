@@ -351,7 +351,8 @@ class PolicyService
         IdentityLog $identityLog = null,
         $phoneData = null,
         $modelNumber = null,
-        $aggregator = false
+        $aggregator = false,
+        $subvariant = null
     ) {
         if (mb_strtolower($phone->getMake()) != 'apple') {
             $aggregator = false;
@@ -392,6 +393,9 @@ class PolicyService
             $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);
             $policy->setPhoneData($phoneData);
+            if ($subvariant) {
+                $policy->setSubvariant($subvariant);
+            }
             /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */

@@ -5696,6 +5696,27 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('50.00', $data['quotes'][0]['picsure_excesses'][2]['amount']);
     }
 
+    public function testUserQuoteSubvariant()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('johnnySubvariant', $this),
+            'foob'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->updateUserDetails($cognitoIdentityId, $user);
+        $url = sprintf(
+            '/api/v1/auth/user/%s/quote?_method=GET&%s',
+            $user->getId(),
+            'make=Apple&device=iPhone%206&rooted=false&subvariant=damage'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertTrue(count($data['quotes']) > 1);
+        $this->assertCount(4, $data['quotes'][0]['excesses']);
+    }
+
     public function testUserQuoteInvalidUser()
     {
         $user = self::createUser(

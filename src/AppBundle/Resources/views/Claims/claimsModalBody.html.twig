@@ -57,6 +57,8 @@
                 {% endif %}
             </div>
 
+            <div class="col-xs-6"><label>Tier</label><p>{{ claim.policy.subvariantName }}</p></div>
+
             {% if app.user.handlingTeam != 'davies' %}
                 <div class="col-xs-6">
                     <label>Claim Handling Team</label>

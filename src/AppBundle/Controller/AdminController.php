@@ -536,6 +536,7 @@ class AdminController extends BaseController
             $from = new \DateTime($request->get('from'), SoSure::getSoSureTimezone());
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             $stream = $this->getRequestString($request, 'stream');
+            $subvariant = $this->getRequestString($request, 'subvariant');
             try {
                 $policyTerms = $this->getLatestPolicyTerms();
                 $excess = $policyTerms->getDefaultExcess();
@@ -570,7 +571,7 @@ class AdminController extends BaseController
                 if ($request->get('picsure-theft-excess')) {
                     $picsureExcess->setTheft($request->get('picsure-theft-excess'));
                 }
-                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes, $stream);
+                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes, $stream, null, $subvariant);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
                 return new RedirectResponse($this->generateUrl('admin_phones'));

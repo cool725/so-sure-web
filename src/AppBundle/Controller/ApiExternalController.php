@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
@@ -283,6 +284,8 @@ class ApiExternalController extends BaseController
     {
         $this->get('logger')->debug(sprintf('GoCompare Deeplink Request: %s', json_encode($request->request->all())));
 
+        $subvariant = $this->getRequestString($request, 'subvariant');
+
         $email = $this->getRequestString($request, 'email_address');
         $reference = $this->getRequestString($request, 'reference');
 
@@ -312,6 +315,17 @@ class ApiExternalController extends BaseController
         ];
         if ($request->get('aggregator') && $request->get('aggregator') == 'true') {
             $data['aggregator'] = 'true';
+        }
+
+        $webAppVariant = ['essential', 'damage-only'];
+
+        if ($subvariant && in_array($subvariant, $webAppVariant)) {
+            $deeplinkPostParams = $request->request->all();
+            $deeplinkGetParams = $request->query->all();
+            $deeplinkParams = array_merge($deeplinkPostParams, $deeplinkGetParams);
+            $deeplinkQueryString = http_build_query($deeplinkParams);
+            $webAppLink = $this->getParameter('webapp_url') . '/?' . $deeplinkQueryString;
+            return new RedirectResponse($webAppLink);
         }
 
         $userRepo = $dm->getRepository(User::class);

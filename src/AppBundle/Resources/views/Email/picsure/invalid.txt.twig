@@ -11,7 +11,7 @@ Hi {{ policy.user.firstName }},
 {{ additional_message }}
 {% endif %}
 
-{% if policy.policyTerms.isPicSureRequired %}
+{% if policy.status == 'picsure-required' %}
 Your cover will NOT start until you have successfully validated your phone!
 {% else %}
 Have another go to reduce your excess by &pound;100! 😆
