@@ -88,11 +88,20 @@
     <ul>
         {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
             <li>
-                Accidental Damage: Two claims per year
+                Accidental Damage
+            </li>
+            <li>
+                Breakdown
+            </li>
+            <li>
+                Two claims per year max
             </li>
         {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
             <li>
                 Accidental Damage: One claim per year
+            </li>
+            <li>
+                Breakdown: One claim per year
             </li>
             <li>
                 Loss: One claim per year
@@ -102,10 +111,10 @@
             </li>
         {% else %}
             <li>
-                Accidental Damage: Unlimited calims per year
+                Accidental Damage: Unlimited claims per year
             </li>
             <li>
-                Breakdown: Unlimited calims per year
+                Breakdown: Unlimited claims per year
             </li>
             <li>
                 Loss: Two claims per year
@@ -123,9 +132,15 @@
                 <li>
                     Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
                 </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
             {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
                 <li>
                     Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
                 <li>
                     Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
@@ -154,9 +169,15 @@
                 <li>
                     Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
                 </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
             {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
                 <li>
                     Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
                 <li>
                     Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
@@ -186,9 +207,15 @@
                 <li>
                     Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
                 </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
             {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
                 <li>
                     Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
                 <li>
                     Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
