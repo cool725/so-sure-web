@@ -117,10 +117,6 @@ doctrine_mongodb:
             server: "%census_mongodb_url%"
             options:
                 readPreference: "primaryPreferred"
-        picsureml:
-            server: "%picsure_mongodb_url%"
-            options:
-                readPreference: "primaryPreferred"
     default_database: "%mongodb_db%"
     document_managers:
         default:
@@ -138,12 +134,6 @@ doctrine_mongodb:
             database: census
             mappings:
                 CensusBundle: ~
-            retry_connect: 5
-            retry_query: 1
-        picsureml:
-            database: picsure
-            mappings:
-                PicsureMLBundle: ~
             retry_connect: 5
             retry_query: 1
     default_commit_options:
@@ -166,7 +156,7 @@ monolog:
     channels: ['receperio']
 
 assetic:
-    bundles:        [ AppBundle, PicsureMLBundle, FOSUserBundle, TwigBundle, SchebTwoFactorBundle, FOSOAuthServerBundle ]
+    bundles:        [ AppBundle, FOSUserBundle, TwigBundle, SchebTwoFactorBundle, FOSOAuthServerBundle ]
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
     filters:
