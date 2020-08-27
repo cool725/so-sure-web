@@ -399,7 +399,7 @@ class PolicyService
             /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
-            $latestTerms = $policyTermsRepo->findLatestTerms();
+            $latestTerms = $policyTermsRepo->findLatestTerms($aggregator);
             $policy->init($user, $latestTerms);
             if ($checkmend) {
                 $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
