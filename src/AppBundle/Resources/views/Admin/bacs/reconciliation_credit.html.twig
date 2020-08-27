@@ -1,105 +1,107 @@
 <h3 class="mb-4">Reconciliation Credit</h3>
 
-{% if files is defined %}
-    {% if files|length == 0 %}
-        <p class="mb-5">No data present</p>
-    {% else %}
-        <div class="table-responsive-sm mb-5">
-            <table class="table table-striped">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Serial Number</th>
-                        <th>Credit Amount</th>
-                        <th>Payment Amount</th>
-                        <th>Bacs Report Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for file in files if file.status != 'cancelled' %}
-                        {% set creditAmount = 0 %}
-                        {%  if file and file.metadata %}
-                            {% if file.metadata['credit-amount'] is defined %}
-                                {% set creditAmount = file.metadata['credit-amount'] %}
-                            {% endif %}
-                        {% endif %}
-
-                        {% set paymentAmount = 0 %}
-                        {% set lastSubmittedPayment = {} %}
-                        {% for payment in paymentsIncPrevNextMonth if payment.serialNumber and payment.submittedDate %}
-                            {% if payment.serialNumber == file.serialNumber and payment.amount < 0.0 %}
-                                {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
-                                    {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
-                                {% endif %}
-                                {% set paymentAmount = paymentAmount + payment.amount %}
-                            {% endif %}
-                        {% endfor %}
-                        {% set paymentAmount = 0 - paymentAmount %}
-
-                        {% set reportAmount = 0 %}
-                        {% for inputFile in inputIncPrevMonth %}
-                            {% if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
-                                {% if inputFile.metadata['credit-accepted-value'] is defined %}
-                                    {% set reportAmount = reportAmount + inputFile.metadata['credit-accepted-value'] %}
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
+{% if paymentsIncPrevNextMonth is defined %}
+    {% if files is defined %}
+        {% if files|length == 0 %}
+            <p class="mb-5">No data present</p>
+        {% else %}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
                         <tr>
-                            <td>{{ file.serialNumber }}</td>
-                            <td title="{{ file.metadata|json_encode }}">
-                                {% if file.metadata %}
-                                    {{ creditAmount|number_format(2, '.', ',') }}
-                                    {% if equal_to_two_dp(paymentAmount, reportAmount) and not equal_to_two_dp(creditAmount, reportAmount) %}
-                                        <button title="Update amount"
-                                                type="button"
-                                                class="btn btn-success btn-sm mb-1 mr-md-2 bacs-meta-update"
-                                                data-token="{{ csrf_token('default') }}"
-                                                data-bacs-update-meta-url="{{ path('admin_bacs_update_meta', {'id': file.id, 'credit': paymentAmount}) }}">
-                                            <i class="fas fa-sync-alt fa-fw"></i></button>
-                                    {% endif %}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-
-                            {% set color = '' %}
-                            {% if equal_to_two_dp(creditAmount, paymentAmount) %}
-                                {% set color = 'table-success' %}
-                            {% else %}
-                                {% set color = 'table-danger' %}
-                            {% endif %}
-
-                            <td class="{{ color }}">
-                                {% if paymentAmount > 0 %}
-                                    {{ paymentAmount|number_format(2, '.', ',') }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
-
-                            {% set delay = false %}
-                            {% if equal_to_two_dp(creditAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
-                                {% set color = 'table-success' %}
-                            {% elseif lastSubmittedPayment[file.serialNumber] is defined and lastSubmittedPayment[file.serialNumber]|date > 'now'|date %}
-                                {% set color = 'table-warning' %}
-                            {% else %}
-                                {% set color = 'table-danger' %}
-                            {% endif %}
-                            <td class="{% if reportAmount != 0 %}{{ color }}{% endif %}">
-                                {% if reportAmount != 0 %}
-                                    {{ reportAmount|number_format(2, '.', ',') }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                                {% if color == 'table-warning' %}
-                                    <i class="fal fa-clock"
-                                       title="Wait until {{  lastSubmittedPayment[file.serialNumber]|date}}"
-                                       data-toggle="tooltip"></i>
-                                {% endif %}
-                            </td>
+                            <th>Serial Number</th>
+                            <th>Credit Amount</th>
+                            <th>Payment Amount</th>
+                            <th>Bacs Report Amount</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for file in files if file.status != 'cancelled' %}
+                            {% set creditAmount = 0 %}
+                            {%  if file and file.metadata %}
+                                {% if file.metadata['credit-amount'] is defined %}
+                                    {% set creditAmount = file.metadata['credit-amount'] %}
+                                {% endif %}
+                            {% endif %}
+
+                            {% set paymentAmount = 0 %}
+                            {% set lastSubmittedPayment = {} %}
+                            {% for payment in paymentsIncPrevNextMonth if payment.serialNumber and payment.submittedDate %}
+                                {% if payment.serialNumber == file.serialNumber and payment.amount < 0.0 %}
+                                    {% if lastSubmittedPayment[file.serialNumber] is not defined or lastSubmittedPayment[file.serialNumber] < payment.submittedDate %}
+                                        {% set lastSubmittedPayment = lastSubmittedPayment|merge({ (file.serialNumber): payment.submittedDate}) %}
+                                    {% endif %}
+                                    {% set paymentAmount = paymentAmount + payment.amount %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set paymentAmount = 0 - paymentAmount %}
+
+                            {% set reportAmount = 0 %}
+                            {% for inputFile in inputIncPrevMonth %}
+                                {% if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
+                                    {% if inputFile.metadata['credit-accepted-value'] is defined %}
+                                        {% set reportAmount = reportAmount + inputFile.metadata['credit-accepted-value'] %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            <tr>
+                                <td>{{ file.serialNumber }}</td>
+                                <td title="{{ file.metadata|json_encode }}">
+                                    {% if file.metadata %}
+                                        {{ creditAmount|number_format(2, '.', ',') }}
+                                        {% if equal_to_two_dp(paymentAmount, reportAmount) and not equal_to_two_dp(creditAmount, reportAmount) %}
+                                            <button title="Update amount"
+                                                    type="button"
+                                                    class="btn btn-success btn-sm mb-1 mr-md-2 bacs-meta-update"
+                                                    data-token="{{ csrf_token('default') }}"
+                                                    data-bacs-update-meta-url="{{ path('admin_bacs_update_meta', {'id': file.id, 'credit': paymentAmount}) }}">
+                                                <i class="fas fa-sync-alt fa-fw"></i></button>
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                {% set color = '' %}
+                                {% if equal_to_two_dp(creditAmount, paymentAmount) %}
+                                    {% set color = 'table-success' %}
+                                {% else %}
+                                    {% set color = 'table-danger' %}
+                                {% endif %}
+
+                                <td class="{{ color }}">
+                                    {% if paymentAmount > 0 %}
+                                        {{ paymentAmount|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                {% set delay = false %}
+                                {% if equal_to_two_dp(creditAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
+                                    {% set color = 'table-success' %}
+                                {% elseif lastSubmittedPayment[file.serialNumber] is defined and lastSubmittedPayment[file.serialNumber]|date > 'now'|date %}
+                                    {% set color = 'table-warning' %}
+                                {% else %}
+                                    {% set color = 'table-danger' %}
+                                {% endif %}
+                                <td class="{% if reportAmount != 0 %}{{ color }}{% endif %}">
+                                    {% if reportAmount != 0 %}
+                                        {{ reportAmount|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                    {% if color == 'table-warning' %}
+                                        <i class="fal fa-clock"
+                                           title="Wait until {{  lastSubmittedPayment[file.serialNumber]|date}}"
+                                           data-toggle="tooltip"></i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
     {% endif %}
 {% endif %}

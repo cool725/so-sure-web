@@ -1,6 +1,6 @@
 <h3 class="mb-4">Daily Files</h3>
 
-{% if files is defined %}
+{% if files is defined and paymentsIncPrevNextMonth is not defined %}
     {% if files|length == 0 %}
         <p class="mb-5">No files present</p>
     {% else %}
