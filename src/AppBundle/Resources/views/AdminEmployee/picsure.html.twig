@@ -123,12 +123,6 @@
                                         {% else %}
                                             <span>-</span>
                                         {% endif %}
-                                        {% for file in policy.getPolicyPicSureFiles %}
-                                            {% if 'picsure-ml-score' in file.getMetadata()|keys %}
-                                                {# TODO: Re-run should only appear for latest pic-sure submitted #}
-                                                {# <a class="btn btn-outline-primary mb-1 btn-sm" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fal fa-sync-alt"></i> <span class="sr-only">Re-run ml</span></a> #}
-                                            {% endif %}
-                                        {% endfor %}
                                     </td>
                                 </tr>
                             {% endfor %}
