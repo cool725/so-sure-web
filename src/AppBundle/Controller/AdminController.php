@@ -1194,12 +1194,10 @@ class AdminController extends BaseController
                 'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
                 'withdrawal' => $s3FileRepo->getAllFiles($date, 'bacsReportWithdrawal'),
             ]);
-        } elseif (
-            in_array(
-                $request->get('_route'),
-                ['admin_bacs_reconciliation_debit', 'admin_bacs_reconciliation_credit']
-            )
-        ) {
+        } elseif ( in_array(
+            $request->get('_route'),
+            ['admin_bacs_reconciliation_debit', 'admin_bacs_reconciliation_credit']
+        )) {
             $data = array_merge($data, [
                 'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date)
             ]);
