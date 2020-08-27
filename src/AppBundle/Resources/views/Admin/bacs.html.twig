@@ -124,7 +124,7 @@
                 id="bacs_tabs"
                 role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link {% if not payments is defined and not input is defined %}active{% endif %}"
+                    <a class="nav-link {% if not payments is defined and not input is defined and paymentsInvPrevNextMonth is defined %}active{% endif %}"
                        id="direct_debits_credits_tab"
                        {# data-toggle="tab" #}
                        {# href="#direct_debits_credits_content" #}
@@ -162,24 +162,20 @@
                 <li class="nav-item">
                     <a class="nav-link"
                        id="reconciliation_debit_tab"
-                       data-toggle="tab"
-                       href="#reconciliation_debit_content"
-                       data-url="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}"
+                       href="{{ path('admin_bacs_reconciliation_debit', {'year': year, 'month': month}) }}"
                        role="tab"
                        aria-controls="reconciliation_debit_content"
-                       aria-selected="false">
+                       aria-selected="{% if paymentsIncPrevNextMonth is defined %}true{% else %}false{% endif %}">
                         Reconciliation Debit
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link"
                        id="reconciliation_credit_tab"
-                       data-toggle="tab"
-                       href="#reconciliation_credit_content"
-                       data-url="{{ path('admin_bacs_date', {'year': year, 'month': month}) }}"
+                       href="{{ path('admin_bacs_reconciliation_credit', {'year': year, 'month': month}) }}"
                        role="tab"
                        aria-controls="reconciliation_credit_content"
-                       aria-selected="false">
+                       aria-selected="{% if paymentsIncPrevNextMonth is defined %}true{% else %}false{% endif %}">
                         Reconciliation Credit
                     </a>
                 </li>
@@ -205,13 +201,13 @@
                      aria-labelledby="bacs_report_tab">
                     {% include 'AppBundle::Admin/bacs/reports.html.twig' %}
                 </div>
-                <div class="tab-pane fade"
+                <div class="tab-pane fade {% if paymentsIncPrevNextMonth is defined %}show active{% endif %}"
                      id="reconciliation_debit_content"
                      role="tabpanel"
                      aria-labelledby="reconciliation_debit_tab">
                     {% include 'AppBundle::Admin/bacs/reconciliation_debit.html.twig' %}
                 </div>
-                <div class="tab-pane fade"
+                <div class="tab-pane fade {% if paymentsIncPrevNextMonth is defined %}show active{% endif %}"
                      id="reconciliation_credit_content"
                      role="tabpanel"
                      aria-labelledby="reconciliation_credit_tab">
