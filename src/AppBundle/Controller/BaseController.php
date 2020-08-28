@@ -149,11 +149,6 @@ abstract class BaseController extends Controller
         return $this->get('doctrine_mongodb.odm.census_document_manager');
     }
 
-    protected function getPicsureMLManager()
-    {
-        return $this->get('doctrine_mongodb.odm.picsureml_document_manager');
-    }
-
     protected function getCognitoIdentityId(Request $request)
     {
         $auth = $this->get('app.user.cognitoidentity.authenticator');

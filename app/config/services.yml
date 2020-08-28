@@ -1742,42 +1742,6 @@ services:
                 id: "app.ops_collector"
         public: false
 
-    picsureml.picsureml:
-        class: PicsureMLBundle\Service\PicsureMLService
-        arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@doctrine_mongodb.odm.picsureml_document_manager"
-            - "@oneup_flysystem.mount_manager"
-            - "@aws.s3"
-
-    picsureml.listener.picsureml:
-        class:   PicsureMLBundle\Listener\PicsureMLListener
-        arguments:
-            - "@picsureml.picsureml"
-            - "@logger"
-        tags:
-            -  { name: kernel.event_listener, event: event.picsure.received, method: onReceivedEvent }
-            -  { name: kernel.event_listener, event: event.picsure.approved, method: onUndamagedEvent }
-            -  { name: kernel.event_listener, event: event.picsure.invalid, method: onInvalidEvent }
-            -  { name: kernel.event_listener, event: event.picsure.rejected, method: onDamagedEvent }
-
-    picsureml.form.type.search:
-        class: PicsureMLBundle\Form\Type\SearchType
-        arguments: ["@request_stack", "@picsureml.picsureml", "%form_required%"]
-        tags:
-            - { name: form.type }
-
-    picsureml.form.type.newversion:
-        class: PicsureMLBundle\Form\Type\NewVersionType
-        arguments: ["@picsureml.picsureml", "%form_required%"]
-        tags:
-            - { name: form.type }
-
-    picsureml.form.type.edit:
-        class: PicsureMLBundle\Form\Type\EditType
-        arguments: ["@picsureml.picsureml", "%form_required%"]
-        tags:
-            - { name: form.type }
 
     twig.extension.text:
            class: Twig_Extensions_Extension_Text
