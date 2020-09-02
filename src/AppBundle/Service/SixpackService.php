@@ -26,7 +26,7 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    const EXPERIMENT_HOMEPAGE_GREETING = 'Homepage Greeting';
+    // const EXPERIMENT_HOMEPAGE_GREETING = 'Homepage Greeting';
 
     // Exp 2
     // const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
@@ -128,12 +128,13 @@ class SixpackService
         'Hompage Copy Cheap vs Fair',
         'Homepage Copy Cheap vs Easy',
         'Pricing Messaging',
-        'Exit Popup Multi'
+        'Exit Popup Multi',
+        'Homepage Greeting'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_HOMEPAGE_GREETING,
+        // self::EXPERIMENT_HOMEPAGE_GREETING,
         // Exp 2
         // self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
@@ -176,7 +177,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-         self::EXPERIMENT_HOMEPAGE_GREETING,
+        //  self::EXPERIMENT_HOMEPAGE_GREETING,
         // Exp 2
         // self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3

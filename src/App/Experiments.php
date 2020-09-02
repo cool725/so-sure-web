@@ -7,7 +7,6 @@ use AppBundle\Service\SixpackService;
 final class Experiments
 {
     private static $unauthExperiments = [
-        SixpackService::EXPERIMENT_HOMEPAGE_GREETING, ['no-greeting', 'greeting'],
         SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS, ['current', 'same-as-homepage'],
     ];
 

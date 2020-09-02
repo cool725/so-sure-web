@@ -147,14 +147,6 @@ class SearchController extends BaseController
             }
         }
 
-        // A/B Greeting Homepage Experiment
-        $homepageGreetingExperiment = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_GREETING,
-            ['no-greeting', 'greeting'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown'),
@@ -230,7 +222,6 @@ class SearchController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
-            'homepage_greeting_exp' => $homepageGreetingExperiment
         ];
     }
 
