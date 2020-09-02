@@ -142,11 +142,7 @@
                         {% set monthlyYearly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') * 12 %}
                         {% set difference = monthlyYearly - yearly %}
                         <div class="h3 mb-4 text-primary fit">
-                            {% if pricing_messaging_experiment is defined and pricing_messaging_experiment == 'copy-d' %}
-                                &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
-                            {% else %}
-                                &pound;{{ monthly }} <span class="sub">per month - <br>Save</span> &pound;{{ difference|number_format(0, '.', ',') }} <span class="sub">if you pay yearly</span>                                
-                            {% endif %}
+                            &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
                         </div>
                         <div class="collapse mb-4" id="mem_sizes">
                             {% if phones | length > 1 %}

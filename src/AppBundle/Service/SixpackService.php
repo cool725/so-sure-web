@@ -29,7 +29,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_GREETING = 'Homepage Greeting';
 
     // Exp 2
-    const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
+    // const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
 
     // Exp 3
     const EXPERIMENT_EXIT_POPUP_MULTI = 'Exit Popup Multi';
@@ -126,14 +126,15 @@ class SixpackService
         'Exit Popup',
         'Email Optional',
         'Hompage Copy Cheap vs Fair',
-        'Homepage Copy Cheap vs Easy'
+        'Homepage Copy Cheap vs Easy',
+        'Pricing Messaging'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
         self::EXPERIMENT_HOMEPAGE_GREETING,
         // Exp 2
-        self::EXPERIMENT_PRICING_MESSAGING,
+        // self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
         // Exp 4
@@ -176,7 +177,7 @@ class SixpackService
         // Exp 1
          self::EXPERIMENT_HOMEPAGE_GREETING,
         // Exp 2
-        self::EXPERIMENT_PRICING_MESSAGING,
+        // self::EXPERIMENT_PRICING_MESSAGING,
         // Exp 3
         self::EXPERIMENT_EXIT_POPUP_MULTI,
         // Exp 4
