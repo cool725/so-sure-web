@@ -548,19 +548,6 @@ class PhoneInsuranceController extends BaseController
         // A/B Manufacturers Landing Pages USPs
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
-        // A/B Exit Popup
-        // Check for feature
-        $exitPopupFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_EXIT_POPUP);
-        $exitPopupExp = null;
-        if ($exitPopupFeature) {
-            $exitPopupExp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_EXIT_POPUP_MULTI,
-                ['variant-a', 'variant-b'],
-                SixpackService::LOG_MIXPANEL_ALL
-            );
-        }
-
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
@@ -680,7 +667,6 @@ class PhoneInsuranceController extends BaseController
             'competitor3' => 'O2',
             'img_url' => mb_strtolower($modelHyph),
             'available_images' => $availableImages,
-            'exit_popup_exp' => $exitPopupExp,
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }

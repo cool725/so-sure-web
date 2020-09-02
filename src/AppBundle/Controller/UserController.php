@@ -1330,9 +1330,6 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        // A/B On popup text
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EXIT_POPUP_MULTI);
-
         // A/B Greeting Homepage Experiment
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_GREETING);
 

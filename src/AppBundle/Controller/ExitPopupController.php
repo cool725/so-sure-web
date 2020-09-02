@@ -50,8 +50,6 @@ class ExitPopupController extends BaseController
                     $this->get('app.mixpanel')->queuePersonProperties([
                         '$email' => $lead->getEmail()
                     ], true);
-                    // A/B On popup text
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EXIT_POPUP_MULTI);
                     return new JsonResponse([
                         'success' => true,
                         'data' => sprintf('Lead created for %s', $lead->getEmail())
