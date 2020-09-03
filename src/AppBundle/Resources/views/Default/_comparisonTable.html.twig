@@ -181,25 +181,25 @@
                 <div class="td-container">
                     {% if affiliate_page is defined %}
                         <span class="td-swap td-active">
-                            {{ competitor[competitor1]['oldphones'] }}
+                            {{ competitor[competitor1]['oldphones']|raw }}
                         </span>
                         <span class="td-swap">
-                            {{ competitor[competitor2]['oldphones'] }}
+                            {{ competitor[competitor2]['oldphones']|raw }}
                         </span>
                         {% if competitor3 is defined %}
                             <span class="td-swap">
-                                {{ competitor[competitor3]['oldphones'] }}
+                                {{ competitor[competitor3]['oldphones']|raw }}
                             </span>
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            {{ competitor['PYB']['oldphones'] }}
+                            {{ competitor['PYB']['oldphones']|raw }}
                         </span>
                         <span class="td-swap">
-                            {{ competitor['GC']['oldphones'] }}
+                            {{ competitor['GC']['oldphones']|raw }}
                         </span>
                         <span class="td-swap">
-                            {{ competitor['O2']['oldphones'] }}
+                            {{ competitor['O2']['oldphones']|raw }}
                         </span>
                     {% endif %}
                 </div>
@@ -476,25 +476,25 @@
             </td>
             {% if affiliate_page is defined %}
                 <td class="wh bs-l">
-                    {{ competitor[competitor1]['oldphones'] }}
+                    {{ competitor[competitor1]['oldphones']|raw }}
                 </td>
                 <td class="wh">
-                    {{ competitor[competitor2]['oldphones'] }}
+                    {{ competitor[competitor2]['oldphones']|raw }}
                 </td>
                 {% if competitor3 is defined %}
                     <td class="wh">
-                        {{ competitor[competitor3]['oldphones'] }}
+                        {{ competitor[competitor3]['oldphones']|raw }}
                     </td>
                 {% endif %}
             {% else %}
                 <td class="wh bs-l">
-                    {{ competitor['PYB']['oldphones'] }}
+                    {{ competitor['PYB']['oldphones']|raw }}
                 </td>
                 <td class="wh">
-                    {{ competitor['GC']['oldphones'] }}
+                    {{ competitor['GC']['oldphones']|raw }}
                 </td>
                 <td class="wh">
-                    {{ competitor['O2']['oldphones'] }}
+                    {{ competitor['O2']['oldphones']|raw }}
                 </td>
             {% endif %}
         </tr>

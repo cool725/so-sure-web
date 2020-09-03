@@ -103,7 +103,7 @@ twig:
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
         support_number: "03450744839"
         broker_name: "Shepherd Compello Ltd"
-        policy_doc_version: 15,
+        policy_doc_version: 16,
         free_months: "one month"
         lowest_excess: "£25"
 
