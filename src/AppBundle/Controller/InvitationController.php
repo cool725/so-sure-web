@@ -131,6 +131,14 @@ class InvitationController extends BaseController
             $template = 'AppBundle:Invitation:invitationReferral.html.twig';
         }
 
+        // A/B Hero Content
+        $experimentHeroLayout = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_SCODE_CONTENT,
+            ['current', 'reordered'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         $data = [
             'invitation' => $invitation,
             'lead_form' => $leadForm->createView(),
@@ -138,6 +146,7 @@ class InvitationController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'LICI',
+            'experiment_hero_layout' => $experimentHeroLayout
         ];
 
         return $this->render($template, $data);
