@@ -3803,7 +3803,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->field('picSureStatus')->equals($data)
             ->sort('picSureApprovedDate', 'desc')
             ->sort('created', 'desc');
-        $pager = $this->pager($request, $qb);
+        $pager = $this->pager($request, $qb, $maxPerPage = 5);
         return [
             'policies' => $pager->getCurrentPageResults(),
             'pager' => $pager,
