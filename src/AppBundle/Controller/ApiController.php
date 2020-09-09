@@ -11,6 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
+use AppBundle\Service\RequestService;
+use UAParser\Parser;
+use AppBundle\Validator\Constraints\AlphanumericValidator;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
@@ -23,6 +26,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\Charge;
+use AppBundle\Document\Attribution;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -720,6 +724,7 @@ class ApiController extends BaseController
             $facebookId = $this->getDataString($data, 'facebook_id');
             $googleId = $this->getDataString($data, 'google_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
+            $attributionData = $data['attribution'];
             $userExists = $repo->existsUser(
                 $this->getDataString($data, 'email'),
                 $facebookId,
@@ -813,6 +818,29 @@ class ApiController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'SCode missing', 404);
                 }
                 $scode->addAcceptor($user);
+            }
+            if ($attributionData !== null) {
+                $attribution = new Attribution();
+                $attribution->setCampaignName($this->getDataString($attributionData, 'utm_campaign'));
+                $attribution->setCampaignMedium($this->getDataString($attributionData, 'utm_medium'));
+                $attribution->setCampaignSource($this->getDataString($attributionData, 'utm_source'));
+                $alphaValidator = new AlphanumericValidator();
+                $attribution->setGoCompareQuote(
+                    $alphaValidator->conform($this->getDataString($attributionData, 'quote_id'))
+                );
+                /** @var RequestService $requestService */
+                $requestService = $this->get('app.request');
+                $deviceCategory = null;
+                $deviceOS = null;
+                if ($userAgent = $requestService->getUserAgent()) {
+                    $parser = Parser::create();
+                    $userAgentDetails = $parser->parse($userAgent);
+                    $deviceCategory = $requestService->getDeviceCategory();
+                    $deviceOS = $requestService->getDeviceOS();
+                }
+                $attribution->setDeviceCategory($deviceCategory);
+                $attribution->setDeviceOS($deviceOS);
+                $user->setAttribution($attribution);
             }
             try {
                 $this->validateObject($user);
