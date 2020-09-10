@@ -4,7 +4,6 @@ namespace AppBundle\Classes;
 
 use AppBundle\Document\Policy;
 use AppBundle\Helpers\CsvHelper;
-use CensusBundle\Service\SearchService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use DateTimeZone;
 use Exception;
@@ -15,11 +14,6 @@ use RuntimeException;
  */
 abstract class PolicyReport
 {
-    /**
-     * @var SearchService $searchService
-     */
-    protected $searchService;
-
     /**
      * @var DocumentManager $dm
      */
@@ -42,16 +36,14 @@ abstract class PolicyReport
 
     /**
      * Injects some dependencies.
-     * @param SearchService   $searchService is used to get the locations of users and stuff.
      * @param DocumentManager $dm            is used to get repositories.
      * @param DateTimeZone    $tz            the timezone to put dates in.
      */
-    public function __construct(SearchService $searchService, DocumentManager $dm, DateTimeZone $tz)
+    public function __construct(DocumentManager $dm, DateTimeZone $tz)
     {
         $header = $this->getHeaders();
         $this->lines = [CsvHelper::line(...$header)];
         $this->columns = count($header);
-        $this->searchService = $searchService;
         $this->dm = $dm;
         $this->tz = $tz;
     }
@@ -86,24 +78,22 @@ abstract class PolicyReport
     /**
      * Creates a report based on string name.
      * @param string          $name          is the name of the report to create.
-     * @param SearchService   $searchService is the search service used.
      * @param DocumentManager $dm            is the document manager used.
      * @param DateTimeZone    $tz            is the timezone to do the report in.
      * @return PolicyReport|null the created report unless you gave a junk value in which case it's null.
      */
     public static function createReport(
         $name,
-        SearchService $searchService,
         DocumentManager $dm,
         DateTimeZone $tz
     ) {
         switch ($name) {
             case 'policy':
-                return new PolicyBiReport($searchService, $dm, $tz);
+                return new PolicyBiReport($dm, $tz);
             case 'picsure':
-                return new PolicyPicSureReport($searchService, $dm, $tz);
+                return new PolicyPicSureReport($dm, $tz);
             case 'scode':
-                return new PolicyScodeReport($searchService, $dm, $tz);
+                return new PolicyScodeReport($dm, $tz);
             default:
                 return null;
         }

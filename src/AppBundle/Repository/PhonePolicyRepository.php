@@ -193,7 +193,7 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are active (excluding so-sure test ones)
      */
-    public function findAllStartedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
+    public function findAllStartedPolicies(\DateTime $startDate = null, \DateTime $endDate = null, $limit = 0)
     {
         if (!$endDate) {
             $endDate = \DateTime::createFromFormat('U', time());
@@ -208,15 +208,16 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
-            ])
-            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
-
+            ]);
         $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
         if ($this->excludedPolicyIds) {
             $this->addExcludedPolicyQuery($qb, 'id');
+        }
+        if ($limit > 0) {
+            $qb->limit($limit);
         }
 
         return $qb->getQuery()

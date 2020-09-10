@@ -6,7 +6,6 @@ use AppBundle\Classes\PolicyReport;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Repository\PhonePolicyRepository;
 use Aws\S3\S3Client;
-use CensusBundle\Service\SearchService;
 use DateTime;
 use DateTimeZone;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -37,30 +36,24 @@ class PolicyReportCommand extends ContainerAwareCommand
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var SearchService */
-    protected $searchService;
-
     /**
      * inserts the required dependencies into the command.
      * @param S3Client        $s3            is the amazon s3 client for uploading generated reports.
      * @param DocumentManager $dm            is the document manager for loading data.
      * @param string          $environment   is the environment name used to upload to the right location in amazon s3.
      * @param LoggerInterface $logger        is used for logging.
-     * @param SearchService   $searchService provides geographical information about users.
      */
     public function __construct(
         S3Client $s3,
         DocumentManager $dm,
         $environment,
-        LoggerInterface $logger,
-        SearchService $searchService
+        LoggerInterface $logger
     ) {
         parent::__construct();
         $this->s3 = $s3;
         $this->dm = $dm;
         $this->environment = $environment;
         $this->logger = $logger;
-        $this->searchService = $searchService;
     }
 
     /**
@@ -86,6 +79,12 @@ class PolicyReportCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Choose a timezone to use for policies report'
+            )
+            ->addOption(
+                'n',
+                0,
+                InputOption::VALUE_REQUIRED,
+                'Choose a certain maximum number of policies to process. 0 means all of them.'
             );
     }
 
@@ -94,13 +93,15 @@ class PolicyReportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $start = time();
         // Set up reports to run.
         $reports = $input->getArgument('reports');
         $debug = $input->getOption('debug') == true;
+        $n = $input->getOption('n');
         $timezone = new DateTimeZone($input->getOption('timezone') ?: 'UTC');
         $executingReports = [];
         foreach ($reports as $report) {
-            $createdReport = PolicyReport::createReport($report, $this->searchService, $this->dm, $timezone);
+            $createdReport = PolicyReport::createReport($report, $this->dm, $timezone);
             if (!$createdReport) {
                 $output->writeln("<error>{$report} is not a valid report type</error>");
                 return;
@@ -110,7 +111,7 @@ class PolicyReportCommand extends ContainerAwareCommand
         // Load policies.
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $phonePolicyRepo->findAllStartedPolicies(new DateTime(SoSure::POLICY_START))->toArray();
+        $policies = $phonePolicyRepo->findAllStartedPolicies(new DateTime(SoSure::POLICY_START), null, $n);
         // Now run the reports.
         foreach ($policies as $policy) {
             foreach ($executingReports as $report) {
@@ -134,6 +135,8 @@ class PolicyReportCommand extends ContainerAwareCommand
                 $output->writeln("<error>{$e->getMessage()}</error>");
             }
         }
+        $time = time() - $start;
+        $output->writeln("Execution completed in {$time} seconds.");
     }
 
     /**
