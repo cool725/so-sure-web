@@ -1333,6 +1333,9 @@ class UserController extends BaseController
         // A/B Manufacturers Landing Pages USPs
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
+        // A/B Hero Content
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_CONTENT);
+
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));
