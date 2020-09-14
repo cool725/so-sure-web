@@ -36,8 +36,8 @@ abstract class PolicyReport
 
     /**
      * Injects some dependencies.
-     * @param DocumentManager $dm            is used to get repositories.
-     * @param DateTimeZone    $tz            the timezone to put dates in.
+     * @param DocumentManager $dm is used to get repositories.
+     * @param DateTimeZone    $tz the timezone to put dates in.
      */
     public function __construct(DocumentManager $dm, DateTimeZone $tz)
     {
@@ -77,9 +77,9 @@ abstract class PolicyReport
 
     /**
      * Creates a report based on string name.
-     * @param string          $name          is the name of the report to create.
-     * @param DocumentManager $dm            is the document manager used.
-     * @param DateTimeZone    $tz            is the timezone to do the report in.
+     * @param string          $name is the name of the report to create.
+     * @param DocumentManager $dm   is the document manager used.
+     * @param DateTimeZone    $tz   is the timezone to do the report in.
      * @return PolicyReport|null the created report unless you gave a junk value in which case it's null.
      */
     public static function createReport(

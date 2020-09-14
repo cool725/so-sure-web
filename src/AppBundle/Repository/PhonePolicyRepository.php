@@ -195,7 +195,7 @@ class PhonePolicyRepository extends PolicyRepository
      * @param \DateTime|null $startDate date from which to start including policies, with null meaning no minimum.
      * @param \DateTime|null $endDate   date from which to start excluding policies, with null meaning no maximum.
      * @param int            $limit     maximum number of policies to return, with anything below 1 meaning no maximum.
-     * @param int            $kip       number of initial results to skip.
+     * @param int            $skip      number of initial results to skip.
      * @return Cursor over the query results.
      */
     public function findAllStartedPolicies(

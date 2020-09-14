@@ -21,8 +21,8 @@ class PolicyScodeReport extends PolicyReport
 
     /**
      * Creates the policy picsure report.
-     * @param DocumentManager $dm            to get repositories.
-     * @param DateTimeZone    $tz            the timezone for the report to be in.
+     * @param DocumentManager $dm to get repositories.
+     * @param DateTimeZone    $tz the timezone for the report to be in.
      */
     public function __construct(DocumentManager $dm, DateTimeZone $tz)
     {

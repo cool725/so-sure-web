@@ -37,8 +37,8 @@ class PolicyBiReport extends PolicyReport
 
     /**
      * Creates the policy picsure report.
-     * @param DocumentManager $dm            for the report to use.
-     * @param DateTimeZone    $tz            is the time zone to report in.
+     * @param DocumentManager $dm for the report to use.
+     * @param DateTimeZone    $tz is the time zone to report in.
      */
     public function __construct(DocumentManager $dm, DateTimeZone $tz)
     {
