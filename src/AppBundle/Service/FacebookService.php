@@ -286,8 +286,8 @@ class FacebookService
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $policyRepo->findAllStartedPolicies($startMonth, $endMonth);
+        /** @var PhonePolicy $policy */
         foreach ($policies as $policy) {
-            /** @var PhonePolicy $policy */
             $users[] = $policy->getUser();
         }
 
