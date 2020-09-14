@@ -545,6 +545,9 @@ class PhoneInsuranceController extends BaseController
         // A/B Manufacturers Landing Pages USPs
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
+        // A/B Hero Content
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_CONTENT);
+
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
         $buyBannerTwoForm = $this->makeBuyButtonForm('buy_form_banner_two');
