@@ -111,9 +111,12 @@ class PolicyReportCommand extends ContainerAwareCommand
         // Load policies.
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $phonePolicyRepo->findAllStartedPolicies(new DateTime(SoSure::POLICY_START), null, $n);
+        $policies = $phonePolicyRepo->findAllStartedPoliciesBatched(new DateTime(SoSure::POLICY_START), null, $n);
         // Now run the reports.
         foreach ($policies as $policy) {
+            if (!$policy->isValidPolicy()) {
+                continue;
+            }
             foreach ($executingReports as $report) {
                 try {
                     $report->process($policy);
