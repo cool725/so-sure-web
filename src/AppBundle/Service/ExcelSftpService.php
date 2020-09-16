@@ -191,7 +191,10 @@ abstract class ExcelSftpService
                 if (file_exists($tempFile)) {
                     unlink($tempFile);
                 }
-                $this->moveSftp($file, self::PROCESSED_FOLDER);
+                $this->moveSftp(
+                    $file,
+                    sprintf('%s/%s', self::PROCESSED_FOLDER, basename($file))
+                );
             } else {
                 if (file_exists($tempFile)) {
                     $lines[] = sprintf('Skipping cleanup for %s', $tempFile);
@@ -276,8 +279,6 @@ abstract class ExcelSftpService
         if (!$this->sftp) {
             $this->loginSftp();
         }
-        var_dump($from);
-        var_dump($to);
         for ($i = 0; $i < self::RENAME_ATTEMPTS; $i++) {
             if ($this->sftp->rename($from, $to)) {
                 return;
