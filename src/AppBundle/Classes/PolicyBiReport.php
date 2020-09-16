@@ -95,6 +95,9 @@ class PolicyBiReport extends PolicyReport
             'Number of Withdrawn/Declined Claims',
             'Policy Purchase Time',
             'Lead Source',
+            'First Scode Type',
+            'First Scode Name',
+            'Promo Codes',
             'Has Sign-up Bonus?',
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
@@ -143,6 +146,8 @@ class PolicyBiReport extends PolicyReport
             $reschedule = $this->scheduledPaymentRepo->getRescheduledBy($lastReverted);
         }
         $company = $policy->getCompany();
+        $scodeType = $this->getFirstSCodeUsedType($connections);
+        $scodeName = $this->getFirstSCodeUsedCode($connections);
         $this->add(
             $policy->getPolicyNumber(),
             $user->getId(),
@@ -175,6 +180,9 @@ class PolicyBiReport extends PolicyReport
             count($policy->getWithdrawnDeclinedClaims()),
             DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'H:i'),
             $policy->getLeadSource(),
+            $scodeType,
+            $scodeName,
+            $this->getSCodesUsed($connections),
             $this->policyHasSignUpBonus($this->rewardRepo, $connections) ? 'yes' : 'no',
             $latestAttribution ? $latestAttribution->getCampaignSource() : '',
             $latestAttribution ? $latestAttribution->getCampaignName() : '',
