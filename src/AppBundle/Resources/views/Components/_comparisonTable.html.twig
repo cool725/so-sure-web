@@ -1,0 +1,506 @@
+{% if affiliate_page is defined %}
+    {% set score1 = competitor[competitor1]['trustpilot'] %}
+    {% set score2 = competitor[competitor2]['trustpilot'] %}
+    {% set score3 = competitor[competitor3]['trustpilot'] %}
+{% else %}
+    {% set score1 = competitor['PYB']['trustpilot'] %}
+    {% set score2 = competitor['GC']['trustpilot'] %}
+    {% set score3 = competitor['O2']['trustpilot'] %}
+{% endif %}
+<table class="table-list-v2 d-md-none">
+    <thead>
+        <tr>
+            <td></td>
+            <td>
+                <div class="table-list-controls">
+                    <a href="#" class="table-list-controls-prev disabled">
+                        <i class="fas fa-arrow-left fa-lg"></i>
+                    </a>
+                    <a href="#" class="table-list-controls-next">
+                        <i class="fas fa-arrow-right fa-lg"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th width="40%"></th>
+            <th width="60%" class="tdh brtl td-collection">
+                <span class="swap active">Loss/Theft & Accidental Damage included</span>
+                <span class="swap">Time to repair/replace after approval</span>
+                <span class="swap">Up to 80% Cashback at end of policy year</span>
+                <span class="swap">Insure second hand phones</span>
+                <span class="swap">Cover for phones purchased up to</span>
+                <span class="swap">Save up to &pound;100 off your excess</span>
+                <span class="swap">Trustpilot rating</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="thss">
+                <div class="thss-inner">
+                    <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg"
+                        class="img-fluid" alt="so-sure">
+                </div>
+            </td>
+            <td class="tdb btb bbb tfss td-collection">
+                <span class="swap active">
+                    <i class="far fa-check fa-2x text-success"></i>
+                </span>
+                <span class="swap">
+                    <strong>24 - 72</strong> <div>hours</div>
+                </span>
+                <span class="swap">
+                    <i class="far fa-check fa-2x text-success"></i>
+                </span>
+                <span class="swap">
+                    <i class="far fa-check fa-2x text-success"></i>
+                </span>
+                <span class="swap">
+                    <strong>3 years</strong> <div>from purchase</div>
+                </span>
+                <span class="swap">
+                    <i class="far fa-check fa-2x text-success"></i>
+                </span>
+                <span class="swap">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ trustpilot_rating }}.svg" alt="Trustpilot {{ trustpilot_rating }} Star"
+                        class="img-fluid">
+                </span>
+            </td>
+        </tr>
+        {% if affiliate_page is defined %}
+            <tr>
+                <td class="th tdw">
+                    {{ competitor[competitor1]['name']|raw }}
+                </td>
+                <td class="tdw td-collection">
+                    <span class="swap active">
+                        <i class="far {{ competitor[competitor1]['cover'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor[competitor1]['days']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor[competitor1]['cashback'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor[competitor1]['oldphones']|raw }}
+                    </span>
+                    <span class="swap">
+                        {{ competitor[competitor1]['phoneage']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor[competitor1]['saveexcess'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score1 }}.svg" alt="Trustpilot {{ score1 }} Star"
+                            class="img-fluid">
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="{% if competitor3 is not defined %}brbl {% endif %}th tdg">
+                    {{ competitor[competitor2]['name']|raw }}
+                </td>
+                <td class="tdg {% if competitor3 is not defined %}brbr{% endif %} td-collection">
+                    <span class="swap active">
+                        <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor[competitor2]['days']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor[competitor2]['oldphones']|raw }}
+                    </span>
+                    <span class="swap">
+                        {{ competitor[competitor2]['phoneage']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score2 }}.svg" alt="Trustpilot {{ score2 }} Star"
+                            class="img-fluid">
+                    </span>
+                </td>
+            </tr>
+            {% if competitor3 is defined %}
+                <tr>
+                    <td class="brbl th tdw">
+                        {{ competitor[competitor3]['name']|raw }}
+                    </td>
+                    <td class="tdw brbr td-collection">
+                        <span class="swap active">
+                            <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
+                        </span>
+                        <span class="swap">
+                            {{ competitor[competitor3]['days']|raw }}
+                        </span>
+                        <span class="swap">
+                            <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
+                        </span>
+                        <span class="swap">
+                            {{ competitor[competitor3]['oldphones']|raw }}
+                        </span>
+                        <span class="swap">
+                            {{ competitor[competitor3]['phoneage']|raw }}
+                        </span>
+                        <span class="swap">
+                            <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
+                        </span>
+                        <span class="swap">
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score3 }}.svg" alt="Trustpilot {{ score3 }} Star"
+                                class="img-fluid">
+                        </span>
+                    </td>
+                </tr>
+            {% endif %}
+        {% else %}
+            <tr>
+                <td class="th tdw">
+                    {{ competitor['PYB']['name']|raw }}
+                </td>
+                <td class="tdw td-collection">
+                    <span class="swap active">
+                        <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor['PYB']['days']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor['PYB']['oldphones']|raw }}
+                    </span>
+                    <span class="swap">
+                        {{ competitor['PYB']['phoneage']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor['PYB']['saveexcess'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score1 }}.svg" alt="Trustpilot {{ score1 }} Star"
+                            class="img-fluid">
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="th tdg">
+                    {{ competitor['GC']['name']|raw }}
+                </td>
+                <td class="tdw td-collection">
+                    <span class="swap active">
+                        <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor['GC']['days']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor['GC']['oldphones']|raw }}
+                    </span>
+                    <span class="swap">
+                        {{ competitor['GC']['phoneage']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score2 }}.svg" alt="Trustpilot {{ score2 }} Star"
+                            class="img-fluid">
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="th brbl tdw">
+                    {{ competitor['O2']['name']|raw }}
+                </td>
+                <td class="tdw brbr td-collection">
+                    <span class="swap active">
+                        <i class="far {{ competitor['O2']['cover'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor['O2']['days']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor['O2']['cashback'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        {{ competitor['O2']['oldphones']|raw }}
+                    </span>
+                    <span class="swap">
+                        {{ competitor['O2']['phoneage']|raw }}
+                    </span>
+                    <span class="swap">
+                        <i class="far {{ competitor['O2']['saveexcess'] }} fa-2x"></i>
+                    </span>
+                    <span class="swap">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score3 }}.svg" alt="Trustpilot {{ score3 }} Star"
+                            class="img-fluid">
+                    </span>
+                </td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+<table class="table-comparison-v2 d-none d-md-block">
+    <thead>
+        <tr>
+            <th width="25%" class="border-0"></th>
+            <th width="18.75%" class="th thss">
+                <div class="thss-inner">
+                    <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg"
+                        class="img-fluid" alt="so-sure">
+                </div>
+            </th>
+            {% if affiliate_page is defined %}
+                <th width="18.75%" class="th">{{ competitor[competitor1]['name']|raw }}</th>
+                <th width="18.75%" class="th">{{ competitor[competitor2]['name']|raw }}</th>
+                {% if competitor3 is defined %}
+                    <th width="18.75%" class="th">{{ competitor[competitor3]['name']|raw }}</th>
+                {% endif %}
+            {% else %}
+                <th width="18.75%" class="th">{{ competitor['PYB']['name']|raw }}</th>
+                <th width="18.75%" class="th">{{ competitor['GC']['name']|raw }}</th>
+                <th width="18.75%" class="th">{{ competitor['O2']['name']|raw }}</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="tdg tdh brtl brb">Time to Repair/replace</td>
+            <td class="tdb brb">
+                <strong>24 - 72</strong> <div>hours</div>
+                <a href="#"
+                    class="td-info-btn"
+                    data-toggle="modal"
+                    data-target="#policy_24_72_hours"
+                    role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            {% if affiliate_page is defined %}
+                <td class="tdg">{{ competitor[competitor1]['days']|raw }}</td>
+                <td class="tdg">{{ competitor[competitor2]['days']|raw }}</td>
+                {% if competitor3 is defined %}
+                    <td class="tdg">{{ competitor[competitor3]['days']|raw }}</td>
+                {% endif %}
+            {% else %}
+                <td class="tdg">{{ competitor['PYB']['days']|raw }}</td>
+                <td class="tdg">{{ competitor['GC']['days']|raw }}</td>
+                <td class="tdg">{{ competitor['LICI']['days']|raw }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="tdw tdh brb">Up to 80% Cashback at end of policy year</td>
+            <td class="tdw brb">
+                <i class="far fa-check fa-2x text-success"></i>
+                <a href="#"
+                    class="td-info-btn"
+                    data-toggle="modal"
+                    data-target="#policy_cashback"
+                    role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            {% if affiliate_page is defined %}
+                <td class="tdw">
+                    <i class="far {{ competitor[competitor1]['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="tdw">
+                    <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="tdw">
+                        <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
+                    </td>
+                {% endif %}
+            {% else %}
+                <td class="tdw">
+                    <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="tdw">
+                    <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
+                </td>
+                <td class="tdw">
+                    <i class="far {{ competitor['O2']['cashback'] }} fa-2x"></i>
+                </td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="tdg tdh brb">Loss, Theft &amp; Accidental Damage included as standard</td>
+            <td class="tdb brb">
+                <i class="far fa-check fa-2x text-success"></i>
+                <a href="#"
+                    class="td-info-btn"
+                    data-toggle="modal"
+                    data-target="#policy_comprehensive"
+                    role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            {% if affiliate_page is defined %}
+                <td class="tdg">
+                    <i class="far {{ competitor[competitor1]['cover'] }} fa-2x"></i>
+                </td>
+                <td class="tdg">
+                    <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="tdg">
+                    <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
+                    </td>
+                {% endif %}
+            {% else %}
+                <td class="tdg">
+                    <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
+                </td>
+                <td class="tdg">
+                    <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
+                </td>
+                <td class="tdg">
+                    <i class="far {{ competitor['O2']['cover'] }} fa-2x"></i>
+                </td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="tdw tdh brb">Insure second hand phones</td>
+            <td class="tdw brb">
+                <i class="far fa-check fa-2x text-success"></i>
+            </td>
+            {% if affiliate_page is defined %}
+                <td class="tdw">
+                    {{ competitor[competitor1]['oldphones']|raw }}
+                </td>
+                <td class="tdw">
+                    {{ competitor[competitor2]['oldphones']|raw }}
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="tdw">
+                        {{ competitor[competitor3]['oldphones']|raw }}
+                    </td>
+                {% endif %}
+            {% else %}
+                <td class="tdw">
+                    {{ competitor['PYB']['oldphones']|raw }}
+                </td>
+                <td class="tdw">
+                    {{ competitor['GC']['oldphones']|raw }}
+                </td>
+                <td class="tdw">
+                    {{ competitor['O2']['oldphones']|raw }}
+                </td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="tdg tdh brb">Cover for phones purchased up to</td>
+            <td class="tdb brb"><strong>3 years</strong> <div>from purchase</div></td>
+            {% if affiliate_page is defined %}
+                <td class="tdg">{{ competitor[competitor1]['phoneage']|raw }}</td>
+                <td class="tdg">{{ competitor[competitor2]['phoneage']|raw }}</td>
+                {% if competitor3 is defined %}
+                    <td class="tdg">{{ competitor[competitor3]['phoneage']|raw }}</td>
+                {% endif %}
+            {% else %}
+                <td class="tdg">{{ competitor['PYB']['phoneage']|raw }}</td>
+                <td class="tdg">{{ competitor['GC']['phoneage']|raw }}</td>
+                <td class="tdg">{{ competitor['O2']['phoneage']|raw }}</td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="tdw tdh brb">Save up to &pound;100 off your excess</td>
+            <td class="tdw brb">
+                <i class="far fa-check fa-2x text-success"></i>
+                <a href="#"
+                class="td-info-btn"
+                data-toggle="modal"
+                data-target="#policy_excess_50"
+                role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            {% if affiliate_page is defined %}
+                <td class="tdw">
+                    <i class="far {{ competitor[competitor1]['saveexcess'] }} fa-2x"></i>
+                </td>
+                <td class="tdw">
+                    <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="tdw">
+                        <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
+                    </td>
+                {% endif %}
+            {% else %}
+                <td class="tdw">
+                    <i class="far {{ competitor['PYB']['saveexcess'] }} fa-2x"></i>
+                </td>
+                <td class="tdw">
+                    <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
+                </td>
+                <td class="tdw">
+                    <i class="far {{ competitor['O2']['saveexcess'] }} fa-2x"></i>
+                </td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td class="tdg tdh brbl brb"><strong>Trustpilot rating</strong></td>
+            <td class="tdb brb tfss">
+                <img src="{{ cdn_url }}/images/onexone.png"
+                    data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ trustpilot_rating }}.svg" alt="Trustpilot {{ trustpilot_rating }} Star"
+                    class="img-fluid">
+            </td>
+            {% if affiliate_page is defined %}
+                <td class="tdg">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score1 }}.svg" alt="Trustpilot {{ score1 }} Star"
+                        class="img-fluid">
+                </td>
+                <td class="tdg">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score2 }}.svg" alt="Trustpilot {{ score2 }} Star"
+                        class="img-fluid">
+                </td>
+                {% if competitor3 is defined %}
+                    <td class="tdg brbr">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score3 }}.svg" alt="Trustpilot {{ score3 }} Star"
+                            class="img-fluid">
+                    </td>
+                {% endif %}
+            {% else %}
+                <td class="tdg">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score1 }}.svg" alt="Trustpilot {{ score1 }} Star"
+                        class="img-fluid">
+                </td>
+                <td class="tdg">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score2 }}.svg" alt="Trustpilot {{ score2 }} Star"
+                        class="img-fluid">
+                </td>
+                <td class="tdg brbr">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/trustpilot/trustpilot_ratings_{{ score3 }}.svg" alt="Trustpilot {{ score3 }} Star"
+                        class="img-fluid">
+                </td>
+            {% endif %}
+        </tr>
+    </tbody>
+</table>
+<p class="text-left text-md-right text-white mt-2">
+    <small>Info correct as of Oct 24 2019 - data taken <br class="d-lg-none"> on a first phone covered basis</small>
+</p>

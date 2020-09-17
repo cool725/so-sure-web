@@ -5,154 +5,220 @@
 {% set robots_noindex = true %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Welcome to Social Insurance {% if affiliate_company is defined %}with {{ affiliate_company }}{% endif %} | so-sure{% endblock %}
+{% block title %}{% if affiliate_company is defined %}{{ affiliate_company|capitalize }} | {% endif %}so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/landing.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/landing-search.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    <section class="hero">
+    <section class="hero{% if modify_class is defined %} {{ modify_class }}{% endif %}">
         <div class="container-large">
-            <div class="hero__intro">
-                <div class="breadcrumbs">
-                    <ul class="list-inline"
-                        vocab="https://schema.org/"
-                        typeof="BreadcrumbList">
-                        <li class="list-inline-item"
-                            property="itemListElement"
-                            typeof="ListItem">
-                            <a href="{{ path('homepage') }}"
-                               class="text-columbia-blue-e"
-                               property="item"
-                               typeof="WebPage">
-                               <span property="name">Home</span>
-                            </a>
-                            <meta property="position" content="1">
+            <div class="row">
+                <div class="col-md-6">
+                    <h1 class="fit text-white mt-md-5 mb-4">
+                        Mobile Insurance <br>
+                        <span class="sub text-deep-sky-blue-d">that's Simply Better</span>
+                    </h1>
+                    <ul class="list-unstyled icn-fa-list mb-5">
+                        <li class="mb-3 h5 text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Fast replace &amp; repair
                         </li>
-                        <li class="list-inline-item text-white">
-                            <i class="fal fa-angle-right text-white"></i>
+                        <li class="mb-3 h5 text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Refer a friend to get a FREE month
                         </li>
-                        <li class="list-inline-item text-white"
-                            property="itemListElement"
-                            typeof="ListItem">
-                            <span property="name">Compare Cover</span>
-                            <meta property="position" content="2">
+                        <li class="h5 text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Low premium &amp; excess
                         </li>
                     </ul>
+                    {% if affiliate_company_logo is defined %}
+                        <hr class="divider">
+                        <div class="affiliate-image-desktop">
+                            <p class="lead text-columbia-blue-e d-inline mr-4">in partnership with:</p>
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}"
+                                title="{{ affiliate_company }}"
+                                width="200px"
+                                class="lozad">
+                        </div>
+                    {% endif %}
+                    {% if affiliate_page == 'comparison' %}
+                        <hr class="divider d-none d-md-block">
+                        <p class="lead text-white d-none d-md-block">{{ leadP|raw }}</p>
+                    {% endif %}
                 </div>
-                {% if affiliate_page == 'comparison' %}
-                    <h1 class="mb-2 text-columbia-blue-e h2">{{ titleH1 }}</h1>
-                    <p class="lead text-white mb-4">{{ leadP|raw }}</p>
-                {% elseif affiliate_page == 'so-sure-compared' or affiliate_page == 'reward-gateway' %}
-                    <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
-                    <h2 class="h4 text-zaffre">Simple terms, pain-free claims, premium cover</h2>
-                    <p class="mb-4 lead text-white">We're a new type of insurer that you can rely on. <br class="d-none d-lg-inline"> We protect you when you need to claim and reward you when you don't.</p>
-                {% elseif affiliate_page == 'moneyback' %}
-                    <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
-                    <p class="mb-4 lead text-white">Simple Insurance with pain-free claims, premium cover and money back when you don't claim. <br class="d-none d-lg-inline"> Amazing when you need us and rewards when you don't.</p>
-                {% else %}
-                    <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
-                    <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
-                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto lozad">
-                {% endif %}
+                <div class="col-md-6 col-lg-5 offset-lg-1">
+                    {% if phone is defined and phone %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCardLanding', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCardLanding', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
+                    {% endif %}
+                    {% if affiliate_company_logo is defined %}
+                        <div class="affiliate-image-mobile">
+                            <span class="h6 text-white mr-2">Affiliated with:</span>
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}"
+                                title="{{ affiliate_company }}"
+                                width="140px"
+                                class="lozad">
+                        </div>
+                    {% elseif affiliate_page == 'comparison' %}
+                        <p class="lead text-white d-md-none mt-4">{{ leadP|raw }}</p>
+                    {% endif %}
+                </div>
             </div>
-            <div class="hero__controls mb-2">
-                <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">Pay yearly and get {{ free_months }} FREE</a>
-            </div>
-            <div class="hero__controls mb-2">
-                <a href="#" class="btn btn-link btn-block-xs text-white get-a-quote disabled"><u>Pay monthly</u></a>
-            </div>
-            {% include 'AppBundle::Default/_comparisonTable.html.twig' with {'affiliate_page': affiliate_page } %}
-        </div>
-        <svg class="d-none d-md-block" preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <defs></defs>
-            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                <g transform="translate(0.000000, -72.000000)" fill="#ffffff">
-                    <g id="---BG---" transform="translate(-4700.000000, -8443.000000)">
-                        <path d="M4700,8515 C4824,8551 4948.66667,8569 5074,8569 C5199.33333,8569 5324.66667,8551 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
-                    </g>
-                </g>
-            </g>
-        </svg>
-    </section>
-
-    <section class="comparison">
-        <div class="container-large">
         </div>
     </section>
 
-    <section class="why py-lg-5 mt-lg-5">
-        <div class="container-large py-5 mt-5">
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    {% include 'AppBundle::Components/_cover.html.twig' %}
+
+    <section id="table-compare" class="comparison py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-deep-sky-blue-d mb-4">Why so-sure mobile phone insurance?</h2>
+            <p class="text-white mb-md-5">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
+            {% include 'AppBundle::Components/_comparisonTable.html.twig' %}
+        </div>
+    </section>
+
+    <section class="top-questions py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h4 mb-4 d-md-none">Top questions about so-sure insurance</h2>
             <div class="row">
-                <div class="col-md-4">
-                    <div class="why__container">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="180px" class="lozad">
-                        <h3 class="h4 text-dodger-blue">24-72 hour replace or repair</h3>
-                    </div>
+                <div class="col-md-6 col-lg-5 order-md-2">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions_mobile.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad mb-4 d-md-none">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad d-none d-md-inline">
                 </div>
-                <div class="col-md-4">
-                    <div class="why__container">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 80% money back" width="180px" class="lozad">
-                        <h3 class="h4 text-dodger-blue">Up to 80% money back</h3>
+                <div class="col-md-6 col-lg-7 order-md-1">
+                    <h2 class="h4 mb-4 d-none d-md-block">Top questions about so-sure insurance</h2>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                Why should I use you? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you money back</p>
+                                <ul class="mb-0">
+                                    <li class="mb-2">Instant cover from purchase</li>
+                                    <li class="mb-2">We aim for 24-72 hour replacement or repair once your claim is approved</li>
+                                    <li class="mb-2">Hassle-Free Claims</li>
+                                    <li class="mb-2">Low excess from just {{ lowest_excess }}</li>
+                                    <li class="mb-2">We insure mobiles purchased in the last three years</li>
+                                    <li class="mb-2">No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
+                                    <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="why__container">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px" class="lozad">
-                        <h3 class="h4 text-dodger-blue">Low excess from just {{ lowest_excess }}</h3>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                How much is excess? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                <p>Our excess is as low as {{ lowest_excess }} when you validate your phone with our app.</p>
+                                <p>Download our app and prove to us your device is in good working order and the screen isn't cracked by taking a selfie of your phone!</p>
+                                <p><strong>Depending on your policy, validating your phone may be mandatory.</strong></p>
+                                <p class="mb-0">Excess levels vary by make, model and memory size and might be higher for latest, more-expensive new handsets- check your quote for more details.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                Do you have a discount for annual payments? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                Yes! If you pay yearly, you get {{ free_months }} free. In addition to that, you can add money to your reward pot by connecting with friends and family to earn up to 80% cashback.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-5">
-                <a href="#" class="btn btn-primary btn-block-xs get-a-quote disabled">Get Insured in minutes</a>
+            <hr class="my-5">
+            <h2 class="h4 mb-4 d-md-none">More about claiming cash back & social insurance</h2>
+            <div class="row">
+                <div class="col-md-6 col-lg-5 order-md-1">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions_cashback_mobile.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad mb-4 d-md-none">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions_cashback.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad d-none d-md-inline">
+                </div>
+                <div class="col-md-6 col-lg-7 order-md-2">
+                    <h2 class="h4 mb-4 d-none d-md-block">More about claiming cash back & social insurance</h2>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                What is the Reward Pot? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                <p>The reward pot is basically a <mark>group no claims bonus</mark>.  For each person that buys insurance with us and connects together, for example You buy a policy and invite your mum to buy.  She buys a policy and then you connect, each of you receive up to &pound;10 into your reward pots.</p>
+
+                                <div class="h4 text-zaffre">4 people connected to you = &pound;40 in your reward pot, £10 in each of theirs.</div>
+
+                                <div class="h4 text-zaffre">8 people connected = &pound;80 in your reward pot, £10 in each of theirs.</div>
+
+                                <p class="mb-0">If neither you nor your connected friends claim, we will payout to you the value of your reward pot at the end of the policy year.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                Can anyone connect to anyone? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                Yes, that is the beauty of social insurance, you can have as many connections as you like, as long as they have a policy with so-sure.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                How do I make connections to people? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                Once you buy a policy its super easy to make connections either through our app or via SMS, email or WhatsApp.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    {# Cover #}
-    {% include 'AppBundle::Default/CommonSections/_cover.html.twig' %}
-
-    {# We do things differently #}
-    {% include 'AppBundle::Default/CommonSections/_weDoThingsDifferently.html.twig' %}
-
-    {# Reviews #}
-    {% include 'AppBundle::Default/CommonSections/_reviews.html.twig' %}
+    <section class="reviews py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Don't just take our<br class="d-md-none"> word for it!</h2>
+            <p class="mb-5">Our customers love us – that's why thousands of customers have joined the so-sure family.</p>
+            {% include 'AppBundle::Components/_trustpilotReviews.html.twig' %}
+        </div>
+    </section>
 
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
-    <div class="modal fade"
-         id="page_terms"
-         tabindex="-1" role="dialog"
-         aria-labelledby="page_terms"
-         aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        Free phone case
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <i class="fal fa-times text-white"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h5>Terms and conditions</h5>
-                    <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if the customer has made no claims.</p>
-                    <p>Promotion is valid from 23rd January 2019 until 15th February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/landing.js') }}"></script>
+    <script src="{{ asset('css-js/landing-search.js') }}"></script>
 {% endblock %}

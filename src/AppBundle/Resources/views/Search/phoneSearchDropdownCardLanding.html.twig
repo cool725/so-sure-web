@@ -1,0 +1,65 @@
+<div class="cardbox cardbox-100 cardbox-flow mt-4 mt-lg-0 p-4 p-lg-5 pb-lg-0">
+    <div class="search-badge">
+      <div class="search-badge-inner fit">
+        Pay yearly for<br>
+        {{ free_months|upper }}<br>
+        <span class="h5 mb-0">FREE!</span><br>
+      </div>
+    </div>
+    <div class="d-md-flex justify-content-md-start align-items-md-center">
+        <img src="{{ cdn_url }}/images/onexone.png"
+          data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png"
+          alt="so-sure - hand holding phone"
+          class="d-none d-md-inline mr-2 lozad"
+          width="100px" />
+        <div class="h5">
+          Select device below <br>
+          <span class="text-primary">and get your quote</span>
+        </div>
+    </div>
+    <hr>
+    {{ form_start(form_phone, { 'attr': {
+        'data-toggle': 'validator',
+        'class': 'phone-search-dropdown-card validate-form',
+        'data-client-validation': form_client_validation,
+        'data-phones': phones|json_encode|raw,
+        'autocomplete': 'off'
+    }}) }}
+        <div class="form-group">
+            {{ form_widget(form_phone.make, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown-card__select phone-search-option-make'
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.model, {
+              'attr': {
+                'class': 'form-control phone-search-dropdown-card__select phone-search-option-model',
+                'disabled': 'disabled'
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.memory, {
+                'attr': {
+                    'class': 'form-control phone-search-dropdown-card__select  phone-search-option-memory',
+                    'disabled': 'disabled'
+            }}) }}
+        </div>
+        <div class="form-group">
+            <input type="email"
+                   class="form-control phone-search-dropdown-card__text phone-search-email"
+                   placeholder="Enter Email for Quote*"
+                   disabled="disabled"
+                   name="launch_phone[email]"
+                   data-required="true">
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.next, {
+              'label': 'Get my quote',
+              'attr': {
+                'class': 'btn btn-success btn-block phone-search-button'
+            }}) }}
+        </div>
+        <input type="hidden" name="token" value="{{ csrf_token('quote') }}"/>
+    {{ form_end(form_phone) }}
+</div>
