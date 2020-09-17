@@ -354,9 +354,6 @@ class PolicyService
         $aggregator = false,
         $subvariant = null
     ) {
-        if (mb_strtolower($phone->getMake()) != 'apple') {
-            $aggregator = false;
-        }
         try {
             $this->validateUser($user);
             if ($imei) {
@@ -396,10 +393,14 @@ class PolicyService
             if ($subvariant) {
                 $policy->setSubvariant($subvariant);
             }
+            $isPicsureRequired = $aggregator;
+            if ($isPicsureRequired) {
+                $policy->setPicSureRequired($isPicsureRequired);
+            }
             /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
-            $latestTerms = $policyTermsRepo->findLatestTerms($aggregator);
+            $latestTerms = $policyTermsRepo->findLatestTerms();
             $policy->init($user, $latestTerms);
             if ($checkmend) {
                 $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
@@ -617,7 +618,7 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                if ($policy->getPolicyTerms()->isPicSureRequired()) {
+                if ($policy instanceof PhonePolicy && $policy->isPicSureRequired()) {
                     $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
                 } else {
                     $policy->setStatus(PhonePolicy::STATUS_ACTIVE);

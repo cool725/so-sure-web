@@ -228,6 +228,13 @@ abstract class PhonePolicy extends Policy
     protected $picSureCircumvention;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $picSureRequired;
+
+    /**
      * @return Phone
      */
     public function getPhone()
@@ -885,6 +892,16 @@ abstract class PhonePolicy extends Policy
     public function setPicSureCircumvention($picSureCircumvention)
     {
         $this->picSureCircumvention = $picSureCircumvention;
+    }
+
+    public function isPicSureRequired()
+    {
+        return ($this->picSureRequired || $this->getPolicyTerms()->isPicSureRequired());
+    }
+
+    public function setPicSureRequired($picSureRequired)
+    {
+        $this->picSureRequired = $picSureRequired;
     }
 
     public function isSameInsurable(Policy $policy)

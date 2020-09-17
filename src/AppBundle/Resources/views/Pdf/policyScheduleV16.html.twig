@@ -180,10 +180,10 @@
                     Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
                 </li>
             {% else %}
                 <li>
@@ -193,10 +193,10 @@
                     Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
                 </li>
             {% endif %}
         </ul>
@@ -239,6 +239,23 @@
             {% endif %}
         </ul>
         <p>Validation is only done through the so-sure app, unless requested otherwise in writing by the so-sure team.</p>
+        {% if not policy.isPicSureRequired %}
+            <p>If, before claiming, you have not validated your phone using the so-sure app, then the Excess is:</p>
+            <ul>
+                <li>
+                    Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                </li>
+            </ul>
+        {% endif %}
     {% endif %}
     <p style="font-size: 12px; margin-top: 20mm"><em>The insurance cover is underwritten by Helvetia Schweizerische Versicherungsgesellschaft AG which is authorised by the Financial Conduct Authority under registration number 454140 with registered office Dufourstrasse 40 9001 St. Gallen, Switzerland.</em></p>
 </body>

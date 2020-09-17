@@ -2510,7 +2510,7 @@ class UserController extends BaseController
             return $this->redirectToRoute('user_upgrade_imei');
         }
 
-        $validationRequired = $policy->getPolicyTerms()->isPicSureRequired();
+        $validationRequired = $policy->isPicSureRequired();
 
         $pledge = new PurchaseStepPledge();
 

@@ -606,6 +606,7 @@ class ApiAuthController extends BaseController
 
             $subvariant = null;
             $subvariantString = $this->getDataString($phonePolicyData, 'subvariant');
+            $aggregator = ($subvariantString != null);
             if ($subvariantString) {
                 /** @var SubvariantRepository $subvariantRepo */
                 $subvariantRepo = $this->getManager()->getRepository(Subvariant::class);
@@ -626,7 +627,7 @@ class ApiAuthController extends BaseController
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
                 ]),
                 $modelNumber,
-                $subvariant != null,
+                $aggregator,
                 $subvariant
             );
             $policy->setName($this->conformAlphanumericSpaceDot($this->getDataString($phonePolicyData, 'name'), 100));

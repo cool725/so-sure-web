@@ -1530,7 +1530,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                     null,
                 ])) {
                 $data['hasOutstandingPicSurePolicy'] = true;
-                if ($policy->getPolicyTerms()->isPicSureRequired()) {
+                if ($policy->isPicSureRequired()) {
                     $data['picsureRequired'] = true;
                 }
             }

@@ -3005,7 +3005,7 @@ abstract class Policy
 
     /**
      * Sets the policy's subvariant.
-     * @param Subvariant $subvariant is the subvariant to set it to.
+     * @param Subvariant|null $subvariant is the subvariant to set it to or null if you wish to blank it.
      */
     public function setSubvariant($subvariant)
     {
@@ -5634,7 +5634,7 @@ abstract class Policy
             }
         }
         $fourteenDaysAgo = (clone $date)->sub(new \DateInterval("P14D"));
-        if ($this->getPolicyTerms()->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
+        if ($this instanceof PhonePolicy && $this->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
             return $this->getStatus() == self::STATUS_PICSURE_REQUIRED;
         } elseif ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;
