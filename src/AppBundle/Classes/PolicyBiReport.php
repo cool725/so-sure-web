@@ -15,7 +15,6 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
-use CensusBundle\Service\SearchService;
 use DateTime;
 use DateTimeZone;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -38,13 +37,12 @@ class PolicyBiReport extends PolicyReport
 
     /**
      * Creates the policy picsure report.
-     * @param SearchService   $searchService for the report to use.
-     * @param DocumentManager $dm            for the report to use.
-     * @param DateTimeZone    $tz            is the time zone to report in.
+     * @param DocumentManager $dm for the report to use.
+     * @param DateTimeZone    $tz is the time zone to report in.
      */
-    public function __construct(SearchService $searchService, DocumentManager $dm, DateTimeZone $tz)
+    public function __construct(DocumentManager $dm, DateTimeZone $tz)
     {
-        parent::__construct($searchService, $dm, $tz);
+        parent::__construct($dm, $tz);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
@@ -71,9 +69,7 @@ class PolicyBiReport extends PolicyReport
             'Policy Holder Id',
             'Age of Policy Holder',
             'Postcode of Policy Holder',
-            'Pen Portrait',
             'Gender',
-            'Total Weekly Income',
             'Make',
             'Make/Model',
             'Make/Model/Memory',
@@ -99,10 +95,6 @@ class PolicyBiReport extends PolicyReport
             'Number of Withdrawn/Declined Claims',
             'Policy Purchase Time',
             'Lead Source',
-            'First Scode Type',
-            'First Scode Name',
-            'All SCodes Used',
-            'Promo Codes',
             'Has Sign-up Bonus?',
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
@@ -142,13 +134,9 @@ class PolicyBiReport extends PolicyReport
         $next = $policy->getNextPolicy();
         $phone = $policy->getPhone();
         $billing = $user->getBillingAddress();
-        $census = $billing ? $this->searchService->findNearest($billing->getPostcode()) : null;
-        $income = $billing ? $this->searchService->findIncome($billing->getPostcode()) : null;
         $attribution = $user->getAttribution();
         $latestAttribution = $user->getLatestAttribution();
         $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
-        $scodeType = $this->getFirstSCodeUsedType($connections);
-        $scodeName = $this->getFirstSCodeUsedCode($connections);
         $reschedule = null;
         $lastReverted = $policy->getLastRevertedScheduledPayment();
         if ($lastReverted) {
@@ -160,9 +148,7 @@ class PolicyBiReport extends PolicyReport
             $user->getId(),
             $user->getAge(),
             $user->getBillingAddress()->getPostcode(),
-            $census ? $census->getSubgrp() : '',
             $user->getGender() ?: '',
-            $income ? sprintf('%0.0f', $income->getTotal()->getIncome()) : '',
             $phone->getMake(),
             sprintf('%s %s', $phone->getMake(), $phone->getModel()),
             $phone,
@@ -189,10 +175,6 @@ class PolicyBiReport extends PolicyReport
             count($policy->getWithdrawnDeclinedClaims()),
             DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'H:i'),
             $policy->getLeadSource(),
-            $scodeType,
-            $scodeName,
-            $this->getSCodesUsed($connections),
-            $this->getPromoCodesUsed($this->rewardRepo, $connections),
             $this->policyHasSignUpBonus($this->rewardRepo, $connections) ? 'yes' : 'no',
             $latestAttribution ? $latestAttribution->getCampaignSource() : '',
             $latestAttribution ? $latestAttribution->getCampaignName() : '',

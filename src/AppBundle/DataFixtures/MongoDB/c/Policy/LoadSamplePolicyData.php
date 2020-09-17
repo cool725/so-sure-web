@@ -84,7 +84,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     public function load(ObjectManager $manager)
     {
         $this->faker = Faker\Factory::create('en_GB');
-
         $users = $this->newUsers($manager, 100);
         $manager->flush();
         $unpaid = $this->newUsers($manager, 10);

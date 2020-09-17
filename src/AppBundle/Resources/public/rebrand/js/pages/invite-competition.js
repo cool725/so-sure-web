@@ -1,6 +1,7 @@
 // homepage.js
 
 require('../../sass/pages/invite-competition.scss');
+require('../components/phone-search-dropdown-card.js');
 
 // Require BS component(s)
 require('bootstrap/js/dist/util');

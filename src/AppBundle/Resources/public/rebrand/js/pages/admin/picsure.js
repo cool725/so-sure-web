@@ -1,20 +1,14 @@
 // picsure.js
 
-// require('../../../sass/pages/picsure.scss');
-
-// Require BS component(s)
-// e.g. require('bootstrap/js/dist/carousel');
-
 // Require components
-// e.g. require('../components/banner.js');
 require('@fancyapps/fancybox');
 
 // Lazy load images
-// require('intersection-observer');
-// import lozad from 'lozad';
+require('intersection-observer');
+import lozad from 'lozad';
 
-// const observer = lozad(); // lazy loads elements with default selector as '.lozad'
-// observer.observe();
+const observer = lozad(); // lazy loads elements with default selector as '.lozad'
+observer.observe();
 
 $(function(){
 

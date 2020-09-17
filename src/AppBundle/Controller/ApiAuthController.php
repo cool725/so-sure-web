@@ -2811,6 +2811,8 @@ class ApiAuthController extends BaseController
             $quote['make'] = $newPhone->getMake();
             $quote['model'] = $newPhone->getModel();
             $quote['memory'] = $newPhone->getMemory();
+            $quote['max_connections'] = $policy->getMaxConnections();
+            $quote['max_pot'] = $policy->getMaxPot();
 
             return new JsonResponse($quote);
         } catch (AccessDeniedException $e) {

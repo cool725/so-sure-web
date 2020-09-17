@@ -304,7 +304,7 @@ abstract class BaseController extends Controller
      *
      * @return Pagerfanta
      */
-    protected function pager(Request $request, Builder $qb, $maxPerPage = 50)
+    protected function pager(Request $request, Builder $qb, $maxPerPage = 25)
     {
         $adapter = new DoctrineODMMongoDBAdapter($qb);
         $pagerfanta = new Pagerfanta($adapter);

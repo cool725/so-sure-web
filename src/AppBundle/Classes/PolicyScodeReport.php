@@ -6,7 +6,6 @@ use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Repository\ConnectionRepository;
-use CensusBundle\Service\SearchService;
 use DateTimeZone;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -22,13 +21,12 @@ class PolicyScodeReport extends PolicyReport
 
     /**
      * Creates the policy picsure report.
-     * @param SearchService   $searchService to find user location info.
-     * @param DocumentManager $dm            to get repositories.
-     * @param DateTimeZone    $tz            the timezone for the report to be in.
+     * @param DocumentManager $dm to get repositories.
+     * @param DateTimeZone    $tz the timezone for the report to be in.
      */
-    public function __construct(SearchService $searchService, DocumentManager $dm, DateTimeZone $tz)
+    public function __construct(DocumentManager $dm, DateTimeZone $tz)
     {
-        parent::__construct($searchService, $dm, $tz);
+        parent::__construct($dm, $tz);
         /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $dm->getRepository(Connection::class);
         $this->connectionRepo = $connectionRepo;
