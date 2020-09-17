@@ -114,9 +114,6 @@ class PolicyReportCommand extends ContainerAwareCommand
         $policies = $phonePolicyRepo->findAllStartedPoliciesBatched(new DateTime(SoSure::POLICY_START), null, $n);
         // Now run the reports.
         foreach ($policies as $policy) {
-            if (!$policy->isValidPolicy()) {
-                continue;
-            }
             foreach ($executingReports as $report) {
                 try {
                     $report->process($policy);

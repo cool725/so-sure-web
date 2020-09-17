@@ -216,7 +216,8 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
-            ]);
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
         $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
