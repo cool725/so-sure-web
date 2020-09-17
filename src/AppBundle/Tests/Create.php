@@ -25,6 +25,7 @@ use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\LogEntry;
 use AppBundle\Document\PhonePolicyIteration;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Classes\Salva;
