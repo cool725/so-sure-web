@@ -4572,7 +4572,7 @@ abstract class Policy
         }
     }
 
-    public function getPolicyPrefix($environment)
+    public function getPolicyPrefix()
     {
         if ($this->getSubvariant()) {
             return $this->getSubvariant()->getPolicyPrefix();

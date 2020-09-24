@@ -531,7 +531,7 @@ class PolicyService
             }
             $user = $policy->getUser();
 
-            $prefix = $policy->getPolicyPrefix($this->environment);
+            $prefix = $policy->getPolicyPrefix();
             if ($policy->isValidPolicy()) {
                 $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
 
