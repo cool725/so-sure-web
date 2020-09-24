@@ -315,7 +315,7 @@ class DefaultController extends BaseController
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'money',
                 'affiliate_company' => 'money',
-                'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'affiliate_company_logo' => 'so-sure_money_logo_light.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',
