@@ -213,7 +213,7 @@ class Subvariant
 
     /**
      * Sets the prefix that policies under this subvariant should have.
-     * @param string is the prefix to give them.
+     * @param string $policyPrefix is the prefix to give them.
      */
     public function setPolicyPrefix($policyPrefix)
     {
