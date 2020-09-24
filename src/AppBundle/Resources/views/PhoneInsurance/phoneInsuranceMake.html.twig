@@ -5,6 +5,11 @@
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
 
+{# Money Version? #}
+{% if money_version is defined and money_version == true  %}
+    {% set robots_noindex = true %}
+{% endif %}
+
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
 {% set with_phone = phone.make ~ ' Phone' %}
@@ -44,46 +49,57 @@
             <div class="row">
                 <div class="col-lg-6 offset-lg-1 order-lg-2">
                     <div class="hero__intro">
-                        <div class="breadcrumbs">
-                            <ul class="list-inline"
-                                vocab="https://schema.org/"
-                                typeof="BreadcrumbList">
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('homepage') }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Home</span>
-                                    </a>
-                                    <meta property="position" content="1">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('phone_insurance') }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Phone Insurance</span>
-                                    </a>
-                                    <meta property="position" content="2">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item text-white"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <span property="name">{{ make_desc }}</span>
-                                    <meta property="position" content="3">
-                                </li>
-                            </ul>
-                        </div>
+                        {% if money_version is defined and money_version == true  %}
+                            <div class="d-flex align-items-center mb-4">
+                                <p class="lead text-columbia-blue-e mr-4 mb-0 fit">In partnership with:</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                    data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_money_logo_light.svg" alt="so-sure - money.co.uk"
+                                    title="so-sure - money.co.uk"
+                                    width="180px"
+                                    class="lozad">
+                            </div>
+                        {% else %}
+                            <div class="breadcrumbs">
+                                <ul class="list-inline"
+                                    vocab="https://schema.org/"
+                                    typeof="BreadcrumbList">
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('homepage') }}"
+                                        class="text-columbia-blue-e"
+                                        property="item"
+                                        typeof="WebPage">
+                                        <span property="name">Home</span>
+                                        </a>
+                                        <meta property="position" content="1">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-white"></i>
+                                    </li>
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('phone_insurance') }}"
+                                        class="text-columbia-blue-e"
+                                        property="item"
+                                        typeof="WebPage">
+                                        <span property="name">Phone Insurance</span>
+                                        </a>
+                                        <meta property="position" content="2">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-white"></i>
+                                    </li>
+                                    <li class="list-inline-item text-white"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <span property="name">{{ make_desc }}</span>
+                                        <meta property="position" content="3">
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
                         <h1 class="text-white mb-4 fit">{{ with_phone }} Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price|number_format(2) }} per month</span></h1>
                         <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">

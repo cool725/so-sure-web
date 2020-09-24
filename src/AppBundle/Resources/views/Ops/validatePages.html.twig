@@ -23,10 +23,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        Any login status <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        Any login status <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2"><a href="{{ url('homepage') }}"><i class="fal fa-link fa-fw"></i> Home</a></li>
                             <li class="mb-2"><a href="{{ path('phone_insurance_make_model_memory', {'make':'Apple','model':'iPhone+7','memory':128}) }}"><i class="fal fa-link fa-fw"></i> Quote</a></li>
@@ -38,10 +38,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        Logged out required <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        Logged out required <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 <a href="{{ url('scode', {'code':scode}) }}"><i class="fal fa-link fa-fw"></i> SCode Invitiation</a>
@@ -56,10 +56,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        Admin login required <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        Admin login required <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 {% if cancelled_policy %}
@@ -204,10 +204,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        Unpaid <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        Unpaid <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             {% for paymentOnTime in ['ontime', 'outoftime'] %}
                                 {% for unpaid_reason in unpaid_reasons %}
@@ -227,10 +227,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        Renewals <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        Renewals <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 {% if valid_renewal_policy_monthly_no_pot %}
@@ -281,10 +281,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        Other pages <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        Other pages <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 <a href="{{ url('about_how_to_contact_so_sure') }}"><i class="fal fa-link fa-fw"></i> Contact Us Page</a>
@@ -311,10 +311,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        Error pages <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        Error pages <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 <a href="/_error/403"><i class="fal fa-link fa-fw"></i> 403</a>
@@ -338,10 +338,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        External <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        External <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2"><a href="http://test.protectyourgadget.com/quote/" target="_blank" rel="noopener noreferrer"><i class="fal fa-link fa-fw"></i> GoCompare / Protect your gadget</a></li>
                         </ul>
@@ -387,10 +387,10 @@
 
             <div class="expanding-cardbox mb-4">
                 <div class="expanding-cardbox__body">
-                    <h5 class="expanding-cardbox__title text-zaffre mb-0">
-                        OAuth/Bearer Api <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                    <h5 class="expanding-cardbox__title">
+                        OAuth/Bearer Api <i class="far fa-chevron-down fa-lg"></i>
                     </h5>
-                    <div class="expanding-cardbox__expand mt-4">
+                    <div class="expanding-cardbox__expand">
                         <ul class="list-unstyled">
                             <li class="mb-2">
                                 Oauth request inbound <br>

@@ -1,3 +1,12 @@
+{% if affiliate_page is defined %}
+    {% set score1 = competitor[competitor1]['trustpilot'] %}
+    {% set score2 = competitor[competitor2]['trustpilot'] %}
+    {% set score3 = competitor[competitor3]['trustpilot'] %}
+{% else %}
+    {% set score1 = competitor['PYB']['trustpilot'] %}
+    {% set score2 = competitor['GC']['trustpilot'] %}
+    {% set score3 = competitor['O2']['trustpilot'] %}
+{% endif %}
 <table width="100%" class="table-comparison table-comparison-carousel light-table d-table d-md-none mx-auto">
     <thead>
         <tr>
@@ -303,14 +312,12 @@
                 <div class="td-container">
                     {% if affiliate_page is defined %}
                         <span class="td-swap td-active">
-                            {% set score1 = competitor[competitor1]['trustpilot'] %}
                             {% for i in range(0, 4) %}
                                 {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
                                 <i class="fas {{ starClass1 }}"></i>
                             {% endfor %}
                         </span>
                         <span class="td-swap">
-                            {% set score2 = competitor[competitor2]['trustpilot'] %}
                             {% for i in range(0, 4) %}
                                 {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
                                 <i class="fas {{ starClass2 }}"></i>
@@ -318,7 +325,6 @@
                         </span>
                         {% if competitor3 is defined %}
                             <span class="td-swap">
-                                {% set score3 = competitor[competitor3]['trustpilot'] %}
                                 {% for i in range(0, 4) %}
                                     {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
                                     <i class="fas {{ starClass3 }}"></i>
@@ -327,25 +333,22 @@
                         {% endif %}
                     {% else %}
                         <span class="td-swap td-active">
-                            {% set score1 = competitor['PYB']['trustpilot'] %}
                             {% for i in range(0, 4) %}
                                 {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
                                 <i class="fas {{ starClass1 }}"></i>
                             {% endfor %}
                         </span>
                         <span class="td-swap">
-                            {% set score2 = competitor['GC']['trustpilot'] %}
                             {% for i in range(0, 4) %}
                                 {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
                                 <i class="fas {{ starClass2 }}"></i>
                             {% endfor %}
                         </span>
                         <span class="td-swap">
-                                {% set score3 = competitor['O2']['trustpilot'] %}
-                                {% for i in range(0, 4) %}
-                                    {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
-                                    <i class="fas {{ starClass3 }}"></i>
-                                {% endfor %}
+                            {% for i in range(0, 4) %}
+                                {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
+                                <i class="fas {{ starClass3 }}"></i>
+                            {% endfor %}
                         </span>
                     {% endif %}
                 </div>
