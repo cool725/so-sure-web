@@ -61,6 +61,12 @@ class Subvariant
     private $nClaims;
 
     /**
+     * Prefix to give to policies with this subvariant.
+     * @MongoDB\Field(type="string")
+     */
+    private $policyPrefix;
+
+    /**
      * Gives you the subvariant's mongo id.
      * @return string the monbgo id as a string.
      */
@@ -194,6 +200,24 @@ class Subvariant
     public function setNClaims($nClaims)
     {
         $this->nClaims = $nClaims;
+    }
+
+    /**
+     * Gives you the prefix that policies with this subvariant should have.
+     * @return string the prefix.
+     */
+    public function getPolicyPrefix()
+    {
+        return $this->policyPrefix;
+    }
+
+    /**
+     * Sets the prefix that policies under this subvariant should have.
+     * @param string is the prefix to give them.
+     */
+    public function setPolicyPrefix($policyPrefix)
+    {
+        $this->policyPrefix = $policyPrefix;
     }
 
     /**

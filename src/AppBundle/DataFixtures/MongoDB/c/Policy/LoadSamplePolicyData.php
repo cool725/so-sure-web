@@ -1032,12 +1032,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 }
             }
         }
+        if ($subvariant) {
+            $policy->setSubvariant($subvariant);
+        }
         $manager->persist($policy);
         if (!$this->container) {
             throw new \Exception('missing container');
         }
-        $env = $this->container->getParameter('kernel.environment');
-        $policy->create(-5000 + $count, mb_strtoupper($env), $startDate);
+        $policy->create(-5000 + $count, $subvariant ? $subvariant->getPolicyPrefix() : null, $startDate);
         $now = \DateTime::createFromFormat('U', time());
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         if ($picSure == self::PICSURE_RANDOM) {
@@ -1093,9 +1095,6 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         }
 
-        if ($subvariant) {
-            $policy->setSubvariant($subvariant);
-        }
 
         return $policy;
     }

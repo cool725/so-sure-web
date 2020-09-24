@@ -706,7 +706,8 @@ abstract class PhonePolicy extends Policy
 
     public function getPolicyNumberPrefix()
     {
-        return 'Mob';
+        $subvariant = $this->getSubvariant();
+        return $subvariant ? $subvariant->getPolicyPrefix() : 'Mob';
     }
 
     public function getPolicyImeiFiles()
