@@ -29,6 +29,7 @@ Encore
     .addEntry('purchase-bacs', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-bacs.js')
     .addEntry('purchase-remainder', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-remainder.js')
     .addEntry('landing', './src/AppBundle/Resources/public/rebrand/js/pages/landing.js')
+    .addEntry('landing-search', './src/AppBundle/Resources/public/rebrand/js/pages/landing-search.js')
     .addEntry('content-pages', './src/AppBundle/Resources/public/rebrand/js/pages/content-pages.js')
     .addEntry('onboarding', './src/AppBundle/Resources/public/rebrand/js/pages/onboarding.js')
     .addEntry('social-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/social-insurance.js')

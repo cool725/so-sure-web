@@ -1,5 +1,22 @@
 // tables.scss
 
+.brtl {
+    border-top-left-radius: $g-border-radius;
+}
+
+.brbl {
+    border-bottom-left-radius: $g-border-radius;
+}
+
+.brtr {
+    border-top-right-radius: $g-border-radius;
+}
+
+.brbr {
+    border-bottom-right-radius: $g-border-radius;
+}
+
+
 .table-list {
     table-layout: fixed;
     background-color: $white;
@@ -49,6 +66,237 @@
     }
 }
 
+.table-list-v2 {
+    table-layout: fixed;
+    width: 100%;
+    position: relative;
+
+    th, td {
+        height: 90px;
+        padding: 0 1.4rem;
+        text-align: center;
+        position: relative;
+        vertical-align: middle;
+        z-index: 5;
+        border: none;
+        background-clip: padding-box;
+    }
+
+    .swap {
+        display: none;
+
+        &.active {
+            display: block;
+            opacity: 1;
+            animation-iteration-count: 1;
+            animation-timing-function: ease-in;
+            animation-duration: 0.5s;
+        }
+
+        &.fade-left {
+            animation-name: fadeInLeft;
+        }
+
+        &.fade-right {
+            animation-name: fadeInRight;
+        }
+    }
+
+    .th {
+        font-family: $g-bold;
+        color: $primary;
+        text-align: left;
+        border-right: 1px solid darken($athens-gray, 10%);
+    }
+
+    .tdh {
+        text-align: center;
+        font-family: $g-bold;
+        background-color: $white;
+    }
+
+    .thss {
+        z-index: 10;
+        background-color: $azureeradiance;
+
+        &-inner {
+            padding: 0 1.4rem;
+            position: absolute;
+            background-color: $azureeradiance;
+            top: -3px; right: 0; left: -10px; bottom: -3px;
+            display: flex;
+            align-items: center;
+            @include border-left-radius($g-border-radius);
+        }
+    }
+
+    .tdw {
+        background-color: $white;
+    }
+
+    .tdg {
+        background-color: $athens-gray;
+    }
+
+    .tdb {
+        background-color: $lily-white;
+    }
+
+    .btb {
+        border-top: 5px solid $azureeradiance;
+    }
+
+    .bbb {
+        border-bottom: 5px solid $azureeradiance;
+    }
+
+    .tfss {
+        &:after {
+            width: 10px; height: 95px;
+            content: '';
+            position: absolute;
+            left: 100%; top: -5px; bottom: -5px;
+            background-color: $lily-white;
+            border: {
+                top: 5px solid $azureeradiance;
+                right: 5px solid $azureeradiance;
+                bottom: 5px solid $azureeradiance;
+            }
+            @include border-right-radius($g-border-radius);
+        }
+    }
+
+    .table-list-controls {
+        width: 80px; height: 40px;
+        position: absolute;
+        bottom: 0; right: 0;
+        display: flex;
+
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; height: 40px;
+            color: $white;
+            background-color: $primary;
+
+            &:hover {
+                cursor: pointer;
+                background-color: darken($primary, 20%);
+                color: darken($white, 10%);
+                text-decoration: none;
+            }
+
+            &.disabled {
+                cursor: default;
+                pointer-events: none;
+                text-decoration: none;
+                background-color: darken($primary, 10%);
+                color: darken($athens-gray, 15%);
+            }
+        }
+    }
+}
+
+.table-comparison-v2 {
+    table-layout: fixed;
+    width: 100%;
+
+    th, td {
+        height: 90px;
+        padding: 0 1.4rem;
+        text-align: center;
+        position: relative;
+        vertical-align: middle;
+        z-index: 5;
+        border-right: 1px solid darken($athens-gray, 10%);
+        background-clip: padding-box;
+
+        &:last-of-type {
+            border-right: none;
+        }
+    }
+
+    .th {
+        font-family: $g-bold;
+        background-color: $white;
+        color: $primary;
+        border-bottom: 1px solid $primary;
+
+        &:last-of-type {
+            border-top-right-radius: $g-border-radius;
+        }
+    }
+
+    .td-info-btn {
+        position: absolute;
+        bottom: 10px; right: 10px;
+        // color: rgba(255, 255, 255, 0.7);
+    }
+
+    .thss {
+        z-index: 10;
+        background-color: $azureeradiance;
+
+        &-inner {
+            padding: 0 1.4rem;
+            position: absolute;
+            background-color: $azureeradiance;
+            top: -10px; right: -3px; left: -3px; bottom: 0;
+            display: flex;
+            align-items: center;
+            @include border-top-radius($g-border-radius);
+        }
+    }
+
+    .tfss {
+        &:after {
+            height: 20px;
+            content: '';
+            position: absolute;
+            top: 100%; left: -5px; right: -5px;
+            background-color: $lily-white;
+            border: {
+                left: 5px solid $azureeradiance;
+                right: 5px solid $azureeradiance;
+                bottom: 5px solid $azureeradiance;
+            }
+            @include border-bottom-radius($g-border-radius);
+        }
+    }
+
+    .td-info-btn {
+        position: absolute;
+        bottom: 10px; right: 10px;
+        // color: rgba(255, 255, 255, 0.7);
+    }
+
+    .tdh {
+        text-align: left;
+        font-family: $g-bold;
+    }
+
+    .tdw {
+        background-color: $white;
+    }
+
+    .tdg {
+        background-color: $athens-gray;
+    }
+
+    .tdb {
+        background-color: $lily-white;
+    }
+
+    .brb {
+        border-right: 5px solid $azureeradiance;
+    }
+
+    .bb {
+        border-bottom: 5px solid $azureeradiance;
+    }
+}
+
 .table-comparison {
     table-layout: fixed;
     background-color: $white;
@@ -86,6 +334,7 @@
         text-align: center;
         position: relative;
         vertical-align: middle;
+        background-clip: padding-box;
     }
 
     td.td-30 {
@@ -280,8 +529,26 @@
     td:not(:last-child) {
         border-right: $table-border-width solid $dodger-blue;
     }
-
-    // td {
-    //     border: $table-border-width solid $dodger-blue;
-    // }
 }
+
+@keyframes fadeInRight {
+    0% {
+       opacity: 0;
+       transform: translateX(50px);
+    }
+    100% {
+       opacity: 1;
+       transform: translateX(0);
+    }
+ }
+
+ @keyframes fadeInLeft {
+    0% {
+       opacity: 0;
+       transform: translateX(-50px);
+    }
+    100% {
+       opacity: 1;
+       transform: translateX(0);
+    }
+ }

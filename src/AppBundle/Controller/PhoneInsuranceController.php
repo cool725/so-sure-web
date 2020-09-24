@@ -277,8 +277,10 @@ class PhoneInsuranceController extends BaseController
      * SEO Pages - Phone Insurance > Make
      * @Route("/phone-insurance/{make}",
      * name="phone_insurance_make", requirements={"make":"[a-zA-Z]+"})
+     * @Route("/phone-insurance/{make}/money",
+     * name="phone_insurance_make_money", requirements={"make":"[a-zA-Z]+"})
      */
-    public function phoneInsuranceMakeAction($make = null)
+    public function phoneInsuranceMakeAction(Request $request, $make = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -312,6 +314,12 @@ class PhoneInsuranceController extends BaseController
                 $make
             ));
             return new RedirectResponse($this->generateUrl('phone_insurance'));
+        }
+
+        // Add money route
+        $money = false;
+        if ($request->get('_route') == 'phone_insurance_make_money') {
+            $money = true;
         }
 
         // Track Page
@@ -350,7 +358,8 @@ class PhoneInsuranceController extends BaseController
             'competitor' => $this->competitorsData(),
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
-            'competitor3' => 'O2'
+            'competitor3' => 'O2',
+            'money_version' => $money
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -384,6 +393,8 @@ class PhoneInsuranceController extends BaseController
      * SEO Pages - Phone Insurance > Make > Model
      * @Route("/phone-insurance/{make}/{model}", name="phone_insurance_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/phone-insurance/{make}/{model}/money", name="phone_insurance_make_model_money",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      */
     public function phoneInsuranceMakeModelAction(Request $request, $make = null, $model = null)
     {
@@ -415,6 +426,12 @@ class PhoneInsuranceController extends BaseController
                 $model
             ));
             return new RedirectResponse($this->generateUrl('phone_insurance'));
+        }
+
+        // Add money route
+        $money = false;
+        if ($request->get('_route') == 'phone_insurance_make_model_money') {
+            $money = true;
         }
 
         // Track Page
@@ -475,7 +492,8 @@ class PhoneInsuranceController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'O2',
-            'manufacturer_landing_usps' => $manufacturerLandingUsps
+            'manufacturer_landing_usps' => $manufacturerLandingUsps,
+            'money_version' => $money
         ];
 
         return $this->render($template, $data);
@@ -547,6 +565,9 @@ class PhoneInsuranceController extends BaseController
 
         // A/B Hero Content
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_CONTENT);
+
+        // A/B Landing Page Design
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_PAGES);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');

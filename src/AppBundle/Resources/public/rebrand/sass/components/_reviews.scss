@@ -146,3 +146,84 @@
         }
     }
 }
+
+.reviews-mobile {
+
+    &-controls {
+        height: 40px;
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: flex-end;
+
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; height: 40px;
+            color: $white;
+            background-color: $primary;
+
+            &:hover {
+                cursor: pointer;
+                background-color: darken($primary, 20%);
+                color: darken($white, 10%);
+                text-decoration: none;
+            }
+
+            &.disabled {
+                cursor: default;
+                pointer-events: none;
+                text-decoration: none;
+                background-color: darken($primary, 10%);
+                color: darken($athens-gray, 15%);
+            }
+        }
+    }
+
+    &-item {
+        display: none;
+
+        &.active {
+            display: block;
+            opacity: 1;
+            animation-iteration-count: 1;
+            animation-timing-function: ease-in;
+            animation-duration: 0.5s;
+        }
+
+        &.fade-out {
+            animation-name: fadeOut;
+        }
+    }
+}
+
+@keyframes fadeInRight {
+    0% {
+       opacity: 0;
+       transform: translateX(50px);
+    }
+    100% {
+       opacity: 1;
+       transform: translateX(0);
+    }
+ }
+
+ @keyframes fadeInLeft {
+    0% {
+       opacity: 0;
+       transform: translateX(-50px);
+    }
+    100% {
+       opacity: 1;
+       transform: translateX(0);
+    }
+ }
+
+ @keyframes fadeOut {
+    0% {
+       opacity: 0;
+    }
+    100% {
+       opacity: 1;
+    }
+ }

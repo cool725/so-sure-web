@@ -5,7 +5,8 @@
     overflow: hidden;
     max-width: 300px;
     background-color: $white;
-    border: 1px solid rgba(0, 146, 255, 1);
+    // border: 1px solid rgba(0, 146, 255, 1);
+    border: 1px solid rgba(173, 177, 181, 0.6);
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                 0 5px 15px 0 rgba(8,27,154,0.08);
     @include border-radius($g-border-radius);
@@ -25,6 +26,21 @@
 
     &__text {
         font-size: 13px;
+    }
+
+    &__header-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 58px; height: 58px;
+        position: absolute;
+        left: 50%; top: -29px;
+        margin-left: -29px;
+        background-color: $primary;
+        color: $white;
+        box-shadow: 0 0 0 0.4rem rgba(0, 146, 255, 0.2);
+
+        @include border-radius(50%);
     }
 
     @include media-breakpoint-up(lg) {
@@ -85,6 +101,10 @@
     }
 }
 
+.cardbox-flow {
+    overflow: visible;
+}
+
 .cardbox-ribbon {
     width: 200px;
     background: $lust;
@@ -101,27 +121,25 @@
 // Only using px here for consistency
 .expanding-cardbox {
     border: 1px solid rgba(0, 146, 255, 1);
+    // border: 1px solid rgba(173, 177, 181, 0.6);
     @include border-radius($g-border-radius);
-
-    &__body {
-        padding: 1.2rem 1.56rem 1.56rem 1.56rem;
-    }
 
     &__title {
         position: relative;
-        padding-right: 2.4rem;
-        margin-top: .25rem;
+        @include border-top-radius($g-border-radius);
+        padding: 1.2rem 3rem 1.2rem 1.56rem;
         cursor: pointer;
+        margin: 0;
 
         .far {
             position: absolute;
-            right: 0; top: 4px;
+            right: 1.2rem; top: 1.4rem;
         }
 
         .fas {
             color: lighten($dodger-blue, 30%);
             position: absolute;
-            right: 0; top: 1.38rem;
+            right: 1.2rem; top: 2.4rem;
         }
     }
 
@@ -134,6 +152,7 @@
 
     &__expand {
         display: none;
+        padding: 1.2rem 1.56rem 1.56rem 1.56rem;
     }
 
     &:hover {
@@ -175,21 +194,49 @@
 
 .expanding-cardbox__open {
     background-color: $white;
-    // border: 2px solid rgba(37,147,243, 0.5);
+    border: none;
     cursor: default;
-    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                0 5px 15px 0 rgba(8,27,154,0.08);
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.2),
+                0 5px 15px 0 rgba(8,27,154,0.2);
+
+    .expanding-cardbox__title {
+        background-color: $primary;
+        color: $white;
+
+        .far {
+            color: $white;
+        }
+    }
 
     &.expanding-cardbox-alt {
         background-color: rgba(255,255,255,.08);
         border: 2px solid $columbia-blue-e;
     }
+}
 
-    // Needs improving
-    .fas {
-        color: $dodger-blue;
+.expanding-cardbox-white.expanding-cardbox__open {
+    border: 1px solid rgba(0, 146, 255, 1);
+
+    .expanding-cardbox__title {
+        background-color: $white;
+        color: $zaffre;
+
+        .far {
+            color: $zaffre;
+        }
+
+        .fas {
+            color: lighten($dodger-blue, 30%);
+        }
     }
 }
+
+.expanding-cardbox-alt.expanding-cardbox__open {
+    .expanding-cardbox__title {
+        background-color: transparent;
+    }
+}
+
 
 // Summary Style Cardbox
 .summary-cardbox {
@@ -415,7 +462,8 @@
             font-family: $g-bold;
             color: $white;
             background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(37, 147, 243, 0.2);
+            // border: 1px solid rgba(37, 147, 243, 0.2);
+            border: 1px solid rgba(173, 177, 181, 0.6);
             border-bottom: none;
             @include border-top-radius($g-border-radius);
 
@@ -434,7 +482,8 @@
             &.active,
             &:hover {
                 background-color: $white;
-                border: 1px solid rgba(37, 147, 243, 1);
+                // border: 1px solid rgba(37, 147, 243, 1);
+                border: 1px solid rgba(173, 177, 181, 0.6);
                 border-bottom: none;
                 color: $zaffre;
                 z-index: 5;
@@ -455,7 +504,8 @@
         position: relative;
         z-index: 4;
         background-color: $white;
-        border: 1px solid rgba(0, 146, 255, 1);
+        // border: 1px solid rgba(0, 146, 255, 1);
+        border: 1px solid rgba(173, 177, 181, 0.6);
         box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
                     0 5px 15px 0 rgba(8,27,154,0.08);
         @include border-bottom-radius($g-border-radius);

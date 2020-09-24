@@ -226,6 +226,103 @@ class SearchController extends BaseController
     }
 
     /**
+     * @Route("/phone-search-dropdown", name="phone_search_dropdown")
+     * @Route("/phone-search-dropdown/{type}", name="phone_search_dropdown_type")
+     * @Route("/phone-search-dropdown/{type}/{id}", name="phone_search_dropdown_type_id")
+     * @Template()
+     */
+    public function phoneSearchDropdownCardLandingAction(Request $request, $type = null, $id = null)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = null;
+        $phoneMake = new PhoneMake();
+        if ($id) {
+            $phone = $phoneRepo->find($id);
+            if ($phone) {
+                $phoneMake->setMake($phone->getMake());
+            }
+        }
+
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
+                'action' => $this->generateUrl('phone_search_dropdown'),
+            ])
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
+                if (!$this->isCsrfTokenValid('quote', $request->get('token'))) {
+                    throw new \InvalidArgumentException('Invalid CSRF');
+                }
+                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
+                if ($phoneId) {
+                    $phone = $phoneRepo->find($phoneId);
+                    if (!$phone) {
+                        throw new \Exception('unknown phone');
+                    }
+                    $email = $this->getDataString($request->get('launch_phone'), 'email');
+                    if ($email) {
+                        $lead = new Lead();
+                        $lead->setEmail($email);
+                        $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME_REQUIRED);
+                        $leadRepo = $dm->getRepository(Lead::class);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
+                        if (!$existingLead) {
+                            $dm->persist($lead);
+                            $dm->flush();
+                        } else {
+                            $lead = $existingLead;
+                        }
+                        $days = new \DateTime();
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
+                        $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
+                        $quoteUrl = $this->setPhoneSession($request, $phone);
+                        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+                        $mailer = $this->get('app.mailer');
+                        // @codingStandardsIgnoreStart
+                        $mailer->sendTemplate(
+                            sprintf('Your saved so-sure quote for %s', $phone),
+                            $lead->getEmail(),
+                            'AppBundle:Email:quote/priceGuarantee.html.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl.$utm, 'price' => $price->getMonthlyPremiumPrice()],
+                            'AppBundle:Email:quote/priceGuarantee.txt.twig',
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl.$utm, 'price' => $price->getMonthlyPremiumPrice()]
+                        );
+                        // @codingStandardsIgnoreEnd
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                        $this->get('app.mixpanel')->queuePersonProperties([
+                            '$email' => $lead->getEmail()
+                        ], true);
+                        $this->addFlash('success', sprintf(
+                            "Thanks! An email of your quote is on it's way"
+                        ));
+                    }
+                    if ($phone->getMemory()) {
+                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
+                            'make' => $phone->getMakeCanonical(),
+                            'model' => $phone->getEncodedModelCanonical(),
+                            'memory' => $phone->getMemory()
+                        ], 301);
+                    } else {
+                        return $this->redirectToRoute('phone_insurance_make_model', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel()
+                        ], 301);
+                    }
+                }
+            }
+        }
+
+        return [
+            'form_phone' => $formPhone->createView(),
+            'phones' => $this->getPhonesArray(),
+            'type' => $type,
+            'phone' => $phone,
+        ];
+    }
+
+    /**
      * @Route("/model-search-dropdown", name="model_search_dropdown")
      * @Route("/model-search-dropdown/{type}", name="model_search_dropdown_type")
      * @Route("/model-search-dropdown/{type}/{id}", name="model_search_dropdown_type_id")

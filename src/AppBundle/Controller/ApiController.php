@@ -930,7 +930,7 @@ class ApiController extends BaseController
             }
 
             // Breaking change to return all the policies objects to support renewals
-            if (($platform == 'ios' && version_compare($version, '1.5.73', '<')) ||
+            if (($platform == 'ios' && version_compare($version, '1.7.5', '<')) ||
                 ($platform == 'android' && version_compare($version, '1.6.0.2', '<')) ) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_UPGRADE_APP,

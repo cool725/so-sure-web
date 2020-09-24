@@ -31,6 +31,9 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_SCODE_CONTENT = 'Scode Layout Variation';
 
+    // Exp 3
+    const EXPERIMENT_LANDING_PAGES = 'Landing Page Design';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -131,6 +134,8 @@ class SixpackService
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
         self::EXPERIMENT_SCODE_CONTENT,
+        // Exp 3
+        self::EXPERIMENT_LANDING_PAGES,
     ];
 
     public static $authExperiments = [
@@ -168,6 +173,8 @@ class SixpackService
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
         self::EXPERIMENT_SCODE_CONTENT,
+        // Exp 3
+        self::EXPERIMENT_LANDING_PAGES,
     ];
 
     /** @var LoggerInterface */
