@@ -531,7 +531,7 @@ class PolicyService
             }
             $user = $policy->getUser();
 
-            $prefix = $policy->getPolicyPrefix($this->environment);
+            $prefix = $policy->getPolicyPrefix();
             if ($policy->isValidPolicy()) {
                 $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
 
@@ -590,7 +590,7 @@ class PolicyService
                 $policy->addSCode($scode);
             }
 
-            if ($prefix) {
+            if ($prefix && !$policy->getSubvariant()) {
                 $policy->create(
                     $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID),
                     $prefix,
@@ -599,9 +599,10 @@ class PolicyService
                     $billing
                 );
             } else {
+                $prefix = $policy->getSubvariant() ? $policy->getSubvariant()->getPolicyPrefix() : null;
                 $policy->create(
                     $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE),
-                    null,
+                    $prefix,
                     $date,
                     1,
                     $billing

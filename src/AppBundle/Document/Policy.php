@@ -4572,16 +4572,15 @@ abstract class Policy
         }
     }
 
-    public function getPolicyPrefix($environment)
+    public function getPolicyPrefix()
     {
-        $prefix = null;
-        if ($environment != 'prod') {
-            $prefix = mb_strtoupper($environment);
+        if ($this->getSubvariant()) {
+            return $this->getSubvariant()->getPolicyPrefix();
         } elseif ($this->getUser() && $this->getUser()->hasSoSureEmail()) {
             // any emails with @so-sure.com will generate an invalid policy
-            $prefix = self::PREFIX_INVALID;
+            return self::PREFIX_INVALID;
         }
-        return $prefix;
+        return null;
     }
 
     /**
