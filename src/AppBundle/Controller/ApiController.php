@@ -738,16 +738,25 @@ class ApiController extends BaseController
                 // being recreated in account in the db.  This is only allowed once per user
                 // and is only because the prelaunch app didn't do anything other than record email address
                 $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($this->getDataString($data, 'email'))]);
+                if (!$user) {
+                    $user = $repo->findOneBy(['mobileNumber' => $this->normalizeUkMobile($mobileNumber)]);
+                }
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
                     $user->setLastLogin(\DateTime::createFromFormat('U', time()));
                 } else {
-                    if (!$user->canDelete()) {
+                    if (!$user) {
                         return $this->getErrorJsonResponse(
                             ApiErrorCode::ERROR_USER_EXISTS,
                             'User already exists',
                             422
                         );
+                    } elseif (!$user->canDelete()) {
+                          return $this->getErrorJsonResponse(
+                              ApiErrorCode::ERROR_USER_EXISTS,
+                              'User already exists with an active policy',
+                              422
+                          );
                     } else {
                         // fix for same person getting quote multiple times
                         $policies = $user->getPolicies();
