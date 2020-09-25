@@ -317,7 +317,7 @@ class ApiExternalController extends BaseController
             $data['aggregator'] = 'true';
         }
 
-        $webAppVariant = ['essential', 'damage-only', 'standard'];
+        $webAppVariant = ['essential', 'damage-only', 'full-cover'];
 
         if ($subvariant && in_array($subvariant, $webAppVariant)) {
             $deeplinkPostParams = $request->request->all();
