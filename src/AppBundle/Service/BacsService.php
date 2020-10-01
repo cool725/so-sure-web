@@ -9,6 +9,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportAddacsFile;
+use AppBundle\Document\File\BacsReportAwacsFile;
 use AppBundle\Document\File\BacsReportAruddFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\BacsReportDdicFile;
@@ -624,13 +625,11 @@ class BacsService
             'items' => 0,
             'changes' => 0
         ];
-        /** @var UserRepository $userRepo */
-        $policyRepo = $this->dm->getRepository(Policy::class);
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         $xml = file_get_contents($file);
         $dom = new DomDocument();
-        $dom->loadXml($xml, LIBXML_NOBLANKS);
+        $dom->loadXML($xml, LIBXML_NOBLANKS);
         $xpath = new DOMXPath($dom);
         $this->validateMessageHeader($xpath);
         $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingAdvice');
@@ -644,17 +643,16 @@ class BacsService
             $policies = $policyRepo->findPoliciesByBacsReference($reference);
             $users = $userRepo->findUsersByBacsReference($reference);
             $used = false;
+            /** @var Policy $policy */
             foreach ($policies as $policy) {
-                $used = true;
-                $bankAccount = $policy->getPaymentMethod()->getBankAccount();
-                $bankAccount->setSortCode($newSortCode);
-                $bankAccount->setAccountNumber($newAccountNumber);
-            }
-            foreach ($users as $user) {
-                $used = true;
-                $bankAccount = $user->getPaymentMethod()->getBankAccount();
-                $bankAccount->setSortCode($newSortCode);
-                $bankAccount->setAccountNumber($newAccountNumber);
+                $paymentMethod = $policy->getPaymentMethod();
+                if ($paymentMethod instanceof BacsPaymentMethod) {
+                    /** @var BacsPaymentMethod $paymentMethod */
+                    $used = true;
+                    $bankAccount = $paymentMethod->getBankAccount();
+                    $bankAccount->setSortCode($newSortCode);
+                    $bankAccount->setAccountNumber($newAccountNumber);
+                }
             }
             if ($used) {
                 $this->dm->flush();

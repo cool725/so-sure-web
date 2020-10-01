@@ -9,6 +9,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 class UserRepository extends DocumentRepository
 {

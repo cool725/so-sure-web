@@ -401,7 +401,7 @@ class PolicyRepository extends BaseDocumentRepository
      */
     public function findPoliciesByBacsReference($reference)
     {
-        return this->createQueryBuilder()
+        return $this->createQueryBuilder()
             ->field('paymentMethod.type')->equals('bacs')
             ->field('paymentMethod.reference')->equals($reference)
             ->getQuery()->execute();
