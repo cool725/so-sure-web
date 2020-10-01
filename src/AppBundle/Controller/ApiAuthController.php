@@ -1689,20 +1689,20 @@ class ApiAuthController extends BaseController
                 $imei->addMetadata('imei-suspected-fraud', $result['Metadata']['suspected-fraud']);
                 if ($result['Metadata']['suspected-fraud'] === "1") {
                     $policy->setImeiCircumvention(true);
-                    /** @var MailerService $mailer */
-                    $mailer = $this->get('app.mailer');
-                    /** @var RouterService $router */
-                    $router = $this->get('app.router');
-                    $body = sprintf(
-                        '<a href="%s">%s</a>',
-                        $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
-                        $policy->getPolicyNumber()
-                    );
-                    $mailer->send(
-                        'Detected imei circumvention attempt',
-                        'tech+ops@so-sure.com',
-                        $body
-                    );
+                    // /** @var MailerService $mailer */
+                    // $mailer = $this->get('app.mailer');
+                    // /** @var RouterService $router */
+                    // $router = $this->get('app.router');
+                    // $body = sprintf(
+                    //     '<a href="%s">%s</a>',
+                    //     $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                    //     $policy->getPolicyNumber()
+                    // );
+                    // $mailer->send(
+                    //     'Detected imei circumvention attempt',
+                    //     'tech+ops@so-sure.com',
+                    //     $body
+                    // );
                 } else {
                     $policy->setImeiCircumvention(false);
                 }
