@@ -340,15 +340,16 @@ class UserRepository extends DocumentRepository
         return $validUsers;
     }
 
-    // /**
-    //  * @return array Array of Users
-    //  */
-    // private function getUsersTestTag()
-    // {
-    //     return array(
-    //         $this->find('5dcac0887bf2783ec449d655'),
-    //         $this->find('5dcac0887bf2783ec449d653'),
-    //         $this->find('5dcac0887bf2783ec449d651'),
-    //     );
-    // }
+    /**
+     * Finds all of the users that have got the given bacs reference.
+     * @param string $reference is the reference to find.
+     * @return Cursor over the results.
+     */
+    public function findUsersByBacsReference($reference)
+    {
+        return $this->createQueryBuilder()
+            ->field('paymentMethod.type')->equals('bacs')
+            ->field('paymentMethod.sortCode')->equals($reference)
+            ->getQuery()->execute();
+    }
 }

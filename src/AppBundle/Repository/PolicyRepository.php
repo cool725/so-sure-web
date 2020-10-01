@@ -393,4 +393,17 @@ class PolicyRepository extends BaseDocumentRepository
             ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX))
             ->getQuery()->execute()->toArray();
     }
+
+    /**
+     * Finds all the policies that have got the given bacs reference on their bank account.
+     * @param string $reference is the bacs reference.
+     * @return Cursor over the results.
+     */
+    public function findPoliciesByBacsReference($reference)
+    {
+        return this->createQueryBuilder()
+            ->field('paymentMethod.type')->equals('bacs')
+            ->field('paymentMethod.reference')->equals($reference)
+            ->getQuery()->execute();
+    }
 }

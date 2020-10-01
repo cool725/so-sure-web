@@ -428,9 +428,11 @@ class BacsService
         } elseif (mb_stripos($originalName, "Withdrawal") !== false) {
             $metadata = $this->withdrawal($file);
             $uploadFile = new BacsReportWithdrawalFile();
+        } elseif (mb_stripos($originalName, "AWACS") !== false) {
+            $metadata = $this->awacs($file);
+            $uploadFile = new BacsReportAwacsFile();
         } else {
             $this->logger->error(sprintf('Unknown bacs report file %s', $originalName));
-
             return false;
         }
 
@@ -608,6 +610,58 @@ class BacsService
         unlink($encTempFile);
 
         return $tempFile;
+    }
+
+    /**
+     * Processes an awacs xml file and actions it and then returns some
+     * metadata which just says how many things were in the file.
+     * @param string $file is the file to process.
+     * @return array containing the metadata.
+     */
+    public function awacs($file)
+    {
+        $results = [
+            'items' => 0,
+            'changes' => 0
+        ];
+        /** @var UserRepository $userRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $xml = file_get_contents($file);
+        $dom = new DomDocument();
+        $dom->loadXml($xml, LIBXML_NOBLANKS);
+        $xpath = new DOMXPath($dom);
+        $this->validateMessageHeader($xpath);
+        $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingAdvice');
+        /** @var \DomElement $element */
+        foreach ($elementList as $element) {
+            $this->validateRecordType($element, 'W');
+            $results['items']++;
+            $reference = trim($this->getNodeValue($element, 'reference'));
+            $newSortCode = trim($this->getNodeValue($element, 'payer-new-sort-code'));
+            $newAccountNumber = trim($this->getNodeValue($element, 'payer-new-account-number'));
+            $policies = $policyRepo->findPoliciesByBacsReference($reference);
+            $users = $userRepo->findUsersByBacsReference($reference);
+            $used = false;
+            foreach ($policies as $policy) {
+                $used = true;
+                $bankAccount = $policy->getPaymentMethod()->getBankAccount();
+                $bankAccount->setSortCode($newSortCode);
+                $bankAccount->setAccountNumber($newAccountNumber);
+            }
+            foreach ($users as $user) {
+                $used = true;
+                $bankAccount = $user->getPaymentMethod()->getBankAccount();
+                $bankAccount->setSortCode($newSortCode);
+                $bankAccount->setAccountNumber($newAccountNumber);
+            }
+            if ($used) {
+                $this->dm->flush();
+                $results['changes']++;
+            }
+        }
+        return $results;
     }
 
     public function addacs($file)
@@ -1232,7 +1286,6 @@ class BacsService
     {
         return trim($this->getNodeValue($element, $referenceName));
     }
-
 
     private function getChildNodeValue(\DOMElement $element, $name, $attributeName = null)
     {
