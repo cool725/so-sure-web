@@ -641,7 +641,6 @@ class BacsService
             $newSortCode = trim($this->getNodeValue($element, 'payer-new-sort-code'));
             $newAccountNumber = trim($this->getNodeValue($element, 'payer-new-account-number'));
             $policies = $policyRepo->findPoliciesByBacsReference($reference);
-            $users = $userRepo->findUsersByBacsReference($reference);
             $used = false;
             /** @var Policy $policy */
             foreach ($policies as $policy) {
