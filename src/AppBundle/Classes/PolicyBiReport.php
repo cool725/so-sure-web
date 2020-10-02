@@ -97,7 +97,7 @@ class PolicyBiReport extends PolicyReport
             'Lead Source',
             'First Scode Type',
             'First Scode Name',
-            'Promo Codes',
+            'SCodes',
             'Has Sign-up Bonus?',
             'Latest Campaign Source (user)',
             'Latest Campaign Name (user)',
