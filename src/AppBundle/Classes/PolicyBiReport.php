@@ -182,7 +182,7 @@ class PolicyBiReport extends PolicyReport
             $policy->getLeadSource(),
             $scodeType,
             $scodeName,
-            $this->getSCodesUsed($connections),
+            $this->getPromoCodesUsed($this->rewardRepo, $connections),
             $this->policyHasSignUpBonus($this->rewardRepo, $connections) ? 'yes' : 'no',
             $latestAttribution ? $latestAttribution->getCampaignSource() : '',
             $latestAttribution ? $latestAttribution->getCampaignName() : '',
