@@ -393,10 +393,6 @@ class PolicyService
             if ($subvariant) {
                 $policy->setSubvariant($subvariant);
             }
-            $isPicsureRequired = $aggregator;
-            if ($isPicsureRequired) {
-                $policy->setPicSureRequired($isPicsureRequired);
-            }
             /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
