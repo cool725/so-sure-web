@@ -619,11 +619,7 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                if ($policy instanceof PhonePolicy && $policy->isPicSureRequired()) {
-                    $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
-                } else {
-                    $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-                }
+                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
                 $this->dm->flush();
             }
 
