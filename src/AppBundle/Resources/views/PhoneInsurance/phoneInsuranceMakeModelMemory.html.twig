@@ -73,7 +73,7 @@
             <div class="row">
                 <div class="col-md-6 order-md-2">
                     <div class="hero__intro">
-                        <div class="breadcrumbs">
+                        {# <div class="breadcrumbs">
                             <ul class="list-inline"
                                 vocab="https://schema.org/"
                                 typeof="BreadcrumbList">
@@ -112,7 +112,7 @@
                                     <meta property="position" content="3">
                                 </li>
                             </ul>
-                        </div>
+                        </div> #}
                         {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
                             {% set greeting = 'Good morning' %}
                         {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
