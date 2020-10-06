@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Feature;
@@ -354,6 +355,7 @@ class PolicyService
         $aggregator = false,
         $subvariant = null
     ) {
+        NoOp::ignore($aggregator);
         try {
             $this->validateUser($user);
             if ($imei) {
