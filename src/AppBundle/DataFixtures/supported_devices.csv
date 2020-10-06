@@ -2856,6 +2856,7 @@ Boost,X4503,X4503,X4503
 Borqs,Falcon,falcon,falcon
 Bouygues Telecom,Bbox Brooklyn 4K,HMB9213NW,Bouygtel4K
 Bouygues Telecom,Bbox Miami,HMB4213H,BouygtelTV
+Bouygues Telecom,BboxTV,UZW4020BYT,BboxTV
 Bouygues Telecom,Bs 451,Bs_451,Bs 451
 BrailleNote,gryphon,gryphon,BrailleNote Touch +
 Brandcode,L1Fa,L1Fa,L1Fa
@@ -5685,6 +5686,7 @@ Fujitsu,M555,M555,M555
 Fujitsu,Patio100,Patio100,Patio100
 Fujitsu,Patio100,Patio100_3G,Patio100_3G
 Fujitsu,Patio600,Patio600,Patio600
+Fujitsu,Patio730,Patio730,Patio730
 Fujitsu,REGZA Phone IS11T,TSI11,IS11T
 Fujitsu,REGZA Phone T-01C,tg03,IS04
 Fujitsu,REGZA Phone T-01C,tg03,T-01C
@@ -6262,6 +6264,7 @@ Google,Intel Braswell Chromebook,wizpig_cheets,Intel Braswell Chromebook
 Google,Intel Comet Lake U Chromebook,hatch_cheets,hatch
 Google,Intel Gemini Lake Chromebook,octopus_cheets,octopus
 Google,Intel Kaby Lake U Chromebook,nami_cheets,nami
+Google,Mediatek MT8173 Chromebook,jacuzzi_cheets,jacuzzi
 Google,Mediatek MT8183 Tablet,kukui_cheets,kukui
 Google,Mediatek MTK8173 Chromebook,hana_cheets,Lenovo N23 Yoga/Flex 11 Chromebook
 Google,Mediatek MTK8173 Chromebook,hana_cheets,Mediatek MT8173 Chromebook
@@ -11755,7 +11758,9 @@ LGE,K51,mdh30lm,LGL555DL
 LGE,K51,mdh30lm,LM-K500
 LGE,K51,mdh30xlm,LM-K500
 LGE,K51S,mdh35lm,LM-K510
+LGE,K52,meh35lm,LM-K520
 LGE,K61,mdh40lm,LM-Q630
+LGE,K62,meh35lm,LM-K525
 LGE,K71,mdh50lm,LM-Q730
 LGE,L Bello,luv80ds,LG-D335
 LGE,L Bello,luv80ds,LG-D335E
@@ -13747,6 +13752,7 @@ Lenovo,Lenovo Tab M8,8705X,Lenovo TB-8705X
 Lenovo,Lenovo Tab P10,X705F,Lenovo TB-X705F
 Lenovo,Lenovo Tab P10,X705L,Lenovo TB-X705L
 Lenovo,Lenovo Tab P10,X705M,Lenovo TB-X705M
+Lenovo,Lenovo Tab P11,J606F,Lenovo TB-J606F
 Lenovo,Lenovo Tab P11 Pro,J706F,Lenovo TB-J706F
 Lenovo,Lenovo Tab P11 Pro,J706L,Lenovo TB-J706L
 Lenovo,Lenovo Tab V7,PB-6505M,Lenovo PB-6505M
@@ -16570,6 +16576,8 @@ Nokia,Nokia 2 V,EVW,Nokia 2 V
 Nokia,Nokia 2.1,E2M,Nokia 2.1
 Nokia,Nokia 2.2,WSP_sprout,Nokia 2.2
 Nokia,Nokia 2.3,IRM_sprout,Nokia 2.3
+Nokia,Nokia 2.4,WVR,Nokia 2.4
+Nokia,Nokia 2.4,WVR_sprout,Nokia 2.4
 Nokia,Nokia 3,NE1,TA-1020
 Nokia,Nokia 3,NE1,TA-1028
 Nokia,Nokia 3,NE1,TA-1032
@@ -16625,6 +16633,7 @@ Nokia,Nokia 9,AOP_sprout,Nokia 9
 Nokia,Nokia C1,RKU,Nokia C1
 Nokia,Nokia C2,NBL,Nebula
 Nokia,Nokia C2,NBL,Nokia C2
+Nokia,Nokia C3,GMR,Nokia C3
 Nokia,Nokia X5,PDA,Nokia X5
 Nokia,Nokia X6,DRG,Nokia X6
 Nokia,Nokia X7,PNX,Nokia X7
@@ -22266,6 +22275,7 @@ Sharp,AQUOS zero2 SH-01M,SH-01M,SH-01M
 Sharp,AQUOS zero2 SH-M13,SH-M13,SH-M13
 Sharp,AQUOS zero2 SH-Z20,SH-Z20,SH-Z20
 Sharp,AQUOS zero2 SHV47,QDA,SHV47
+Sharp,AQUOS zero5G basic,SGA002SH,A002SH
 Sharp,AQUOS zero5G basic DX,OJ6,SHG02
 Sharp,AQUOS ケータイ SH-02L,SH-02L,SH-02L
 Sharp,AQUOS ケータイ SH-06G,SH-06G,SH-06G
@@ -22637,7 +22647,9 @@ Skyworth,North America,SW3_ATV,SWTV
 Skyworth,North America,globe_na,globe
 Skyworth,North America,shimbashi,2K TV
 Skyworth,SWTV-20AE,SW4H,SWTV-20AE
+Skyworth,SWTV-20N,SW4H,SWTV-20AE
 Skyworth,SWTV-20N,SW4H,SWTV-20NA
+Skyworth,SWTV-20SA,SW4H,SWTV-20AE
 Skyworth,SWTV-20SA,SW4H,SWTV-20SA
 Skyworth,Skyworth,grape,HPA02
 Skyworth,South Africa,open_fhd_sa,open_fhd
@@ -26751,6 +26763,7 @@ Vodafone,Vodafone Smart mini 7 ve,U3_3G,VFD 310
 Vodafone,Vodafone Smart mini 7 ve dual,U3_3G,VFD 311
 Vodafone,Vodafone TV,uiw4030vha,Vodafone TV
 Volt Mobile,VOLT_SV451_Vision,VOLT_SV451_Vision,VOLT_SV451_Vision
+Volvo,Volvo,ihu_abl_car,Volvo
 Vonino,Druid_L10,Druid_L10,Druid_L10
 Vonino,Epic E8,Epic_E8,Epic E8
 Vonino,Epic P7,Epic_P7,Epic_P7
