@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Feature;
@@ -354,6 +355,7 @@ class PolicyService
         $aggregator = false,
         $subvariant = null
     ) {
+        NoOp::ignore($aggregator);
         try {
             $this->validateUser($user);
             if ($imei) {
@@ -392,10 +394,6 @@ class PolicyService
             $policy->setPhoneData($phoneData);
             if ($subvariant) {
                 $policy->setSubvariant($subvariant);
-            }
-            $isPicsureRequired = $aggregator;
-            if ($isPicsureRequired) {
-                $policy->setPicSureRequired($isPicsureRequired);
             }
             /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
@@ -619,11 +617,7 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                if ($policy instanceof PhonePolicy && $policy->isPicSureRequired()) {
-                    $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
-                } else {
-                    $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-                }
+                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
                 $this->dm->flush();
             }
 
