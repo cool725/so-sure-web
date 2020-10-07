@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Important information about your Reward Pot cashback.
 
 **
@@ -12,8 +11,21 @@ The claim has been successful and you’ve helped your connection replace their 
 
 Changes in the Reward Pot values have been applied to all of the policyholders connected to this claimant.
 
-If you have any further questions on this, please do not hesitate to contact us.
+Have a question or issue? contact us: {{ contact_us_url }}
 
 Best,
 SO-SURE Team
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
