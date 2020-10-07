@@ -465,6 +465,7 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
                 - https://www.googleadservices.com # necessary?
+                - https://optimize.google.com
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
                 - https://angel.co
@@ -840,6 +841,7 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
                 - https://www.googleadservices.com # necessary?
+                - https://optimize.google.com
                 - https://*.doubleclick.net
                 - https://www.google.com
                 - https://*.doubleclick.net
