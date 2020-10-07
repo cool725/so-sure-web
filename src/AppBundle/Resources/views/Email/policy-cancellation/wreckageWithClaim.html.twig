@@ -1,19 +1,172 @@
-{% extends 'AppBundle:Email:base.html.twig' %}
-{% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}Goodbye {{ policy.user.name }}!{% endblock %}
-{% block body %}
-	{{ macros.start_table() }}
-		<h1>
-		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		</h1>
-		<div style="font-size: 14px; text-align: left;">
-		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
-		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-			   This email serves as official notice that your policy {{ policy.policyNumber }} is now cancelled and no longer in effect.<br><br>
-				 No further payments will be taken.<br><br>
-			   If you have any questions, please don't hesitate to
-				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
-		   </div>
-		</div>
-	{{ macros.end_table() }}
-{% endblock %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+  <head> </head>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <!--[if !mso]><!-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--<![endif]-->
+    <style type="text/css">
+      * {
+        text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        -moz-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      html {
+        height: 100%;
+        width: 100%;
+      }
+
+      body {
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        mso-line-height-rule: exactly;
+      }
+
+      div[style*="margin: 16px 0"] {
+        margin: 0 !important;
+      }
+
+      table,
+      td {
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      img {
+        border: 0;
+        height: auto;
+        line-height: 100%;
+        outline: none;
+        text-decoration: none;
+        -ms-interpolation-mode: bicubic;
+      }
+
+      .ReadMsgBody,
+      .ExternalClass {
+        width: 100%;
+      }
+
+      .ExternalClass,
+      .ExternalClass p,
+      .ExternalClass span,
+      .ExternalClass td,
+      .ExternalClass div {
+        line-height: 100%;
+      }
+    </style>
+    <!--[if gte mso 9]>
+      <style type="text/css">
+      li { text-indent: -1em; }
+      table td { border-collapse: collapse; }
+      </style>
+      <![endif]-->
+    <title>Goodbye {{ policy.user.name }}!</title>
+    <style>
+      @media only screen and (min-width:641px) {
+        .text-left-res {
+          text-align: left !important;
+        }
+
+        .text-right-res {
+          text-align: right;
+        }
+      }
+    </style><!-- content -->
+    <!--[if gte mso 9]><xml>
+       <o:OfficeDocumentSettings>
+        <o:AllowPNG/>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+       </o:OfficeDocumentSettings>
+      </xml><![endif]-->
+  </head>
+  <body class="body" style="background-color: #E0EFFF; margin: 0; width: 100%;">
+    <div class="preview" style="color: #E0EFFF; display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all;">Your policy is now cancelled&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+    <table class="bodyTable" role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #E0EFFF; margin: 0;" bgcolor="#E0EFFF">
+      <tr>
+        <td class="body__content" align="left" width="100%" valign="top" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif;">
+          <div class="pad block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
+              <tr>
+                <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                    <tr class="block__row">
+                      <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
+                        <div class="header container" style="margin: 0 auto; width: 100%; max-width: 550px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                            <tr>
+                              <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr class="container__row">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="padding: 30px 0;">
+                                      <div class="row">
+                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+                                          <tr class="row__row">
+                                            <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
+                                              <a href="https://www.wearesosure.com" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">
+                                                  <img src="https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo-blue.png" alt="so-sure" width="140px" class="img-center img__block" border="0" style="max-width: 100%; margin: 0 auto; display: block;" />
+                                                </span></a>
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table> <!--[if mso | IE]> </td>
+                            </tr>
+                          </table> <![endif]--> </div>
+                        <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                            <tr>
+                              <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr class="container__row">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #FFFFFF; border-radius: 15px; box-shadow: 0 15px 30px 0 rgba(8,27,154,.08),0 5px 15px 0 rgba(8,27,154,.08); padding: 40px;" bgcolor="#FFFFFF">
+                                      <div class="row">
+                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+                                          <tr class="row__row">
+                                            <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Goodbye {{ policy.user.name }}!</p>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">This email serves as official notice that your policy {{ policy.policyNumber }} is now cancelled and no longer in effect.</p>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">No further payments will be taken.</p>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><em>Have a question or issue? <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;"><span style="color:#3399ff">contact us</span></span></a></em></p>
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Best,<br />SO-SURE Team</p>
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table> <!--[if mso | IE]> </td>
+                            </tr>
+                          </table> <![endif]--> </div>
+                        <div class="footer container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                            <tr>
+                              <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr class="container__row">
+                                    <td class="container__cell" width="100%" align="left" valign="top">
+                                      <div class="row">
+                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+                                          <tr class="row__row">
+                                            <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
+                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><small style="color: #777777;">Copyright &copy; {{ 'now'|date('Y') }} so-sure Limited, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK. All rights reserved. {% if unsubscribe_url is defined %}<a href="{{ unsubscribe_url }}" class="a" style="color: #777777;"><span class="a__text" style="color: #777777;"><u>Unsubscribe</u></span></a> from these emails{% else %}<a href="mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!" class="a" style="color: #777777;"><span class="a__text" style="color: #777777;">Unsubscribe from this list</span></a>{% endif %}</small></p>
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table> <!--[if mso | IE]> </td>
+                            </tr>
+                          </table> <![endif]--> </div>
+                      </td>
+                    </tr>
+                  </table> <!--[if mso | IE]> </td>
+              </tr>
+            </table> <![endif]--> </div>
+        </td>
+      </tr>
+    </table>
+    <div style="display:none; white-space:nowrap; font-size:15px; line-height:0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
+  </body>
+</html>
