@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 {{ policy.debtCollector|capitalize }} has now been authorised to chase your debt to so-sure
 
 **
@@ -15,4 +14,17 @@ As per so-sure terms & conditions, the remainder of the policy must be paid for 
 Your current debt for the amount of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }} was due on {{ policy.end | date }}
 
 You can make online payment at:  {{ url('purchase_remainder_policy', {'id': policy.Id }) }}
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

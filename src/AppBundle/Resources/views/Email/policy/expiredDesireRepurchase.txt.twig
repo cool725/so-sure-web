@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Your policy has now ended.
 
 **
@@ -8,4 +7,16 @@ Thank you for trusting so-sure to provide you with amazing cover for loss, left,
 
 Your policy for {{ policy.phone }} ended on {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
 
-{% endblock body %}
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
