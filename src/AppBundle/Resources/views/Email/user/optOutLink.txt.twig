@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 **
 ------------------------------------------------------------
 You recently requested a link to manage your communication preferences with so-sure.
@@ -7,4 +6,16 @@ You recently requested a link to manage your communication preferences with so-s
 Update Preferences here:
 {{ url('optout_hash', {'hash': hash}) }}
 
-{% endblock body %}
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

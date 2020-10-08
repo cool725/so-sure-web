@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 **
 ------------------------------------------------------------
 Hi {% if user.name %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
@@ -11,4 +10,16 @@ GDPR ensures that organisations protect your personal data better. To reflect th
 Should you with to opt-out of receiving information from so-sure you can do so here:
 {{ url('optout_hash', {'hash': hash}) }}
 
-{% endblock body %}
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

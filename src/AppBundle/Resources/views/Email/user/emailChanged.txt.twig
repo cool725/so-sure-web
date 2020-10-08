@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Your email has been changed.
 
 **
@@ -8,4 +7,16 @@ As per request, your email has been changed to {{ user.email }}.
 
 If you didn't request this change, please let us know immediately.
 
-{% endblock body %}
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
