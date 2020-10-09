@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Your SO-SURE cashback.
 
 **
@@ -12,8 +11,21 @@ In order to transfer your cashback to you, we need your bank details. Please log
 
 Add my bank details: {{ withdraw_url }}
 
-Thank you for using so-sure.
+Have a question or issue? contact us: {{ contact_us_url }}
 
 Best,
 SO-SURE Team
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
