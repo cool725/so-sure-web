@@ -46,6 +46,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const GENDER_FEMALE = 'female';
     const GENDER_UNKNOWN = 'unknown';
 
+    const ROLE_PICSURE = 'ROLE_PICSURE';
     const ROLE_CLAIMS = 'ROLE_CLAIMS';
     const ROLE_EMPLOYEE = 'ROLE_EMPLOYEE';
     const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
@@ -1009,6 +1010,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return 90 - $diff->days;
+    }
+
+    /**
+     * Tells you if this user has the picsure role.
+     * @return boolean true only if they do.
+     */
+    public function hasPicsureRole()
+    {
+        return $this->hasRole(self::ROLE_PICSURE) ||
+            $this->hasRole(self::ROLE_EMPLOYEE) ||
+            $this->hasRole(self::ROLE_ADMIN) ||
+            $this->hasRole(self::ROLE_CUSTOMER_SERVICES);
     }
 
     public function hasEmployeeRole()

@@ -411,13 +411,14 @@ class DefaultController extends BaseController
         if ($this->getUser()) {
             if ($this->isGranted(User::ROLE_EMPLOYEE)) {
                 return $this->redirectToRoute('admin_home');
-            } elseif ($this->isGranted('ROLE_CLAIMS')) {
+            } elseif ($this->isGranted(User::ROLE_CLAIMS)) {
                 return $this->redirectToRoute('claims_policies');
-            } elseif ($this->isGranted('ROLE_USER')) {
+            } elseif ($this->isGranted(User::ROLE_PICSURE)) {
+                return $this->redirectToRoute('picsure_index');
+            } elseif ($this->isGranted('USER')) {
                 return $this->redirectToRoute('user_home');
             }
         }
-
         return $this->redirectToRoute('homepage');
     }
 

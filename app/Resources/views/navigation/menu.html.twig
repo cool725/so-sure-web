@@ -8,6 +8,8 @@
                     <a href="{{ path('admin_home') }}" class="h5">Admin</a>
                 {% elseif is_granted('ROLE_CLAIMS') %}
                     <a href="{{ path('claims_home') }}" class="h5">Claims</a>
+                {% elseif is_granted('ROLE_PICSURE') %}
+                    <a href="{{ path('picsure_index') }}" class="h5">Picsure</a>
                 {% else %}
                     <a href="{{ path('user_home') }}" class="h5">Dashboard</a>
                 {% endif %}
