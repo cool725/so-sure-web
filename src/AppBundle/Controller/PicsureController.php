@@ -81,11 +81,9 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
         $environment = $this->getParameter('kernel.environment');
         $file = str_replace(sprintf('%s/', $environment), '', $file);
-
         if (!$filesystem->has($file)) {
             throw $this->createNotFoundException(sprintf('URL not found %s', $file));
         }
-
         $mimetype = $filesystem->getMimetype($file);
         return StreamedResponse::create(
             function () use ($file, $filesystem) {
@@ -124,7 +122,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
                 'Your phone is now successfully validated.'
             ), null, null, $policy);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            $this->get('logger')->error(sprintf('Error in pic-sure push.'), ['exception' => $e]);
         }
         $picsureFiles = $policy->getPolicyPicSureFiles();
         if (count($picsureFiles) > 0) {
@@ -133,7 +131,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
                 new PicsureEvent($policy, $picsureFiles[0])
             );
         } else {
-            $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
+            $this->get('logger')->error(sprintf('Missing picture file in policy %s.', $policy->getId()));
         }
     }
 
@@ -163,7 +161,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
                 $request->get('message')
             ), null, null, $policy);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            $this->get('logger')->error(sprintf('Error in pic-sure push.'), ['exception' => $e]);
         }
         $picsureFiles = $policy->getPolicyPicSureFiles();
         if (count($picsureFiles) > 0) {
@@ -172,7 +170,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
                 new PicsureEvent($policy, $picsureFiles[0])
             );
         } else {
-            $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
+            $this->get('logger')->error(sprintf('Missing picture file in policy %s.', $policy->getId()));
         }
     }
 
@@ -184,7 +182,6 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
     private function rejectPicsure($policy, $user)
     {
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $this->getUser());
-        $this->getManager()->flush();
         $mailer = $this->get('app.mailer');
         $mailer->sendTemplateToUser(
             'Phone validation failed ❌',
@@ -194,26 +191,16 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
             'AppBundle:Email:picsure/rejected.txt.twig',
             ['policy' => $policy]
         );
-        if ($policy->isWithinCooloffPeriod()) {
-            $mailer->sendTemplate(
-                'Please cancel (cooloff) policy due to pic-sure rejection',
-                'support@wearesosure.com',
-                'AppBundle:Email:picsure/adminRejected.html.twig',
-                ['policy' => $policy]
-            );
-            $this->addFlash('error-raw', sprintf(
-                'Policy <a href="%s">%s</a> should be cancelled (intercom support message also sent).',
-                $this->get('app.router')->generateUrl('admin_policy', ['id' => $policy->getId()]),
-                $policy->getPolicyNumber()
-            ));
-        }
+        $policyService = $this->get('app.policy');
+        $policyService->cancel($policy, Policy::CANCELLED_WRECKAGE);
+        $this->getManager()->flush();
         try {
             $push = $this->get('app.push');
             $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                 'Your phone did not pass validation. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
             ), null, null, $policy);
         } catch (\Exception $e) {
-            $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            $this->get('logger')->error(sprintf('Error in pic-sure push.'), ['exception' => $e]);
         }
         $picsureFiles = $policy->getPolicyPicSureFiles();
         if (count($picsureFiles) > 0) {
@@ -222,7 +209,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
                 new PicsureEvent($policy, $picsureFiles[0])
             );
         } else {
-            $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
+            $this->get('logger')->error(sprintf('Missing picture file in policy %s.', $policy->getId()));
         }
     }
 }
