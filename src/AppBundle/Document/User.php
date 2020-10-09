@@ -1018,7 +1018,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     public function hasPicsureRole()
     {
-        return $this->hasRole(self::ROLE_PICSURE);
+        return $this->hasRole(self::ROLE_PICSURE) ||
+            $this->hasRole(self::ROLE_EMPLOYEE) ||
+            $this->hasRole(self::ROLE_ADMIN) ||
+            $this->hasRole(self::ROLE_CUSTOMER_SERVICES);
     }
 
     public function hasEmployeeRole()

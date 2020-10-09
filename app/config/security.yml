@@ -9,9 +9,9 @@ security:
     role_hierarchy:
         ROLE_PICSURE:            ROLE_USER
         ROLE_CLAIMS:             ROLE_USER
-        ROLE_EMPLOYEE:           ROLE_USER
-        ROLE_CUSTOMER_SERVICES:  ROLE_USER,ROLE_EMPLOYEE
-        ROLE_ADMIN:              ROLE_USER,ROLE_EMPLOYEE,ROLE_CUSTOMER_SERVICES
+        ROLE_EMPLOYEE:           ROLE_USER,ROLE_PICSURE
+        ROLE_CUSTOMER_SERVICES:  ROLE_USER,ROLE_EMPLOYEE,ROLE_PICSURE
+        ROLE_ADMIN:              ROLE_USER,ROLE_EMPLOYEE,ROLE_CUSTOMER_SERVICES,ROLE_PICSURE
 
     access_decision_manager:
         strategy: unanimous
