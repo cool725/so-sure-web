@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Debt Collection Request
 
 **
@@ -21,4 +20,17 @@ Link to pay: {{ url('purchase_remainder_policy', {'id': policy.Id }) }}
 Reason: {{ policy.phone }} was insured (Policy {{ policy.policyNumber }}) and replacement phone was received on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}. As per so-sure terms & conditions, the remainder of the policy must be paid for in full.
 
 Debt owed to: so-sure Limited, {{ business_address|replace({'\n':','}) }} (07488 720 002)
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
