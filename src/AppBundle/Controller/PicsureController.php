@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Helpers\StringHelper;
 use AppBundle\Event\PicsureEvent;
 use AppBundle\Form\Type\PicSureSearchType;
 use AppBundle\Service\PushService;
@@ -105,7 +106,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
      */
     private function approvePicsure($policy, $user)
     {
-        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $user);
         $this->getManager()->flush();
         $mailer = $this->get('app.mailer');
         $mailer->sendTemplateToUser(
@@ -145,7 +146,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
      */
     private function invalidatePicsure($policy, $user, $message)
     {
-        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $user);
         $this->getManager()->flush();
         $mailer = $this->get('app.mailer');
         $mailer->sendTemplateToUser(
@@ -160,7 +161,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
             $push = $this->get('app.push');
             $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                 'Sorry, your phone validation was not successful: %s',
-                $request->get('message')
+                $message
             ), null, null, $policy);
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in pic-sure push.'), ['exception' => $e]);
@@ -183,7 +184,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
      */
     private function rejectPicsure($policy, $user)
     {
-        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $this->getUser());
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $user);
         $mailer = $this->get('app.mailer');
         $mailer->sendTemplateToUser(
             'Phone validation failed ❌',
@@ -198,9 +199,18 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
         $this->getManager()->flush();
         try {
             $push = $this->get('app.push');
-            $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                'Your phone did not pass validation. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
-            ), null, null, $policy);
+            $push->sendToUser(
+                PushService::PSEUDO_MESSAGE_PICSURE,
+                $policy->getUser(),
+                StringHelper::join(
+                    'Your phone did not pass validation. If you phone was damaged prior to your policy purchase, ',
+                    'then it is crimial fraud to claim on our policy. Please contact us if you have purchased this ',
+                    'policy by mistake.'
+                ),
+                null,
+                null,
+                $policy
+            );
         } catch (\Exception $e) {
             $this->get('logger')->error(sprintf('Error in pic-sure push.'), ['exception' => $e]);
         }

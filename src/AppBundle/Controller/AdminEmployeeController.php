@@ -155,7 +155,6 @@ use AppBundle\Form\Type\AdminMakeModelType;
 use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
-use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
