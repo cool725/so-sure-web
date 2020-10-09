@@ -11,7 +11,7 @@ class CsvHelper
 {
     /**
      * Makes a line of the csv with quotes around the items and commas between them.
-     * @param mixed ..$item are all of the string items to concatenate of variable number.
+     * @param mixed ...$item are all of the string items to concatenate of variable number.
      */
     public static function line(...$item)
     {
