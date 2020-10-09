@@ -104,15 +104,19 @@
                         <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Fast replace and repair service
+                                24-72 hrs replace & repair service
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                FREE month when you refer a friend
+                                Low excess from just {{ lowest_excess }}
                             </li>
                             <li class="h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Low excess from just {{ lowest_excess }}
+                                {% set wording = free_months|capitalize ~ ' FREE ' %}
+                                {% if 'one' in free_months  %}
+                                    {% set wording = 'FREE month' %}
+                                {% endif %}
+                                {{ wording }} when you pay yearly
                             </li>
                         </ul>
                     </div>
