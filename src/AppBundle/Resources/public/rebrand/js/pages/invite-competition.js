@@ -29,11 +29,10 @@ $(function() {
         knowledgeBaseD.css('top', -tabsHeight);
 
     // Tabs - style the arrow if open
-    $('.tab-link').on('click', function (e) {
-        $('.tab-indicator').removeClass('fa-arrow-circle-down')
-                           .addClass('fa-arrow-circle-right');
-        $(this).find('.fas').removeClass('fa-arrow-circle-right')
-                            .addClass('fa-arrow-circle-down');
+    $('.tab-link').on('click', function(e) {
+        let clicked = $(this);
+        $('.tab-indicator').removeClass('fa-arrow-circle-up').addClass('fa-arrow-circle-down');
+        clicked.find('.tab-indicator').removeClass('fa-arrow-circle-down').addClass('fa-arrow-circle-up');
     });
 
     // Reviews

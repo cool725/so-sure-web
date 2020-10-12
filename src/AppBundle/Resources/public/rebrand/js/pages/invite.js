@@ -21,6 +21,13 @@ $(function() {
         tabsHeight     = knowledgeBaseD.find('.nav-item').height() + 4;
         knowledgeBaseD.css('top', -tabsHeight);
 
+    // Tabs - style the arrow if open
+    $('.tab-link').on('click', function(e) {
+        let clicked = $(this);
+        $('.tab-indicator').removeClass('fa-arrow-circle-up').addClass('fa-arrow-circle-down');
+        clicked.find('.tab-indicator').removeClass('fa-arrow-circle-down').addClass('fa-arrow-circle-up');
+    });
+
     // Carousel setup
     const startStep = () => {
         $('#hero_img_1_1').show().addClass('animated bounceInUp');
@@ -72,14 +79,6 @@ $(function() {
                 break;
         }
     })
-
-    // Tabs - style the arrow if open
-    $('.tab-link').on('click', function (e) {
-        $('.tab-indicator').removeClass('fa-arrow-circle-down')
-                           .addClass('fa-arrow-circle-right');
-        $(this).find('.fas').removeClass('fa-arrow-circle-right')
-                            .addClass('fa-arrow-circle-down');
-    });
 
     // Scroll to feedback section
     $('#user_feedback_btn').on('click', function(e) {
