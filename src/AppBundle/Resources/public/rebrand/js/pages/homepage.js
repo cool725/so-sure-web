@@ -10,6 +10,7 @@ require('bootstrap/js/dist/tab');
 require('../components/table.js');
 require('../components/modalVideo.js');
 require('../components/phone-search-dropdown-card.js');
+let textFit = require('textfit');
 
 let jQueryBridget = require('jquery-bridget');
 let Flickity = require('flickity');
@@ -19,6 +20,10 @@ Flickity.setJQuery( $ );
 jQueryBridget( 'flickity', Flickity, $ );
 
 $(function() {
+
+    if ($('.fit').length) {
+        textFit($('.fit'), {detectMultiLine: false});
+    }
 
     // Adjust top position of knowledge base as true value differs between browser
     let knowledgeBaseD = $('.knowledge-base__desktop'),
