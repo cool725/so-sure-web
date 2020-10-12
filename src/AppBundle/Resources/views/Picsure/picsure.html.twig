@@ -52,7 +52,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for policy in policies %}
+                            {% for policy in policies|reverse %}
                                 {# TODO: Set table row colour based of ML score eventually #}
                                 <tr>
                                     {# Policy #}
