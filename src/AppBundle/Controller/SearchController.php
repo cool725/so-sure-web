@@ -93,7 +93,7 @@ class SearchController extends BaseController
 
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $this->generateUrl('phone_search_dropdown'),
+                'action' => $this->generateUrl('phone_search_dropdown_two'),
             ])
             ->getForm();
         if ('POST' === $request->getMethod()) {
@@ -129,9 +129,9 @@ class SearchController extends BaseController
     }
 
     /**
-     * @Route("/phone-search-dropdown", name="phone_search_dropdown")
-     * @Route("/phone-search-dropdown/{type}", name="phone_search_dropdown_type")
-     * @Route("/phone-search-dropdown/{type}/{id}", name="phone_search_dropdown_type_id")
+     * @Route("/phone-search-dropdown-two", name="phone_search_dropdown_two")
+     * @Route("/phone-search-dropdown-two/{type}", name="phone_search_dropdown_type_two")
+     * @Route("/phone-search-dropdown-two/{type}/{id}", name="phone_search_dropdown_type_id_two")
      * @Template()
      */
     public function phoneSearchDropdownCardAction(Request $request, $type = null, $id = null)
@@ -149,11 +149,14 @@ class SearchController extends BaseController
 
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $this->generateUrl('phone_search_dropdown'),
+                'action' => $this->generateUrl('phone_search_dropdown_two'),
             ])
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
+            $email = $this->getDataString($request->get('launch_phone'), 'email');
+            $session = $this->get('session');
+            $session->set('email', $email);
             if ($request->request->has('launch_phone')) {
                 if (!$this->isCsrfTokenValid('quote', $request->get('token'))) {
                     throw new \InvalidArgumentException('Invalid CSRF');
@@ -164,7 +167,6 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
-                    $email = $this->getDataString($request->get('launch_phone'), 'email');
                     if ($email) {
                         $lead = new Lead();
                         $lead->setEmail($email);
@@ -192,14 +194,14 @@ class SearchController extends BaseController
                             'AppBundle:Email:quote/priceGuarantee.txt.twig',
                             ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl.$utm, 'price' => $price->getMonthlyPremiumPrice()]
                         );
-                        // @codingStandardsIgnoreEnd
                         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
                         $this->get('app.mixpanel')->queuePersonProperties([
                             '$email' => $lead->getEmail()
                         ], true);
                         $this->addFlash('success', sprintf(
-                            "Thanks! An email of your quote is on it's way"
+                            "Thanks! An email of your quote is on it's way to: %s", $lead->getEmail()
                         ));
+                        // @codingStandardsIgnoreEnd
                     }
                     if ($phone->getMemory()) {
                         return $this->redirectToRoute('phone_insurance_make_model_memory', [
@@ -226,9 +228,9 @@ class SearchController extends BaseController
     }
 
     /**
-     * @Route("/phone-search-dropdown", name="phone_search_dropdown")
-     * @Route("/phone-search-dropdown/{type}", name="phone_search_dropdown_type")
-     * @Route("/phone-search-dropdown/{type}/{id}", name="phone_search_dropdown_type_id")
+     * @Route("/phone-search-dropdown-three", name="phone_search_dropdown_three")
+     * @Route("/phone-search-dropdown-three/{type}", name="phone_search_dropdown_type_three")
+     * @Route("/phone-search-dropdown-three/{type}/{id}", name="phone_search_dropdown_type_id_three")
      * @Template()
      */
     public function phoneSearchDropdownCardLandingAction(Request $request, $type = null, $id = null)
@@ -246,7 +248,7 @@ class SearchController extends BaseController
 
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $this->generateUrl('phone_search_dropdown'),
+                'action' => $this->generateUrl('phone_search_dropdown_three'),
             ])
             ->getForm();
 
