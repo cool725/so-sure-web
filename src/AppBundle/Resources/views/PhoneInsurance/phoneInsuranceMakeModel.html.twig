@@ -128,7 +128,7 @@
                                     <li class="list-inline-item text-white"
                                         property="itemListElement"
                                         typeof="ListItem">
-                                        <span property="name">{% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }}</span>
+                                        <span property="name">{% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }}</span>
                                         <meta property="position" content="4">
                                     </li>
                                 </ul>
@@ -136,9 +136,9 @@
                         {% endif %}
                         <h1 class="text-white h1m mb-0">
                             {% if phone.active %}
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price|number_format(2) }} per month
+                                {% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price|number_format(2) }} per month
                             {% else %}
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance
+                                {% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance
                             {% endif %}
                         </h1>
                         {% if not phone.active %}
@@ -180,7 +180,7 @@
     {# Intro #}
     <section class="intro py-lg-5">
         <div class="container-large py-5">
-            <h2 class="h3 mb-4 text-primary text-center">Why insure your {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }} with so-sure</h2>
+            <h2 class="h3 mb-4 text-primary text-center">Why insure your {% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }} with so-sure</h2>
             {% block phone_hero_text %}{% endblock %}
             <div class="row">
                 {# TODO: Needs copy #}
@@ -239,7 +239,7 @@
                                  class="img-fluid lozad mb-4 d-lg-none"
                                  width="320px">
                         {% endif %}
-                        <h2 class="h3 mt-3 mb-4 text-primary">Why insure your {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }}?</h2>
+                        <h2 class="h3 mt-3 mb-4 text-primary">Why insure your {% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }}?</h2>
                         {% block phone_why_insure_text %}{% endblock %}
                         <a href="#" class="btn btn-success btn-block-xs mx-auto my-5 get-a-quote disabled">Get a Quote</a>
                     </div>
@@ -264,7 +264,7 @@
     {# Cover #}
     <section class="cover py-lg-5">
         <div class="container-large {% if hide_section == false %}pt-lg-5{% else %}pt-5{% endif %}">
-            <h2 class="h3 mb-5 text-primary text-center">Comprehensive {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }} Insurance that starts immediately</h2>
+            <h2 class="h3 mb-5 text-primary text-center">Comprehensive {% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }} Insurance that starts immediately</h2>
             <div class="d-none d-lg-block">
                 {% if hide_section == true %}
                     <div class="row">

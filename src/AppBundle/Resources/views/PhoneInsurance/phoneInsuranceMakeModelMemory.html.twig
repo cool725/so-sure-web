@@ -133,7 +133,7 @@
                                aria-expanded="false"
                                aria-controls="mem_sizes"
                                title="Not the phone you're looking for?">
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB)
+                                {% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB)
                             </a>
                         </h1>
                         {% set yearly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') %}

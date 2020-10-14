@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="text-center text-lg-left">
-                    <h2 class="h3 mb-3 text-primary">{% if phone is defined and phone %}{% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }}{% else %}Phone{% endif %} Insurance <br><span class="sub">FAQs</span></h2>
+                    <h2 class="h3 mb-3 text-primary">{% if phone is defined and phone %}{% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }}{% else %}Phone{% endif %} Insurance <br><span class="sub">FAQs</span></h2>
                     <p class="mb-4">Here's the top questions we get asked.</p>
                     <a href="{{ path('faq') }}" class="d-none d-md-inline btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
                 </div>
