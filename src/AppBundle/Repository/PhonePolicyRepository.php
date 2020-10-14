@@ -323,7 +323,8 @@ class PhonePolicyRepository extends PolicyRepository
         \DateTime $startDate = null,
         \DateTime $endDate = null,
         $emptyCancellation = true,
-        $metric = null
+        $metric = null,
+        $filter = null
     ) {
         return $this->findAllEndingPolicies(
             $cancellationReason,
@@ -332,7 +333,8 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate,
             false,
             $emptyCancellation,
-            $metric
+            $metric,
+            $filter
         )->count();
     }
 
@@ -346,7 +348,8 @@ class PhonePolicyRepository extends PolicyRepository
         \DateTime $endDate = null,
         $requestedCancellation = false,
         $emptyCancellation = true,
-        $metric = null
+        $metric = null,
+        $filter = null
     ) {
         if (!$endDate) {
             $endDate = \DateTime::createFromFormat('U', time());
@@ -375,6 +378,14 @@ class PhonePolicyRepository extends PolicyRepository
 
         if ($metric) {
             $qb->field('metrics')->equals($metric);
+        }
+
+        if ($filter) {
+            if ($filter === 'renewal') {
+                $qb->field('previousPolicy')->exists(true);
+            } elseif ($filter === 'new') {
+                $qb->field('previousPolicy')->exists(false);
+            }
         }
 
         if (!$onlyWithFNOL) {
