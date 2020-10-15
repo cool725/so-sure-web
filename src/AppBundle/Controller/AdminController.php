@@ -536,6 +536,7 @@ class AdminController extends BaseController
             $from = new \DateTime($request->get('from'), SoSure::getSoSureTimezone());
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             $stream = $this->getRequestString($request, 'stream');
+            $subvariant = $this->getRequestString($request, 'subvariant');
             try {
                 $policyTerms = $this->getLatestPolicyTerms();
                 $excess = $policyTerms->getDefaultExcess();
@@ -570,7 +571,7 @@ class AdminController extends BaseController
                 if ($request->get('picsure-theft-excess')) {
                     $picsureExcess->setTheft($request->get('picsure-theft-excess'));
                 }
-                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes, $stream);
+                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes, $stream, null, $subvariant);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
                 return new RedirectResponse($this->generateUrl('admin_phones'));
@@ -974,6 +975,10 @@ class AdminController extends BaseController
      *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
      * @Route("/bacs/reports/{year}/{month}", name="admin_bacs_reports",
      *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/reconciliation-debit/{year}/{month}", name="admin_bacs_reconciliation_debit",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
+     * @Route("/bacs/reconciliation-credit/{year}/{month}", name="admin_bacs_reconciliation_credit",
+     *     requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
      * @Template
      */
     public function bacsAction(Request $request, $year = null, $month = null)
@@ -1172,8 +1177,7 @@ class AdminController extends BaseController
             'currentSequence' => $currentSequence,
             'outstandingMandates' => $userRepo->findPendingMandates()->getQuery()->execute()->count(),
             'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
-            'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date),
-            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true),
+            'inputIncPrevMonth' => $s3FileRepo->getAllFiles($date, 'bacsReportInput', true)
         ];
 
         if ($request->get('_route') == 'admin_bacs_payments') {
@@ -1189,6 +1193,13 @@ class AdminController extends BaseController
                 'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
                 'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
                 'withdrawal' => $s3FileRepo->getAllFiles($date, 'bacsReportWithdrawal'),
+            ]);
+        } elseif (in_array(
+            $request->get('_route'),
+            ['admin_bacs_reconciliation_debit', 'admin_bacs_reconciliation_credit']
+        )) {
+            $data = array_merge($data, [
+                'paymentsIncPrevNextMonth' => $paymentsRepo->findPaymentsIncludingPreviousNextMonth($date)
             ]);
         }
 

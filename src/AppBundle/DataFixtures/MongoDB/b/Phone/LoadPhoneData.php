@@ -222,12 +222,6 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             if ($data[5]) {
                 $premium = $data[5] + 1.5;
             }
-            /*
-            // devices
-            if (!$data[4]) {
-                return;
-            }
-            */
 
             $devices = str_getcsv($data[4], ",", "'");
             foreach ($devices as $device) {
@@ -281,6 +275,24 @@ abstract class LoadPhoneData implements ContainerAwareInterface
                 $data[8], // $initialPriceUrl
                 $date
             );
+            if ($premium > 0) {
+                $damagePrice = new PhonePrice();
+                $damagePrice->setMonthlyPremiumPrice($premium * 0.8, $date);
+                $damagePrice->setValidFrom($date);
+                $damagePrice->setExcess($latestTerms->getDefaultExcess());
+                $damagePrice->setPicSureExcess($latestTerms->getDefaultPicSureExcess());
+                $damagePrice->setStream(PhonePrice::STREAM_ALL);
+                $damagePrice->setSubvariant('damage');
+                $essentialsPrice = new PhonePrice();
+                $essentialsPrice->setMonthlyPremiumPrice($premium * 0.9, $date);
+                $essentialsPrice->setValidFrom($date);
+                $essentialsPrice->setExcess($latestTerms->getDefaultExcess());
+                $essentialsPrice->setPicSureExcess($latestTerms->getDefaultPicSureExcess());
+                $essentialsPrice->setStream(PhonePrice::STREAM_ALL);
+                $essentialsPrice->setSubvariant('essentials');
+                $phone->addPhonePrice($damagePrice);
+                $phone->addPhonePrice($essentialsPrice);
+            }
 
             if ($phone->getMake() == 'LG' && in_array($phone->getModel(), ['Nexus 5', 'Nexus 5X'])) {
                 $phone->setAlternativeMake('Google');

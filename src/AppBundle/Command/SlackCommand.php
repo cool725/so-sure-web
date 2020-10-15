@@ -250,7 +250,7 @@ class SlackCommand extends ContainerAwareCommand
 
         $weekText = '';
         $start = new \DateTime('2016-12-05', SoSure::getSoSureTimezone());
-        $targetEnd = new \DateTime('2019-09-01', SoSure::getSoSureTimezone());
+        $targetEnd = new \DateTime('2020-12-31', SoSure::getSoSureTimezone());
         $dowOffset = 0;
 
         $startOfDay = $this->startOfDay();
@@ -270,7 +270,7 @@ class SlackCommand extends ContainerAwareCommand
             $end->format('d/m/Y'),
             $weeksRemaining
         );
-        $growthTarget = 10000;
+        $growthTarget = 25000;
 
         $yesterday = $this->subDays($startOfDay, 1);
         $oneWeekAgo = $this->subDays($startOfDay, 7);
@@ -279,6 +279,7 @@ class SlackCommand extends ContainerAwareCommand
         $renewal = 0;
         $upgrade = 0;
         $policies = $repo->findAllStartedPolicies($yesterday, $startOfDay);
+        /** @var PhonePolicy $policy */
         foreach ($policies as $policy) {
             if ($policy->hasPreviousPolicy()) {
                 $renewal++;
@@ -288,7 +289,22 @@ class SlackCommand extends ContainerAwareCommand
                 $gross++;
             }
         }
-        $cooloff = $repo->countAllEndingPolicies(Policy::CANCELLED_COOLOFF, $yesterday, $startOfDay);
+        $coolofsRenewal = $repo->countAllEndingPolicies(
+            Policy::CANCELLED_COOLOFF,
+            $yesterday,
+            $startOfDay,
+            true,
+            null,
+            'renewal'
+        );
+        $coolofsNew = $repo->countAllEndingPolicies(
+            Policy::CANCELLED_COOLOFF,
+            $yesterday,
+            $startOfDay,
+            true,
+            null,
+            'new'
+        );
         $cancellations = $repo->countEndingByStatus(Policy::STATUS_CANCELLED, $yesterday, $startOfDay);
         $weekStart = $repo->countAllActivePolicies($startOfWeek);
         $weekTarget = ($growthTarget - $weekStart) / $weeksRemaining;
@@ -297,12 +313,13 @@ class SlackCommand extends ContainerAwareCommand
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            "*%s*\n\nGross Policies (last 24 hours): *%d*\nNet Policies (last 24 hours): *%d*\nNon cooloff cancellations (last 24 hours): *%d*\nRenewals (last 24 hours): *%d*\nUpgrades (last 24 hours): *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: *%d*\nWeekly Remaining: *%d*\n\nOverall Target (%s): %d\nOverall Actual: *%d*\nOverall Remaining: *%d*\n\n_*Data as of %s (Europe/London)*_",
+            "*%s*\n\nGross New Policies (last 24 hours): *%d*\nNet New Policies (last 24 hours): *%d*\nNon cooloff cancellations (last 24 hours): *%d*\nRenewals (last 24 hours): *%d*\nRenewals cooloff (last 24 hours): *%d*\nUpgrades (last 24 hours): *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: *%d*\nWeekly Remaining: *%d*\n\nOverall Target (%s): %d\nOverall Actual: *%d*\nOverall Remaining: *%d*\n\n_*Data as of %s (Europe/London)*_",
             $weekText,
             $gross,
-            $gross - $cooloff,
-            $cancellations - $cooloff,
+            $gross - $coolofsNew,
+            $cancellations - ($coolofsNew + $coolofsRenewal),
             $renewal,
+            $coolofsRenewal,
             $upgrade,
             $weekTarget,
             $weekTargetIncCancellations,

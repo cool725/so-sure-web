@@ -9,6 +9,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Classes\NoOp;
+use AppBundle\Tests\Create;
 
 /**
  * @group unit
@@ -304,6 +305,65 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     {
         $phone = new Phone();
         $phone->setModel('A-Plus');
+    }
+
+    /**
+     * Tests that when there are subvariant phone prices in amongst the normal phone prices nothing strange happens for
+     * either type.
+     */
+    public function testGetSubvariantPhonePrices()
+    {
+        $phone = new Phone();
+        $j = Create::phonePrice("2020-07-29", PhonePrice::STREAM_YEARLY, "abba");
+        $q = Create::phonePrice("2020-05-19", PhonePrice::STREAM_ALL, "camel");
+        $i = Create::phonePrice("2020-04-25", PhonePrice::STREAM_YEARLY, "abba");
+        $d = Create::phonePrice("2020-04-04", PhonePrice::STREAM_YEARLY);
+        $c = Create::phonePrice("2020-02-12", PhonePrice::STREAM_YEARLY);
+        $m = Create::phonePrice("2020-02-08", PhonePrice::STREAM_MONTHLY, "camel");
+        $e = Create::phonePrice("2020-01-01", PhonePrice::STREAM_ALL);
+        $k = Create::phonePrice("2019-11-24", PhonePrice::STREAM_ALL, "abba");
+        $l = Create::phonePrice("2019-10-13", PhonePrice::STREAM_ALL, "abba");
+        $g = Create::phonePrice("2019-09-04", PhonePrice::STREAM_MONTHLY, "abba");
+        $p = Create::phonePrice("2019-08-15", PhonePrice::STREAM_YEARLY, "camel");
+        $f = Create::phonePrice("2019-07-15", PhonePrice::STREAM_ALL);
+        $a = Create::phonePrice("2019-07-08", PhonePrice::STREAM_MONTHLY);
+        $h = Create::phonePrice("2019-04-04", PhonePrice::STREAM_MONTHLY, "abba");
+        $o = Create::phonePrice("2019-03-29", PhonePrice::STREAM_YEARLY, "camel");
+        $r = Create::phonePrice("2019-03-10", PhonePrice::STREAM_ALL, "camel");
+        $n = Create::phonePrice("2019-03-04", PhonePrice::STREAM_MONTHLY, "camel");
+        $b = Create::phonePrice("2019-02-16", PhonePrice::STREAM_MONTHLY);
+        $phone->addPhonePrice($a);
+        $phone->addPhonePrice($b);
+        $phone->addPhonePrice($c);
+        $phone->addPhonePrice($d);
+        $phone->addPhonePrice($e);
+        $phone->addPhonePrice($f);
+        $phone->addPhonePrice($g);
+        $phone->addPhonePrice($h);
+        $phone->addPhonePrice($i);
+        $phone->addPhonePrice($j);
+        $phone->addPhonePrice($k);
+        $phone->addPhonePrice($l);
+        $phone->addPhonePrice($m);
+        $phone->addPhonePrice($n);
+        $phone->addPhonePrice($o);
+        $phone->addPhonePrice($p);
+        $phone->addPhonePrice($q);
+        $phone->addPhonePrice($r);
+        // check that they are found rightly.
+        $date = new \DateTime('2020-05-28');
+        $this->assertEquals([$e, $f, $a, $b], $phone->getOrderedPhonePrices(PhonePrice::STREAM_MONTHLY));
+        $this->assertEquals([$d, $c, $e, $f], $phone->getOrderedPhonePrices(PhonePrice::STREAM_YEARLY));
+        $this->assertEquals([$k, $l, $g, $h], $phone->getOrderedPhonePrices(PhonePrice::STREAM_MONTHLY, "abba"));
+        $this->assertEquals([$j, $i, $k, $l], $phone->getOrderedPhonePrices(PhonePrice::STREAM_YEARLY, "abba"));
+        $this->assertEquals([$q, $m, $r, $n], $phone->getOrderedPhonePrices(PhonePrice::STREAM_MONTHLY, "camel"));
+        $this->assertEquals([$q, $p, $o, $r], $phone->getOrderedPhonePrices(PhonePrice::STREAM_YEARLY, "camel"));
+        $this->assertEquals($e, $phone->getCurrentMonthlyPhonePrice($date));
+        $this->assertEquals($d, $phone->getCurrentYearlyPhonePrice($date));
+        $this->assertEquals($k, $phone->getCurrentMonthlyPhonePrice($date, "abba"));
+        $this->assertEquals($i, $phone->getCurrentYearlyPhonePrice($date, "abba"));
+        $this->assertEquals($q, $phone->getCurrentMonthlyPhonePrice($date, "camel"));
+        $this->assertEquals($q, $phone->getCurrentYearlyPhonePrice($date, "camel"));
     }
 
     /**

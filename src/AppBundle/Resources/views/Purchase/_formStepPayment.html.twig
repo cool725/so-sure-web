@@ -30,9 +30,9 @@
                                 <h6 class="radio-btn__title">Pay Monthly</h6>
                                 <hr class="my-2" />
                                 <div class="radio-btn__price"><strong>&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong></div>      
-                                <small class="mb-2 d-inline-block">&nbsp;</small><br>
-                                <small>Total &pound;{{ withoutDiscount }}</small><br>
-                                <small>Billed monthly</small>
+                                <small class="mb-2 d-inline-block">Billed monthly</small><br>
+                                <small>&pound;{{ withoutDiscount }} a year</small><br>
+                                <small>&nbsp;</small>
                             </div>
                         </div>
                     </div>
@@ -49,10 +49,10 @@
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title">Pay Yearly</h6>
                                 <hr class="my-2" />
-                                <div class="radio-btn__price"><strong class="text-columbia-blue-e">&pound;{{ yearlyMonthly }}</strong></div>
-                                <small class="mb-2 d-inline-block">Monthly equivalent</small><br>
-                                <small>Total &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</small><br>
-                                <small>Billed yearly</small>
+                                <div class="radio-btn__price"><strong>&pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</strong></div>
+                                <small class="mb-2 d-inline-block">Billed yearly</small><br>
+                                <small>&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }} per month</small><br>
+                                <small>&nbsp;</small>
                             </div>
                         </div>
                     </div>

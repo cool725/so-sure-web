@@ -95,11 +95,7 @@
                         {% set difference = monthlyYearly - yearly %}             
                         <div class="qpw__h3 h4 text-center text-lg-left text-white mb-4 fit">                            
                             {% if not app.user or app.user.allowedMonthly %}                  
-                                {% if pricing_messaging_experiment is defined and pricing_messaging_experiment == 'copy-d' %}
-                                    &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
-                                {% else %}
-                                    &pound;{{ monthly }} <span class="sub">per month - <br>Save</span> &pound;{{ difference|number_format(0, '.', ',') }} <span class="sub">if you pay yearly</span>                                
-                                {% endif %}
+                                &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
                             {% else %}
                                 <span class="sub">For only</span> &pound;{{ yearly }} <span class="sub">a year</span>
                             {% endif %}
@@ -120,7 +116,7 @@
                                 <ul class="list-unstyled icn-fa-list">
                                     <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Fast replace and repair service</li>
                                     <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> FREE month when you refer a friend</li>
-                                    <li class="text-white"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Low price and excess from &pound;50</li>
+                                    <li class="text-white"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Low price and excess from &pound;{{ prices['monthly'].picsureexcess.damage }}</li>
                                 </ul>
                             </div>
                             <div class="qpw__footer__cta">

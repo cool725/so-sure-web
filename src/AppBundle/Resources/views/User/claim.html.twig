@@ -107,6 +107,7 @@
                                             {{ form_label(claim_form.policyNumber) }}
                                             {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'e.g. Mob/2016/40000001'}}) }}
                                             <div class="with-errors">{{ form_errors(claim_form.policyNumber) }}</div>
+                                            <div class="with-errors">{{ form_errors(claim_form) }}</div>
                                         </div>
                                         <div class="form-row">
                                             <div class="col-md form-group">

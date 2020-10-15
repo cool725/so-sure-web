@@ -10,6 +10,9 @@ use AppBundle\Validator\Constraints as AppAssert;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
+/**
+ * @AppAssert\PolicyClaimAllowed
+ */
 class ClaimFnol
 {
     use DateTrait;

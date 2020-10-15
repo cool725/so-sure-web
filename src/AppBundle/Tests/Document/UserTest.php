@@ -9,7 +9,6 @@ use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
-use AppBundle\Document\Offer;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Address;

@@ -191,14 +191,22 @@ class PhonePolicyRepository extends PolicyRepository
     }
 
     /**
-     * All policies that are active (excluding so-sure test ones)
+     * All policies that are active (excluding so-sure test ones).
+     * @param \DateTime|null $startDate date from which to start including policies, with null meaning no minimum.
+     * @param \DateTime|null $endDate   date from which to start excluding policies, with null meaning no maximum.
+     * @param int            $limit     maximum number of policies to return, with anything below 1 meaning no maximum.
+     * @param int            $skip      number of initial results to skip.
+     * @return Cursor over the query results.
      */
-    public function findAllStartedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
-    {
+    public function findAllStartedPolicies(
+        \DateTime $startDate = null,
+        \DateTime $endDate = null,
+        $limit = 0,
+        $skip = 0
+    ) {
         if (!$endDate) {
             $endDate = \DateTime::createFromFormat('U', time());
         }
-
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
@@ -210,7 +218,6 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_EXPIRED_WAIT_CLAIM,
             ])
             ->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
-
         $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
@@ -218,9 +225,44 @@ class PhonePolicyRepository extends PolicyRepository
         if ($this->excludedPolicyIds) {
             $this->addExcludedPolicyQuery($qb, 'id');
         }
+        if ($limit > 0) {
+            $qb->limit($limit);
+        }
+        if ($skip >0) {
+            $qb->skip($skip);
+        }
+        return $qb->getQuery()->execute();
+    }
 
-        return $qb->getQuery()
-            ->execute();
+    /**
+     * Finds all started policies but does so making a number of small queries and returns the results one by one.
+     * @param \DateTime|null $startDate is the minimum date.
+     * @param \DateTime|null $endDate   is the maximum date.
+     * @param int            $limit     is the maximum number of policies to return with any value < 1 meaning not to
+     *                                  limit.
+     * @param int            $batchSize is the number of policies to query at once.
+     * @return \Generator which produces all policies.
+     */
+    public function findAllStartedPoliciesBatched(
+        \DateTime $startDate = null,
+        \DateTime $endDate = null,
+        $limit = 0,
+        $batchSize = 666
+    ) {
+        $n = 0;
+        $limit = ($limit > 0) ? $limit : PHP_INT_MAX;
+        while ($n < $limit) {
+            $yieldSize = ($batchSize > $limit - $n) ? ($limit - $n) : $batchSize;
+            $policies = $this->findAllStartedPolicies($startDate, $endDate, $yieldSize, $n)->toArray();
+            $count = count($policies);
+            foreach ($policies as $policy) {
+                yield $policy;
+            }
+            $n += $yieldSize;
+            if ($count < $batchSize) {
+                break;
+            }
+        }
     }
 
     public function countAllStartedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
@@ -281,7 +323,8 @@ class PhonePolicyRepository extends PolicyRepository
         \DateTime $startDate = null,
         \DateTime $endDate = null,
         $emptyCancellation = true,
-        $metric = null
+        $metric = null,
+        $filter = null
     ) {
         return $this->findAllEndingPolicies(
             $cancellationReason,
@@ -290,7 +333,8 @@ class PhonePolicyRepository extends PolicyRepository
             $endDate,
             false,
             $emptyCancellation,
-            $metric
+            $metric,
+            $filter
         )->count();
     }
 
@@ -304,7 +348,8 @@ class PhonePolicyRepository extends PolicyRepository
         \DateTime $endDate = null,
         $requestedCancellation = false,
         $emptyCancellation = true,
-        $metric = null
+        $metric = null,
+        $filter = null
     ) {
         if (!$endDate) {
             $endDate = \DateTime::createFromFormat('U', time());
@@ -333,6 +378,14 @@ class PhonePolicyRepository extends PolicyRepository
 
         if ($metric) {
             $qb->field('metrics')->equals($metric);
+        }
+
+        if ($filter) {
+            if ($filter === 'renewal') {
+                $qb->field('previousPolicy')->exists(true);
+            } elseif ($filter === 'new') {
+                $qb->field('previousPolicy')->exists(false);
+            }
         }
 
         if (!$onlyWithFNOL) {

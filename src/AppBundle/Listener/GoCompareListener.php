@@ -47,7 +47,9 @@ class GoCompareListener
         if ($user->getAttribution() && $user->getAttribution()->getGoCompareQuote()) {
             /** @var PhonePolicy $policy */
             $policy = $event->getPolicy();
-            return $this->notifyGoCompare($policy);
+            if (!$policy->hasPreviousPolicy()) {
+                return $this->notifyGoCompare($policy);
+            }
         }
 
         return false;

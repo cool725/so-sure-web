@@ -40,6 +40,7 @@ $tropical-blue:        #c9dbf6;
 $gun-powder:           #464661;
 $aquamarine:           #6cf3b4;
 $froly:                #f36c6c;
+$tan-hide:             #f9a34a;
 
 // New A/B Test colours
 $pictonblue:           #398ef0;
@@ -50,11 +51,12 @@ $malibu:               #8cc5f7;
 $blacksqueeze:         #f4f8fB;
 
 // Brands
-$facebook: #3B5998;
-$google:   #df4A32;
-$starling: #7420FF;
-$twitter:  #00aced;
-$whatsapp: #25d366;
+$facebook:      #3B5998;
+$google:        #df4A32;
+$starling:      #7420FF;
+$starling-dark: #1d2346;
+$twitter:       #00aced;
+$whatsapp:      #25d366;
 
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
@@ -83,6 +85,7 @@ $theme-colors: (
     "facebook":             $facebook,
     "google":               $google,
     "starling":             $starling,
+    "starling-dark":        $starling-dark,
     "twitter":              $twitter,
     "whatsapp":             $whatsapp,
     "bright-yellow":        $bright-yellow,
@@ -98,7 +101,8 @@ $theme-colors: (
     "tropical-blue":        $tropical-blue,
     "gun-powder":           $gun-powder,
     "aquamarine":           $aquamarine,
-    "froly":                $froly
+    "froly":                $froly,
+    "tan-hide":            $tan-hide
 );
 
 // Bootstrap overides

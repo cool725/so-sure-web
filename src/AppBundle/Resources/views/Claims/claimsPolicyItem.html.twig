@@ -142,6 +142,9 @@
                                     <td>Underwriter</td>
                                     <td>{{ policy.underwriterName }}</td>
                                 </tr>
+                                <tr>
+                                    <td>Policy Type</td>
+                                    <td> {{ policy.subvariantName }}</td>
                                 {% endif %}
                             </table>
                         </div>
@@ -909,21 +912,6 @@
                     <td>Chase Payment<br> (Policy Cancelled w/Successful Claim)</td>
                     <td>{% if policy.user.hasPolicyCancelledAndPaymentOwed %}Yes{% else %}No{% endif %}</td>
                 </tr>
-                {# Offers not yet implemented.
-                <tr>
-                    <td>Offers</td>
-                    <td>
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userOffers">
-                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            View Eligible Offers
-                        </button>
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#createOfferForm">
-                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            Create Offer
-                        </button>
-                    </td>
-                </tr>
-                #}
             </table>
             {% if policy.namedUser %}
             <h2>Additional Named User</h2>

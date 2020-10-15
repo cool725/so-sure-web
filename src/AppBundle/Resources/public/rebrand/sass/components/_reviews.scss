@@ -1,7 +1,6 @@
 // reviews.scss
 
 .review {
-    // min-height: 330px;
     background-color: $white;
     text-align: center;
     opacity: 0.6;
@@ -51,13 +50,8 @@
         @include border-bottom-radius(12px);
     }
 
-    &__rating {
-
-    }
-
     &__controls {
         display: none;
-        // width: 96px; height: 48px;
         position: absolute;
         top: 0; right: 0;
         z-index: 2000;
@@ -117,7 +111,7 @@
 
     @include media-breakpoint-up(lg) {
         // min-height: none;
-        height: 275px;
+        // height: 275px;
         text-align: left;
         // Remove Push down
         margin-top: 0;
@@ -125,11 +119,12 @@
 }
 
 .rewiew-slide {
-    width: 80%; height: 400px;
+    width: 80%;
     margin-right: 1rem;
+    padding-bottom: 2rem;
 
     @include media-breakpoint-up(lg) {
-        width: 40%; height: 300px;
+        width: 40%;
         margin-right: 70px;
     }
 
@@ -151,3 +146,84 @@
         }
     }
 }
+
+.reviews-mobile {
+
+    &-controls {
+        height: 40px;
+        margin-bottom: 3rem;
+        display: flex;
+        justify-content: flex-end;
+
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; height: 40px;
+            color: $white;
+            background-color: $primary;
+
+            &:hover {
+                cursor: pointer;
+                background-color: darken($primary, 20%);
+                color: darken($white, 10%);
+                text-decoration: none;
+            }
+
+            &.disabled {
+                cursor: default;
+                pointer-events: none;
+                text-decoration: none;
+                background-color: darken($primary, 10%);
+                color: darken($athens-gray, 15%);
+            }
+        }
+    }
+
+    &-item {
+        display: none;
+
+        &.active {
+            display: block;
+            opacity: 1;
+            animation-iteration-count: 1;
+            animation-timing-function: ease-in;
+            animation-duration: 0.5s;
+        }
+
+        &.fade-out {
+            animation-name: fadeOut;
+        }
+    }
+}
+
+@keyframes fadeInRight {
+    0% {
+       opacity: 0;
+       transform: translateX(50px);
+    }
+    100% {
+       opacity: 1;
+       transform: translateX(0);
+    }
+ }
+
+ @keyframes fadeInLeft {
+    0% {
+       opacity: 0;
+       transform: translateX(-50px);
+    }
+    100% {
+       opacity: 1;
+       transform: translateX(0);
+    }
+ }
+
+ @keyframes fadeOut {
+    0% {
+       opacity: 0;
+    }
+    100% {
+       opacity: 1;
+    }
+ }

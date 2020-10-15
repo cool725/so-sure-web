@@ -6,10 +6,12 @@ use AppBundle\Classes\Salva;
 use AppBundle\Classes\NoOp;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Exception\DirectDebitBankException;
 use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\SubvariantRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Service\InvitationService;
@@ -602,6 +604,15 @@ class ApiAuthController extends BaseController
                 );
             }
 
+            $subvariant = null;
+            $subvariantString = $this->getDataString($phonePolicyData, 'subvariant');
+            $aggregator = ($subvariantString != null);
+            if ($subvariantString) {
+                /** @var SubvariantRepository $subvariantRepo */
+                $subvariantRepo = $this->getManager()->getRepository(Subvariant::class);
+                $subvariant = $subvariantRepo->getSubvariantByName($subvariantString);
+            }
+
             $policyService = $this->get('app.policy');
             $policyService->setWarnMakeModelMismatch(false);
             $policy = $policyService->init(
@@ -615,7 +626,9 @@ class ApiAuthController extends BaseController
                     'device' => $this->getDataString($phonePolicyData, 'device'),
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
                 ]),
-                $modelNumber
+                $modelNumber,
+                $aggregator,
+                $subvariant
             );
             $policy->setName($this->conformAlphanumericSpaceDot($this->getDataString($phonePolicyData, 'name'), 100));
 
@@ -1245,7 +1258,7 @@ class ApiAuthController extends BaseController
                 $bankAccount->setAccountName($accountName);
                 $bankAccount->setReference($mandate);
                 $bankAccount->setIdentityLog($this->getIdentityLog($request));
-                
+
 
                 // todo: record/bill initial amount
                 $initialAmount = $this->getDataString($bacsData, 'initial_amount');
@@ -1676,20 +1689,20 @@ class ApiAuthController extends BaseController
                 $imei->addMetadata('imei-suspected-fraud', $result['Metadata']['suspected-fraud']);
                 if ($result['Metadata']['suspected-fraud'] === "1") {
                     $policy->setImeiCircumvention(true);
-                    /** @var MailerService $mailer */
-                    $mailer = $this->get('app.mailer');
-                    /** @var RouterService $router */
-                    $router = $this->get('app.router');
-                    $body = sprintf(
-                        '<a href="%s">%s</a>',
-                        $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
-                        $policy->getPolicyNumber()
-                    );
-                    $mailer->send(
-                        'Detected imei circumvention attempt',
-                        'tech+ops@so-sure.com',
-                        $body
-                    );
+                    // /** @var MailerService $mailer */
+                    // $mailer = $this->get('app.mailer');
+                    // /** @var RouterService $router */
+                    // $router = $this->get('app.router');
+                    // $body = sprintf(
+                    //     '<a href="%s">%s</a>',
+                    //     $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                    //     $policy->getPolicyNumber()
+                    // );
+                    // $mailer->send(
+                    //     'Detected imei circumvention attempt',
+                    //     'tech+ops@so-sure.com',
+                    //     $body
+                    // );
                 } else {
                     $policy->setImeiCircumvention(false);
                 }
@@ -2528,23 +2541,14 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
-            /*
-            // The way the client currently works, checking billing details is problematic
-            // Removing for now - could look at having the client choose which quote request to use
-            if (!$user->hasValidBillingDetails()) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_USER_INVALID_ADDRESS,
-                    'Invalid billing address',
-                    422
-                );
-            }
-            */
             $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
             $make = $this->getRequestString($request, 'make');
             $device = $this->getRequestString($request, 'device');
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
+            $data = json_decode($request->getContent(), true)['body'];
+            $subvariantString = $this->getDataString($data, 'subvariant');
             $quoteService = $this->get('app.quote');
             $quoteData = $quoteService->getQuotes($make, $device, $memory, $rooted);
             $phones = $quoteData['phones'];
@@ -2560,7 +2564,7 @@ class ApiAuthController extends BaseController
             /** @var Phone $phone */
             foreach ($phones as $phone) {
                 $hasPolicyWithSamePhone = $hasPolicyWithSamePhone || $user->hasPolicyWithSamePhone($phone);
-                if ($quote = $phone->asQuoteApiArray($postcodeService, $user)) {
+                if ($quote = $phone->asQuoteApiArray($postcodeService, $user, $subvariantString)) {
                     $quotes[] = $quote;
                 }
             }
@@ -2765,17 +2769,36 @@ class ApiAuthController extends BaseController
             $priceService = $this->get("app.price");
 
             $stream = PhonePrice::installmentsStream($policy->getPremiumInstallments());
+            $subvariant = $policy->getSubvariant();
             $futurePayments = $policy->countFutureInvoiceSchedule();
             if ($futurePayments == 0) {
-                $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+                $newPhonePremium = $priceService->getPhonePremium(
+                    $policy,
+                    $newPhone,
+                    $stream,
+                    null,
+                    $now,
+                    $subvariant ? $subvariant->getName() : null
+                );
                 $upgradePremium = $policy->getPremiumUpgradeCostYearly($newPhonePremium, $now);
             } else {
-                $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+                $newPhonePremium = $priceService->getPhonePremium(
+                    $policy,
+                    $newPhone,
+                    $stream,
+                    null,
+                    $now,
+                    $subvariant ? $subvariant->getName() : null
+                );
                 $upgradePremium = $policy->getPremiumUpgradeCostMonthly($newPhonePremium, $now);
             }
-
-            $oldPhonePremium = $priceService->getPhonePolicyPremium($policy, $stream, null, $now);
-
+            $oldPhonePremium = $priceService->getPhonePolicyPremium(
+                $policy,
+                $stream,
+                null,
+                $now,
+                $subvariant ? $subvariant->getName() : null
+            );
             $quote = [];
             $quote['stream'] = $stream;
             $quote['old_premium'] = $oldPhonePremium->getAdjustedStandardMonthlyPremiumPrice();
@@ -2789,6 +2812,8 @@ class ApiAuthController extends BaseController
             $quote['make'] = $newPhone->getMake();
             $quote['model'] = $newPhone->getModel();
             $quote['memory'] = $newPhone->getMemory();
+            $quote['max_connections'] = $policy->getMaxConnections();
+            $quote['max_pot'] = $policy->getMaxPot();
 
             return new JsonResponse($quote);
         } catch (AccessDeniedException $e) {

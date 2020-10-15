@@ -863,18 +863,18 @@ class ReceperioService extends BaseImeiService
     {
         // This case occurs occasionally
         if (isset($data['makes']) && count($data['makes']) == 0) {
-            // @codingStandardsIgnoreStart
-            $this->mailer->send(
-                sprintf('Empty Data Response for %s', $serialNumber),
-                'tech+ops@so-sure.com',
-                sprintf(
-                    "A recent make/model query via %s for %s returned a successful response but without any data in the makes field. If apple, verify at https://sndeep.info/en?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?",
-                    $this->viaText(),
-                    $serialNumber,
-                    $serialNumber,
-                    $serialNumber
-                )
-            );
+            // // @codingStandardsIgnoreStart
+            // $this->mailer->send(
+            //     sprintf('Empty Data Response for %s', $serialNumber),
+            //     'tech+ops@so-sure.com',
+            //     sprintf(
+            //         "A recent make/model query via %s for %s returned a successful response but without any data in the makes field. If apple, verify at https://sndeep.info/en?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?",
+            //         $this->viaText(),
+            //         $serialNumber,
+            //         $serialNumber,
+            //         $serialNumber
+            //     )
+            // );
             // @codingStandardsIgnoreEnd
             $this->statsd->increment('recipero.makeModelEmptyMakes');
 
@@ -988,12 +988,12 @@ class ReceperioService extends BaseImeiService
 
     public function isSameApplePhone(Phone $phone, $serialNumber, $modelData, $data, $warnMismatch = true)
     {
-
-        if (mb_strtolower($modelData['name']) != mb_strtolower($phone->getModel())) {
+        $conformed = mb_strtolower(mb_ereg_replace('[()]', '', $phone->getModel()));
+        if (mb_strtolower($modelData['name']) != $conformed) {
             $this->statsd->increment('recipero.makeModelMismatch');
             $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
-                $phone->getModel(),
+                $conformed,
                 $serialNumber,
                 json_encode($data)
             );

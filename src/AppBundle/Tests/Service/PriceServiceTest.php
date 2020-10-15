@@ -8,7 +8,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\User;
-use AppBundle\Document\Offer;
 use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Service\PriceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -79,51 +78,6 @@ class PriceServiceTest extends WebTestCase
                 new \DateTime('2019-03-09')
             )
         );
-        // with offers present.
-        $offerA = new Offer();
-        $offerB = new Offer();
-        $offerC = new Offer();
-        $offerPriceA = new PhonePrice();
-        $offerPriceB = new PhonePrice();
-        $offerPriceC = new PhonePrice();
-        $offerPriceA->setStream(PhonePrice::STREAM_MONTHLY);
-        $offerPriceB->setStream(PhonePrice::STREAM_YEARLY);
-        $offerPriceC->setStream(PhonePrice::STREAM_ALL);
-        $offerPriceA->setValidFrom(new \DateTime("2019-03-01"));
-        $offerPriceB->setValidFrom(new \DateTime("2019-03-01"));
-        $offerPriceC->setValidFrom(new \DateTime("2019-03-01"));
-        $offerA->setPrice($offerPriceA);
-        $offerB->setPrice($offerPriceB);
-        $offerC->setPrice($offerPriceC);
-        $offerA->setPhone($data["phone"]);
-        $offerB->setPhone($data["phone"]);
-        $offerC->setPhone($data["phone"]);
-        $data["user"]->addOffer($offerA);
-        $data["user"]->addOffer($offerB);
-        $offerA->addUser($data["user"]);
-        $offerB->addUser($data["user"]);
-        self::$dm->persist($offerA);
-        self::$dm->persist($offerB);
-        self::$dm->persist($offerC);
-        self::$dm->flush();
-        $this->assertEquals(
-            ["price" => $offerPriceA, "source" => $offerA],
-            self::$priceService->userPhonePriceSource(
-                $data["user"],
-                $data["phone"],
-                PhonePrice::STREAM_MONTHLY,
-                new \DateTime('2019-05-19')
-            )
-        );
-        $this->assertEquals(
-            ["price" => $offerPriceB, "source" => $offerB],
-            self::$priceService->userPhonePriceSource(
-                $data["user"],
-                $data["phone"],
-                PhonePrice::STREAM_YEARLY,
-                new \DateTime('2019-05-19')
-            )
-        );
     }
 
     /**
@@ -132,16 +86,6 @@ class PriceServiceTest extends WebTestCase
     public function testPolicySetPhonePremium()
     {
         $data = $this->userData();
-        $offer = new Offer();
-        $offerPrice = new PhonePrice();
-        $offerPrice->setGwp(41);
-        $offerPrice->setValidFrom(new \DateTime("2019-05-01"));
-        $offerPrice->setStream(PhonePrice::STREAM_YEARLY);
-        $offer->setPrice($offerPrice);
-        $offer->setPhone($data["phone"]);
-        $offer->addUser($data["user"]);
-        $data["user"]->addOffer($offer);
-        self::$dm->persist($offer);
         self::$dm->flush();
         self::$priceService->setPhonePolicyPremium(
             $data["policy"],
@@ -157,7 +101,6 @@ class PriceServiceTest extends WebTestCase
             0,
             new \DateTime('2019-07-08')
         );
-        $this->assertEquals("offer", $data["policy"]->getPremium()->getSource());
         $this->assertEquals(41, $data["policy"]->getPremium()->getGwp());
         self::$priceService->setPhonePolicyPremium(
             $data["policy"],

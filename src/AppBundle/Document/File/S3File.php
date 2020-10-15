@@ -35,6 +35,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "picsure"="PicSureFile",
  *      "accesspay"="AccessPayFile",
  *      "bacsReportAddacs"="BacsReportAddacsFile",
+ *      "bacsReportAwacs"="BacsReportAwacsFile",
  *      "bacsReportAuddis"="BacsReportAuddisFile",
  *      "bacsReportArudd"="BacsReportAruddFile",
  *      "bacsReportDdic"="BacsReportDdicFile",

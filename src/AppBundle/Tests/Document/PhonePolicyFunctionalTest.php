@@ -3434,11 +3434,11 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
 
-        $this->assertEquals('INVALID', $sosurePolicy->getPolicyPrefix('prod'));
-        $this->assertNull($policy->getPolicyPrefix('prod'));
+        $this->assertEquals('INVALID', $sosurePolicy->getPolicyPrefix());
+        $this->assertNull($policy->getPolicyPrefix());
 
-        $this->assertEquals('TEST', $sosurePolicy->getPolicyPrefix('test'));
-        $this->assertEquals('TEST', $policy->getPolicyPrefix('test'));
+        $this->assertEquals('TEST', $sosurePolicy->getPolicyPrefix());
+        $this->assertEquals('TEST', $policy->getPolicyPrefix());
     }
 
     public function testHasPolicyPrefix()

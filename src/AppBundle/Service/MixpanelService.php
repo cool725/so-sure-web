@@ -66,6 +66,7 @@ class MixpanelService
     const EVENT_QUOTE_PAGE_PURCHASE = 'Quote Page Purchase Step';
     // Unused, but reserved
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
+    const EVENT_MODEL_PAGE = 'Model Page';
 
     // Company Page
     const EVENT_COMPANY_PHONES = 'Company Phones Page';
@@ -157,6 +158,7 @@ class MixpanelService
         self::EVENT_QUOTE_PAGE,
         self::EVENT_QUOTE_PAGE_PURCHASE,
         self::EVENT_MANUFACTURER_PAGE,
+        self::EVENT_MODEL_PAGE,
         self::EVENT_LANDING_PAGE,
         self::EVENT_CPC_QUOTE_PAGE,
         self::EVENT_CPC_MANUFACTURER_PAGE,

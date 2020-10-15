@@ -1,0 +1,280 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <style>
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.5;
+            font-size: 12px;
+            margin-bottom: 20mm;
+            margin-left: 20mm;
+            margin-right: 20mm;
+        }
+    </style>
+</head>
+<body>
+    <img src="https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo-blue.png" width="140mm" />
+    <h4>Mobile Phone Insurance Policy Schedule</h4>
+    {% if policy.isUpgraded %}
+        <h4>Upgrade</h4>
+    {% endif %}
+    <p>
+        {{ policy.user.name }}<br />
+        {{ policy.user.billingAddress.line1 }}<br />
+        {% if policy.user.billingAddress.line2 %}
+            {{ policy.user.billingAddress.line2 }}<br />
+        {% endif %}
+        {% if policy.user.billingAddress.line3 %}
+            {{ policy.user.billingAddress.line3 }}<br />
+        {% endif %}
+        {{ policy.user.billingAddress.city }} {{ policy.user.billingAddress.postcode }}<br />
+        United Kingdom
+    </p>
+    <p>Date of Birth: {{ policy.user.birthday|date('d M Y') }}</p>
+    <h4>Policy Reference</h4>
+    <ul>
+        <li>Policy Number: {{ policy.policyNumber }}</li>
+        <li>Date of subscription: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
+        <li>
+            Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }}
+            [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]
+            {% if policy.isUpgraded %}
+                <li>
+                    Phones previously covered by this policy:
+                    <ul>
+                        {% for iteration in policy.previousIterations %}
+                            <li>
+                                {{ iteration.phone.make }} {{ iteration.phone.model}}
+                                [IMEI: {{ iteration.imei }}{% if iteration.serialNumber %} / Serial Number: {{ iteration.serialNumber }}{% endif %}]
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endif %}
+        </li>
+        <li>
+            {% if policy.isUpgraded %}
+                Overall period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to
+                {{ policy.end|date('d M Y H:i', 'Europe/London') }}, updated portion starting at
+                {{ policy.getCurrentIteration.realStart | date('d M Y H:i', 'Europe/London') }}.
+            {% else %}
+                Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to
+                {{ policy.end|date('d M Y H:i', 'Europe/London') }}
+            {% endif %}
+        </li>
+        <li>
+            {% set upgradedYearly = policy.getUpgradedYearlyPrice() %}
+            {% set futurePayments = policy.countFutureInvoiceSchedule(policy.getCurrentIterationStart) %}
+            Cost of policy: £{{ policy.yearlyPremiumPrice|number_format(2, '.', ',') }},
+            inclusive of £{{ policy.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
+            {% if policy.isUpgraded %}
+                the post upgrade remainder being
+            {% endif %}
+            {% if upgradedYearly > 0 %}
+                {% if futurePayments > 1 %}
+                    £{{ policy.getUpgradedYearlyPrice }} payable as {{ futurePayments }}{% if policy.premiumInstallments != 1 %} monthly{% endif %}
+                    installments of {{ policy.getUpgradedStandardMonthlyPrice }}.
+                {% else %}
+                    payable as 1 installment of £{{ policy.getUpgradedYearlyPrice }}.
+                {% endif %}
+            {% elseif upgradedYearly < 0 %}
+                £{{ policy.getUpgradedYearlyPrice }} to be reimbursed.
+            {% else %}
+                fully paid.
+            {% endif %}
+        </li>
+    </ul>
+    <p>Your policy covers you for:</p>
+    {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+        <ul>
+            <li>
+                Accidental Damage
+            </li>
+            <li>
+                Breakdown
+            </li>
+            <li>
+                Accessories: up to £50 (inc VAT)
+            </li>
+        </ul>
+        <p>As defined in the policy terms and conditions.</p>
+    {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+        <ul>
+            <li>
+                Accidental Damage
+            </li>
+            <li>
+                Breakdown
+            </li>
+            <li>
+                Loss
+            </li>
+            <li>
+                Theft
+            </li>
+            <li>
+                Accessories: up to £50 (inc VAT)
+            </li>
+            <li>
+                Unauthorised Charges: up to £1,000
+            </li>
+        </ul>
+        <p>As defined in the policy terms and conditions. You are limited to a maximum of one Loss or Theft claim per year.</p>
+    {% else %}
+        <ul>
+            <li>
+                Accidental Damage
+            </li>
+            <li>
+                Breakdown
+            </li>
+            <li>
+                Loss
+            </li>
+            <li>
+                Theft
+            </li>
+            <li>
+                Accessories: up to £100 (inc VAT)
+            </li>
+            <li>
+                Unauthorised Charges: up to £2,000
+            </li>
+        </ul>
+        <p>As defined in the policy terms and conditions. You are limited to a maximum of two Loss or Theft claims per year.</p>
+    {% endif %}
+    {% if policy.picSureStatus == 'preapproved' %}
+        <p>Excess to be paid at point of claim:</p>
+        <ul>
+            {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+            {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                </li>
+            {% else %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                </li>
+            {% endif %}
+        </ul>
+        <p>If you upgrade or change phone, you must validate your new phone using the so-sure app, prior to making a claim, to continue paying the Excess stated above. If, however, before claiming you have not validated your phone using the so-sure app, then the Excess is:</p>
+        <ul>
+            {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+            {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                </li>
+            {% else %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                </li>
+            {% endif %}
+        </ul>
+    {% else %}
+        <p>Once you have activated your policy by validating via the so-sure app that your phone is in good working condition with no cracked screen, the Excess is:</p>
+        <ul>
+            {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+            {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                </li>
+            {% else %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                </li>
+            {% endif %}
+        </ul>
+        <p>Validation is only done through the so-sure app, unless requested otherwise in writing by the so-sure team.</p>
+        {% if not policy.isPicSureRequired %}
+            <p>If, before claiming, you have not validated your phone using the so-sure app, then the Excess is:</p>
+            <ul>
+                <li>
+                    Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                </li>
+            </ul>
+        {% endif %}
+    {% endif %}
+    <p style="font-size: 12px; margin-top: 20mm"><em>The insurance cover is underwritten by Helvetia Schweizerische Versicherungsgesellschaft AG which is authorised by the Financial Conduct Authority under registration number 454140 with registered office Dufourstrasse 40 9001 St. Gallen, Switzerland.</em></p>
+</body>
+</html>

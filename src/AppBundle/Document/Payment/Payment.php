@@ -267,6 +267,11 @@ abstract class Payment
         $this->id = $id;
     }
 
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
     public function getDate()
     {
         return $this->date;

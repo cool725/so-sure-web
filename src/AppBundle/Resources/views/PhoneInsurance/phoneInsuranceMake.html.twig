@@ -5,6 +5,11 @@
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
 
+{# Money Version? #}
+{% if money_version is defined and money_version == true  %}
+    {% set robots_noindex = true %}
+{% endif %}
+
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
 {% set with_phone = phone.make ~ ' Phone' %}
@@ -44,63 +49,74 @@
             <div class="row">
                 <div class="col-lg-6 offset-lg-1 order-lg-2">
                     <div class="hero__intro">
-                        <div class="breadcrumbs">
-                            <ul class="list-inline"
-                                vocab="https://schema.org/"
-                                typeof="BreadcrumbList">
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('homepage') }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Home</span>
-                                    </a>
-                                    <meta property="position" content="1">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('phone_insurance') }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Phone Insurance</span>
-                                    </a>
-                                    <meta property="position" content="2">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item text-white"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <span property="name">{{ make_desc }}</span>
-                                    <meta property="position" content="3">
-                                </li>
-                            </ul>
-                        </div>
+                        {% if money_version is defined and money_version == true  %}
+                            <div class="d-flex align-items-center mb-4">
+                                <p class="lead text-columbia-blue-e mr-4 mb-0 fit">In partnership with:</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                    data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_money_logo_light.svg" alt="so-sure - money.co.uk"
+                                    title="so-sure - money.co.uk"
+                                    width="180px"
+                                    class="lozad">
+                            </div>
+                        {% else %}
+                            <div class="breadcrumbs">
+                                <ul class="list-inline"
+                                    vocab="https://schema.org/"
+                                    typeof="BreadcrumbList">
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('homepage') }}"
+                                        class="text-columbia-blue-e"
+                                        property="item"
+                                        typeof="WebPage">
+                                        <span property="name">Home</span>
+                                        </a>
+                                        <meta property="position" content="1">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-white"></i>
+                                    </li>
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('phone_insurance') }}"
+                                        class="text-columbia-blue-e"
+                                        property="item"
+                                        typeof="WebPage">
+                                        <span property="name">Phone Insurance</span>
+                                        </a>
+                                        <meta property="position" content="2">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-white"></i>
+                                    </li>
+                                    <li class="list-inline-item text-white"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <span property="name">{{ make_desc }}</span>
+                                        <meta property="position" content="3">
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
                         <h1 class="text-white mb-4 fit">{{ with_phone }} Insurance <br><span class="sub text-deep-sky-blue-d">from just &pound;{{ from_price|number_format(2) }} per month</span></h1>
                         <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                24-72 hour replace or repair
+                                24-72 hrs replace & repair service
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Low excess from just &pound;50
-                            </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Up to 80% money back
+                                Low excess from just {{ lowest_excess }}
                             </li>
                             <li class="h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                New, second hand &amp; refurbished phones
+                                {% set wording = free_months|capitalize ~ ' FREE ' %}
+                                {% if 'one' in free_months  %}
+                                    {% set wording = 'FREE month' %}
+                                {% endif %}
+                                {{ wording }} when you pay yearly
                             </li>
                         </ul>
                     </div>
@@ -120,22 +136,22 @@
                 <div class="col-md-8 offset-md-2 offset-lg-0 col-lg-5 order-lg-1 d-flex align-items-center">
                     {% if phone.make == 'Apple'  %}
                         <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_hand-holding-iphone-x.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/apple/so-sure_hand-holding-iphone-x-flipped.png"
                              alt="{{ phone.make }} - Phone Insurance"
                              class="img-fluid lozad">
                     {% elseif phone.make == 'Samsung'  %}
                         <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/samsung/so-sure_hand-holding-galaxy-s9.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/samsung/so-sure_hand-holding-galaxy-s9-flipped.png"
                              alt="{{ phone.make }} - Phone Insurance"
                              class="img-fluid lozad">
                     {% elseif phone.make == 'Google'  %}
                         <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/google/so-sure_hand-holding-pixel-3xl.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/google/so-sure_hand-holding-pixel-3xl-flipped.png"
                              alt="{{ phone.make }} - Phone Insurance"
                              class="img-fluid lozad">
                     {% else %}
                         <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hand-holding-phone-flipped.png"
                              alt="{{ phone.make }} - Phone Insurance"
                              class="img-fluid lozad">
                     {% endif %}
@@ -172,9 +188,9 @@
             <div class="row">
                 <div class="col-lg-6">
                     <h2 class="text-zaffre mb-3">Protect Your {{ make_desc }}: <br> <span class="text-primary">Phone Insurance that gives you more</span></h2>
-                    <p class="mb-4">Your {{ with_phone }} insurance should come with real benefits like money back if there’s no claim, faster-than-fast repair or replacement, and the option  to include family or friends in your plan to save money. Second hand phone?  Not a problem with so-sure.</p>
+                    <p class="mb-4">Your {{ with_phone }} insurance should come with real benefits like moneyback if there’s no claim, faster-than-fast repair or replacement, and the option to include family or friends in your plan to save money. Second hand phone? Not a problem with so-sure.</p>
                     <h3 class="h5 text-primary">{{ make_desc }} Insurance by the pros</h3>
-                    <p class="mb-4 mb-lg-5">Our mobile device insurance keeps your {{ make_desc }} fully covered for theft and loss as standard- at home and abroad. We also provide coverage for any accidental damage to your phone. Our {{ make_desc }} insurance is designed to  focus on your peace of mind so you have one thing less to worry about. We  also see that your favourite accessories are covered, with a value of up to &pound;100.</p>
+                    <p class="mb-4 mb-lg-5">Our mobile device insurance keeps your {{ make_desc }} fully covered for theft and loss as standard- at home and abroad. We also provide coverage for any accidental damage to your phone. Our {{ make_desc }} insurance is designed to focus on your peace of mind so you have one thing less to worry about. We also see that your favourite accessories are covered, with a value of up to &pound;100.</p>
                     <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Get a Quote</a>
                 </div>
                 <div class="col-lg-6 align-items-center">

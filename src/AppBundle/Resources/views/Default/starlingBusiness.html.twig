@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'company-phones' %}
+{% set include_get_a_quote = true %}
 
 {% block title %}Phone Insurance Starling Business | so-sure{% endblock %}
 {% block meta %}
@@ -56,7 +57,7 @@
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>
-                                Low excess from just &pound;50
+                                Low excess from just {{ lowest_excess }}
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-columbia-blue-e"></i>

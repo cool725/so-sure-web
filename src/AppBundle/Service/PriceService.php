@@ -9,8 +9,10 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\PhonePremium;
-use AppBundle\Document\Offer;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Repository\SubvariantRepository;
+use AppBundle\Classes\NoOp;
 use AppBundle\Exception\IncorrectPriceException;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -41,51 +43,50 @@ class PriceService
 
     /**
      * Gives you the right price for the given user and phone and also the source of the price in an array.
-     * @param User|null $user   is the user to get the price for.
-     * @param Phone     $phone  is the phone that they are getting a policy for.
-     * @param string    $stream is the price stream that they are paying in.
-     * @param \DateTime $date   is the date at which they are purchasing.
+     * @param User|null   $user       is the user to get the price for.
+     * @param Phone       $phone      is the phone that they are getting a policy for.
+     * @param string      $stream     is the price stream that they are paying in.
+     * @param \DateTime   $date       is the date at which they are purchasing.
+     * @param string|null $subvariant is the choice of subvariant to get prices for if any.
      * @return array containing the price and the source of the price.
      */
-    public function userPhonePriceSource($user, $phone, $stream, $date)
+    public function userPhonePriceSource($user, $phone, $stream, $date, $subvariant = null)
     {
-        // Offer price takes first precedence.
-        $offer = $user ? $user->getApplicableOffer($phone, $stream, $date) : null;
-        if ($offer) {
-            return ["price" => $offer->getPrice(), "source" => $offer];
-        }
         // Default phone price.
-        return ["price" => $phone->getCurrentPhonePrice($stream, $date), "source" => $phone];
+        NoOp::ignore($user);
+        return ["price" => $phone->getCurrentPhonePrice($stream, $date, $subvariant), "source" => $phone];
     }
 
     /**
      * Gets a price for a given phone in a given stream for a given user, assuming this is a new purchase and not
      * a renewal.
-     * @param User|null $user   is the user who will be paying the price.
-     * @param Phone     $phone  is the phone that they will be paying for.
-     * @param string    $stream is whether they are going to be paying monthly or yearly (Don't pass ALL or ANY).
-     * @param \DateTime $date   is the date at which the purchase is occuring.
+     * @param User|null   $user       is the user who will be paying the price.
+     * @param Phone       $phone      is the phone that they will be paying for.
+     * @param string      $stream     is whether they are going to be paying monthly or yearly (Don't pass ALL or ANY).
+     * @param \DateTime   $date       is the date at which the purchase is occuring.
+     * @param string|null $subvariant is the choice of subvariant to get prices for if any.
      * @return PhonePrice|null the price that they should pay under these conditions, or null if there is no applicable
      *                         price.
      */
-    public function userPhonePrice($user, $phone, $stream, $date)
+    public function userPhonePrice($user, $phone, $stream, $date, $subvariant = null)
     {
-        return $this->userPhonePriceSource($user, $phone, $stream, $date)["price"];
+        return $this->userPhonePriceSource($user, $phone, $stream, $date, $subvariant)["price"];
     }
 
     /**
      * Finds the right phone price for a user in every stream so that they can see their options. If the user is null
      * then it just gives the most up to date general pricing.
-     * @param User|null $user  is the user we are enquiring about.
-     * @param Phone     $phone is the phone we are enquiring about.
-     * @param \DateTime $date  is the date at which this must be valid.
+     * @param User|null   $user       is the user we are enquiring about.
+     * @param Phone       $phone      is the phone we are enquiring about.
+     * @param \DateTime   $date       is the date at which this must be valid.
+     * @param string|null $subvariant is the choice of subvariant to get prices for if any.
      * @return array with keys on each real price stream and offers or null under each.
      */
-    public function userPhonePriceStreams($user, $phone, $date)
+    public function userPhonePriceStreams($user, $phone, $date, $subvariant = null)
     {
         $prices = [];
         foreach (PhonePrice::STREAMS as $stream) {
-            $prices[$stream] = $this->userPhonePrice($user, $phone, $stream, $date);
+            $prices[$stream] = $this->userPhonePrice($user, $phone, $stream, $date, $subvariant);
         }
         return $prices;
     }
@@ -100,16 +101,39 @@ class PriceService
     public function phonePolicyDeterminePremium(PhonePolicy $policy, $amount, \DateTime $date)
     {
         $prices = $this->userPhonePriceStreams($policy->getUser(), $policy->getPhone(), $date);
-        // TODO: Ideally should loop over prices that were valid in the last half hour even if not valid this moment.
         foreach ($prices as $stream => $price) {
             $installments = PhonePrice::streamInstallments($stream);
             $installmentPrice = $price->getYearlyPremiumPrice() / $installments;
             if ($this->areEqualToTwoDp($amount, $installmentPrice)) {
+                $policy->setSubvariant(null);
                 $policy->setPremiumInstallments($installments);
                 $policy->setPremium($price->createPremium());
                 $this->dm->persist($policy);
                 $this->dm->flush();
                 return;
+            }
+        }
+        /** @var SubvariantRepository $subvariantRepo */
+        $subvariantRepo = $this->dm->getRepository(Subvariant::class);
+        $subvariants = $subvariantRepo->findAll();
+        foreach ($subvariants as $subvariant) {
+            $prices = $this->userPhonePriceStreams(
+                $policy->getUser(),
+                $policy->getPhone(),
+                $date,
+                $subvariant->getName()
+            );
+            foreach ($prices as $stream => $price) {
+                $installments = PhonePrice::streamInstallments($stream);
+                $installmentPrice = $price->getYearlyPremiumPrice() / $installments;
+                if ($this->areEqualToTwoDp($amount, $installmentPrice)) {
+                    $policy->setPremiumInstallments($installments);
+                    $policy->setPremium($price->createPremium());
+                    $policy->setSubvariant($subvariant);
+                    $this->dm->persist($policy);
+                    $this->dm->flush();
+                    return;
+                }
             }
         }
         throw new IncorrectPriceException(sprintf(
@@ -139,20 +163,16 @@ class PriceService
      * @param string      $stream            is the stream that they will be paying in.
      * @param float       $additionalPremium is some additional cost to add to the premium for some reason.
      * @param \DateTime   $date              is the date at which this premium is being calculated.
+     * @param string|null $subvariant        is the subvariant for the price to be for if any.
      * @return PhonePremium the premium for them.
      */
-    public function getPhonePremium($policy, $phone, $stream, $additionalPremium, $date)
+    public function getPhonePremium($policy, $phone, $stream, $additionalPremium, $date, $subvariant = null)
     {
-        $priceSource = $this->userPhonePriceSource($policy->getUser(), $phone, $stream, $date);
+        $priceSource = $this->userPhonePriceSource($policy->getUser(), $phone, $stream, $date, $subvariant);
         $premium = $priceSource["price"]->createPremium($additionalPremium);
         $premium->setSource($priceSource["source"]);
         $premium->setStream($priceSource["price"]->getStream());
-        if ($priceSource["source"] instanceof Offer) {
-            $priceSource["source"]->addPolicy($policy);
-            $premium->setSource(Premium::SOURCE_OFFER);
-        } elseif ($priceSource["source"] instanceof Phone) {
-            $premium->setSource(Premium::SOURCE_PHONE);
-        }
+        $premium->setSource(Premium::SOURCE_PHONE);
         return $premium;
     }
 

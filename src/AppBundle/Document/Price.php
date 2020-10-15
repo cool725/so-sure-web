@@ -46,6 +46,14 @@ abstract class Price
      */
     protected $excess;
 
+    /**
+     * Name of a subvariant that this price is for if any.
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string|null
+     */
+    protected $subvariant = null;
+
     public function __construct()
     {
     }
@@ -159,6 +167,24 @@ abstract class Price
         $this->excess = $excess;
     }
 
+    /**
+     * Gives you the name of the subvariant that this price is relating to.
+     * @return string|null the name of the subvariant.
+     */
+    public function getSubvariant()
+    {
+        return $this->subvariant;
+    }
+
+    /**
+     * Sets the subvariant that this price is in relation to.
+     * @param string $subvariant is the name to use.
+     */
+    public function setSubvariant($subvariant)
+    {
+        $this->subvariant = $subvariant;
+    }
+
     abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
 
     protected function populatePremium(Premium $premium, $additionalGwp = null, \DateTime $date = null)
@@ -190,7 +216,8 @@ abstract class Price
         return array_merge($this->toApiArray($date), [
             'initial_premium' => $this->getMonthlyPremiumPrice(null, $this->getValidFrom()),
             'excess' => $this->getExcess() ? $this->getExcess()->toPriceArray() : null,
-            'excess_detail' => $this->getExcess() ? $this->getExcess()->toPriceArray()['detail'] : '??'
+            'excess_detail' => $this->getExcess() ? $this->getExcess()->toPriceArray()['detail'] : '??',
+            'subvariant' => $this->getSubvariant()
         ]);
     }
 }
