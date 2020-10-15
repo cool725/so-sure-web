@@ -179,10 +179,11 @@ class Create
 
     /**
      * Creates a phone price.
-     * @param \DateTime|string $validFrom is the date that the price is valid from as a string or a date.
-     * @param string           $stream    is the stream that the price is in.
+     * @param \DateTime|string $validFrom  is the date that the price is valid from as a string or a date.
+     * @param string           $stream     is the stream that the price is in.
+     * @param string|null      $subvariant is the subvariant to apply the price to if any.
      */
-    public static function phonePrice($validFrom, $stream)
+    public static function phonePrice($validFrom, $stream, $subvariant = null)
     {
         $date = is_string($validFrom) ? new \DateTime($validFrom) : $validFrom;
         $gwp = rand(100, 600) / 90;
@@ -190,6 +191,9 @@ class Create
         $price->setGwp($gwp);
         $price->setValidFrom($date);
         $price->setStream($stream);
+        if ($subvariant) {
+            $price->setSubvariant($subvariant);
+        }
         return $price;
     }
 

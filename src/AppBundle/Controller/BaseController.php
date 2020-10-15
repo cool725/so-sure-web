@@ -149,11 +149,6 @@ abstract class BaseController extends Controller
         return $this->get('doctrine_mongodb.odm.census_document_manager');
     }
 
-    protected function getPicsureMLManager()
-    {
-        return $this->get('doctrine_mongodb.odm.picsureml_document_manager');
-    }
-
     protected function getCognitoIdentityId(Request $request)
     {
         $auth = $this->get('app.user.cognitoidentity.authenticator');
@@ -309,7 +304,7 @@ abstract class BaseController extends Controller
      *
      * @return Pagerfanta
      */
-    protected function pager(Request $request, Builder $qb, $maxPerPage = 50)
+    protected function pager(Request $request, Builder $qb, $maxPerPage = 25)
     {
         $adapter = new DoctrineODMMongoDBAdapter($qb);
         $pagerfanta = new Pagerfanta($adapter);

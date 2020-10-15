@@ -952,11 +952,32 @@ class ApiControllerTest extends BaseApiControllerTest
     public function testUserDuplicate()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $user = static::createUser(self::$userManager, 'dup-user@api.bar.com', 'bar');
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail('dup-user@api.bar.com');
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
             'email' => 'dup-user@api.bar.com'
         ));
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
+    }
+
+    /**
+     * Creating a user that already exists and has no policy should delete
+     * the old user and create a new ones.
+     * This fixes the issue of quoting multiple times.
+     */
+    public function testUserDuplicateCreateWithNoPolicy()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(self::$userManager, 'dup-user-2@api.bar.com', 'bar');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/user', array(
+            'email' => 'dup-user-2@api.bar.com'
+        ));
+
+        $data = $this->verifyResponse(200);
     }
 
     public function testUserFacebookDuplicate()

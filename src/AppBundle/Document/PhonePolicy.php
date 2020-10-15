@@ -228,6 +228,13 @@ abstract class PhonePolicy extends Policy
     protected $picSureCircumvention;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $picSureRequired;
+
+    /**
      * @return Phone
      */
     public function getPhone()
@@ -679,6 +686,7 @@ abstract class PhonePolicy extends Policy
         $phonePolicy->setImei($this->getImei());
         $phonePolicy->setSerialNumber($this->getSerialNumber());
         $phonePolicy->setPremiumInstallments($this->getPremiumInstallments());
+        $phonePolicy->setSubvariant($this->getSubvariant());
         // make sure ipt rate is set to ipt rate at the start of the policy
         if ($terms->isPicSureEnabled()) {
             $phonePolicy->setPicSureStatus(self::PICSURE_STATUS_PREAPPROVED);
@@ -693,11 +701,13 @@ abstract class PhonePolicy extends Policy
         $phonePolicy->setPhone($this->getPhone());
         $phonePolicy->setImei($this->getImei());
         $phonePolicy->setSerialNumber($this->getSerialNumber());
+        $phonePolicy->setSubvariant($this->getSubvariant());
     }
 
     public function getPolicyNumberPrefix()
     {
-        return 'Mob';
+        $subvariant = $this->getSubvariant();
+        return $subvariant ? $subvariant->getPolicyPrefix() : 'Mob';
     }
 
     public function getPolicyImeiFiles()
@@ -883,6 +893,16 @@ abstract class PhonePolicy extends Policy
     public function setPicSureCircumvention($picSureCircumvention)
     {
         $this->picSureCircumvention = $picSureCircumvention;
+    }
+
+    public function isPicSureRequired()
+    {
+        return ($this->picSureRequired || $this->getPolicyTerms()->isPicSureRequired());
+    }
+
+    public function setPicSureRequired($picSureRequired)
+    {
+        $this->picSureRequired = $picSureRequired;
     }
 
     public function isSameInsurable(Policy $policy)

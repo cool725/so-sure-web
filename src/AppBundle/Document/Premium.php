@@ -22,7 +22,6 @@ abstract class Premium implements EqualsInterface
 {
     use CurrencyTrait;
 
-    const SOURCE_OFFER = "offer";
     const SOURCE_RENEWAL = "renewal";
     const SOURCE_PHONE = "phone";
 

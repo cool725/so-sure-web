@@ -19,6 +19,11 @@ import tracking from '../../common/track-data.js';
 
 $(function() {
 
+    // Starling
+    if ($('#starling_modal').length) {
+        $('#starling_modal').modal('show');
+    }
+
     // Could move
     $('.connection').tooltip();
 

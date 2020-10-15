@@ -12,7 +12,6 @@ require('./common/track-data.js');
 require('./common/toggle-text.js');
 require('./common/append-email.js');
 require('./components/nav.js');
-require('./components/select.js');
 require('./components/animate.js');
 require('./components/custom-select.js');
 require('./components/phone-search-dropdown.js');

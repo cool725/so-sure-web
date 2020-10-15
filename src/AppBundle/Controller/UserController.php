@@ -196,6 +196,14 @@ class UserController extends BaseController
             $scode = $scodeRepo->findOneBy(['code' => $session->get('scode'), 'active' => true]);
         }
 
+        $oauth2FlowParams = null;
+        $session = $request->getSession();
+        if ($session && $session->has('oauth2Flow')) {
+            $url = $session->get('oauth2Flow.targetPath');
+            $query = parse_url($url, PHP_URL_QUERY);
+            parse_str($query, $oauth2FlowParams);
+        }
+
         /** @var InvitationService $invitationService */
         $invitationService = $this->get('app.invitation');
         $emailInvitiation = new EmailInvitation();
@@ -420,7 +428,8 @@ class UserController extends BaseController
             'scode_form_two' => $scodeFormTwo->createView(),
             'scode' => $scode,
             'friends' => $fbFriends,
-            'max_connections' => $maxConnections
+            'max_connections' => $maxConnections,
+            'oauth2FlowParams' => $oauth2FlowParams
         );
     }
 
@@ -1321,13 +1330,14 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        // A/B On popup text
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_EXIT_POPUP_MULTI);
+        // A/B Manufacturers Landing Pages USPs
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
-        if ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
-            // A/B Pricing Messaging Experiment
-            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PRICING_MESSAGING);
-        }
+        // A/B Hero Content
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_CONTENT);
+
+        // A/B Landing Page Design
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_PAGES);
 
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
@@ -1349,14 +1359,6 @@ class UserController extends BaseController
                 $invitePage
             );
             $this->addFlash('success-raw', $message);
-        }
-
-        $oauth2FlowParams = null;
-        $session = $request->getSession();
-        if ($session && $session->has('oauth2Flow')) {
-            $url = $session->get('oauth2Flow.targetPath');
-            $query = parse_url($url, PHP_URL_QUERY);
-            parse_str($query, $oauth2FlowParams);
         }
 
         // In-store
@@ -1382,7 +1384,6 @@ class UserController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $policy,
             'has_visited_welcome_page' => $pageVisited,
-            'oauth2FlowParams' => $oauth2FlowParams,
             'user' => $user,
             'instore' => $instore,
         ]);
@@ -2512,7 +2513,7 @@ class UserController extends BaseController
             return $this->redirectToRoute('user_upgrade_imei');
         }
 
-        $validationRequired = $policy->getPolicyTerms()->isPicSureRequired();
+        $validationRequired = $policy->isPicSureRequired();
 
         $pledge = new PurchaseStepPledge();
 

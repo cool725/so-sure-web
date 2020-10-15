@@ -15,6 +15,8 @@
                         <a href="{{ path('admin_home') }}" class="btn btn-primary btn-block">Admin</a>
                     {% elseif is_granted('ROLE_CLAIMS') %}
                         <a href="{{ path('claims_home') }}" class="btn btn-primary btn-block">Claims</a>
+                    {% elseif is_granted('ROLE_PICSURE') %}
+                        <a href="{{ path('picsure_index') }}" class="btn btn-primary btn-block">Picsure</a>
                     {% else %}
                         <a href="{{ path('user_home') }}" class="btn btn-primary btn-block">Your Account</a>
                     {% endif %}

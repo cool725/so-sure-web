@@ -38,7 +38,7 @@ class CompanyLeadType extends AbstractType
                 'required' => true,
                 'placeholder' => 'Purchasing timeframe...',
                 'choices' => [
-                    'immedidate' => 'immedidate',
+                    'immediate' => 'immediate',
                     'this quarter' => 'this quarter',
                     'next quarter' => 'next quarter',
                     'next year' => 'next year',

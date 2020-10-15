@@ -73,7 +73,7 @@
             <div class="row">
                 <div class="col-md-6 order-md-2">
                     <div class="hero__intro">
-                        <div class="breadcrumbs">
+                        {# <div class="breadcrumbs">
                             <ul class="list-inline"
                                 vocab="https://schema.org/"
                                 typeof="BreadcrumbList">
@@ -112,21 +112,19 @@
                                     <meta property="position" content="3">
                                 </li>
                             </ul>
+                        </div> #}
+                        {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
+                            {% set greeting = 'Good morning' %}
+                        {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
+                            {% set greeting = 'Good afternoon' %}
+                        {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
+                            {% set greeting = 'Good evening' %}
+                        {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
+                            {% set greeting = 'Hello night owl 🦉' %}
+                        {% endif %}
+                        <div class="personalised mb-2 lead">
+                            {{ greeting|raw }}{% if app.user is not null and app.user %} {{ app.user.firstName }}{% endif %}, here's your quote:
                         </div>
-                        {% if app.user is not null and app.user %}
-                            {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 12) %}
-                                {% set greeting = 'Good morning' %}
-                            {% elseif ('now'|date('G') > 12) and ('now'|date('G') <= 18)  %}
-                                {% set greeting = 'Good afternoon' %}
-                            {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
-                                {% set greeting = 'Good evening' %}
-                            {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
-                                {% set greeting = 'Hello night owl 🦉' %}
-                            {% endif %}
-                            <div class="personalised mb-2 lead">
-                                {{ greeting|raw }} here's your quote:
-                            </div>                        
-                        {% endif %}                        
                         <h1 class="h1b fit">
                             <a href="#mem_sizes"
                                class=""
@@ -135,7 +133,7 @@
                                aria-expanded="false"
                                aria-controls="mem_sizes"
                                title="Not the phone you're looking for?">
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB)
+                                {% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }} ({{ phone.memory }}GB)
                             </a>
                         </h1>
                         {% set yearly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') %}
@@ -144,11 +142,7 @@
                         {% set monthlyYearly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') * 12 %}
                         {% set difference = monthlyYearly - yearly %}
                         <div class="h3 mb-4 text-primary fit">
-                            {% if pricing_messaging_experiment is defined and pricing_messaging_experiment == 'copy-d' %}
-                                &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
-                            {% else %}
-                                &pound;{{ monthly }} <span class="sub">per month - <br>Save</span> &pound;{{ difference|number_format(0, '.', ',') }} <span class="sub">if you pay yearly</span>                                
-                            {% endif %}
+                            &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
                         </div>
                         <div class="collapse mb-4" id="mem_sizes">
                             {% if phones | length > 1 %}
@@ -177,7 +171,7 @@
                             </li>
                             <li class="h5">
                                 <i class="far fa-check fa-lg fa-fw text-primary"></i>
-                                <span class="sub">Low price and excess from &pound;50</span>
+                                <span class="sub">Low price and excess from &pound;{{ prices['monthly'].picsureexcess.damage }}</span>
                             </li>
                         </ul>
                         {{ form_start(buy_form, {'attr': { 'class': 'mb-3'}}) }}
@@ -348,7 +342,7 @@
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
     {% if feature_enabled('exit-popup') %}
-        {% include 'AppBundle::Components/_exitPopup.html.twig' with { 'exit_popup_exp': exit_popup_exp } %}
+        {% include 'AppBundle::Components/_exitPopup.html.twig' %}
     {% endif %}
 
 {% endblock %}

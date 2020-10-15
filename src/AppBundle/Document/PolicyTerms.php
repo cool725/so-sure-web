@@ -64,6 +64,9 @@ class PolicyTerms extends PolicyDocument
     // Version 15 for Aggregators
     const VERSION_15_R = 'Version 1 January 2020 Aggregator';
 
+    // Version 16 for All including tiers
+    const VERSION_16 = 'Version 16 August 2020';
+
     // ensure that lastest version is last in the array
     public static $allVersions = [
         self::VERSION_0 => '1',
@@ -83,7 +86,8 @@ class PolicyTerms extends PolicyDocument
         self::VERSION_14_R => '14_R',
         self::VERSION_14 => '14',
         self::VERSION_15_R => '15_R',
-        self::VERSION_15 => '15'
+        self::VERSION_15 => '15',
+        self::VERSION_16 => '16'
     ];
 
     public static function getLowExcess()
@@ -207,13 +211,13 @@ class PolicyTerms extends PolicyDocument
         return $this->getVersionNumber() >= static::getVersionNumberByVersion(self::VERSION_14);
     }
 
-    public function getAllowedExcesses()
+    public function getAllowedExcesses($isPicsureRequired = false)
     {
         if ($this->isPicSureEnabled()) {
             return [
                 static::getHighExcess()
             ];
-        } elseif (!$this->isPicSureRequired()) {
+        } elseif (!$isPicsureRequired) {
             return [
                 static::getLowExcess()
             ];
@@ -236,9 +240,9 @@ class PolicyTerms extends PolicyDocument
     /**
      * @return PhoneExcess
      */
-    public function getDefaultExcess()
+    public function getDefaultExcess($isPicsureRequired = false)
     {
-        if ($this->isPicSureEnabled() && !$this->isPicSureRequired()) {
+        if ($this->isPicSureEnabled() && !$isPicsureRequired) {
             return static::getHighExcess();
         } else {
             return static::getLowExcess();

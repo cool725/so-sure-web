@@ -637,6 +637,24 @@
                                                 Determines whether this price is exclusively for monthly premiums, yearly premiums, or set to all if no discount.
                                             </small>
                                         </div>
+                                        <div class="form-group">
+                                            <label>Subvariant</label>
+                                            <div class="input-group">
+                                                <select type="select"
+                                                     id="phone_subvariant"
+                                                     name="subvariant"
+                                                     class="form-control">
+                                                        <option value="" selected></option>
+                                                        {% for subvariant in subvariants %}
+                                                            <option value="{{ subvariant.name }}">{{ subvariant.name }}</option>
+                                                        {% endfor %}
+                                                </select>
+                                            </div>
+                                            <small class="form-text">
+                                                Sets the subvariant policy that this price is applicable to. If the
+                                                price is not for a subvariant policy, it should not be set.
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

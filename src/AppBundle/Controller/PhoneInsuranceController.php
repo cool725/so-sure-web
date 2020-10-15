@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\Subvariant;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\ValidationException;
@@ -276,8 +277,10 @@ class PhoneInsuranceController extends BaseController
      * SEO Pages - Phone Insurance > Make
      * @Route("/phone-insurance/{make}",
      * name="phone_insurance_make", requirements={"make":"[a-zA-Z]+"})
+     * @Route("/phone-insurance/{make}/money",
+     * name="phone_insurance_make_money", requirements={"make":"[a-zA-Z]+"})
      */
-    public function phoneInsuranceMakeAction($make = null)
+    public function phoneInsuranceMakeAction(Request $request, $make = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -313,6 +316,15 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('phone_insurance'));
         }
 
+        // Add money route
+        $money = false;
+        if ($request->get('_route') == 'phone_insurance_make_money') {
+            $money = true;
+        }
+
+        // Track Page
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MANUFACTURER_PAGE);
+
         // To display in Popular Models sections
         $topPhones = $repo->findBy([
             'active' => true,
@@ -347,6 +359,7 @@ class PhoneInsuranceController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'O2',
+            'money_version' => $money
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -380,8 +393,10 @@ class PhoneInsuranceController extends BaseController
      * SEO Pages - Phone Insurance > Make > Model
      * @Route("/phone-insurance/{make}/{model}", name="phone_insurance_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/phone-insurance/{make}/{model}/money", name="phone_insurance_make_model_money",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      */
-    public function phoneInsuranceMakeModelAction($make = null, $model = null)
+    public function phoneInsuranceMakeModelAction(Request $request, $make = null, $model = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -412,6 +427,23 @@ class PhoneInsuranceController extends BaseController
             ));
             return new RedirectResponse($this->generateUrl('phone_insurance'));
         }
+
+        // Add money route
+        $money = false;
+        if ($request->get('_route') == 'phone_insurance_make_model_money') {
+            $money = true;
+        }
+
+        // Track Page
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE);
+
+        // A/B Pricing Messaging Experiment
+        $manufacturerLandingUsps = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS,
+            ['current', 'same-as-homepage'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
 
         // Model template control
         // Hyphenate Model for images/template
@@ -444,10 +476,14 @@ class PhoneInsuranceController extends BaseController
             $template = 'AppBundle:PhoneInsurance:phoneInsuranceMakeModel.html.twig';
         }
 
+        // Get the price service
+        $priceService = $this->get('app.price');
+
         $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
         $data = [
             'phone' => $phone,
+            'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),
             'phone_price' => $fromPrice,
             'img_url' => $modelHyph,
             'available_images' => $availableImages,
@@ -456,6 +492,8 @@ class PhoneInsuranceController extends BaseController
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
             'competitor3' => 'O2',
+            'manufacturer_landing_usps' => $manufacturerLandingUsps,
+            'money_version' => $money
         ];
 
         return $this->render($template, $data);
@@ -522,26 +560,14 @@ class PhoneInsuranceController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        // A/B Pricing Messaging Experiment
-        $pricingMessagingExperiment = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_PRICING_MESSAGING,
-            ['copy-c', 'copy-d'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
+        // A/B Manufacturers Landing Pages USPs
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
-        // A/B Exit Popup
-        // Check for feature
-        $exitPopupFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_EXIT_POPUP);
-        $exitPopupExp = null;
-        if ($exitPopupFeature) {
-            $exitPopupExp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_EXIT_POPUP_MULTI,
-                ['variant-a', 'variant-b'],
-                SixpackService::LOG_MIXPANEL_ALL
-            );
-        }
+        // A/B Hero Content
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_SCODE_CONTENT);
+
+        // A/B Landing Page Design
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_PAGES);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
@@ -662,8 +688,6 @@ class PhoneInsuranceController extends BaseController
             'competitor3' => 'O2',
             'img_url' => mb_strtolower($modelHyph),
             'available_images' => $availableImages,
-            'pricing_messaging_experiment' => $pricingMessagingExperiment,
-            'exit_popup_exp' => $exitPopupExp,
         ];
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelMemory.html.twig', $data);
     }
@@ -736,6 +760,8 @@ class PhoneInsuranceController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $subvariantRepo = $dm->getRepository(Subvariant::class);
+        $subvariants = $subvariantRepo->findAll();
         $decodedModel = Phone::decodeModel($model);
         $phone = null;
         $aggregator = '';
@@ -774,12 +800,25 @@ class PhoneInsuranceController extends BaseController
             ]);
         }
         if ($phone) {
+            $prices = [[
+                'subvariant' => 'standard',
+                'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
+            ]];
+            foreach ($subvariants as $subvariant) {
+                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
+                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvariant->getName());
+                if ($monthly && $yearly) {
+                    $prices[] = [
+                        'subvariant' => $subvariant->getName(),
+                        'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
+                        'yearlyPremium' => $yearly->getYearlyPremiumPrice()
+                    ];
+                }
+            }
             $response = new JsonResponse([
                 'phoneId' => $phone->getId(),
-                'price' => [
-                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
-                ],
+                'price' => $prices,
                 'excesses' => [
                     'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
@@ -811,6 +850,8 @@ class PhoneInsuranceController extends BaseController
         // For generic use by insurance aggregator sites
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
+        $subvariantRepo = $dm->getRepository(Subvariant::class);
+        $subvariants = $subvariantRepo->findAll();
         $phones = $repo->findActive()->getQuery()->execute();
         $list = [];
 
@@ -836,15 +877,29 @@ class PhoneInsuranceController extends BaseController
                 // Placeholder for generic use with partners
                 $requester = 'requesterId';
             }
+            $prices = [[
+                'subvariant' => 'standard',
+                'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
+            ]];
+            foreach ($subvariants as $subvariant) {
+                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
+                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvariant->getName());
+                if ($monthly && $yearly) {
+                    $prices[] = [
+                        'subvariant' => $subvariant->getName(),
+                        'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
+                        'yearlyPremium' => $yearly->getYearlyPremiumPrice()
+                    ];
+                }
+            }
             $list[] = [
                 'id'            => $phone->getId(),
                 'make'          => $phone->getMake(),
                 'model'         => $phone->getModel(),
                 'memory'        => $phone->getMemory(),
-                'price' => [
-                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
-                ],
+                'devices' => $phone->getDevices(),
+                'price' => $prices,
                 'excesses' => [
                     'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
@@ -857,6 +912,7 @@ class PhoneInsuranceController extends BaseController
             ];
         }
         $response = new JsonResponse($list);
+        $response->headers->set('Access-Control-Allow-Origin', '*');
         return $response;
     }
 

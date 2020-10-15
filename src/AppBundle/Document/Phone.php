@@ -9,6 +9,7 @@ use AppBundle\Exception\InvalidPriceStreamException;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
+use RuntimeException;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -110,11 +111,6 @@ class Phone
      * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice")
      */
     protected $phonePrices = [];
-
-    /**
-     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhonePrice")
-     */
-    protected $annualPhonePrices = [];
 
     /**
      * List of the phone's retail prices over time. Not guaranteed to be in order.
@@ -268,12 +264,6 @@ class Phone
      * @MongoDB\Field(type="boolean")
      */
     protected $newHighDemand;
-
-    /**
-     * The offers that pertain to this phone.
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
-     */
-    protected $offers = [];
 
     /**
      * If set, then use this path for the canonical link
@@ -629,16 +619,6 @@ class Phone
         $this->phonePrices[] = $phonePrice;
     }
 
-    public function getAnnualPhonePrices()
-    {
-        return $this->annualPhonePrices;
-    }
-
-    public function addAnnualPhonePrice(PhonePrice $phonePrice)
-    {
-        $this->annualPhonePrices[] = $phonePrice;
-    }
-
     public function getInitialPrice()
     {
         return $this->toTwoDp($this->initialPrice);
@@ -652,46 +632,6 @@ class Phone
     public function getReplacementPrice()
     {
         return $this->toTwoDp($this->replacementPrice);
-    }
-
-    /**
-     * Adds an offer into the phone's list of offers and sets a pointer to this phone on the offer.
-     * @param Offer $offer is the offer to add.
-     */
-    public function addOffer($offer)
-    {
-        $this->offers[] = $offer;
-        $offer->setPhone($this);
-    }
-
-    /**
-     * Gives a list of all offers associated with this phone.
-     * @return array containing all offers.
-     */
-    public function getOffers()
-    {
-        if (is_array($this->offers)) {
-            return $this->offers;
-        }
-        return $this->offers->toArray();
-    }
-
-    public function getActiveOffers()
-    {
-        foreach ($this->getOffers() as $offer) {
-            if ($offer->getActive()) {
-                yield $offer;
-            }
-        }
-    }
-
-    public function getInactiveOffers()
-    {
-        foreach ($this->getOffers() as $offer) {
-            if (!$offer->getActive()) {
-                yield $offer;
-            }
-        }
     }
 
     /**
@@ -997,46 +937,49 @@ class Phone
 
     /**
      * Gives you all of the phone's prices in the given stream in descending order of when they become valid.
-     * @param string $stream is the stream of prices we are trying to get.
+     * @param string      $stream     is the stream of prices we are trying to get.
+     * @param string|null $subvariant is the name of a variant to look at prices for. If this is null then it is
+     *                                specifically looking for prices that are not for a subvariant.
      * @return array of the prices.
      */
-    public function getOrderedPhonePrices($stream)
+    public function getOrderedPhonePrices($stream, $subvariant = null)
     {
         $prices = $this->getPhonePrices();
-        if (!is_array($prices)) {
-            $prices = $prices->toArray();
-        }
-        usort($prices, function ($a, $b) {
+        $prices = is_array($prices) ? $prices : $prices->toArray();
+        $relevantPrices = array_filter($prices, function ($price) use ($stream, $subvariant) {
+            return $price->inStream($stream) && $price->getSubvariant() === $subvariant;
+        });
+        usort($relevantPrices, function ($a, $b) {
             $aValid = $a->getValidFrom();
             $bValid = $b->getValidFrom();
-            if ($aValid < $bValid) {
-                return 1;
-            } elseif ($aValid > $bValid) {
-                return -1;
-            }
-            return 0;
+            return ($aValid < $bValid) ? 1 : -1;
         });
-        return array_values(array_filter($prices, function ($price) use ($stream) {
-            return $price->inStream($stream);
-        }));
+        return $relevantPrices;
     }
 
     /**
      * Returns the price that is current.
-     * @param string         $stream is the price stream that we want the current price for.
-     * @param \DateTime|null $date   the date at which the price should be current. Null for now.
+     * @param string          $stream     is the price stream that we want the current price for.
+     * @param \DateTime|null  $date       the date at which the price should be current. Null for now.
+     * @param Subvariant|null $subvariant is the subvariant upon which to seek a price. If there are none of that
+     *                                    subvariant then the current normal price will be given. Also if you give
+     *                                    a subvariant but then there are no prices under that subvariant then it will
+     *                                    return the current normal price in the given stream.
      * @return PhonePrice|null the found price or null if there is no price current at that time.
      */
-    public function getCurrentPhonePrice($stream, \DateTime $date = null)
+    public function getCurrentPhonePrice($stream, \DateTime $date = null, $subvariant = null)
     {
         if ($stream == PhonePrice::STREAM_ALL) {
             throw new InvalidPriceStreamException("Can't get current price occupying all streams");
         }
         $date = $date ?: new \DateTime();
-        foreach ($this->getOrderedPhonePrices($stream) as $price) {
+        foreach ($this->getOrderedPhonePrices($stream, $subvariant) as $price) {
             if ($price->getValidFrom() <= $date) {
                 return $price;
             }
+        }
+        if ($subvariant) {
+            return $this->getCurrentPhonePrice($stream, $date);
         }
         return null;
     }
@@ -1046,9 +989,9 @@ class Phone
      * @param \DateTime|null $date is the date at which the given price should be current. null for the present.
      * @return PhonePrice|null the found price or null if there is no such price.
      */
-    public function getCurrentMonthlyPhonePrice(\DateTime $date = null)
+    public function getCurrentMonthlyPhonePrice(\DateTime $date = null, $subvariant = null)
     {
-        return $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date ?: new \DateTime());
+        return $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, $date ?: new \DateTime(), $subvariant);
     }
 
     /**
@@ -1056,9 +999,9 @@ class Phone
      * @param \DateTime|null $date is the date at which the given price should be current. null for the present.
      * @return PhonePrice|null the found price or null if there is no such price.
      */
-    public function getCurrentYearlyPhonePrice(\DateTime $date = null)
+    public function getCurrentYearlyPhonePrice(\DateTime $date = null, $subvariant = null)
     {
-        return $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date ?: new \DateTime());
+        return $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, $date ?: new \DateTime(), $subvariant);
     }
 
     /**
@@ -1321,10 +1264,23 @@ class Phone
         ];
     }
 
-    public function asQuoteApiArray(PostcodeService $postcodeService, User $user = null)
+    /**
+     * Converts the phone to a quote api array.
+     * @param PostcodeService $postcodeService is used to determine user income and stuff.
+     * @param User|null       $user            is the user to spy on.
+     * @param Subvariant|null $subvariant      is the subtype of policy if any the user is getting a quote for.
+     * @return array|null the created quote array or null if it could not be made.
+     */
+    public function asQuoteApiArray(PostcodeService $postcodeService, User $user = null, $subvariant = null)
     {
-        $monthlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        $yearlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY);
+        $monthlyPhonePrice = 0;
+        $yearlyPhonePrice = 0;
+        try {
+            $monthlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, $subvariant);
+            $yearlyPhonePrice = $this->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, $subvariant);
+        } catch (InvalidPriceStreamException $e) {
+            throw new RuntimeException('Invalid price stream exception occured which should never happen');
+        }
         if (!($monthlyPhonePrice && $yearlyPhonePrice)) {
             if ($this->getActive()) {
                 return null;
@@ -1542,18 +1498,11 @@ class Phone
         PhoneExcess $picSureExcess,
         $notes = null,
         $stream = null,
-        \DateTime $date = null
+        \DateTime $date = null,
+        $subvariant = null
     ) {
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
-        }
-        // dates must be in the future
-        if ($from < $date) {
-            throw new \Exception(sprintf(
-                '%s must be after %s',
-                $from->format(\DateTime::ATOM),
-                $date->format(\DateTime::ATOM)
-            ));
         }
         if (!$this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf('Unable to determine min binder'));
@@ -1573,6 +1522,9 @@ class Phone
         $price->setNotes($notes);
         if ($stream) {
             $price->setStream($stream);
+        }
+        if ($subvariant) {
+            $price->setSubvariant($subvariant);
         }
         // Turned off by ElliotM 30/06/20
         // Alex and I think this is a Salva requirement that no longer applies

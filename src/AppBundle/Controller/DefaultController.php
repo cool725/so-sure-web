@@ -155,71 +155,71 @@ class DefaultController extends BaseController
             'PYB' => [
                 'name' => 'Protect Your Bubble',
                 'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
+                'cashback' => 'fa-times text-danger',
+                'cover' => 'fa-times text-danger',
                 'oldphones' => 'From approved retailers only',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
+                'saveexcess' => 'fa-times text-danger',
                 'trustpilot' => 4.5,
             ],
             'GC' => [
-                'name' => 'Gadget<br>Cover',
+                'name' => 'Gadget Cover',
                 'days' => '<strong>5 - 7</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
+                'cashback' => 'fa-times text-danger',
+                'cover' => 'fa-times text-danger',
                 'oldphones' => 'From approved retailers only',
                 'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
+                'saveexcess' => 'fa-times text-danger',
                 'trustpilot' => 2,
             ],
             'SS' => [
                 'name' => 'Simplesurance',
                 'days' => '<strong>3 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'cashback' => 'fa-times text-danger',
+                'cover' => 'fa-times text-danger',
+                'oldphones' => '<i class="far fa-times fa-2x text-danger"></i>',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
+                'saveexcess' => 'fa-times text-danger',
                 'trustpilot' => 1,
             ],
             'CC' => [
                 'name' => 'CloudCover',
                 'days' => '<strong>3 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'cashback' => 'fa-times text-danger',
+                'cover' => 'fa-times text-danger',
+                'oldphones' => '<i class="far fa-times fa-2x text-danger"></i>',
                 'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
+                'saveexcess' => 'fa-times text-danger',
                 'trustpilot' => 3,
             ],
             'END' => [
                 'name' => 'Endsleigh',
                 'days' => '<strong>1 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-check',
-                'oldphones' => '<i class="far fa-check fa-2x"></i>',
+                'cashback' => 'fa-times text-danger',
+                'cover' => 'fa-check text-success',
+                'oldphones' => '<i class="far fa-check fa-2x text-success"></i>',
                 'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
+                'saveexcess' => 'fa-times text-danger',
                 'trustpilot' => 1,
             ],
             'LICI' => [
                 'name' => 'Loveit<br>coverIt.co.uk',
                 'days' => '<strong>1 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => '<i class="far fa-times fa-2x"></i>',
+                'cashback' => 'fa-times text-danger',
+                'cover' => 'fa-times text-danger',
+                'oldphones' => '<i class="far fa-times fa-2x text-danger"></i>',
                 'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
+                'saveexcess' => 'fa-times text-danger',
                 'trustpilot' => 2,
             ],
             'O2' => [
                 'name' => 'O2',
                 'days' => '<strong>1 - 7</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
+                'cashback' => 'fa-times text-danger',
+                'cover' => 'fa-times text-danger',
                 'oldphones' => 'From 02 only',
                 'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
-                'saveexcess' => 'fa-times',
+                'saveexcess' => 'fa-times text-danger',
                 'trustpilot' => 1.5,
             ],
         ];
@@ -248,7 +248,19 @@ class DefaultController extends BaseController
             'competitor' => $this->competitorsData(),
         ];
 
-        $template = 'AppBundle:Default:indexAffiliate.html.twig';
+        // A/B Landing Page Design
+        $expLandingPageDesign = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_LANDING_PAGES,
+            ['current', 'new-design'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
+        $template = 'AppBundle:Default:indexAffiliateOld.html.twig';
+
+        if ($expLandingPageDesign == 'new-design') {
+            $template = 'AppBundle:Default:indexAffiliate.html.twig';
+        }
 
         if ($request->get('_route') == 'topcashback') {
             $data = [
@@ -303,7 +315,7 @@ class DefaultController extends BaseController
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'money',
                 'affiliate_company' => 'money',
-                'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'affiliate_company_logo' => 'so-sure_money_logo_light.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',
@@ -322,24 +334,26 @@ class DefaultController extends BaseController
             $data = [
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'starling-bank',
-                // 'affiliate_company' => 'Starling Bank',
-                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'affiliate_company' => 'Starling Bank',
+                'affiliate_company_logo' => 'so-sure_starling_bank_logo.svg',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',
+                'modify_class' => 'starling'
             ];
-            $template = 'AppBundle:Default:indexStarlingBank.html.twig';
+            if ($expLandingPageDesign == 'current') {
+                $template = 'AppBundle:Default:indexStarlingBank.html.twig';
+            }
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'starling_business') {
             $data = [
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'starling-business',
-                // 'affiliate_company' => 'Starling Bank',
-                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',
             ];
+            // Ignore this
             $template = 'AppBundle:Default:starlingBusiness.html.twig';
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'comparison') {
@@ -347,7 +361,10 @@ class DefaultController extends BaseController
                 'competitor' => $this->competitorsData(),
                 'affiliate_page' => 'comparison',
                 'titleH1' => 'Mobile Insurance beyond compare',
-                'leadP' => 'But if you do want to compare... <br> here\'s how we stack up against the competition 🤔',
+                'leadP' => 'If you do want to compare... <br> here\'s how we stack up against
+                the <a href="#" class="text-white scroll-to"
+                data-scroll-to-anchor="#table-compare"
+                data-scroll-to-offset="50">competition</a> 👇',
                 'competitor1' => 'PYB',
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',
@@ -380,7 +397,7 @@ class DefaultController extends BaseController
             ];
         }
 
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, [
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
             'page' => $data['affiliate_page']]);
 
         return $this->render($template, $data);
@@ -394,13 +411,14 @@ class DefaultController extends BaseController
         if ($this->getUser()) {
             if ($this->isGranted(User::ROLE_EMPLOYEE)) {
                 return $this->redirectToRoute('admin_home');
-            } elseif ($this->isGranted('ROLE_CLAIMS')) {
+            } elseif ($this->isGranted(User::ROLE_CLAIMS)) {
                 return $this->redirectToRoute('claims_policies');
-            } elseif ($this->isGranted('ROLE_USER')) {
+            } elseif ($this->isGranted(User::ROLE_PICSURE)) {
+                return $this->redirectToRoute('picsure_index');
+            } elseif ($this->isGranted('USER')) {
                 return $this->redirectToRoute('user_home');
             }
         }
-
         return $this->redirectToRoute('homepage');
     }
 

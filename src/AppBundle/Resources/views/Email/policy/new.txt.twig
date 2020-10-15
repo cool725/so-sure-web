@@ -1,7 +1,7 @@
 
 Welcome to so-sure 🎉
 
-{% if policy.policyTerms.isPicSureRequired %}
+{% if policy.status == 'picsure-required' %}
 Almost there! Your policy details are below, however your policy will NOT commence until you have verified the condition of phone with our app. Click the link below to install the app and follow the instructions.
 
 {% if policy.phone.isITunes %}
@@ -49,14 +49,24 @@ Important boring bits:
 Note: As you have a shiny new model, we wanted to let you know your repair or replacement may take longer than usual. This is unfortunately out of our control and due to market shortages for this new model, but it’s only temporary.
 {% endif %}
 
+{% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+Cover includes: Accidental Damage, Global Travel 😍.
+{% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+Cover includes: Loss, Theft, Accidental Damage, Accessories, Global Travel 😍.
+{% else %}
 Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel 😍.
+{% endif %}
 
 Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions please don't hesitate to contact us.
 
-{% if policy.policyTerms.isPicSureRequired %}
+{% if policy.status == 'picsure-required' %}
 Don't forget to download the app and verify the condition of your phone to start your policy.
 {% elseif policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
+{% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+Your excess is currently &pound;{{ policy.premium.excess.damage }}, you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} by validating your phone with our app.
+{% else %}
 Your excess is currently &pound;{{ policy.premium.excess.damage }} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss), you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
+{% endif %}
 {% if policy.phone.isITunes %}
 Download our iOS App, login, and complete the validation process.
 {{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}

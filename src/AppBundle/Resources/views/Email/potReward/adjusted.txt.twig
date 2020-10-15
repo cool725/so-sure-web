@@ -1,5 +1,4 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
+
 Important information about your Reward Pot.
 
 **
@@ -8,7 +7,7 @@ Hi {{ policy.user.name }},
 
 Your so-sure Reward Pot value has been updated as you or one of your connections have made a claim with us.
 
-The claim has been successful and you’ve helped your connection replace their device, however, that means that your Reward Pot has been reduced to £{{ policy.getAdjustedRewardPotPaymentAmount|number_format(2,'.',',') }}. 
+The claim has been successful and you’ve helped your connection replace their device, however, that means that your Reward Pot has been reduced to £{{ policy.getAdjustedRewardPotPaymentAmount|number_format(2,'.',',') }}.
 
 As you have used your Reward Pot to discount your renewal policy, there is now an outstanding amount of £{{ additional_amount|number_format(2,'.',',') }} due on your renewal policy, which we have billed to your card on file.
 
@@ -22,4 +21,17 @@ If you have any further questions on this, please do not hesitate to contact us.
 
 Best,
 SO-SURE Team
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

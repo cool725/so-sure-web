@@ -59,7 +59,7 @@ class SmsListener
                         Charge::TYPE_SMS_DOWNLOAD
                     );
                 }
-                if ($policyTerms->isPicSureRequired()) {
+                if ($policy->isPicSureRequired()) {
                     $smsTemplate = "AppBundle:Sms:picsure-required/picsureReminderOne.txt.twig";
                     $this->smsService->sendUser(
                         $policy,

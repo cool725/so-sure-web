@@ -49,7 +49,7 @@
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Low excess from just &pound;50
+                                Low excess from just {{ lowest_excess }}
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
@@ -131,36 +131,36 @@
                     </div>
                 </div>
                 <div class="col-lg-6 pb-lg-5">
-                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                    <div class="expanding-cardbox mb-4">
                         <div class="expanding-cardbox__body">
-                            <h3 class="h5 expanding-cardbox__title mb-0">
-                                Aim for 24-72 hour replace or repair <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            <h3 class="h5 expanding-cardbox__title">
+                                Aim for 24-72 hour replace or repair <i class="far fa-chevron-down fa-lg"></i>
                             </h3>
-                            <div class="expanding-cardbox__expand mt-4">
+                            <div class="expanding-cardbox__expand">
                                 We understand it's stressful to be without your phone, that’s why we aim to get you back up and running quickly after your claim is approved. While we aim for 24-72 hours, some repairs may take a little longer.
                             </div>
                         </div>
                     </div>
-                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                    <div class="expanding-cardbox mb-4">
                         <div class="expanding-cardbox__body">
-                            <h3 class="h5 expanding-cardbox__title mb-0">
-                                Up to 80% money back <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            <h3 class="h5 expanding-cardbox__title">
+                                Up to 80% money back <i class="far fa-chevron-down fa-lg"></i>
                             </h3>
-                            <div class="expanding-cardbox__expand mt-4">
+                            <div class="expanding-cardbox__expand">
                                 We reward our careful customers.  If you and your connections don’t make a claim we return up to 80% of your premium back at the end of every policy year.
                             </div>
                         </div>
                     </div>
-                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                    <div class="expanding-cardbox mb-4">
                         <div class="expanding-cardbox__body">
-                            <h3 class="h5 expanding-cardbox__title mb-0">
-                                Low excess from just &pound;50 with our app <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            <h3 class="h5 expanding-cardbox__title">
+                                Low excess from just {{ lowest_excess }} with our app <i class="far fa-chevron-down fa-lg"></i>
                             </h3>
-                            <div class="expanding-cardbox__expand mt-4">
+                            <div class="expanding-cardbox__expand">
                                 {% if store is not null %}
                                     <div class="h6">{{ store|capitalize }} customers - phones insured in-store are exempt from verifying their device.</div>
                                 {% endif %}
-                                Our excess is as low as &pound;50 for accidental damage and &pound;70 for loss &amp; theft when you validate your phone with our app.
+                                Our excess is as low as {{ lowest_excess }} for accidental damage and &pound;70 for loss &amp; theft when you validate your phone with our app.
                                 <br><br>
                                 Download our app and prove to us your device is in good working order and the screen isn't cracked by taking a selfie of your phone!
                                 <br><br>
@@ -170,22 +170,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                    <div class="expanding-cardbox mb-4">
                         <div class="expanding-cardbox__body">
-                            <h3 class="h5 expanding-cardbox__title mb-0">
-                                Insuring second hand phones <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            <h3 class="h5 expanding-cardbox__title">
+                                Insuring second hand phones <i class="far fa-chevron-down fa-lg"></i>
                             </h3>
-                            <div class="expanding-cardbox__expand mt-4">
+                            <div class="expanding-cardbox__expand">
                                 We're one of the only ones in the UK that insure older phones and second hand devices.
                             </div>
                         </div>
                     </div>
-                    <div class="expanding-cardbox expanding-cardbox__icon mb-4">
+                    <div class="expanding-cardbox mb-4">
                         <div class="expanding-cardbox__body">
-                            <h3 class="h5 expanding-cardbox__title mb-0">
-                                We decline less than 3.5% of claims* <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                            <h3 class="h5 expanding-cardbox__title">
+                                We decline less than 3.5% of claims* <i class="far fa-chevron-down fa-lg"></i>
                             </h3>
-                            <div class="expanding-cardbox__expand mt-4">
+                            <div class="expanding-cardbox__expand">
                                 We have our customers backs and we're here to protect you when you need us. That's what insurance is for after all. <br><br>
                                 <small>*as of July 18</small>
                             </div>

@@ -46,6 +46,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const GENDER_FEMALE = 'female';
     const GENDER_UNKNOWN = 'unknown';
 
+    const ROLE_PICSURE = 'ROLE_PICSURE';
     const ROLE_CLAIMS = 'ROLE_CLAIMS';
     const ROLE_EMPLOYEE = 'ROLE_EMPLOYEE';
     const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
@@ -479,12 +480,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Gedmo\Versioned
      */
     protected $isInfluencer = false;
-
-    /**
-     * Contains references to all the offers that are offered to this user.
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Offer")
-     */
-    protected $offers = [];
 
     protected $allowedMonthly = true;
 
@@ -1017,6 +1012,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return 90 - $diff->days;
     }
 
+    /**
+     * Tells you if this user has the picsure role.
+     * @return boolean true only if they do.
+     */
+    public function hasPicsureRole()
+    {
+        return $this->hasRole(self::ROLE_PICSURE) ||
+            $this->hasRole(self::ROLE_EMPLOYEE) ||
+            $this->hasRole(self::ROLE_ADMIN) ||
+            $this->hasRole(self::ROLE_CUSTOMER_SERVICES);
+    }
+
     public function hasEmployeeRole()
     {
         return $this->hasRole(self::ROLE_EMPLOYEE) ||
@@ -1536,7 +1543,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                     null,
                 ])) {
                 $data['hasOutstandingPicSurePolicy'] = true;
-                if ($policy->getPolicyTerms()->isPicSureRequired()) {
+                if ($policy->isPicSureRequired()) {
                     $data['picsureRequired'] = true;
                 }
             }
@@ -1901,45 +1908,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     {
         $this->isInfluencer = $isInfluencer;
         return $this;
-    }
-
-    /**
-     * Gives you all of the offers that are applied to this user.
-     * @return ArrayCollection of the offers.
-     */
-    public function getOffers()
-    {
-        return $this->offers;
-    }
-
-    /**
-     * Links an offer to this user.
-     * @param Offer $offer is the offer to add to the user.
-     */
-    public function addOffer(Offer $offer)
-    {
-        $this->offers[] = $offer;
-    }
-
-    /**
-     * Finds an offer on this user that matches the required conditions.
-     * @param Phone     $phone  is the phone that the offer must be for.
-     * @param string    $stream is the stream of price the offer must be for.
-     * @param \DateTime $date   is the date at which the offer must be applicable.
-     * @return Offer|null the found offer if there is one.
-     */
-    public function getApplicableOffer(Phone $phone, $stream, \DateTime $date)
-    {
-        $phoneId = $phone->getId();
-        foreach ($this->getOffers() as $offer) {
-            $price = $offer->getPrice();
-            if ($offer->getPhone()->getId() == $phoneId && $price && $price->inStream($stream) &&
-                $price->getValidFrom() <= $date
-            ) {
-                return $offer;
-            }
-        }
-        return null;
     }
 
     public function hasEmail()

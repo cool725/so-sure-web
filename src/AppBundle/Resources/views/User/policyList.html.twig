@@ -62,7 +62,7 @@
                 </div>
                 <div class="cardbox-divider d-none d-lg-flex excess">
                     <div class="excess-item text-left flex-fill">
-                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                         {% elseif not policy.isPicSureValidated %}
                             <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
@@ -81,7 +81,7 @@
                         {% endif %}
                     </div>
                     <div class="excess-item flex-fill">
-                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             <div class="h2 text-primary">&pound;{{ policy.premium.picsureExcess.damage|number_format(0, '.', ',') }}</div>
                         {% else %}
                             <div class="h2 text-primary">&pound;{{ policy.getCurrentExcess.damage|number_format(0, '.', ',') }}</div>
@@ -89,7 +89,7 @@
                         Excess for Accidental <br> Damage/Breakdown
                     </div>
                     <div class="excess-item flex-fill">
-                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             <div class="h2 text-primary">&pound;{{ policy.premium.picsureExcess.loss|number_format(0, '.', ',') }}</div>
                         {% else %}
                             <div class="h2 text-primary">&pound;{{ policy.getCurrentExcess.loss|number_format(0, '.', ',') }}</div>
@@ -97,7 +97,7 @@
                         Excess for <br> Loss
                     </div>
                     <div class="excess-item flex-fill">
-                        {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             <div class="h2 text-primary">&pound;{{ policy.premium.picsureExcess.theft|number_format(0, '.', ',') }}</div>
                         {% else %}
                             <div class="h2 text-primary">&pound;{{ policy.getCurrentExcess.theft|number_format(0, '.', ',') }}</div>
@@ -109,7 +109,7 @@
                     <span class="h6 mb-0"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }}</span>
                 </div>
                 <div class="cardbox__body cardbox-divider d-lg-none bg-athens-gray">
-                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                    {% if policy.status == 'picsure-required' %}
                         <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                     {% elseif not policy.isPicSureValidated %}
                         <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
@@ -127,21 +127,21 @@
                     </div>
                 {% endif %}
                 <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
-                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                    {% if policy.status == 'picsure-required' %}
                         Excess for Accidental Damage/Breakdown <strong>&pound;{{ policy.premium.picsureExcess.damage|number_format(0, '.', ',') }}</strong>
                     {% else %}
                         Excess for Accidental Damage/Breakdown <strong>&pound;{{ policy.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
                     {% endif %}
                 </div>
                 <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
-                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                    {% if policy.status == 'picsure-required' %}
                         Excess for Loss <strong>&pound;{{ policy.premium.picsureExcess.loss|number_format(0, '.', ',') }}</strong>
                     {% else %}
                         Excess for Loss <strong>&pound;{{ policy.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
                     {% endif %}
                 </div>
                 <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
-                    {% if policy.policyTerms.isPicSureRequired and not policy.isPicSureValidated %}
+                    {% if policy.status == 'picsure-required' %}
                         Excess for Theft <strong>&pound;{{ policy.premium.picsureExcess.theft|number_format(0, '.', ',') }}</strong>
                     {% else %}
                         Excess for Theft <strong>&pound;{{ policy.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
@@ -209,7 +209,7 @@
                     </div>
                     <div class="cardbox-divider d-none d-lg-flex excess">
                         <div class="excess-item text-left flex-fill">
-                            {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                            {% if policy.status == 'picsure-required' %}
                                 <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                             {% elseif not policyItem.isPicSureValidated %}
                                 <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
@@ -222,7 +222,7 @@
                             {% endif %}
                         </div>
                         <div class="excess-item flex-fill">
-                            {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                            {% if policy.status == 'picsure-required' %}
                                 <div class="h2 text-primary">&pound;{{ policyItem.premium.picsureExcess.damage|number_format(0, '.', ',') }}</div>
                             {% else %}
                                 <div class="h2 text-primary">&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</div>
@@ -230,7 +230,7 @@
                             Excess for Accidental <br> Damage/Breakdown
                         </div>
                         <div class="excess-item flex-fill">
-                            {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                            {% if policy.status == 'picsure-required' %}
                                 <div class="h2 text-primary">&pound;{{ policyItem.premium.picsureExcess.loss|number_format(0, '.', ',') }}</div>
                             {% else %}
                                 <div class="h2 text-primary">&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</div>
@@ -238,7 +238,7 @@
                             Excess for <br> Loss
                         </div>
                         <div class="excess-item flex-fill">
-                            {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                            {% if policy.status == 'picsure-required' %}
                                 <div class="h2 text-primary">&pound;{{ policyItem.premium.picsureExcess.theft|number_format(0, '.', ',') }}</div>
                             {% else %}
                                 <div class="h2 text-primary">&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</div>
@@ -250,7 +250,7 @@
                         <span class="h6 mb-0"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }}</span>
                     </div>
                     <div class="cardbox__body cardbox-divider d-lg-none bg-athens-gray">
-                        {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
                         {% elseif not policyItem.isPicSureValidated %}
                             <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
@@ -268,21 +268,21 @@
                         </div>
                     {% endif %}
                     <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
-                        {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.premium.picsureExcess.damage|number_format(0, '.', ',') }}</strong>
                         {% else %}
                             Excess for Accidental Damage/Breakdown <strong>&pound;{{ policyItem.getCurrentExcess.damage|number_format(0, '.', ',') }}</strong>
                         {% endif %}
                     </div>
                     <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
-                        {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             Excess for Loss <strong>&pound;{{ policyItem.premium.picsureExcess.loss|number_format(0, '.', ',') }}</strong>
                         {% else %}
                             Excess for Loss <strong>&pound;{{ policyItem.getCurrentExcess.loss|number_format(0, '.', ',') }}</strong>
                         {% endif %}
                     </div>
                     <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
-                        {% if policyItem.policyTerms.isPicSureRequired and not policyItem.isPicSureValidated %}
+                        {% if policy.status == 'picsure-required' %}
                             Excess for Theft <strong>&pound;{{ policyItem.premium.picsureExcess.theft|number_format(0, '.', ',') }}</strong>
                         {% else %}
                             Excess for Theft <strong>&pound;{{ policyItem.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>

@@ -1,4 +1,6 @@
 // phone-search-dropdown.js
+require('./select.js');
+let MobileDetect = require('mobile-detect');
 
 $(function() {
 
@@ -12,6 +14,16 @@ $(function() {
             button = $('.phone-search-dropdown__button'),
             quote  = $('.get-a-quote'),
             arule  = $('#a-rule');
+
+        // Phone detection using mobile-detect
+        let mobileDetected = new MobileDetect(window.navigator.userAgent),
+            makeDetected = mobileDetected.phone();
+
+        let phonesToMatch = $.map(phones, function(key, make) {
+            return [make];
+        });
+
+        let makeIs = makeDetected;
 
         const updateModels = () => {
 
@@ -67,6 +79,18 @@ $(function() {
         quote.removeClass('disabled');
 
         updateModels();
+
+        // Check match and set if found using mobile-detect
+        if (makeIs == 'iPhone') {
+            makeIs = 'Apple';
+        }
+
+        if (phonesToMatch.includes(makeIs) && !make.val()) {
+            make.val(makeIs);
+            updateModels();
+            model.prop('disabled', '');
+            model.focus();
+        }
 
         make.resizeselect();
 

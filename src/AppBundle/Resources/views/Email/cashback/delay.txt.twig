@@ -1,19 +1,31 @@
-{% extends 'AppBundle:Email:base.txt.twig' %}
-{% block body %}
-Important information about your Reward Pot cashback.
+
+Your SO-SURE cashback.
 
 **
 ------------------------------------------------------------
 Hi {{ cashback.policy.user.name }},
 
-Your so-sure Reward Pot cashback of £{{ cashback.amount|number_format(2,'.',',') }} is currently under review as you or one of your connections have made a claim with us.
+We tried to send your so-sure cashback of £{{ cashback.amount|number_format(2,'.',',') }} to the account you gave us. Unfortunately, we were unable to do so.
 
-This may cause some changes to the final value of your Reward Pot and we will update you once the claim is settled.
+Please login to your account using the link below and update your details so we can re-send the cashback to you.
 
-If you have any further questions on this, please do not hesitate to contact us.
+Update my cashback details: {{ withdraw_url }}
 
-Thank you for using so-sure.
+Have a question or issue? contact us: {{ contact_us_url }}
 
 Best,
 SO-SURE Team
-{% endblock body %}
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (http://wearesosure.com)
+** (http://blog.wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK

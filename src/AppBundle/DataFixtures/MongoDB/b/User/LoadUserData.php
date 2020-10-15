@@ -37,14 +37,13 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser(self::DEFAULT_CLAIMS_DIRECTGROUP, self::DEFAULT_PASSWORD, 'DirectGroup', 'Claims', [User::ROLE_CLAIMS], Claim::TEAM_DIRECT_GROUP);
         $this->newUser('employee@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Employee', [User::ROLE_EMPLOYEE]);
         $this->newUser('customer-services@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'CustomerServices', [User::ROLE_CUSTOMER_SERVICES]);
-
+        $this->newUser('picsure@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'PicSure', [User::ROLE_PICSURE]);
         $this->newUser('dylan@so-sure.com', self::DEFAULT_PASSWORD, 'Dylan', 'Bourguignon', [User::ROLE_ADMIN]);
         $this->newUser('julien@so-sure.com', self::DEFAULT_PASSWORD, 'Julien', 'Champagne', [User::ROLE_ADMIN]);
         $this->newUser('nick@so-sure.com', self::DEFAULT_PASSWORD, 'Nick', 'Waller', [User::ROLE_ADMIN]);
-        $this->newUser('olly@so-sure.com', self::DEFAULT_PASSWORD, 'Olly', 'Mandling', [User::ROLE_ADMIN]);
         $this->newUser('kitti@so-sure.com', self::DEFAULT_PASSWORD, 'Kitti', 'Varga', [User::ROLE_CUSTOMER_SERVICES]);
         $this->newUser('daly@so-sure.com', self::DEFAULT_PASSWORD, 'Daly', 'Barron', [User::ROLE_ADMIN]);
-        $this->newUser('blake@so-sure.com', self::DEFAULT_PASSWORD, 'Blake', 'Payne', [User::ROLE_ADMIN]);
+        $this->newUser('rossella@so-sure.com', self::DEFAULT_PASSWORD, 'Rossella', 'Morgante', [User::ROLE_ADMIN]);
         $this->newUser('charles@so-sure.com', self::DEFAULT_PASSWORD, 'Charles', 'Roels', [User::ROLE_ADMIN]);
         $this->newUser('dev@so-sure.com', self::DEFAULT_PASSWORD, 'Robo', 'Bogdan', [User::ROLE_ADMIN]);
         $this->newUser('elliot@so-sure.com', self::DEFAULT_PASSWORD, 'Elliot', 'Mitchell', [User::ROLE_ADMIN]);

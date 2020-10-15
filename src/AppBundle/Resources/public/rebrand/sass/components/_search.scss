@@ -84,6 +84,12 @@
 .phone-search-dropdown-card {
     visibility: hidden;
 
+    .form-group {
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
     &__select  {
 
         // Reset

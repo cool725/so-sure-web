@@ -5,9 +5,7 @@ namespace AppBundle\Document;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
-use AppBundle\Document\Note\CallNote;
 use AppBundle\Document\Note\Note;
-use AppBundle\Document\Participation;
 use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
@@ -19,10 +17,8 @@ use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Exception\DuplicatePaymentException;
-use AppBundle\Service\InvitationService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Document\File\S3File;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -39,7 +35,6 @@ use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\Payment\SoSurePayment;
-use AppBundle\Exception\ClaimException;
 use AppBundle\Annotation\DataChange;
 
 /**
@@ -656,6 +651,13 @@ abstract class Policy
      * )
      */
     protected $inviteeReferralBonuses;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Subvariant")
+     * @Gedmo\Versioned
+     * @var Subvariant|null
+     */
+    protected $subvariant = null;
 
     public function __construct()
     {
@@ -1848,9 +1850,8 @@ abstract class Policy
     public function addClaim(Claim $claim)
     {
         if (!$this->isClaimAllowed($claim)) {
-            throw new \Exception(sprintf('This policy can not have any additional lost/theft claims'));
+            throw new \Exception("This policy can not have any additional {$claim->getType()} claims");
         }
-
         $claim->setPolicy($this);
         $this->claims[] = $claim;
     }
@@ -1972,13 +1973,19 @@ abstract class Policy
         return $this->linkedClaims;
     }
 
+    /**
+     * Tells you if the policy is allowed to make the given claim.
+     * @param Claim $claim is the the claim that they may or may not be allowed to make.
+     * @return boolean true iff the claim can be made.
+     */
     public function isClaimAllowed($claim)
     {
-        if (!$claim->isLostTheft()) {
-            return true;
+        $subvariant = $this->getSubvariant();
+        if ($subvariant) {
+            return $subvariant->allows($claim->getType(), $this);
+        } else {
+            return (!$claim->isLostTheft()) ? true : $this->isAdditionalClaimLostTheftApprovedAllowed();
         }
-
-        return $this->isAdditionalClaimLostTheftApprovedAllowed();
     }
 
     public function isAdditionalClaimLostTheftApprovedAllowed()
@@ -2985,6 +2992,24 @@ abstract class Policy
             }
         }
         return $total;
+    }
+
+    /**
+     * gives you the policy's subvariant if it has one.
+     * @return Subvariant|null the policy's subvariant should it have one.
+     */
+    public function getSubvariant()
+    {
+        return $this->subvariant;
+    }
+
+    /**
+     * Sets the policy's subvariant.
+     * @param Subvariant|null $subvariant is the subvariant to set it to or null if you wish to blank it.
+     */
+    public function setSubvariant($subvariant)
+    {
+        $this->subvariant = $subvariant;
     }
 
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)
@@ -4547,16 +4572,15 @@ abstract class Policy
         }
     }
 
-    public function getPolicyPrefix($environment)
+    public function getPolicyPrefix()
     {
-        $prefix = null;
-        if ($environment != 'prod') {
-            $prefix = mb_strtoupper($environment);
+        if ($this->getSubvariant()) {
+            return $this->getSubvariant()->getPolicyPrefix();
         } elseif ($this->getUser() && $this->getUser()->hasSoSureEmail()) {
             // any emails with @so-sure.com will generate an invalid policy
-            $prefix = self::PREFIX_INVALID;
+            return self::PREFIX_INVALID;
         }
-        return $prefix;
+        return null;
     }
 
     /**
@@ -4921,11 +4945,7 @@ abstract class Policy
             throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $this->getId()));
         }
 
-        if ($this instanceof SalvaPhonePolicy) {
-            $newPolicy = new HelvetiaPhonePolicy();
-        } else {
-            $newPolicy = new static();
-        }
+        $newPolicy = new HelvetiaPhonePolicy();
         $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd(), $terms);
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
@@ -4948,7 +4968,7 @@ abstract class Policy
             throw new \Exception(sprintf('Unable to repurchase for policy %s', $this->getId()));
         }
 
-        $newPolicy = new static();
+        $newPolicy = new HelvetiaPhonePolicy();
         $this->setPolicyDetailsForRepurchase($newPolicy, $date);
         $newPolicy->setStatus(null);
 
@@ -5234,6 +5254,20 @@ abstract class Policy
     public function getUpgradedYearlyPrice()
     {
         return $this->getPremium()->getAdjustedYearlyPremiumPrice();
+    }
+
+    /**
+     * Gives you this policy's subvariant name, with a default name if there is no subvariant so that they do not cause
+     * a crash or require logic everywhere.
+     * @return string the name of the subvariant type of this policy.
+     */
+    public function getSubvariantName()
+    {
+        $subvariant = $this->getSubvariant();
+        if ($subvariant) {
+            return $subvariant->getName();
+        }
+        return SoSure::FULL_POLICY_NAME;
     }
 
     /**
@@ -5599,7 +5633,7 @@ abstract class Policy
             }
         }
         $fourteenDaysAgo = (clone $date)->sub(new \DateInterval("P14D"));
-        if ($this->getPolicyTerms()->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
+        if ($this instanceof PhonePolicy && $this->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
             return $this->getStatus() == self::STATUS_PICSURE_REQUIRED;
         } elseif ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;

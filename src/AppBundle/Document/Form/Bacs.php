@@ -132,7 +132,7 @@ class Bacs extends BankAccount
     {
         $date = $date ?: new \DateTime();
         // wait 4 business days. first payment is scheduled 2 days later, and 2 days for payment to be run.
-        $initialDone = DateTrait::addDays(DateTrait::addBusinessDays($date, 2), 2);
+        $initialDone = DateTrait::addDays(DateTrait::addBusinessDays($date, 4), 5);
         $endOfMonth = DateTrait::endOfMonth($date);
         if ($initialDone > $endOfMonth) {
             $i = (int) $initialDone->format("d");

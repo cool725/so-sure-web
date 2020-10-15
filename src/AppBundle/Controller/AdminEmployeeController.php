@@ -3,11 +3,11 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\InvalidImei;
 use AppBundle\Document\Form\PicSureStatus;
 use AppBundle\Document\Form\SerialNumber;
-use AppBundle\Document\Offer;
 use AppBundle\Document\Excess\PhoneExcess;
 use AppBundle\Document\Excess\Excess;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
@@ -30,7 +30,6 @@ use AppBundle\Form\Type\DetectedImeiType;
 use AppBundle\Form\Type\InvalidImeiType;
 use AppBundle\Form\Type\LinkClaimType;
 use AppBundle\Form\Type\ClaimNoteType;
-use AppBundle\Form\Type\OfferType;
 use AppBundle\Form\Type\PaymentRequestUploadFileType;
 use AppBundle\Form\Type\PicSureStatusType;
 use AppBundle\Form\Type\SerialNumberType;
@@ -141,7 +140,6 @@ use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\JudoFileType;
-use AppBundle\Form\Type\PicSureSearchType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
@@ -157,7 +155,6 @@ use AppBundle\Form\Type\AdminMakeModelType;
 use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
-use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -365,6 +362,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $now = \DateTime::createFromFormat('U', time());
         $oneDay = $this->addBusinessDays($now, 1);
 
+        $subvariants = $this->getManager()->getRepository(Subvariant::class)->findAll();
 
         return [
             'phones' => $pager->getCurrentPageResults(),
@@ -376,7 +374,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'one_day' => $oneDay,
             'policyTerms' => $this->getLatestPolicyTerms(),
             'excess' => $excess,
-            'picsureExcess' => $picsureExcess
+            'picsureExcess' => $picsureExcess,
+            'subvariants' => $subvariants
         ];
     }
 
@@ -578,169 +577,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
         return $response;
-    }
-
-    /**
-     * @Route("/offer/phone/{id}", name="admin_phone_offers")
-     * @Template("AppBundle::AdminEmployee/adminPhoneOffers.html.twig")
-     */
-    public function adminPhoneOffersAction($id)
-    {
-        $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phone = $phoneRepo->find($id);
-        return [
-            "phone" => $phone
-        ];
-    }
-
-    /**
-     * @Route("/offer/create/{id}", name="admin_offer_create")
-     * @Template
-     */
-    public function offerFormAction(Request $request, $id)
-    {
-        $offerForm = $this->get("form.factory")
-            ->createNamedBuilder("offer_form", OfferType::class)
-            ->setAction($this->generateUrl("admin_offer_create", ["id" => $id]))
-            ->getForm();
-        if ("POST" === $request->getMethod()) {
-            if ($request->request->has("offer_form")) {
-                $offerForm->handleRequest($request);
-                if ($offerForm->isValid()) {
-                    $dm = $this->getManager();
-                    $phoneRepo = $dm->getRepository(Phone::class);
-                    $phone = $phoneRepo->find($id);
-                    if (!$phone) {
-                        throw new \Exception("trying to create offer for nonexistent phone");
-                    }
-                    $date = new \DateTime();
-                    $data = $offerForm->getData();
-                    $offer = new Offer();
-                    $offer->setName($data["name"]);
-                    $offer->setCreated($date);
-                    $phone->addOffer($offer);
-                    $excess = new PhoneExcess();
-                    $picsureExcess = new PhoneExcess();
-                    $excess->setDamage($data["damage"]);
-                    $excess->setWarranty($data["warranty"]);
-                    $excess->setExtendedWarranty($data["extendedWarranty"]);
-                    $excess->setLoss($data["loss"]);
-                    $excess->setTheft($data["theft"]);
-                    $picsureExcess->setDamage($data["picsureDamage"]);
-                    $picsureExcess->setWarranty($data["picsureWarranty"]);
-                    $picsureExcess->setExtendedWarranty($data["picsureExtendedWarranty"]);
-                    $picsureExcess->setLoss($data["picsureLoss"]);
-                    $picsureExcess->setTheft($data["picsureTheft"]);
-                    $price = new PhonePrice();
-                    $price->setStream($data["stream"]);
-                    $price->setValidFrom($date);
-                    $price->setGwp($data["gwp"]);
-                    $price->setExcess($excess);
-                    $price->setPicSureExcess($picsureExcess);
-                    $offer->setPrice($price);
-                    $offer->setActive(true);
-                    $dm->persist($offer);
-                    $dm->persist($phone);
-                    $dm->flush();
-                    $this->addFlash("success", "Created Offer");
-                    return new RedirectResponse($this->generateUrl("admin_phone_offers", ["id" => $id]));
-                } else {
-                    $this->addFlash("error", sprintf(
-                        "Unable to add offer. %s",
-                        (string) $offerForm->getErrors()
-                    ));
-                }
-                return new RedirectResponse($this->generateUrl("admin_phone_offers", ["id" => $id]));
-            }
-        }
-        return ["form" => $offerForm->createView()];
-    }
-
-    /**
-     * Gives the details on an offer including a list of all users and policies using it as JSON.
-     * @Route("/offer/{id}/details", name="admin_offer_details")
-     */
-    public function offerDetailsAction($id)
-    {
-        $dm = $this->getManager();
-        $offerRepo = $dm->getRepository(Offer::class);
-        $offer = $offerRepo->find($id);
-        if (!$offer) {
-            throw new \Exception("No offer with id '{$id}'");
-        }
-        return $this->json($offer->toDetailsArray());
-    }
-
-    /**
-     * Adds a given user to the given offer. The offer id must be passed as a POST parameter as well as the email for
-     * this request.
-     * @param Request $request is the http request.
-     * @return Response to send back to the client.
-     * @Route("/offer/add-user", name="admin_offer_add_user")
-     * @Method({"POST"})
-     */
-    public function offerAddUserAction(Request $request)
-    {
-        $offerId = $request->request->get("offer_id");
-        $email = $request->request->get("user_email");
-        $dm = $this->getManager();
-        $offerRepo = $dm->getRepository(Offer::class);
-        $userRepo = $dm->getRepository(User::class);
-        $offer = $offerRepo->find($offerId);
-        $user = $userRepo->findOneBy(["emailCanonical" => mb_strtolower($email)]);
-        if (!$offer) {
-            throw new \Exception(sprintf(
-                "'%s' is not a valid offer id",
-                $offerId
-            ));
-        } elseif (!$user) {
-            $this->addFlash("error", sprintf(
-                "'%s' is not a user email in our system",
-                $email
-            ));
-        } else {
-            $offer->addUser($user);
-            $dm->persist($offer);
-            $dm->flush();
-            $this->addFlash("success", "Added user to offer");
-        }
-        return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
-    }
-
-    /**
-     * Turns an offer on or off.
-     * @param Request $request is the http request.
-     * @param string  $id      is the id of the offer we are requesting information on.
-     * @return Response to send back to the client.
-     * @Route("/offer/{id}/enable", name="admin_offer_able")
-     * @Method({"POST"})
-     */
-    public function offerAbleAction(Request $request, $id)
-    {
-        $dm = $this->getManager();
-        $offerRepo = $dm->getRepository(Offer::class);
-        $offer = $offerRepo->find($id);
-        $ableText = $request->request->get("able");
-        if (!$offer) {
-            throw new \Exception("No offer with id '{$id}'");
-        }
-        $able = false;
-        if ($ableText == "enable") {
-            $able = true;
-        } elseif ($ableText != "disable") {
-            $this->addFlash("error", "Request to change offer state was invalid");
-            return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
-        }
-        $offer->setActive($able);
-        $dm->persist($offer);
-        $dm->flush();
-        $this->addFlash("success", sprintf(
-            "%s %s",
-            $offer->getName(),
-            $able ? "reenabled" : "disabled"
-        ));
-        return $this->redirectToRoute('admin_phone_offers', ["id" => $offer->getPhone()->getId()]);
     }
 
     /**
@@ -1172,72 +1008,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return [
             'form' => $imeiForm->createView(),
             'policy' => $policy,
-        ];
-    }
-
-    /**
-     * @Route("/picsure-form/{id}", name="picsure_form")
-     * @Template
-     */
-    public function picsureFormAction(Request $request, $id = null)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(PhonePolicy::class);
-        /** @var PhonePolicy $policy */
-        $policy = $repo->find($id);
-
-        if (!$policy) {
-            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
-        }
-
-        $picSure = new PicSureStatus();
-        $picSure->setPolicy($policy);
-        /** @var Form $picsureForm */
-        $picsureForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_form', PicSureStatusType::class, $picSure)
-            ->setAction($this->generateUrl(
-                'picsure_form',
-                ['id' => $id]
-            ))
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('picsure_form')) {
-                $picsureForm->handleRequest($request);
-                if ($picsureForm->isValid()) {
-                    if ($policy->getPolicyTerms()->isPicSureEnabled()) {
-                        $policy->setPicSureStatus($picSure->getPicSureStatus(), $this->getUser());
-                        $policy->addNoteDetails(
-                            $picSure->getNote(),
-                            $this->getUser(),
-                            'Changed Pic-Sure status'
-                        );
-
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
-                        );
-                    } else {
-                        $this->addFlash(
-                            'error',
-                            'Policy is not a pic-sure policy'
-                        );
-                    }
-                } else {
-                    $this->addFlash(
-                        'error',
-                        sprintf('Unable to update. Errror: %s', (string) $picsureForm->getErrors())
-                    );
-                }
-
-                return $this->redirectToRoute('admin_policy', ['id' => $id]);
-            }
-        }
-
-        return [
-            'form' => $picsureForm->createView(),
-            'policy' => $policy
         ];
     }
 
@@ -3789,6 +3559,72 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     }
 
     /**
+     * @Route("/picsure-form/{id}", name="picsure_form")
+     * @Template
+     */
+    public function picsureFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $picSure = new PicSureStatus();
+        $picSure->setPolicy($policy);
+        /** @var Form $picsureForm */
+        $picsureForm = $this->get('form.factory')
+            ->createNamedBuilder('picsure_form', PicSureStatusType::class, $picSure)
+            ->setAction($this->generateUrl(
+                'picsure_form',
+                ['id' => $id]
+            ))
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('picsure_form')) {
+                $picsureForm->handleRequest($request);
+                if ($picsureForm->isValid()) {
+                    if ($policy->getPolicyTerms()->isPicSureEnabled()) {
+                        $policy->setPicSureStatus($picSure->getPicSureStatus(), $this->getUser());
+                        $policy->addNoteDetails(
+                            $picSure->getNote(),
+                            $this->getUser(),
+                            'Changed Pic-Sure status'
+                        );
+
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Policy is not a pic-sure policy'
+                        );
+                    }
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf('Unable to update. Errror: %s', (string) $picsureForm->getErrors())
+                    );
+                }
+
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
+            }
+        }
+
+        return [
+            'form' => $picsureForm->createView(),
+            'policy' => $policy
+        ];
+    }
+
+    /**
      * @Route("/payments", name="admin_payments")
      * @Route("/payments/{year}/{month}", name="admin_payments_date")
      * @Template
@@ -3814,190 +3650,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'year' => $year,
             'month' => $month,
         ];
-    }
-
-    /**
-     * @Route("/picsure", name="admin_picsure")
-     * @Route("/picsure/{id}/approve", name="admin_picsure_approve")
-     * @Route("/picsure/{id}/reject", name="admin_picsure_reject")
-     * @Route("/picsure/{id}/invalid", name="admin_picsure_invalid")
-     * @Template
-     */
-    public function picsureAction(Request $request, $id = null)
-    {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(PhonePolicy::class);
-        /** @var PhonePolicy $policy */
-        $policy = null;
-        if ($id) {
-            /** @var PhonePolicy $policy */
-            $policy = $repo->find($id);
-        }
-        $picSureSearchForm = $this->get('form.factory')
-            ->createNamedBuilder('search_form', PicSureSearchType::class, null, ['method' => 'GET'])
-            ->getForm();
-        $picSureSearchForm->handleRequest($request);
-
-        if ($request->get('_route') == "admin_picsure_approve") {
-            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
-            $dm->flush();
-            $mailer = $this->get('app.mailer');
-            $mailer->sendTemplateToUser(
-                'Phone validation successful ✅',
-                $policy->getUser(),
-                'AppBundle:Email:picsure/accepted.html.twig',
-                ['policy' => $policy],
-                'AppBundle:Email:picsure/accepted.txt.twig',
-                ['policy' => $policy],
-                null,
-                'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com'
-            );
-
-            try {
-                $push = $this->get('app.push');
-                // @codingStandardsIgnoreStart
-                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Your phone is now successfully validated.'
-                ), null, null, $policy);
-                // @codingStandardsIgnoreEnd
-            } catch (\Exception $e) {
-                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
-            }
-
-            $picsureFiles = $policy->getPolicyPicSureFiles();
-            if (count($picsureFiles) > 0) {
-                $this->get('event_dispatcher')->dispatch(
-                    PicsureEvent::EVENT_APPROVED,
-                    new PicsureEvent($policy, $picsureFiles[0])
-                );
-            } else {
-                $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
-            }
-
-            return new RedirectResponse($this->generateUrl('admin_picsure'));
-        } elseif ($request->get('_route') == "admin_picsure_reject") {
-            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $this->getUser());
-            $dm->flush();
-            $mailer = $this->get('app.mailer');
-            $mailer->sendTemplateToUser(
-                'Phone validation failed ❌',
-                $policy->getUser(),
-                'AppBundle:Email:picsure/rejected.html.twig',
-                ['policy' => $policy],
-                'AppBundle:Email:picsure/rejected.txt.twig',
-                ['policy' => $policy]
-            );
-            if ($policy->isWithinCooloffPeriod()) {
-                $mailer->sendTemplate(
-                    'Please cancel (cooloff) policy due to pic-sure rejection',
-                    'support@wearesosure.com',
-                    'AppBundle:Email:picsure/adminRejected.html.twig',
-                    ['policy' => $policy]
-                );
-                $this->addFlash('error-raw', sprintf(
-                    'Policy <a href="%s">%s</a> should be cancelled (intercom support message also sent).',
-                    $this->get('app.router')->generateUrl('admin_policy', ['id' => $policy->getId()]),
-                    $policy->getPolicyNumber()
-                ));
-            }
-            try {
-                $push = $this->get('app.push');
-                // @codingStandardsIgnoreStart
-                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Your phone did not pass validation. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
-                ), null, null, $policy);
-                // @codingStandardsIgnoreEnd
-            } catch (\Exception $e) {
-                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
-            }
-
-            $picsureFiles = $policy->getPolicyPicSureFiles();
-            if (count($picsureFiles) > 0) {
-                $this->get('event_dispatcher')->dispatch(
-                    PicsureEvent::EVENT_REJECTED,
-                    new PicsureEvent($policy, $picsureFiles[0])
-                );
-            } else {
-                $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
-            }
-
-            return new RedirectResponse($this->generateUrl('admin_picsure'));
-        } elseif ($request->get('_route') == "admin_picsure_invalid") {
-            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
-            $dm->flush();
-            $mailer = $this->get('app.mailer');
-            $mailer->sendTemplateToUser(
-                'Sorry, please attempt to validate again ⚠️',
-                $policy->getUser(),
-                'AppBundle:Email:picsure/invalid.html.twig',
-                ['policy' => $policy, 'additional_message' => $request->get('message')],
-                'AppBundle:Email:picsure/invalid.txt.twig',
-                ['policy' => $policy, 'additional_message' => $request->get('message')]
-            );
-            try {
-                $push = $this->get('app.push');
-                // @codingStandardsIgnoreStart
-                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Sorry, your phone validation was not successful: %s',
-                    $request->get('message')
-                ), null, null, $policy);
-                // @codingStandardsIgnoreEnd
-            } catch (\Exception $e) {
-                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
-            }
-
-            $picsureFiles = $policy->getPolicyPicSureFiles();
-            if (count($picsureFiles) > 0) {
-                $this->get('event_dispatcher')->dispatch(
-                    PicsureEvent::EVENT_INVALID,
-                    new PicsureEvent($policy, $picsureFiles[0])
-                );
-            } else {
-                $this->get('logger')->error(sprintf("Missing picture file in policy %s.", $policy->getId()));
-            }
-
-            return new RedirectResponse($this->generateUrl('admin_picsure'));
-        }
-
-        $status = $request->get('status');
-        $data = $picSureSearchForm->get('status')->getData();
-        $qb = $repo->createQueryBuilder()
-            ->field('picSureStatus')->equals($data)
-            ->sort('picSureApprovedDate', 'desc')
-            ->sort('created', 'desc');
-        $pager = $this->pager($request, $qb);
-        return [
-            'policies' => $pager->getCurrentPageResults(),
-            'pager' => $pager,
-            'status' => $data,
-            'picsure_search_form' => $picSureSearchForm->createView(),
-        ];
-    }
-
-    /**
-     * @Route("/picsure/image/{file}", name="admin_picsure_image", requirements={"file"=".*"})
-     * @Template()
-     */
-    public function picsureImageAction($file)
-    {
-        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
-        $environment = $this->getParameter('kernel.environment');
-        $file = str_replace(sprintf('%s/', $environment), '', $file);
-
-        if (!$filesystem->has($file)) {
-            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
-        }
-
-        $mimetype = $filesystem->getMimetype($file);
-        return StreamedResponse::create(
-            function () use ($file, $filesystem) {
-                $stream = $filesystem->readStream($file);
-                echo stream_get_contents($stream);
-                flush();
-            },
-            200,
-            array('Content-Type' => $mimetype)
-        );
     }
 
     /**

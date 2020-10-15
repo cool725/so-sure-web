@@ -3,16 +3,21 @@ Phone validation successful ✅
 
 Congratulations {{ policy.user.firstName }},
 
-{% if policy.policyTerms.isPicSureRequired %}
 Your {{ policy.phone }} is now successfully verified and your cover has now started!
-{% else %}
-Your {{ policy.phone }} is now successfully verified and your excess has dropped by a whopping &pound;100!
-{% endif %}
 
 😎 How cool is that?
 
 Your excess for policy {{ policy.policyNumber }} is now:
 
+{% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+- Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
+{% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+- Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
+
+- Theft: £{{ policy.premium.picSureExcess.theft }}
+
+- Loss: £{{ policy.premium.picSureExcess.loss }}
+{% else %}
 - Accidental Damage: £{{ policy.premium.picSureExcess.damage }}
 
 - Breakdown: £{{ policy.premium.picSureExcess.warranty }}
@@ -20,6 +25,8 @@ Your excess for policy {{ policy.policyNumber }} is now:
 - Theft: £{{ policy.premium.picSureExcess.theft }}
 
 - Loss: £{{ policy.premium.picSureExcess.loss }}
+{% endif %}
+
 
 😀 Share the love and earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback if you don't claim.
 

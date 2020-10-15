@@ -33,7 +33,6 @@ sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fi
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/b --append
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/c --append
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/d --append
-sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/PicsureMLBundle/DataFixtures/MongoDB --dm=picsureml
 if [ "$PREFIX" != "" ]; then
   sudo app/console --env=$ENV sosure:policy:update-status --skip-email --skip-unpaid-timecheck --prefix $PREFIX
 fi
