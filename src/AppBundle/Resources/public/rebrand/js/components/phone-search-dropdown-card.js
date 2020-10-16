@@ -139,7 +139,6 @@ $(function() {
             make.val(makeIs);
             updateModels();
             model.prop('disabled', '');
-            model.focus();
         }
 
         // On Make change
