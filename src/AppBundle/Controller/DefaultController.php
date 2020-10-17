@@ -249,18 +249,18 @@ class DefaultController extends BaseController
         ];
 
         // A/B Landing Page Design
-        $expLandingPageDesign = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_LANDING_PAGES,
-            ['current', 'new-design'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
+        // $expLandingPageDesign = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_LANDING_PAGES,
+        //     ['current', 'new-design'],
+        //     SixpackService::LOG_MIXPANEL_ALL
+        // );
 
         $template = 'AppBundle:Default:indexAffiliateOld.html.twig';
 
-        if ($expLandingPageDesign == 'new-design') {
-            $template = 'AppBundle:Default:indexAffiliate.html.twig';
-        }
+        // if ($expLandingPageDesign == 'new-design') {
+        //     $template = 'AppBundle:Default:indexAffiliate.html.twig';
+        // }
 
         if ($request->get('_route') == 'topcashback') {
             $data = [
@@ -341,9 +341,10 @@ class DefaultController extends BaseController
                 'competitor3' => 'O2',
                 'modify_class' => 'starling'
             ];
-            if ($expLandingPageDesign == 'current') {
-                $template = 'AppBundle:Default:indexStarlingBank.html.twig';
-            }
+            // if ($expLandingPageDesign == 'current') {
+                // $template = 'AppBundle:Default:indexStarlingBank.html.twig';
+            // }
+            $template = 'AppBundle:Default:indexAffiliate.html.twig';
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'starling_business') {
             $data = [
@@ -369,6 +370,7 @@ class DefaultController extends BaseController
                 'competitor2' => 'GC',
                 'competitor3' => 'O2',
             ];
+            $template = 'AppBundle:Default:indexAffiliate.html.twig';
         } elseif ($request->get('_route') == 'vendi_app') {
             $data = [
                 'competitor' => $this->competitorsData(),

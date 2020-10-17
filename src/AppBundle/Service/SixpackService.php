@@ -32,7 +32,7 @@ class SixpackService
     const EXPERIMENT_SCODE_CONTENT = 'Scode Layout Variation';
 
     // Exp 3
-    const EXPERIMENT_LANDING_PAGES = 'Landing Page Design';
+    // const EXPERIMENT_LANDING_PAGES = 'Landing Page Design';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -126,7 +126,8 @@ class SixpackService
         'Homepage Copy Cheap vs Easy',
         'Pricing Messaging',
         'Exit Popup Multi',
-        'Homepage Greeting'
+        'Homepage Greeting',
+        'Landing Page Design'
     ];
 
     public static $unauthExperiments = [
@@ -135,7 +136,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_SCODE_CONTENT,
         // Exp 3
-        self::EXPERIMENT_LANDING_PAGES,
+        // self::EXPERIMENT_LANDING_PAGES,
     ];
 
     public static $authExperiments = [
@@ -174,7 +175,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_SCODE_CONTENT,
         // Exp 3
-        self::EXPERIMENT_LANDING_PAGES,
+        // self::EXPERIMENT_LANDING_PAGES,
     ];
 
     /** @var LoggerInterface */

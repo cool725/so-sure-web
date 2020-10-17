@@ -9,7 +9,6 @@ final class Experiments
     private static $unauthExperiments = [
         SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS, ['current', 'same-as-homepage'],
         SixpackService::EXPERIMENT_SCODE_CONTENT, ['current', 'reordered'],
-        SixpackService::EXPERIMENT_LANDING_PAGES, ['current', 'new-design'],
     ];
 
     private static $authExperiments = [
