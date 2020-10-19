@@ -25,49 +25,28 @@
     <section class="hero">
         <div class="container-large">
             <div class="row">
-                <div class="{% if experiment_hero_layout is defined and experiment_hero_layout == 'reordered' %}col-lg-6{% else %}col-lg-6 d-none d-lg-block{% endif %}">
-                    {% if experiment_hero_layout is defined and experiment_hero_layout == 'reordered' %}
-                        {% if scode is defined and scode and scode.policy %}
-                            <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Get so-sure perks with</span> {{ scode.policy.user.firstname }}!</h1>
-                            <ul class="list-unstyled icn-fa-list mb-4">
-                                <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>One month FREE thanks to {{ scode.policy.user.firstname }}, <br> just click "Get a quote" below!</li>
-                                <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>&pound;10 in your no claims reward pot</li>
-                                <li class="text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>An extra {{ free_months }} FREE if you pay yearly</li>
-                            </ul>
-                            <p class="text-white mb-4">And that's on top of the game changing low price, easy as pie cover and lightning fast claims we offer! Yes, we're cheap, fast and easy. Don't tell your parents 😉</p>
-                            <p class="text-white">Is your phone already covered with so-sure? <a href="{{ path('fos_user_security_login') }}" class="text-white"><u>Login</u></a> to connect with {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}others{% endif %} and claim your connection bonus.</p>
-                        {% endif %}
-                    {% else %}
-                        <div class="hero__illustration">
-                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-polaroid-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
-                        </div>
-                    {% endif %}
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-polaroid-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
+                    </div>
                 </div>
-                <div class="{% if experiment_hero_layout is defined and experiment_hero_layout == 'reordered' %}col-md-6 col-lg-5 offset-lg-1{% else %}col-lg-6{% endif %}">
-                    {% if experiment_hero_layout is defined and experiment_hero_layout == 'reordered' %}
-                        {% if phone is defined and phone %}
-                            {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
-                        {% else %}
-                            {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
-                        {% endif %}
-                    {% else %}
-                        {% if scode is defined and scode and scode.policy %}
-                            <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Get so-sure perks with</span> {{ scode.policy.user.firstname }}!</h1>
-                            <ul class="list-unstyled icn-fa-list mb-4">
-                                <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>One month FREE thanks to {{ scode.policy.user.firstname }}, <br> just click "Get a quote" below!</li>
-                                <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>&pound;10 in your no claims reward pot</li>
-                                <li class="text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>An extra {{ free_months }} FREE if you pay yearly</li>
-                            </ul>
-                            <p class="text-white mb-4">And that's on top of the game changing low price, easy as pie cover and lightning fast claims we offer! Yes, we're cheap, fast and easy. Don't tell your parents 😉</p>
-                        {% endif %}
-                        <div class="d-md-flex justify-content-md-center justify-content-xl-start flex-nowrap mb-4">
-                            <a href="#"
-                            class="btn btn-success btn-block-xs track-data get-a-quote disabled order-md-2"
-                            data-event="scode-hero-quote-btn{% if scode is defined and scode and scode.policy %}-{{ user_code }}{% elseif share_code is defined and share_code %}{{ share_code }}{% endif %}">
-                            Get a Quote</a>
-                        </div>
-                        <p class="text-white">Is your phone already covered with so-sure? <a href="{{ path('fos_user_security_login') }}" class="text-white"><u>Login</u></a> to connect with {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}others{% endif %} and claim your connection bonus.</p>
+                <div class="col-lg-6">
+                    {% if scode is defined and scode and scode.policy %}
+                        <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Get so-sure perks with</span> {{ scode.policy.user.firstname }}!</h1>
+                        <ul class="list-unstyled icn-fa-list mb-4">
+                            <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>One month FREE thanks to {{ scode.policy.user.firstname }}, <br> just click "Get a quote" below!</li>
+                            <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>&pound;10 in your no claims reward pot</li>
+                            <li class="text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>An extra {{ free_months }} FREE if you pay yearly</li>
+                        </ul>
+                        <p class="text-white mb-4">And that's on top of the game changing low price, easy as pie cover and lightning fast claims we offer! Yes, we're cheap, fast and easy. Don't tell your parents 😉</p>
                     {% endif %}
+                    <div class="d-md-flex justify-content-md-center justify-content-xl-start flex-nowrap mb-4">
+                        <a href="#"
+                        class="btn btn-success btn-block-xs track-data get-a-quote disabled order-md-2"
+                        data-event="scode-hero-quote-btn{% if scode is defined and scode and scode.policy %}-{{ user_code }}{% elseif share_code is defined and share_code %}{{ share_code }}{% endif %}">
+                        Get a Quote</a>
+                    </div>
+                    <p class="text-white">Is your phone already covered with so-sure? <a href="{{ path('fos_user_security_login') }}" class="text-white"><u>Login</u></a> to connect with {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}others{% endif %} and claim your connection bonus.</p>
                 </div>
             </div>
             <div class="hero__illustration d-block d-lg-none mt-4">

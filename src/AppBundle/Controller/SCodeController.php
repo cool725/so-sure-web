@@ -131,14 +131,6 @@ class SCodeController extends BaseController
             $template = 'AppBundle:SCode:scodeReferral.html.twig';
         }
 
-        // A/B Hero Content
-        $experimentHeroLayout = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_SCODE_CONTENT,
-            ['current', 'reordered'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         $data = [
             'scode'     => $scode,
             'user_code' => $code,
@@ -146,8 +138,7 @@ class SCodeController extends BaseController
             'competitor' => $this->competitorsData(),
             'competitor1' => 'PYB',
             'competitor2' => 'GC',
-            'competitor3' => 'O2',
-            'experiment_hero_layout' => $experimentHeroLayout
+            'competitor3' => 'O2'
         ];
 
         return $this->render($template, $data);
