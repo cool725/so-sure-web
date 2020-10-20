@@ -18,7 +18,8 @@ $(function() {
             email   = $('.phone-search-email'),
             emailR  = $('.phone-search-email').data('required'),
             button  = $('.phone-search-button'),
-            firstOp = $('.phone-search-option-make option:first');
+            firstOp = $('.phone-search-option-make option:first'),
+            fiveG   = $('.five-g-warning');
 
         // Phone detection using mobile-detect
         let mobileDetected = new MobileDetect(window.navigator.userAgent),
@@ -168,6 +169,12 @@ $(function() {
             } else {
                 memory.prop('disabled', 'disabled').val('');
             }
+
+            if ($(this).val().includes('5G')) {
+                fiveG.removeClass('hideme');
+            } else {
+                fiveG.addClass('hideme');
+            }
         });
 
         // On Memory change
@@ -177,6 +184,7 @@ $(function() {
             if ($(this).val()) {
                 email.prop('disabled', '');
                 email.focus();
+                fiveG.addClass('hideme');
             } else {
                 email.prop('disabled', 'disabled');
             }
