@@ -3722,7 +3722,7 @@ abstract class Policy
 
     public function getOutstandingPremium()
     {
-        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->getPremiumPaid());
+        return $this->toTwoDp($this->getUpgradedYearlyPrice() - $this->getPremiumPaid());
     }
 
     /**
@@ -5536,17 +5536,8 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return null;
         }
-
-        $totalPaid = $this->getTotalSuccessfulPayments($date, false);
-        $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
-
-        $diff = $expectedPaid - $totalPaid;
-        // print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
-        if (!$allowNegative && $diff < 0) {
-            return 0;
-        }
-
-        return $diff;
+        return $this->getOutstandingPremium() - $this->countFutureInvoiceSchedule() *
+            $this->getUpgradedStandardMonthlyPrice();
     }
 
     public function getOutstandingUserPremiumToDate(\DateTime $date = null)
