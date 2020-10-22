@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Policy;
+use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
@@ -96,5 +97,31 @@ class PhonePolicyTest extends \PHPUnit\Framework\TestCase
         $price->setValidFrom($start);
         $price->setGwp($amount);
         return $price;
+    }
+
+    /**
+     * Test that the max pot returned is correct and based on the actual premium value including yearly discount
+     */
+    public function testMaxPot()
+    {
+        $phone = new Phone();
+        $phone->setHighlight(false);
+        $phone->addPhonePrice($this->createPhonePrice(8.93, new \DateTime("2019-01-01")));
+        $policy = new HelvetiaPhonePolicy();
+        $policy->setPhone($phone);
+        /** @var PhonePrice */
+        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
+        $this->assertNotNull($price);
+        $policy->setPremium($price->createPremium());
+        $policy->setStatus('active');
+        $user = new User();
+        $policy->setUser($user);
+        $policy->setStart(new \DateTime("2019-05-19"));
+        $policy->setStaticEnd(new \DateTime("2020-05-19"));
+        //check max pot values
+        $policy->setPremiumInstallments(1);
+        $this->assertEquals(number_format((120/11*12*0.80), 2), $policy->getMaxPot());
+        $policy->setPremiumInstallments(12);
+        $this->assertEquals((120*0.80), $policy->getMaxPot());
     }
 }
