@@ -51,9 +51,6 @@
 {% block body %}
 
     <section class="hero">
-        {# <div class="alert-strip alert-strip-green h6 p-3 pt-0 mb-4">
-            <div class="container-large">🙂 During the lockdown we can still get your phone fixed in just 72 hours</div>
-        </div> #}
         <div class="container-large">
             <h1 class="mb-4 text-white text-center fit">
                 <span class="sub text-deep-sky-blue-d">Simply Better</span> Mobile Insurance
@@ -69,6 +66,8 @@
                             <div class="hero__badge-inner">{{ free_months|capitalize }}<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
                         </div>
                     </div>
+                    {# Toasts #}
+                    {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left' } %}
                 </div>
                 <div class="col-md-6 col-lg-5 offset-lg-1">
                     {% if phone is defined and phone %}
@@ -85,6 +84,8 @@
                         <div class="hero__badge animated tada">
                             <div class="hero__badge-inner">{{ free_months|capitalize }}<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
                         </div>
+                        {# Toasts #}
+                        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left' } %}
                     </div>
                 </div>
             </div>
