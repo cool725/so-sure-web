@@ -101,6 +101,7 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
+                    $this->setPhoneSession($request, $phone);
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_TO_DETAILS);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
@@ -190,6 +191,7 @@ class SearchController extends BaseController
                         ));
                         // @codingStandardsIgnoreEnd
                     }
+                    $this->setPhoneSession($request, $phone);
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_TO_DETAILS);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
@@ -277,6 +279,7 @@ class SearchController extends BaseController
                             "Thanks! An email of your quote is on it's way"
                         ));
                     }
+                    $this->setPhoneSession($request, $phone);
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_TO_DETAILS);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
@@ -336,6 +339,7 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
+                    $this->setPhoneSession($request, $phone);
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
@@ -395,6 +399,7 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
+                    $this->setPhoneSession($request, $phone);
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
