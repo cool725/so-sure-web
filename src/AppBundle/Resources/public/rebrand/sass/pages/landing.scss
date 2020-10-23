@@ -115,10 +115,10 @@
     position: relative;
 
     // Height so table overlaps
-    height: 600px;
+    height: 1100px;
 
     @include media-breakpoint-up(sm) {
-        height: 485px;
+        height: 600px;
     }
 }
 

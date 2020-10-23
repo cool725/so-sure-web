@@ -80,13 +80,21 @@
 
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
+    <section class="reviews py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Don't just take our<br class="d-md-none"> word for it!</h2>
+            <p class="mb-5">Our customers love us – that's why thousands of customers have joined the so-sure family.</p>
+            {% include 'AppBundle::Components/_trustpilotReviews.html.twig' %}
+        </div>
+    </section>
+
     {% include 'AppBundle::Components/_cover.html.twig' %}
 
     <section id="table-compare" class="comparison py-lg-5">
         <div class="container-large py-5">
-            <h2 class="h3 text-deep-sky-blue-d mb-4">Why so-sure mobile phone insurance?</h2>
-            <p class="text-white mb-md-5">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
-            {% include 'AppBundle::Components/_comparisonTable.html.twig' %}
+            <h2 class="h3 text-primary mb-4">Why so-sure mobile phone insurance?</h2>
+            <p class="mb-md-5">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
         </div>
     </section>
 
@@ -203,14 +211,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <section class="reviews py-lg-5">
-        <div class="container-large py-5">
-            <h2 class="h3 text-primary mb-4">Don't just take our<br class="d-md-none"> word for it!</h2>
-            <p class="mb-5">Our customers love us – that's why thousands of customers have joined the so-sure family.</p>
-            {% include 'AppBundle::Components/_trustpilotReviews.html.twig' %}
         </div>
     </section>
 

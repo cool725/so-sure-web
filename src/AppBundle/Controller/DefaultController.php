@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Classes\Competitors;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Form\Type\CompanyLeadType;
 use AppBundle\Form\Type\EmailOptInType;
@@ -122,10 +123,12 @@ class DefaultController extends BaseController
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
+        $competitorData = new Competitors();
+
         $data = array(
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
-            'competitor' => $this->competitorsData(),
+            'competitor' => $competitorData::$competitorComparisonData,
             'from_price' => $fromPrice,
         );
 
@@ -149,84 +152,6 @@ class DefaultController extends BaseController
         return $this->render('AppBundle:Pdf:policyTermsV15.html.twig');
     }
 
-    private function competitorsData()
-    {
-        $competitor = [
-            'PYB' => [
-                'name' => 'Protect Your Bubble',
-                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
-                'cashback' => 'fa-times text-danger',
-                'cover' => 'fa-times text-danger',
-                'oldphones' => 'From approved retailers only',
-                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times text-danger',
-                'trustpilot' => 4.5,
-            ],
-            'GC' => [
-                'name' => 'Gadget Cover',
-                'days' => '<strong>5 - 7</strong> <div>working days</div>',
-                'cashback' => 'fa-times text-danger',
-                'cover' => 'fa-times text-danger',
-                'oldphones' => 'From approved retailers only',
-                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times text-danger',
-                'trustpilot' => 2,
-            ],
-            'SS' => [
-                'name' => 'Simplesurance',
-                'days' => '<strong>3 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times text-danger',
-                'cover' => 'fa-times text-danger',
-                'oldphones' => '<i class="far fa-times fa-2x text-danger"></i>',
-                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times text-danger',
-                'trustpilot' => 1,
-            ],
-            'CC' => [
-                'name' => 'CloudCover',
-                'days' => '<strong>3 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times text-danger',
-                'cover' => 'fa-times text-danger',
-                'oldphones' => '<i class="far fa-times fa-2x text-danger"></i>',
-                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times text-danger',
-                'trustpilot' => 3,
-            ],
-            'END' => [
-                'name' => 'Endsleigh',
-                'days' => '<strong>1 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times text-danger',
-                'cover' => 'fa-check text-success',
-                'oldphones' => '<i class="far fa-check fa-2x text-success"></i>',
-                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times text-danger',
-                'trustpilot' => 1,
-            ],
-            'LICI' => [
-                'name' => 'Loveit<br>coverIt.co.uk',
-                'days' => '<strong>1 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times text-danger',
-                'cover' => 'fa-times text-danger',
-                'oldphones' => '<i class="far fa-times fa-2x text-danger"></i>',
-                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times text-danger',
-                'trustpilot' => 2,
-            ],
-            'O2' => [
-                'name' => 'O2',
-                'days' => '<strong>1 - 7</strong> <div>working days</div>',
-                'cashback' => 'fa-times text-danger',
-                'cover' => 'fa-times text-danger',
-                'oldphones' => 'From 02 only',
-                'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
-                'saveexcess' => 'fa-times text-danger',
-                'trustpilot' => 1.5,
-            ],
-        ];
-
-        return $competitor;
-    }
-
     /**
      * @Route("/topcashback", name="topcashback")
      * @Route("/vouchercodes", name="vouchercodes")
@@ -244,158 +169,105 @@ class DefaultController extends BaseController
      */
     public function affiliateLanding(Request $request)
     {
-        $data = [
-            'competitor' => $this->competitorsData(),
-        ];
-
-        // A/B Landing Page Design
-        // $expLandingPageDesign = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_LANDING_PAGES,
-        //     ['current', 'new-design'],
-        //     SixpackService::LOG_MIXPANEL_ALL
-        // );
-
         $template = 'AppBundle:Default:indexAffiliateOld.html.twig';
+        $competitorData = new Competitors();
 
-        // if ($expLandingPageDesign == 'new-design') {
-        //     $template = 'AppBundle:Default:indexAffiliate.html.twig';
-        // }
+        $data = [
+
+        ];
 
         if ($request->get('_route') == 'topcashback') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'topcashback',
                 'affiliate_company' => 'TopCashback',
                 'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'SS',
             ];
         } elseif ($request->get('_route') == 'vouchercodes') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'vouchercodes',
                 'affiliate_company' => 'VoucherCodes',
                 'affiliate_company_logo' => 'so-sure_vouchercodes_logo.svg',
-                'competitor1' => 'PYB',
-                'competitor2' => 'END',
             ];
         } elseif ($request->get('_route') == 'quidco') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'quidco',
                 'affiliate_company' => 'Quidco',
                 'affiliate_company_logo' => 'so-sure_quidco_logo.svg',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'CC',
             ];
         } elseif ($request->get('_route') == 'ivip') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'ivip',
                 'affiliate_company' => 'iVIP',
                 'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'reward_gateway') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'reward-gateway',
                 'affiliate_company' => 'Reward Gateway',
-                'competitor1' => 'PYB',
-                'competitor2' => 'END',
-                'competitor3' => 'SS',
             ];
         } elseif ($request->get('_route') == 'money') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'money',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo_light.svg',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'money_free_phone_case') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'money-free-phone-case',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'starling_bank') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'starling-bank',
                 'affiliate_company' => 'Starling Bank',
                 'affiliate_company_logo' => 'so-sure_starling_bank_logo.svg',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
                 'modify_class' => 'starling'
             ];
-            // if ($expLandingPageDesign == 'current') {
-                // $template = 'AppBundle:Default:indexStarlingBank.html.twig';
-            // }
             $template = 'AppBundle:Default:indexAffiliate.html.twig';
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'starling_business') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'starling-business',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
             // Ignore this
             $template = 'AppBundle:Default:starlingBusiness.html.twig';
             $this->starlingOAuthSession($request);
         } elseif ($request->get('_route') == 'comparison') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'comparison',
                 'titleH1' => 'Mobile Insurance beyond compare',
                 'leadP' => 'If you do want to compare... <br> here\'s how we stack up against
                 the <a href="#" class="text-white scroll-to"
                 data-scroll-to-anchor="#table-compare"
                 data-scroll-to-offset="50">competition</a> 👇',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
-            $template = 'AppBundle:Default:indexAffiliate.html.twig';
         } elseif ($request->get('_route') == 'vendi_app') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'vendi-app',
                 'affiliate_company' => 'Vendi',
                 'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'so_sure_compared') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'so-sure-compared',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
         } elseif ($request->get('_route') == 'moneyback') {
             $data = [
-                'competitor' => $this->competitorsData(),
+                'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'moneyback',
-                'competitor1' => 'PYB',
-                'competitor2' => 'GC',
-                'competitor3' => 'O2',
             ];
         }
 
