@@ -203,7 +203,7 @@
             }
 
             @include media-breakpoint-up(md) {
-                width: 384px;
+                width: 500px;
             }
 
             @include media-breakpoint-up(xl) {
@@ -213,11 +213,11 @@
                 }
 
                 &__so-sure {
-                    transform: translateX(-25px);
-                    z-index: 11;
+                    // transform: translateX(-25px);
+                    // z-index: 11;
 
                     @include media-breakpoint-up(md) {
-                        width: 400px;
+                        // width: 400px;
                     }
                 }
             }
