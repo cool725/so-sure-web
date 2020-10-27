@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\Note;
@@ -5533,11 +5534,16 @@ abstract class Policy
         $allowNegative = false,
         $firstDayIsUnpaid = false
     ) {
+        NoOp::ignore($firstDayIsUnpaid);
         if (!$this->isPolicy()) {
             return null;
         }
-        return $this->getOutstandingPremium() - $this->countFutureInvoiceSchedule() *
+        $real = $this->getOutstandingPremium() - $this->countFutureInvoiceSchedule($date) *
             $this->getUpgradedStandardMonthlyPrice();
+        if ($allowNegative) {
+            return $real;
+        }
+        return max($real, 0);
     }
 
     public function getOutstandingUserPremiumToDate(\DateTime $date = null)
