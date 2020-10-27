@@ -2402,11 +2402,20 @@ class PolicyService
         /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findLatestTerms();
         $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
-        $this->priceService->setPhonePolicyRenewalPremium(
-            $newPolicy,
-            $policy->getUser()->getAdditionalPremium(),
-            $date
-        );
+        if ($policy->getCompany()) {
+            $this->priceService->setPhonePolicyPremium(
+                $newPolicy,
+                PhonePrice::installmentsStream($newPolicy->getInstallments()),
+                $policy->getUser()->getAdditionalPremium(),
+                $date
+            );
+        } else {
+            $this->priceService->setPhonePolicyRenewalPremium(
+                $newPolicy,
+                $policy->getUser()->getAdditionalPremium(),
+                $date
+            );
+        }
         $this->dm->persist($newPolicy);
         $this->dm->flush();
 
