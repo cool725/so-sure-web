@@ -152,7 +152,11 @@
                 {# Sub Content #}
                 <div class="qpw__sub__container">
                     <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
-                        {% include 'AppBundle::Purchase/_formStepPayment.html.twig' %}
+                        {% if purchase_payment_step_exp is defined and purchase_payment_step_exp == 'new-format' %}
+                            {% include 'AppBundle::Purchase/_formStepPaymentB.html.twig' %}
+                        {% else %}
+                            {% include 'AppBundle::Purchase/_formStepPayment.html.twig' %}
+                        {% endif %}
                     </div>
                 </div>
                 {# Mobile Info #}
@@ -191,5 +195,9 @@
         <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
     {% endif %}
     <script src="{{ asset('css-js/purchase.js') }}"></script>
-    <script src="{{ asset('css-js/purchase-payment.js') }}"></script>
+    {% if purchase_payment_step_exp is defined and purchase_payment_step_exp == 'new-format' %}
+        <script src="{{ asset('css-js/purchase-payment-b.js') }}"></script>
+    {% else %}
+        <script src="{{ asset('css-js/purchase-payment.js') }}"></script>
+    {% endif %}
 {% endblock %}

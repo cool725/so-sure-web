@@ -29,7 +29,7 @@ class SixpackService
     const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
 
     // Exp 2
-    // const EXPERIMENT_SCODE_CONTENT = 'Scode Layout Variation';
+    const EXPERIMENT_PAYMENT_STEP = 'Purchase Payment Step';
 
     // Exp 3
     // const EXPERIMENT_LANDING_PAGES = 'Landing Page Design';
@@ -135,7 +135,7 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
-        // self::EXPERIMENT_SCODE_CONTENT,
+        self::EXPERIMENT_PAYMENT_STEP,
         // Exp 3
         // self::EXPERIMENT_LANDING_PAGES,
     ];
@@ -164,6 +164,7 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
+        self::EXPERIMENT_PAYMENT_STEP,
     ];
 
     /**
