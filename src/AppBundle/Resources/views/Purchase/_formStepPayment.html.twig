@@ -29,7 +29,7 @@
                             <div class="radio-btn__content">
                                 <h6 class="radio-btn__title">Pay Monthly</h6>
                                 <hr class="my-2" />
-                                <div class="radio-btn__price"><strong>&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong></div>      
+                                <div class="radio-btn__price"><strong>&pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong></div>
                                 <small class="mb-2 d-inline-block">Billed monthly</small><br>
                                 <small>&pound;{{ withoutDiscount }} a year</small><br>
                                 <small>&nbsp;</small>
@@ -95,11 +95,11 @@
         </div>
     {% else %}
         <div class="form-group text-center">
-            {{ form_widget(purchase_form.next, {     
+            {{ form_widget(purchase_form.next, {
             'attr': {
                 'hidden': 'hidden'
-            }}) }}    
-        </div>        
+            }}) }}
+        </div>
     {% endif %}
 {{ form_end(purchase_form) }}
 <div class="mb-4">
@@ -132,7 +132,7 @@
                 {{ form_widget(to_card_form.submit, {
                     'label': button_text,
                     'fa': 'fas fa-credit-card fa-lg ml-2',
-                    'right': true,                                
+                    'right': true,
                     'attr': {
                         'class': button_class
                 }}) }}

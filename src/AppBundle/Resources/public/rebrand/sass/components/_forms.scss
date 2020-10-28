@@ -292,3 +292,55 @@ label {
         border-radius: 0 $g-border-radius $g-border-radius 0;
     }
 }
+
+.payment-card {
+    background-color: $white;
+    border: 1px solid $cadet-blue;
+    @include border-radius($g-border-radius);
+
+    &-body {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+        color: $cadet-blue;
+
+        .h5 {
+            margin-bottom: 0;
+        }
+
+        img {
+            opacity: 0.4;
+        }
+    }
+
+    &:hover {
+        * {
+            cursor: pointer;
+        }
+    }
+
+    &:hover,
+    &.active {
+        border-color: $crayon-blue;
+        box-shadow: 0 15px 30px 0 rgba(8, 27, 154, 0.1),
+        0 5px 15px 0 rgba(8, 27, 154, 0.1);
+
+        .payment-card-body {
+            color: $crayon-blue;
+
+            .sub {
+                color: $mako;
+            }
+
+            img {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+.payment-card-type {
+    .payment-card-body {
+        align-items: center;
+    }
+}
