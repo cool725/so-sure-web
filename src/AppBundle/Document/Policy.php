@@ -5538,8 +5538,8 @@ abstract class Policy
         if (!$this->isPolicy()) {
             return null;
         }
-        $real = $this->getOutstandingPremium() - $this->countFutureInvoiceSchedule($date) *
-            $this->getUpgradedStandardMonthlyPrice();
+        $real = $this->getUpgradedYearlyPrice() - $this->countFutureInvoiceSchedule($date) *
+            $this->getUpgradedStandardMonthlyPrice() - $this->getTotalSuccessfulUserPayments($date);
         if ($allowNegative) {
             return $real;
         }
