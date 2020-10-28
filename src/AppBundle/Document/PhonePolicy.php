@@ -670,10 +670,13 @@ abstract class PhonePolicy extends Policy
         }
 
         if ($this->isPreLaunchPolicy()) {
-            // 100% of policy
             return $this->getPremium()->getYearlyPremiumPrice();
         } else {
-            return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() * 0.8);
+            if ($this->getPremiumInstallments() == 1) {
+                return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() / 11 * 12 * 0.8);
+            } else {
+                return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() * 0.8);
+            }
         }
     }
 

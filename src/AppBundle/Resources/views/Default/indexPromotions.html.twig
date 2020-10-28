@@ -28,7 +28,7 @@
     <section class="hero">
 
         {# Toasts #}
-        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %}
+        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-right' } %}
 
         <div class="container-large">
             <div class="row">

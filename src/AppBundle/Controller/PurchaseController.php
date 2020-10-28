@@ -1097,6 +1097,15 @@ class PurchaseController extends BaseController
 
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
+
+        // A/B Test Payment Page Design
+        $purchaseStepPaymentDesign = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PAYMENT_STEP,
+            ['current', 'new-format'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         $template = 'AppBundle:Purchase:purchaseStepPayment.html.twig';
 
         $now = \DateTime::createFromFormat('U', time());
@@ -1122,6 +1131,7 @@ class PurchaseController extends BaseController
             'validation_required' => $validationRequired,
             'user_code' => $scode,
             'user_code_type' => $scodeType,
+            'purchase_payment_step_exp' => $purchaseStepPaymentDesign
         );
 
         if ($toCardForm) {

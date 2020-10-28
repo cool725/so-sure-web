@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use AppBundle\Classes\Competitors;
 
 class PromoController extends BaseController
 {
@@ -122,92 +123,16 @@ class PromoController extends BaseController
             ], true);
         }
 
+        $competitorData = new Competitors();
+
         $data = [
             'scode' => $scode,
             'use_code' => $code,
             'custom' => $custom,
             'lead_form' => $leadForm->createView(),
-            'competitor' => $this->competitorsData(),
+            'competitor' => $competitorData::$competitorComparisonData,
         ];
 
         return $this->render($template, $data);
-    }
-
-    private function competitorsData()
-    {
-        $competitor = [
-            'PYB' => [
-                'name' => 'Protect Your Bubble',
-                'days' => '<strong>1 - 5</strong> days <div>depending on stock</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => 'From approved retailers only',
-                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
-                'trustpilot' => 4.5,
-            ],
-            'GC' => [
-                'name' => 'Gadget<br>Cover',
-                'days' => '<strong>5 - 7</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => 'From approved retailers only',
-                'phoneage' => '<strong>18 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
-                'trustpilot' => 2,
-            ],
-            'SS' => [
-                'name' => 'Simplesurance',
-                'days' => '<strong>3 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
-                'trustpilot' => 1,
-            ],
-            'CC' => [
-                'name' => 'CloudCover',
-                'days' => '<strong>3 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
-                'trustpilot' => 3,
-            ],
-            'END' => [
-                'name' => 'Endsleigh',
-                'days' => '<strong>1 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-check',
-                'oldphones' => '<i class="far fa-check fa-2x"></i>',
-                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
-                'trustpilot' => 1,
-            ],
-            'LICI' => [
-                'name' => 'Loveit<br>coverIt.co.uk',
-                'days' => '<strong>1 - 5</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => '<i class="far fa-times fa-2x"></i>',
-                'phoneage' => '<strong>3 years</strong> <div>from purchase</div>',
-                'saveexcess' => 'fa-times',
-                'trustpilot' => 2,
-            ],
-            'O2' => [
-                'name' => 'O2',
-                'days' => '<strong>1 - 7</strong> <div>working days</div>',
-                'cashback' => 'fa-times',
-                'cover' => 'fa-times',
-                'oldphones' => 'From 02 only',
-                'phoneage' => '<strong>29 days</strong> <div>O2 phones only</div>',
-                'saveexcess' => 'fa-times',
-                'trustpilot' => 1.5,
-            ],
-        ];
-
-        return $competitor;
     }
 }

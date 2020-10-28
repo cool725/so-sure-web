@@ -102,15 +102,53 @@ $(function(){
         });
     }
 
-    // TODO: Move to component
-    $('.radio-btn').on('click', function(e) {
+    const payOptionCC = $('#payment-option-credit-card'),
+          payOptionDD = $('#payment-option-direct-debit'),
+          payCtaCC    = $('#payment-cta-credit-card'),
+          payCtaDD    = $('#payment-cta-direct-debit'),
+          payOptionTl = $('#payment-option-title');
+
+    $('.payment-card-type').on('click', function(e) {
+        $('.payment-card-type').removeClass('active');
+        $(this).addClass('active');
+
+        let option = $(this).data('option');
+
+        if (option == 'direct-debit') {
+            payCtaCC.addClass('hideme');
+            payCtaDD.removeClass('hideme');
+        } else {
+            payCtaCC.removeClass('hideme');
+            payCtaDD.addClass('hideme');
+        }
+    });
+
+    $('.payment-card-cycle').on('click', function(e) {
         e.preventDefault();
 
-        $('.radio-btn').removeClass('radio-btn-active');
-        $(this).addClass('radio-btn-active');
+        $('.payment-card-cycle').removeClass('active');
+        $(this).addClass('active');
 
         // Set the value for the form element
-        let val = $(this).data('value');
+        let val   = $(this).data('value'),
+            cycle = $(this).data('premium-type');
+
+        if (cycle === 'month') {
+            payOptionCC.addClass('hideme');
+            payOptionDD.find('.payment-card-type').addClass('active');
+            payCtaCC.addClass('hideme');
+            payCtaDD.removeClass('hideme');
+            payOptionTl.addClass('hideme');
+        } else {
+            payOptionCC.removeClass('hideme');
+            payOptionDD.find('.payment-card-type').removeClass('active');
+            payOptionCC.find('.payment-card-type').addClass('active');
+            payCtaCC.removeClass('hideme');
+            payCtaDD.addClass('hideme');
+            payOptionTl.removeClass('hideme');
+        }
+
+        // Set the linked radio
         $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
 
         let checkoutUrl = paymentForm.data('url'),

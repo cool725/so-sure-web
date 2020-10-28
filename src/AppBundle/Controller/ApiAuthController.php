@@ -2383,25 +2383,11 @@ class ApiAuthController extends BaseController
 
             if ($this->isDataStringPresent($data, 'first_name') &&
                 $this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50) != $user->getFirstName()) {
-                if ($user->hasPolicy()) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
-                        'Unable to change name after policy is created',
-                        422
-                    );
-                }
                 $user->setFirstName($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50));
                 $userChanged = true;
             }
             if ($this->isDataStringPresent($data, 'last_name') &&
                 $this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50) != $user->getLastName()) {
-                if ($user->hasPolicy()) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
-                        'Unable to change name after policy is created',
-                        422
-                    );
-                }
                 $user->setLastName($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50));
                 $userChanged = true;
             }

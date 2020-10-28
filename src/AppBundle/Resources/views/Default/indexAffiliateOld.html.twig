@@ -62,11 +62,8 @@
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto lozad">
                 {% endif %}
             </div>
-            <div class="hero__controls mb-2">
-                <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">Pay yearly and get {{ free_months }} FREE</a>
-            </div>
-            <div class="hero__controls mb-2">
-                <a href="#" class="btn btn-link btn-block-xs text-white get-a-quote disabled"><u>Pay monthly</u></a>
+            <div class="hero__controls mb-4">
+                <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">Get a Quote </a>
             </div>
             <div id="table-compare">
                 {% include 'AppBundle::Default/_comparisonTable.html.twig' with {'affiliate_page': affiliate_page } %}
@@ -89,31 +86,9 @@
         </div>
     </section>
 
-    <section class="why py-lg-5 mt-lg-5">
-        <div class="container-large py-5 mt-5">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="why__container">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - 24-72 hour replacement" width="180px" class="lozad">
-                        <h3 class="h4 text-dodger-blue">24-72 hour replace or repair</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="why__container">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 80% money back" width="180px" class="lozad">
-                        <h3 class="h4 text-dodger-blue">Up to 80% money back</h3>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="why__container">
-                        <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - Low excess from just £50" width="180px" class="lozad">
-                        <h3 class="h4 text-dodger-blue">Low excess from just {{ lowest_excess }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center mt-5">
-                <a href="#" class="btn btn-primary btn-block-xs get-a-quote disabled">Get Insured in minutes</a>
-            </div>
+    <section class="cta py-lg-5">
+        <div class="container-large text-center py-5">
+            <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled">Get a Quote</a>
         </div>
     </section>
 

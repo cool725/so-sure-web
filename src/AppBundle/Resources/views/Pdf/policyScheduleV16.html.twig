@@ -119,7 +119,7 @@
                 Unauthorised Charges: up to £1,000
             </li>
         </ul>
-        <p>As defined in the policy terms and conditions. You are limited to a maximum of one Loss or Theft claim per year.</p>
+        <p>As defined in the policy terms and conditions. You are limited to a maximum of two Loss or Theft claims per year.</p>
     {% else %}
         <ul>
             <li>
@@ -260,18 +260,40 @@
         {% if not policy.isPicSureRequired %}
             <p>If, before claiming, you have not validated your phone using the so-sure app, then the Excess is:</p>
             <ul>
-                <li>
-                    Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
-                </li>
-                <li>
-                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
-                </li>
-                <li>
-                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
-                </li>
-                <li>
-                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
-                </li>
+                {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+                    <li>
+                        Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+                    <li>
+                        Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                    </li>
+                {% else %}
+                    <li>
+                        Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                    </li>
+                {% endif %}
             </ul>
         {% endif %}
     {% endif %}

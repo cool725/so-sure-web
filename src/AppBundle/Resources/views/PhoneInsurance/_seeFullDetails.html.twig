@@ -4,27 +4,42 @@
     {% set device = policy.phone %}
 {% endif %}
 
-<div class="policy__info mx-4 mx-lg-5 py-5">
-    {% if body_class is defined and body_class != 'quote' %}
-        <div class="h1 text-white">{{ make_desc }} {{ device.model }} <span class="sub">({{ device.memory }}GB)</span></div>
+<div class="policy__info mx-4 mx-lg-5 pb-5">
+    <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
+    {% if validation_required is not null or instore is not null %}
+        <p class="mb-4 text-white">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app. 👋 You must validate your phone within 14 days or you will not be able to claim and the policy will be cancelled.</p>
+    {% else %}
+        <p class="text-white">Reduce the excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> by using our app to verify that it isn't already damaged prior to any claim.</p>
+        <p class="mb-4 text-white">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive.</p>
     {% endif %}
-    <div class="h1 text-columbia-blue-e mb-5">Full Cover Details</div>
-    <h2 class="h4 text-columbia-blue-e mb-4">What's covered</h2>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Loss &amp; Theft</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 90 days global travel</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Out of warranty breakdown</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft or loss claims</li>
-        <li class="text-white mb-5"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
-    </ul>
-    <h2 class="h4 text-columbia-blue-e my-4">What's not covered</h2>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="text-white mb-3"><i class="far fa-times text-columbia-blue-e fa-lg"></i> A claim where you have knowingly put your phone at risk</li>
-        <li class="text-white mb-5"><i class="far fa-times text-columbia-blue-e fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
-    </ul>
-    <h2 class="h4 text-columbia-blue-e my-4">Insurance Product Information Document</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered text-white">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="h6">Damage</th>
+                    <th class="h6">Loss</th>
+                    <th class="h6">Theft</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="h6">Excess</td>
+                    <td>&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
+                    <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
+                    <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
+                </tr>
+                {% if instore is null and validation_required is null %}
+                    <tr>
+                        <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="policy__info mx-4 mx-lg-5 py-5">
+    <h2 class="h4 text-columbia-blue-e mb-4">Insurance Product Information Document</h2>
     <ul class="list-unstyled icn-fa-list mb-0">
         <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
         <li class="text-white mb-5">
@@ -43,11 +58,26 @@
             </a>
         </li>
     </ul>
+    <h2 class="h4 text-columbia-blue-e my-4">What's covered</h2>
+    <ul class="list-unstyled icn-fa-list mb-0">
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Loss &amp; Theft</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 90 days global travel</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Out of warranty breakdown</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft or loss claims</li>
+        <li class="text-white mb-5"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
+    </ul>
+    <h2 class="h4 text-columbia-blue-e my-4">What's not covered</h2>
+    <ul class="list-unstyled icn-fa-list mb-0">
+        <li class="text-white mb-3"><i class="far fa-times text-columbia-blue-e fa-lg"></i> A claim where you have knowingly put your phone at risk</li>
+        <li class="text-white mb-5"><i class="far fa-times text-columbia-blue-e fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
+    </ul>
 </div>
 <div class="policy__info mx-4 mx-lg-5 py-5">
     <h2 class="h4 text-columbia-blue-e mb-4">Here’s how we compare to other insurers</h2>
-    <div class="d-xl-flex justify-content-lg-center">
-        <table class="table-list mx-auto table-list__insurers mb-5">
+    {# <div class="d-xl-flex justify-content-lg-center"> #}
+        <table class="table-list table-list__insurers mb-5">
             <thead>
                 <tr>
                     <th class="table-list__header h4 text-white">Traditional Insurers</th>
@@ -81,7 +111,7 @@
                 </tr>
             </tbody>
         </table>
-        <table class="table-list mx-auto table-list__so-sure">
+        <table class="table-list table-list__so-sure">
             <thead>
                 <tr>
                     <th class="table-list__header h2 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" alt="so-sure" width="130px"></th>
@@ -115,42 +145,8 @@
                 </tr>
             </tbody>
         </table>
-    </div>
+    {# </div> #}
     <p class="text-columbia-blue-e mb-0 mt-1"><small>*FCA report Dec 2015</small></p>
-</div>
-<div class="policy__info mx-4 mx-lg-5 py-5">
-<h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
-    {% if validation_required is not null or instore is not null %}
-        <p class="mb-4 text-white">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app. 👋 You must validate your phone within 14 days or you will not be able to claim and the policy will be cancelled.</p>
-    {% else %}
-        <p class="text-white">Reduce the excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> by using our app to verify that it isn't already damaged prior to any claim.</p>
-        <p class="mb-4 text-white">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive.</p>
-    {% endif %}
-    <div class="table-responsive">
-        <table class="table table-bordered text-white">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th class="h6">Damage</th>
-                    <th class="h6">Loss</th>
-                    <th class="h6">Theft</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="h6">Excess</td>
-                    <td>&pound;{{ prices['monthly'].picsureexcess.damage }}</td>
-                    <td>&pound;{{ prices['monthly'].picsureexcess.loss }}</td>
-                    <td>&pound;{{ prices['monthly'].picsureexcess.theft }}</td>
-                </tr>
-                {% if instore is null and validation_required is null %}
-                    <tr>
-                        <td colspan="4">If you don't verify the condition of your phone your excess will be up to &pound;100 more expensive</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>
 </div>
 <div class="policy__info mx-4 mx-lg-5 py-5">
     <h2 class="h4 my-4 text-columbia-blue-e">Cashback and Social Insurance</h2>

@@ -27,7 +27,6 @@ class SearchController extends BaseController
 {
     use PhoneTrait;
 
-
     /**
      * @Route("/phone-search", name="phone_search")
      * @Route("/phone-search/{type}", name="phone_search_type")
@@ -47,7 +46,6 @@ class SearchController extends BaseController
             if ($session = $request->getSession()) {
                 $session->set('quote', $phone->getId());
             }
-
             // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_phone');
         }
@@ -82,7 +80,6 @@ class SearchController extends BaseController
             if ($session = $request->getSession()) {
                 $session->set('quote', $phone->getId());
             }
-
             // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_phone');
         } elseif ($phone && in_array($type, ['learn-more'])) {
@@ -104,18 +101,9 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory()
-                        ], 301);
-                    } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel()
-                        ], 301);
-                    }
+                    $this->setPhoneSession($request, $phone);
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_TO_DETAILS);
+                    return $this->redirectToRoute('purchase', [], 301);
                 }
             }
         }
@@ -203,18 +191,9 @@ class SearchController extends BaseController
                         ));
                         // @codingStandardsIgnoreEnd
                     }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMakeCanonical(),
-                            'model' => $phone->getEncodedModelCanonical(),
-                            'memory' => $phone->getMemory()
-                        ], 301);
-                    } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel()
-                        ], 301);
-                    }
+                    $this->setPhoneSession($request, $phone);
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_TO_DETAILS);
+                    return $this->redirectToRoute('purchase', [], 301);
                 }
             }
         }
@@ -300,18 +279,9 @@ class SearchController extends BaseController
                             "Thanks! An email of your quote is on it's way"
                         ));
                     }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMakeCanonical(),
-                            'model' => $phone->getEncodedModelCanonical(),
-                            'memory' => $phone->getMemory()
-                        ], 301);
-                    } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel()
-                        ], 301);
-                    }
+                    $this->setPhoneSession($request, $phone);
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_TO_DETAILS);
+                    return $this->redirectToRoute('purchase', [], 301);
                 }
             }
         }
@@ -369,18 +339,9 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                        ], 301);
-                    } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                        ], 301);
-                    }
+                    $this->setPhoneSession($request, $phone);
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS);
+                    return $this->redirectToRoute('purchase', [], 301);
                 }
             }
         }
@@ -438,18 +399,9 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
-                    if ($phone->getMemory()) {
-                        return $this->redirectToRoute('phone_insurance_make_model_memory', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                            'memory' => $phone->getMemory(),
-                        ], 301);
-                    } else {
-                        return $this->redirectToRoute('phone_insurance_make_model', [
-                            'make' => $phone->getMake(),
-                            'model' => $phone->getEncodedModel(),
-                        ], 301);
-                    }
+                    $this->setPhoneSession($request, $phone);
+                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS);
+                    return $this->redirectToRoute('purchase', [], 301);
                 }
             }
         }

@@ -64,6 +64,9 @@ class MixpanelService
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
     const EVENT_QUOTE_PAGE_PURCHASE = 'Quote Page Purchase Step';
+    const EVENT_HOME_TO_DETAILS = 'Home Quote To Details Step';
+    const EVENT_QUOTE_TO_DETAILS = 'Dropdown Quote To Details Step';
+    const EVENT_MODEL_PAGE_TO_DETAILS = 'Model Pages To Details Step';
     // Unused, but reserved
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
     const EVENT_MODEL_PAGE = 'Model Page';
@@ -156,7 +159,10 @@ class MixpanelService
     public static $trackedEvents = [
         self::EVENT_HOME_PAGE,
         self::EVENT_QUOTE_PAGE,
+        self::EVENT_HOME_TO_DETAILS,
+        self::EVENT_QUOTE_TO_DETAILS,
         self::EVENT_QUOTE_PAGE_PURCHASE,
+        self::EVENT_MODEL_PAGE_TO_DETAILS,
         self::EVENT_MANUFACTURER_PAGE,
         self::EVENT_MODEL_PAGE,
         self::EVENT_LANDING_PAGE,
