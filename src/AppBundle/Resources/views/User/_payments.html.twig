@@ -34,7 +34,7 @@
             {% endif %}
         </div>
         <div class="tabbed-cardbox-info-item">
-            Current balance: <span>&pound;{{ policy.getCurrentInvoiceBalance| number_format(2, '.', ',') }}</span>
+            Current balance: <span>&pound;{{ policy.getOutstandingPremiumToDate| number_format(2, '.', ',') }}</span>
         </div>
         <div class="tabbed-cardbox-info-item">
             Paid to date: <span>&pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</span>
