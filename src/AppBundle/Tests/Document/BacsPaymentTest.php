@@ -226,6 +226,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $policy->setPremium($premium);
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2018-02-01'));
+        $policy->setEnd(new \DateTime('2019-02-01'));
         $policy->setBilling(new \DateTime('2018-02-01'));
         // one payment late.
         $bacs = new BacsPayment();
@@ -235,6 +236,16 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
         $bacs->submit(new \DateTime('2018-03-02'));
         $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
+        // another one.
+        // Technically we can not test multiple payments in a unit test. As a workaround, just double the value of this
+        // payment to pretend it is two payments.
+        $bacs = new BacsPayment();
+        $bacs->setPolicy($policy);
+        $bacs->setSubmittedDate(new \DateTime('2018-03-10'));
+        $bacs->setAmount($premium->getMonthlyPremiumPrice() * 2);
+        $this->assertEquals(PhonePolicy::STATUS_UNPAID, $bacs->getPolicy()->getStatus());
+        $bacs->submit(new \DateTime('2018-03-10'));
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $bacs->getPolicy()->getStatus());
     }
 
     public function testApproveSetsCorrectCommission()

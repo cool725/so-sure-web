@@ -5539,7 +5539,7 @@ abstract class Policy
             return null;
         }
         $real = $this->getUpgradedYearlyPrice() - $this->countFutureInvoiceSchedule($date) *
-            $this->getUpgradedStandardMonthlyPrice() - $this->getTotalSuccessfulUserPayments($date);
+            $this->getUpgradedStandardMonthlyPrice() - $this->getTotalSuccessfulPayments($date, false);
         if ($allowNegative) {
             return $real;
         }
