@@ -77,6 +77,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/uk-phone-statistics' => 'UK Phone Statistics',
             '/blog/sony-xperia-1-II-release-rumours' => 'New Sony Xperia 1 II Release Rumour Hub',
             '/blog/how-long-do-mobile-phones-last' => 'How Long Do Mobile Phones Last?',
+            '/blog/halloween-horror-stories' => 'Halloween Horror Stories',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',
