@@ -230,7 +230,7 @@ class OneOffCommand extends ContainerAwareCommand
             /** @var PhonePremium $premium */
             $premium = $policy->getPremium();
             if ($premium) {
-                $premium->setExcess($terms->getDefaultExcess());
+                $premium->setExcess($terms->getDefaultExcess($policy->isPicsureRequired()));
                 $premium->setPicSureExcess($terms->getDefaultPicSureExcess());
             }
         }

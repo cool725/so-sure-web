@@ -226,6 +226,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $policy->setPremium($premium);
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2018-02-01'));
+        $policy->setEnd(new \DateTime('2019-02-01'));
         $policy->setBilling(new \DateTime('2018-02-01'));
         // one payment late.
         $bacs = new BacsPayment();

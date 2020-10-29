@@ -26,16 +26,13 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    // const EXPERIMENT_HOMEPAGE_GREETING = 'Homepage Greeting';
+    const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
 
     // Exp 2
-    // const EXPERIMENT_PRICING_MESSAGING = 'Pricing Messaging';
+    const EXPERIMENT_PAYMENT_STEP = 'Purchase Payment Step';
 
     // Exp 3
-    // const EXPERIMENT_EXIT_POPUP_MULTI = 'Exit Popup Multi';
-
-    // Exp 4
-    const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
+    // const EXPERIMENT_LANDING_PAGES = 'Landing Page Design';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -129,20 +126,18 @@ class SixpackService
         'Homepage Copy Cheap vs Easy',
         'Pricing Messaging',
         'Exit Popup Multi',
-        'Homepage Greeting'
+        'Homepage Greeting',
+        'Landing Page Design',
+        'Scode Layout Variation'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        // self::EXPERIMENT_HOMEPAGE_GREETING,
-        // Exp 2
-        // self::EXPERIMENT_PRICING_MESSAGING,
-        // Exp 3
-        // self::EXPERIMENT_EXIT_POPUP_MULTI,
-        // Exp 4
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-        // Exp 5
-        // self::EXPERIMENT_COPY_CHEAP_VS_EASY,
+        // Exp 2
+        self::EXPERIMENT_PAYMENT_STEP,
+        // Exp 3
+        // self::EXPERIMENT_LANDING_PAGES,
     ];
 
     public static $authExperiments = [
@@ -169,6 +164,7 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionSimple = [
+        self::EXPERIMENT_PAYMENT_STEP,
     ];
 
     /**
@@ -177,15 +173,11 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        //  self::EXPERIMENT_HOMEPAGE_GREETING,
-        // Exp 2
-        // self::EXPERIMENT_PRICING_MESSAGING,
-        // Exp 3
-        // self::EXPERIMENT_EXIT_POPUP_MULTI,
-        // Exp 4
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-        // Exp 5
-        // self::EXPERIMENT_COPY_CHEAP_VS_EASY,
+        // Exp 2
+        // self::EXPERIMENT_SCODE_CONTENT,
+        // Exp 3
+        // self::EXPERIMENT_LANDING_PAGES,
     ];
 
     /** @var LoggerInterface */

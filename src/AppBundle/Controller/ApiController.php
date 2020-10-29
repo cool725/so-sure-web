@@ -11,6 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
+use AppBundle\Service\RequestService;
+use UAParser\Parser;
+use AppBundle\Validator\Constraints\AlphanumericValidator;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Phone;
@@ -23,6 +26,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\Charge;
+use AppBundle\Document\Attribution;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -720,6 +724,7 @@ class ApiController extends BaseController
             $facebookId = $this->getDataString($data, 'facebook_id');
             $googleId = $this->getDataString($data, 'google_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
+            $attributionData = $data['attribution'];
             $userExists = $repo->existsUser(
                 $this->getDataString($data, 'email'),
                 $facebookId,
@@ -733,16 +738,25 @@ class ApiController extends BaseController
                 // being recreated in account in the db.  This is only allowed once per user
                 // and is only because the prelaunch app didn't do anything other than record email address
                 $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($this->getDataString($data, 'email'))]);
+                if (!$user) {
+                    $user = $repo->findOneBy(['mobileNumber' => $this->normalizeUkMobile($mobileNumber)]);
+                }
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
                     $user->setLastLogin(\DateTime::createFromFormat('U', time()));
                 } else {
-                    if (!$user->canDelete()) {
+                    if (!$user) {
                         return $this->getErrorJsonResponse(
                             ApiErrorCode::ERROR_USER_EXISTS,
                             'User already exists',
                             422
                         );
+                    } elseif (!$user->canDelete()) {
+                          return $this->getErrorJsonResponse(
+                              ApiErrorCode::ERROR_USER_EXISTS,
+                              'User already exists with an active policy',
+                              422
+                          );
                     } else {
                         // fix for same person getting quote multiple times
                         $policies = $user->getPolicies();
@@ -813,6 +827,29 @@ class ApiController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'SCode missing', 404);
                 }
                 $scode->addAcceptor($user);
+            }
+            if ($attributionData !== null) {
+                $attribution = new Attribution();
+                $attribution->setCampaignName($this->getDataString($attributionData, 'utm_campaign'));
+                $attribution->setCampaignMedium($this->getDataString($attributionData, 'utm_medium'));
+                $attribution->setCampaignSource($this->getDataString($attributionData, 'utm_source'));
+                $alphaValidator = new AlphanumericValidator();
+                $attribution->setGoCompareQuote(
+                    $alphaValidator->conform($this->getDataString($attributionData, 'quote_id'))
+                );
+                /** @var RequestService $requestService */
+                $requestService = $this->get('app.request');
+                $deviceCategory = null;
+                $deviceOS = null;
+                if ($userAgent = $requestService->getUserAgent()) {
+                    $parser = Parser::create();
+                    $userAgentDetails = $parser->parse($userAgent);
+                    $deviceCategory = $requestService->getDeviceCategory();
+                    $deviceOS = $requestService->getDeviceOS();
+                }
+                $attribution->setDeviceCategory($deviceCategory);
+                $attribution->setDeviceOS($deviceOS);
+                $user->setAttribution($attribution);
             }
             try {
                 $this->validateObject($user);
@@ -902,7 +939,7 @@ class ApiController extends BaseController
             }
 
             // Breaking change to return all the policies objects to support renewals
-            if (($platform == 'ios' && version_compare($version, '1.5.73', '<')) ||
+            if (($platform == 'ios' && version_compare($version, '1.7.5', '<')) ||
                 ($platform == 'android' && version_compare($version, '1.6.0.2', '<')) ) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_UPGRADE_APP,

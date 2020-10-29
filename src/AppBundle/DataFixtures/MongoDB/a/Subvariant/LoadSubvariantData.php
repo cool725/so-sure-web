@@ -35,6 +35,7 @@ class LoadSubvariantData implements FixtureInterface, ContainerAwareInterface
         $damage->setWarranty(false);
         $damage->setExtendedWarranty(false);
         $damage->setNClaims(1);
+        $damage->setPolicyPrefix('Dam');
         $essentials = new Subvariant();
         $essentials->setName('essentials');
         $essentials->setDamage(true);
@@ -43,6 +44,7 @@ class LoadSubvariantData implements FixtureInterface, ContainerAwareInterface
         $essentials->setWarranty(true);
         $essentials->setExtendedWarranty(true);
         $essentials->setNClaims(2);
+        $essentials->setPolicyPrefix('Ess');
         $manager->persist($damage);
         $manager->persist($essentials);
         $manager->flush();

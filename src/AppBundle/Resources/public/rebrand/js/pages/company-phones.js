@@ -9,6 +9,7 @@ require('../../sass/pages/company-phones.scss');
 let textFit = require('textfit');
 require('jquery-validation');
 require('../common/validation-methods.js');
+require('../components/memory-search-dropdown.js');
 
 $(function() {
 

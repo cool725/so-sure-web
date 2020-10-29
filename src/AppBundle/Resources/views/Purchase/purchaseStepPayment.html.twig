@@ -108,7 +108,7 @@
                             <a href="#qpw-info-mobile"
                                id="qpw-info-btn"
                                class="text-white">
-                                see full details <i class="fas fa-caret-down ml-2"></i>
+                                View my excess <i class="fas fa-caret-down ml-2"></i>
                             </a>
                         </div>
                         <div class="qpw__footer d-none d-lg-block">
@@ -116,7 +116,7 @@
                                 <h2 class="h4 text-columbia-blue-e">Easy, Fast &amp; Great Value</h2>
                                 <ul class="list-unstyled icn-fa-list">
                                     <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Fast replace and repair service</li>
-                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> FREE month when you refer a friend</li>
+                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Up to 80% no claims cashback</li>
                                     <li class="text-white"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Low price and excess from &pound;{{ prices['monthly'].picsureexcess.damage }}</li>
                                 </ul>
                             </div>
@@ -125,10 +125,10 @@
                                    class="btn btn-outline-columbia-blue-e mt-2 toggle-text"
                                    data-toggle="collapse"
                                    data-target="#qpw-info"
-                                   data-text-swap='hide full details <i class="fas fa-caret-up ml-2"></i>'
+                                   data-text-swap='Hide my excess <i class="fas fa-caret-up ml-2"></i>'
                                    role="button"
                                    aria-expanded="false"
-                                   aria-controls="qpw-info">see full details
+                                   aria-controls="qpw-info">View my excess
                                    <i class="fas fa-caret-down ml-2"></i>
                                </a>
                             </div>
@@ -152,7 +152,11 @@
                 {# Sub Content #}
                 <div class="qpw__sub__container">
                     <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
-                        {% include 'AppBundle::Purchase/_formStepPayment.html.twig' %}
+                        {% if purchase_payment_step_exp is defined and purchase_payment_step_exp == 'new-format' %}
+                            {% include 'AppBundle::Purchase/_formStepPaymentB.html.twig' %}
+                        {% else %}
+                            {% include 'AppBundle::Purchase/_formStepPayment.html.twig' %}
+                        {% endif %}
                     </div>
                 </div>
                 {# Mobile Info #}
@@ -191,5 +195,9 @@
         <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
     {% endif %}
     <script src="{{ asset('css-js/purchase.js') }}"></script>
-    <script src="{{ asset('css-js/purchase-payment.js') }}"></script>
+    {% if purchase_payment_step_exp is defined and purchase_payment_step_exp == 'new-format' %}
+        <script src="{{ asset('css-js/purchase-payment-b.js') }}"></script>
+    {% else %}
+        <script src="{{ asset('css-js/purchase-payment.js') }}"></script>
+    {% endif %}
 {% endblock %}

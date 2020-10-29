@@ -171,6 +171,8 @@
             <a href="{{ path('admin_home') }}" class="nav-link user-link">Admin</a>
         {% elseif is_granted('ROLE_CLAIMS') %}
             <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
+        {% elseif is_granted('ROLE_PICSURE') %}
+            <a href="{{ path('picsure_index') }}" class="nav-link user-link">Picsure</a>
         {% else %}
             <a href="{{ path('user_home') }}" class="nav-link user-link">Dashboard</a>
         {% endif %}

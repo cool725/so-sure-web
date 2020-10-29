@@ -62,7 +62,7 @@ Attached is a copy of all your key documents, including your policy terms for re
 {% if policy.status == 'picsure-required' %}
 Don't forget to download the app and verify the condition of your phone to start your policy.
 {% elseif policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
-{% if policy.subvariant.name == 'damage' %}
+{% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
 Your excess is currently &pound;{{ policy.premium.excess.damage }}, you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} by validating your phone with our app.
 {% else %}
 Your excess is currently &pound;{{ policy.premium.excess.damage }} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss), you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.

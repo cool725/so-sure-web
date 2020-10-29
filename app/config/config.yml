@@ -95,7 +95,6 @@ twig:
         form_client_validation: true
         api_base_url: "%api_base_url%"
         web_base_url: "%web_base_url%"
-        cookie_url: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
         rollbar_client_access_token: "%rollbar_client_access_token%"
         checkout_salva_public_key: "%checkout_salva_apipublic%"
         checkout_helvetia_public_key: "%checkout_helvetia_apipublic%"
@@ -103,9 +102,10 @@ twig:
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
         support_number: "03450744839"
         broker_name: "Shepherd Compello Ltd"
-        policy_doc_version: 15,
+        policy_doc_version: 16,
         free_months: "one month"
         lowest_excess: "£25"
+        trustpilot_rating: 4.5
 
 doctrine_mongodb:
     connections:
@@ -528,6 +528,7 @@ nelmio_security:
                 - https://*.googletagmanager.com
                 - https://*.googlesyndication.com
                 - https://www.google-analytics.com
+                - https://optimize.google.com
                 - https://stats.g.doubleclick.net
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
@@ -758,6 +759,7 @@ nelmio_security:
                 - http://fonts.gstatic.com
                 - https://fonts.gstatic.com
                 - https://script.hotjar.com
+                - https://optimize.google.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -796,6 +798,7 @@ nelmio_security:
                 - http://track.omguk.com
                 - https://track.omguk.com
                 - https://www.instagram.com
+                - https://optimize.google.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -840,6 +843,7 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
                 - https://www.googleadservices.com # necessary?
+                - https://optimize.google.com
                 - https://*.doubleclick.net
                 - https://www.google.com
                 - https://*.doubleclick.net
@@ -1104,6 +1108,7 @@ nelmio_security:
                 - http://smct.co
                 - https://cdn.smct.co
                 - https://fonts.smct.co
+                - https://optimize.google.com
             img-src:
                 - 'self'
                 - https://wearesosure.com
@@ -1144,6 +1149,7 @@ nelmio_security:
                 - https://chart.googleapis.com
                 - https://bat.bing.com
                 - https://www.googletagmanager.com
+                - https://optimize.google.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com

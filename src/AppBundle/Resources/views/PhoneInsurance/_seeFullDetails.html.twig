@@ -4,122 +4,8 @@
     {% set device = policy.phone %}
 {% endif %}
 
-<div class="policy__info mx-4 mx-lg-5 py-5">
-    {% if body_class is defined and body_class != 'quote' %}
-        <div class="h1 text-white">{{ make_desc }} {{ device.model }} <span class="sub">({{ device.memory }}GB)</span></div>
-    {% endif %}
-    <div class="h1 text-columbia-blue-e mb-5">Full Cover Details</div>
-    <h2 class="h4 text-columbia-blue-e mb-4">What's covered</h2>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Loss &amp; Theft</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 90 days global travel</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Out of warranty breakdown</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
-        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft or loss claims</li>
-        <li class="text-white mb-5"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
-    </ul>
-    <h2 class="h4 text-columbia-blue-e my-4">What's not covered</h2>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="text-white mb-3"><i class="far fa-times text-columbia-blue-e fa-lg"></i> A claim where you have knowingly put your phone at risk</li>
-        <li class="text-white mb-5"><i class="far fa-times text-columbia-blue-e fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
-    </ul>
-    <h2 class="h4 text-columbia-blue-e my-4">Insurance Product Information Document</h2>
-    <ul class="list-unstyled icn-fa-list mb-0">
-        <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
-        <li class="text-white mb-5">
-            <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
-            {% set ipidFile = 'IPID_so-sure_030918.pdf' %}
-            {% if validation_required is not null %}
-                {% set ipidFile = 'IPID_so-sure_agg.pdf' %}
-            {% endif %}
-            <a href="{{ cdn_url }}/files/{{ ipidFile }}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="track-data text-white"
-                data-event="user-download-ipid"
-                data-event-url="{{ cdn_url }}/files/{{ ipidFile }}">
-                <u>Download a copy of our IPID</u>
-            </a>
-        </li>
-    </ul>
-</div>
-<div class="policy__info mx-4 mx-lg-5 py-5">
-    <h2 class="h4 text-columbia-blue-e mb-4">Here’s how we compare to other insurers</h2>
-    <div class="d-xl-flex justify-content-lg-center">
-        <table class="table-list mx-auto table-list__insurers mb-5">
-            <thead>
-                <tr>
-                    <th class="table-list__header h4 text-white">Traditional Insurers</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-dark text-white">4-18 days wait on average*</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-dark text-white">Cover starts after 14 days</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-dark text-white">Only phones purchased within 30 days are covered</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-dark text-white">You'll need to have a law degree to understand the terms</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4 border-fix">
-                        <span class="table-list__icn table-list__icn-dark text-white">Unnecessarily expensive</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <table class="table-list mx-auto table-list__so-sure">
-            <thead>
-                <tr>
-                    <th class="table-list__header h2 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" alt="so-sure" width="130px"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>24-72 hour replace/repair once claim approved</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>Immediate cover</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>Refurbished and second-hand devices up to 3 years old covered</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>Plain English Terms &amp; Conditions</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="py-3 px-4">
-                        <span class="table-list__icn table-list__icn-happy"><strong>We’re up to 40% cheaper</strong></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <p class="text-columbia-blue-e mb-0 mt-1"><small>*FCA report Dec 2015</small></p>
-</div>
-<div class="policy__info mx-4 mx-lg-5 py-5">
-<h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
+<div class="policy__info mx-4 mx-lg-5 pb-5">
+    <h2 class="h4 my-4 text-columbia-blue-e">Excess</h2>
     {% if validation_required is not null or instore is not null %}
         <p class="mb-4 text-white">The excess for your <strong>{{ make_desc }} {{ phone.model }} ({{ phone.memory }}GB)</strong> once validated through our app. 👋 You must validate your phone within 14 days or you will not be able to claim and the policy will be cancelled.</p>
     {% else %}
@@ -153,6 +39,116 @@
     </div>
 </div>
 <div class="policy__info mx-4 mx-lg-5 py-5">
+    <h2 class="h4 text-columbia-blue-e mb-4">Insurance Product Information Document</h2>
+    <ul class="list-unstyled icn-fa-list mb-0">
+        <li class="text-white mb-3"><i class="fal fa-info-circle text-columbia-blue-e fa-lg"></i> The insurance product information document (IPID) is a simple, standardised document that you can use to compare policies with other insurers in the UK and EU.</li>
+        <li class="text-white mb-5">
+            <i class="fal fa-file-download text-columbia-blue-e fa-lg"></i>
+            {% set ipidFile = 'IPID_so-sure_030918.pdf' %}
+            {% if validation_required is not null %}
+                {% set ipidFile = 'IPID_so-sure_agg.pdf' %}
+            {% endif %}
+            <a href="{{ cdn_url }}/files/{{ ipidFile }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="track-data text-white"
+                data-event="user-download-ipid"
+                data-event-url="{{ cdn_url }}/files/{{ ipidFile }}">
+                <u>Download a copy of our IPID</u>
+            </a>
+        </li>
+    </ul>
+    <h2 class="h4 text-columbia-blue-e my-4">What's covered</h2>
+    <ul class="list-unstyled icn-fa-list mb-0">
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Loss &amp; Theft</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accidental Damage, including water damage &amp; cracked screens</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> 90 days global travel</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Out of warranty breakdown</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Unauthorised network charges up the value of &pound;1000 (inc VAT)</li>
+        <li class="text-white mb-3"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Accessories up to the value of £100 (inc VAT) for theft or loss claims</li>
+        <li class="text-white mb-5"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Cover for phones up to 3 years old, including second hand and refurbished devices</li>
+    </ul>
+    <h2 class="h4 text-columbia-blue-e my-4">What's not covered</h2>
+    <ul class="list-unstyled icn-fa-list mb-0">
+        <li class="text-white mb-3"><i class="far fa-times text-columbia-blue-e fa-lg"></i> A claim where you have knowingly put your phone at risk</li>
+        <li class="text-white mb-5"><i class="far fa-times text-columbia-blue-e fa-lg"></i> 3+ claims for Loss and/or Theft in any policy year</li>
+    </ul>
+</div>
+<div class="policy__info mx-4 mx-lg-5 py-5">
+    <h2 class="h4 text-columbia-blue-e mb-4">Here’s how we compare to other insurers</h2>
+    {# <div class="d-xl-flex justify-content-lg-center"> #}
+        <table class="table-list table-list__insurers mb-5">
+            <thead>
+                <tr>
+                    <th class="table-list__header h4 text-white">Traditional Insurers</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-dark text-white">4-18 days wait on average*</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-dark text-white">Cover starts after 14 days</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-dark text-white">Only phones purchased within 30 days are covered</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-dark text-white">You'll need to have a law degree to understand the terms</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4 border-fix">
+                        <span class="table-list__icn table-list__icn-dark text-white">Unnecessarily expensive</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table-list table-list__so-sure">
+            <thead>
+                <tr>
+                    <th class="table-list__header h2 text-white blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-light.svg" alt="so-sure" width="130px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-happy"><strong>24-72 hour replace/repair once claim approved</strong></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-happy"><strong>Immediate cover</strong></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-happy"><strong>Refurbished and second-hand devices up to 3 years old covered</strong></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-happy"><strong>Plain English Terms &amp; Conditions</strong></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="py-3 px-4">
+                        <span class="table-list__icn table-list__icn-happy"><strong>We’re up to 40% cheaper</strong></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    {# </div> #}
+    <p class="text-columbia-blue-e mb-0 mt-1"><small>*FCA report Dec 2015</small></p>
+</div>
+<div class="policy__info mx-4 mx-lg-5 py-5">
     <h2 class="h4 my-4 text-columbia-blue-e">Cashback and Social Insurance</h2>
     {% if feature_enabled('referral') %}
         <p class="text-white">Refer a friend and you’ll both get a month free! You can also get additional cashback if you connect with friends on so-sure and none of you claim.</p>
@@ -160,7 +156,7 @@
         <p class="text-white">Refer a friend and you’ll both get a month for free. Simple as that.</p>
         <p class="mb-5 text-white">Each of you will also get up to £10 in your individual Reward Pots when you connect via our app. You can top this up with another £10 each time you connect to a new friend - and if none of you make a claim, all the money in your pot will be paid out to you at the end of your policy year!</p>
     {% else %}
-        <p>Get up to 80% cashback every year when you and your friends don’t claim.</p>
+        <p class="text-white">Get up to 80% cashback every year when you and your friends don’t claim.</p>
         <h3 class="h5 text-columbia-blue-e">How?</h3>
         <p class="mb-5 text-white">Connect to friends/family and each receive up to &pound;10 in your individual Reward Pots. At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</p>
     {% endif %}
@@ -170,10 +166,10 @@
     <h2 class="h4 text-columbia-blue-e mb-4">Top FAQ's</h2>
     <div class="expanding-cardbox expanding-cardbox-alt mb-4">
         <div class="expanding-cardbox__body">
-            <h3 class="h5 expanding-cardbox__title text-white mb-0">
+            <h3 class="h5 expanding-cardbox__title text-white">
                 Why should I use you? <i class="far fa-chevron-down text-white fa-lg"></i>
             </h3>
-            <div class="expanding-cardbox__expand text-white mt-4">
+            <div class="expanding-cardbox__expand text-white">
                 <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you <a href="{{ path('faq') }}#social-insurance-and-reward-pot" class="text-white">money back</a>.</p>
                 <ul class="mb-0">
                     <li>Instant cover from purchase</li>
@@ -192,20 +188,20 @@
     {% if instore is null %}
         <div class="expanding-cardbox expanding-cardbox-alt mb-4">
             <div class="expanding-cardbox__body">
-                <h3 class="h5 expanding-cardbox__title text-white mb-0">
+                <h3 class="h5 expanding-cardbox__title text-white">
                     I bought a used phone/my friend gave me an older phone can I still insure it? <i class="far fa-chevron-down text-white fa-lg"></i>
                 </h3>
-                <div class="expanding-cardbox__expand text-white mt-4">
+                <div class="expanding-cardbox__expand text-white">
                     <p class="mb-0">Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.</p>
                 </div>
             </div>
         </div>
         <div class="expanding-cardbox expanding-cardbox-alt mb-4">
             <div class="expanding-cardbox__body">
-                <h3 class="h5 expanding-cardbox__title text-white mb-0">
+                <h3 class="h5 expanding-cardbox__title text-white">
                     Can I insure a mobile phone I bought from eBay or another auction site? <i class="far fa-chevron-down text-white fa-lg"></i>
                 </h3>
-                <div class="expanding-cardbox__expand text-white mt-4">
+                <div class="expanding-cardbox__expand text-white">
                     <p>Yes, you can take out insurance on a second hand phone.</p>
                     <p class="mb-0">The phone bought needs to have orginally been sold into the UK market prior your purchase (eg we don't insure models sold in China).</p>
                 </div>
@@ -214,30 +210,30 @@
     {% endif %}
     <div class="expanding-cardbox expanding-cardbox-alt mb-4">
         <div class="expanding-cardbox__body">
-            <h3 class="h5 expanding-cardbox__title text-white mb-0">
+            <h3 class="h5 expanding-cardbox__title text-white">
                 If I pay annually do I get a discount? <i class="far fa-chevron-down text-white fa-lg"></i>
             </h3>
-            <div class="expanding-cardbox__expand text-white mt-4">
+            <div class="expanding-cardbox__expand text-white">
                 <p class="mb-0">Yes! If you pay yearly, you get {{ free_months }} free. In addition to that, you can add money to your reward pot by connecting with friends and family to earn up to 80% cashback.</p>
             </div>
         </div>
     </div>
     <div class="expanding-cardbox expanding-cardbox-alt mb-4">
         <div class="expanding-cardbox__body">
-            <h3 class="h5 expanding-cardbox__title text-white mb-0">
+            <h3 class="h5 expanding-cardbox__title text-white">
                 Is there an age limit on the mobile phone I want to insure? <i class="far fa-chevron-down text-white fa-lg"></i>
             </h3>
-            <div class="expanding-cardbox__expand text-white mt-4">
+            <div class="expanding-cardbox__expand text-white">
                 <p class="mb-0">The phone you want to insure must be <strong>less than 3 years old</strong> from when your policy begins.</p>
             </div>
         </div>
     </div>
     <div class="expanding-cardbox expanding-cardbox-alt mb-4">
         <div class="expanding-cardbox__body">
-            <h3 class="h5 expanding-cardbox__title text-white mb-0">
+            <h3 class="h5 expanding-cardbox__title text-white">
                 What is an IMEI number and how do I find out the IMEI of my mobile phone? <i class="far fa-chevron-down text-white fa-lg"></i>
             </h3>
-            <div class="expanding-cardbox__expand text-white mt-4">
+            <div class="expanding-cardbox__expand text-white">
                 <p>The IMEI (International Mobile Equipment Identification) number of your mobile phone is a unique identification code that is specific to your mobile phone.  If you change your mobile phone, it is important that you call us so we can update your policy with the correct details.</p>
                 <h4>For Android users:</h4>
                 <p>The easiest way to find your phone’s IMEI number if you’re on an Android device is to simply dial <strong>*#06#</strong>.</p>

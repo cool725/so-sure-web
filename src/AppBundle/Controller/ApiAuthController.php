@@ -606,6 +606,7 @@ class ApiAuthController extends BaseController
 
             $subvariant = null;
             $subvariantString = $this->getDataString($phonePolicyData, 'subvariant');
+            $aggregator = ($subvariantString != null);
             if ($subvariantString) {
                 /** @var SubvariantRepository $subvariantRepo */
                 $subvariantRepo = $this->getManager()->getRepository(Subvariant::class);
@@ -626,7 +627,7 @@ class ApiAuthController extends BaseController
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
                 ]),
                 $modelNumber,
-                $subvariant != null,
+                $aggregator,
                 $subvariant
             );
             $policy->setName($this->conformAlphanumericSpaceDot($this->getDataString($phonePolicyData, 'name'), 100));
@@ -1688,20 +1689,20 @@ class ApiAuthController extends BaseController
                 $imei->addMetadata('imei-suspected-fraud', $result['Metadata']['suspected-fraud']);
                 if ($result['Metadata']['suspected-fraud'] === "1") {
                     $policy->setImeiCircumvention(true);
-                    /** @var MailerService $mailer */
-                    $mailer = $this->get('app.mailer');
-                    /** @var RouterService $router */
-                    $router = $this->get('app.router');
-                    $body = sprintf(
-                        '<a href="%s">%s</a>',
-                        $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
-                        $policy->getPolicyNumber()
-                    );
-                    $mailer->send(
-                        'Detected imei circumvention attempt',
-                        'tech+ops@so-sure.com',
-                        $body
-                    );
+                    // /** @var MailerService $mailer */
+                    // $mailer = $this->get('app.mailer');
+                    // /** @var RouterService $router */
+                    // $router = $this->get('app.router');
+                    // $body = sprintf(
+                    //     '<a href="%s">%s</a>',
+                    //     $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                    //     $policy->getPolicyNumber()
+                    // );
+                    // $mailer->send(
+                    //     'Detected imei circumvention attempt',
+                    //     'tech+ops@so-sure.com',
+                    //     $body
+                    // );
                 } else {
                     $policy->setImeiCircumvention(false);
                 }
@@ -2382,25 +2383,11 @@ class ApiAuthController extends BaseController
 
             if ($this->isDataStringPresent($data, 'first_name') &&
                 $this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50) != $user->getFirstName()) {
-                if ($user->hasPolicy()) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
-                        'Unable to change name after policy is created',
-                        422
-                    );
-                }
                 $user->setFirstName($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50));
                 $userChanged = true;
             }
             if ($this->isDataStringPresent($data, 'last_name') &&
                 $this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50) != $user->getLastName()) {
-                if ($user->hasPolicy()) {
-                    return $this->getErrorJsonResponse(
-                        ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
-                        'Unable to change name after policy is created',
-                        422
-                    );
-                }
                 $user->setLastName($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50));
                 $userChanged = true;
             }
@@ -2811,6 +2798,8 @@ class ApiAuthController extends BaseController
             $quote['make'] = $newPhone->getMake();
             $quote['model'] = $newPhone->getModel();
             $quote['memory'] = $newPhone->getMemory();
+            $quote['max_connections'] = $policy->getMaxConnections();
+            $quote['max_pot'] = $policy->getMaxPot();
 
             return new JsonResponse($quote);
         } catch (AccessDeniedException $e) {

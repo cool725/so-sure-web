@@ -5,6 +5,11 @@
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
 
+{# Money Version? #}
+{% if money_version is defined and money_version == true  %}
+    {% set robots_noindex = true %}
+{% endif %}
+
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
 {% set with_phone = phone.model %}
@@ -64,65 +69,76 @@
             <div class="row">
                 <div class="col-lg-6 order-lg-2">
                     <div class="hero__intro">
-                        <div class="breadcrumbs">
-                            <ul class="list-inline"
-                                vocab="https://schema.org/"
-                                typeof="BreadcrumbList">
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('homepage') }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Home</span>
-                                    </a>
-                                    <meta property="position" content="1">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('phone_insurance') }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Phone Insurance</span>
-                                    </a>
-                                    <meta property="position" content="2">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('phone_insurance_make', {'make': phone.makeCanonical}) }}"
-                                       class="text-columbia-blue-e"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">{{ phone.make }}</span>
-                                    </a>
-                                    <meta property="position" content="3">
-                                </li>
-                                <li class="list-inline-item text-white">
-                                    <i class="fal fa-angle-right text-white"></i>
-                                </li>
-                                <li class="list-inline-item text-white"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <span property="name">{% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }}</span>
-                                    <meta property="position" content="4">
-                                </li>
-                            </ul>
-                        </div>
+                        {% if money_version is defined and money_version == true  %}
+                            <div class="d-flex align-items-center mb-4">
+                                <p class="lead text-columbia-blue-e mr-4 mb-0 fit">In partnership with:</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                    data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_money_logo_light.svg" alt="so-sure - money.co.uk"
+                                    title="so-sure - money.co.uk"
+                                    width="180px"
+                                    class="lozad">
+                            </div>
+                        {% else %}
+                            <div class="breadcrumbs">
+                                <ul class="list-inline"
+                                    vocab="https://schema.org/"
+                                    typeof="BreadcrumbList">
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('homepage') }}"
+                                        class="text-columbia-blue-e"
+                                        property="item"
+                                        typeof="WebPage">
+                                        <span property="name">Home</span>
+                                        </a>
+                                        <meta property="position" content="1">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-white"></i>
+                                    </li>
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('phone_insurance') }}"
+                                        class="text-columbia-blue-e"
+                                        property="item"
+                                        typeof="WebPage">
+                                        <span property="name">Phone Insurance</span>
+                                        </a>
+                                        <meta property="position" content="2">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-white"></i>
+                                    </li>
+                                    <li class="list-inline-item"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <a href="{{ path('phone_insurance_make', {'make': phone.makeCanonical}) }}"
+                                        class="text-columbia-blue-e"
+                                        property="item"
+                                        typeof="WebPage">
+                                        <span property="name">{{ phone.make }}</span>
+                                        </a>
+                                        <meta property="position" content="3">
+                                    </li>
+                                    <li class="list-inline-item text-white">
+                                        <i class="fal fa-angle-right text-white"></i>
+                                    </li>
+                                    <li class="list-inline-item text-white"
+                                        property="itemListElement"
+                                        typeof="ListItem">
+                                        <span property="name">{% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }}</span>
+                                        <meta property="position" content="4">
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endif %}
                         <h1 class="text-white h1m mb-0">
                             {% if phone.active %}
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price|number_format(2) }} per month
+                                {% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price|number_format(2) }} per month
                             {% else %}
-                                {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance
+                                {% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance
                             {% endif %}
                         </h1>
                         {% if not phone.active %}
@@ -164,7 +180,7 @@
     {# Intro #}
     <section class="intro py-lg-5">
         <div class="container-large py-5">
-            <h2 class="h3 mb-4 text-primary text-center">Why insure your {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }} with so-sure</h2>
+            <h2 class="h3 mb-4 text-primary text-center">Why insure your {% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }} with so-sure</h2>
             {% block phone_hero_text %}{% endblock %}
             <div class="row">
                 {# TODO: Needs copy #}
@@ -183,7 +199,7 @@
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" width="180px" class="lozad">
                     <h3 class="h5 text-primary">
                         {% if manufacturer_landing_usps is defined and manufacturer_landing_usps == 'same-as-homepage' %}
-                            FREE month when you refer a friend
+                            Up to 80% no claims cashback
                         {% else %}
                             Up to 80% money back
                         {% endif %}
@@ -223,7 +239,7 @@
                                  class="img-fluid lozad mb-4 d-lg-none"
                                  width="320px">
                         {% endif %}
-                        <h2 class="h3 mt-3 mb-4 text-primary">Why insure your {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }}?</h2>
+                        <h2 class="h3 mt-3 mb-4 text-primary">Why insure your {% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }}?</h2>
                         {% block phone_why_insure_text %}{% endblock %}
                         <a href="#" class="btn btn-success btn-block-xs mx-auto my-5 get-a-quote disabled">Get a Quote</a>
                     </div>
@@ -248,7 +264,7 @@
     {# Cover #}
     <section class="cover py-lg-5">
         <div class="container-large {% if hide_section == false %}pt-lg-5{% else %}pt-5{% endif %}">
-            <h2 class="h3 mb-5 text-primary text-center">Comprehensive {% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }} Insurance that starts immediately</h2>
+            <h2 class="h3 mb-5 text-primary text-center">Comprehensive {% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }} Insurance that starts immediately</h2>
             <div class="d-none d-lg-block">
                 {% if hide_section == true %}
                     <div class="row">

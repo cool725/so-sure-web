@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\Note;
@@ -3005,7 +3006,7 @@ abstract class Policy
 
     /**
      * Sets the policy's subvariant.
-     * @param Subvariant $subvariant is the subvariant to set it to.
+     * @param Subvariant|null $subvariant is the subvariant to set it to or null if you wish to blank it.
      */
     public function setSubvariant($subvariant)
     {
@@ -3722,7 +3723,7 @@ abstract class Policy
 
     public function getOutstandingPremium()
     {
-        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->getPremiumPaid());
+        return $this->toTwoDp($this->getUpgradedYearlyPrice() - $this->getPremiumPaid());
     }
 
     /**
@@ -4572,16 +4573,15 @@ abstract class Policy
         }
     }
 
-    public function getPolicyPrefix($environment)
+    public function getPolicyPrefix()
     {
-        $prefix = null;
-        if ($environment != 'prod') {
-            $prefix = mb_strtoupper($environment);
+        if ($this->getSubvariant()) {
+            return $this->getSubvariant()->getPolicyPrefix();
         } elseif ($this->getUser() && $this->getUser()->hasSoSureEmail()) {
             // any emails with @so-sure.com will generate an invalid policy
-            $prefix = self::PREFIX_INVALID;
+            return self::PREFIX_INVALID;
         }
-        return $prefix;
+        return null;
     }
 
     /**
@@ -5534,20 +5534,16 @@ abstract class Policy
         $allowNegative = false,
         $firstDayIsUnpaid = false
     ) {
+        NoOp::ignore($firstDayIsUnpaid);
         if (!$this->isPolicy()) {
             return null;
         }
-
-        $totalPaid = $this->getTotalSuccessfulPayments($date, false);
-        $expectedPaid = $this->getTotalExpectedPaidToDate($date, $firstDayIsUnpaid);
-
-        $diff = $expectedPaid - $totalPaid;
-        // print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
-        if (!$allowNegative && $diff < 0) {
-            return 0;
+        $real = $this->getUpgradedYearlyPrice() - $this->countFutureInvoiceSchedule($date) *
+            $this->getUpgradedStandardMonthlyPrice() - $this->getTotalSuccessfulPayments($date, false);
+        if ($allowNegative) {
+            return $real;
         }
-
-        return $diff;
+        return max($real, 0);
     }
 
     public function getOutstandingUserPremiumToDate(\DateTime $date = null)
@@ -5634,7 +5630,7 @@ abstract class Policy
             }
         }
         $fourteenDaysAgo = (clone $date)->sub(new \DateInterval("P14D"));
-        if ($this->getPolicyTerms()->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
+        if ($this instanceof PhonePolicy && $this->isPicSureRequired() && $this->getStart() >= $fourteenDaysAgo) {
             return $this->getStatus() == self::STATUS_PICSURE_REQUIRED;
         } elseif ($this->getStatus() == self::STATUS_RENEWAL) {
             return $this->getStart() > $date;

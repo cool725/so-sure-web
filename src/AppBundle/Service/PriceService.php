@@ -10,7 +10,9 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Repository\SubvariantRepository;
 use AppBundle\Classes\NoOp;
 use AppBundle\Exception\IncorrectPriceException;
 use Psr\Log\LoggerInterface;
@@ -99,23 +101,40 @@ class PriceService
      */
     public function phonePolicyDeterminePremium(PhonePolicy $policy, $amount, \DateTime $date)
     {
-        $subvariant = $policy->getSubvariant();
-        $prices = $this->userPhonePriceStreams(
-            $policy->getUser(),
-            $policy->getPhone(),
-            $date,
-            $subvariant ? $subvariant->getName() : null
-        );
-        // TODO: Ideally should loop over prices that were valid in the last half hour even if not valid this moment.
+        $prices = $this->userPhonePriceStreams($policy->getUser(), $policy->getPhone(), $date);
         foreach ($prices as $stream => $price) {
             $installments = PhonePrice::streamInstallments($stream);
             $installmentPrice = $price->getYearlyPremiumPrice() / $installments;
             if ($this->areEqualToTwoDp($amount, $installmentPrice)) {
+                $policy->setSubvariant(null);
                 $policy->setPremiumInstallments($installments);
                 $policy->setPremium($price->createPremium());
                 $this->dm->persist($policy);
                 $this->dm->flush();
                 return;
+            }
+        }
+        /** @var SubvariantRepository $subvariantRepo */
+        $subvariantRepo = $this->dm->getRepository(Subvariant::class);
+        $subvariants = $subvariantRepo->findAll();
+        foreach ($subvariants as $subvariant) {
+            $prices = $this->userPhonePriceStreams(
+                $policy->getUser(),
+                $policy->getPhone(),
+                $date,
+                $subvariant->getName()
+            );
+            foreach ($prices as $stream => $price) {
+                $installments = PhonePrice::streamInstallments($stream);
+                $installmentPrice = $price->getYearlyPremiumPrice() / $installments;
+                if ($this->areEqualToTwoDp($amount, $installmentPrice)) {
+                    $policy->setPremiumInstallments($installments);
+                    $policy->setPremium($price->createPremium());
+                    $policy->setSubvariant($subvariant);
+                    $this->dm->persist($policy);
+                    $this->dm->flush();
+                    return;
+                }
             }
         }
         throw new IncorrectPriceException(sprintf(

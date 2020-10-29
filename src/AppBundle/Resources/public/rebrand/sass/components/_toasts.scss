@@ -23,7 +23,7 @@
     }
 
     &-bottom-left {
-        bottom: 1.4rem; left: 1.4rem;
+        bottom: 0;
 
         @include media-breakpoint-up(lg) {
             bottom: 2rem; left: 3rem;

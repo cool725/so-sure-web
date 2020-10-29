@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\NoOp;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Feature;
@@ -354,9 +355,7 @@ class PolicyService
         $aggregator = false,
         $subvariant = null
     ) {
-        if (mb_strtolower($phone->getMake()) != 'apple') {
-            $aggregator = false;
-        }
+        NoOp::ignore($aggregator);
         try {
             $this->validateUser($user);
             if ($imei) {
@@ -399,7 +398,7 @@ class PolicyService
             /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
             /** @var PolicyTerms $latestTerms */
-            $latestTerms = $policyTermsRepo->findLatestTerms($aggregator);
+            $latestTerms = $policyTermsRepo->findLatestTerms();
             $policy->init($user, $latestTerms);
             if ($checkmend) {
                 $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
@@ -530,7 +529,7 @@ class PolicyService
             }
             $user = $policy->getUser();
 
-            $prefix = $policy->getPolicyPrefix($this->environment);
+            $prefix = $policy->getPolicyPrefix();
             if ($policy->isValidPolicy()) {
                 $this->logger->warning(sprintf('Policy %s is valid, but attempted to re-create', $policy->getId()));
 
@@ -589,7 +588,7 @@ class PolicyService
                 $policy->addSCode($scode);
             }
 
-            if ($prefix) {
+            if ($prefix && !$policy->getSubvariant()) {
                 $policy->create(
                     $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE_INVALID),
                     $prefix,
@@ -598,9 +597,10 @@ class PolicyService
                     $billing
                 );
             } else {
+                $prefix = $policy->getSubvariant() ? $policy->getSubvariant()->getPolicyPrefix() : null;
                 $policy->create(
                     $this->sequence->getSequenceId(SequenceService::SEQUENCE_PHONE),
-                    null,
+                    $prefix,
                     $date,
                     1,
                     $billing
@@ -617,11 +617,7 @@ class PolicyService
             $this->queueMessage($policy);
 
             if ($setActive) {
-                if ($policy->getPolicyTerms()->isPicSureRequired()) {
-                    $policy->setStatus(PhonePolicy::STATUS_PICSURE_REQUIRED);
-                } else {
-                    $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
-                }
+                $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
                 $this->dm->flush();
             }
 

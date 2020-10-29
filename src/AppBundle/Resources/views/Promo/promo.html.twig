@@ -44,7 +44,7 @@
 
         {% if not custom %}
             {# Toasts #}
-            {% include 'AppBundle::Components/_trustpilotToasts.html.twig' %}
+            {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-right' } %}
         {% endif %}
 
         <div class="container-large">
@@ -189,7 +189,7 @@
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     {# Reviews #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %}
+    {# {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %} #}
 
     {# Page Modals #}
     <div class="modal fade"

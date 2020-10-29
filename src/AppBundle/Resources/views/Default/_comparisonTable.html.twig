@@ -7,29 +7,15 @@
             <th width="50%" class="b4">
                 <a href="#" class="td-prev-btn"><i class="fal fa-angle-left fa-3x text-columbia-blue-e"></i></a>
                 <div class="td-container">
-                    {% if affiliate_page is defined %}
-                        <span class="td-swap td-active">
-                            {{ competitor[competitor1]['name']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor[competitor2]['name']|raw }}
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                               {{ competitor[competitor3]['name']|raw }}
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            {{ competitor['PYB']['name']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['GC']['name']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['O2']['name']|raw }}
-                        </span>
-                    {% endif %}
+                    <span class="td-swap td-active">
+                        {{ competitor['PYB']['name']|raw }}
+                    </span>
+                    <span class="td-swap">
+                        {{ competitor['LICI']['name']|raw }}
+                    </span>
+                    <span class="td-swap">
+                        {{ competitor['LCANI']['name']|raw }}
+                    </span>
                 </div>
                 <a href="#" class="td-next-btn"><i class="fal fa-angle-right fa-3x text-columbia-blue-e"></i></a>
             </th>
@@ -37,57 +23,11 @@
     </thead>
     <tbody>
         <tr>
-            <td class="td-30 bb1" colspan="2" align="center">
-                <strong>Time to repair / replace after approval</strong>
-            </td>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Up to 80% no claims cashback every policy year</strong></td>
         </tr>
         <tr>
             <td class="b2a">
-                <strong>24 - 72</strong> <div>hours</div>
-                <a href="#"
-                   class="td-info-btn"
-                   data-toggle="modal"
-                   data-target="#policy_24_72_hours"
-                   role="button">
-                    <i class="fal fa-info-circle fa-lg"></i>
-                </a>
-            </td>
-            <td class="wh">
-                <div class="td-container">
-                    {% if affiliate_page is defined %}
-                        <span class="td-swap td-active">
-                            {{ competitor[competitor1]['days']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor[competitor2]['days']|raw }}
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                                {{ competitor[competitor3]['days']|raw }}
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            {{ competitor['PYB']['days']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['GC']['days']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['O2']['days']|raw }}
-                        </span>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="td-30 bb1" colspan="2" align="center">
-                <strong>Up to 80% Cashback at end of policy year</strong>
-            </td>
-        </tr>
-        <tr>
-            <td class="b2a">
-                <i class="far fa-check fa-2x"></i>
+                {{ competitor['SS']['cashback']|raw }}
                 <a href="#"
                    class="td-info-btn"
                    data-toggle="modal"
@@ -98,40 +38,96 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    {% if affiliate_page is defined %}
-                        <span class="td-swap td-active">
-                            <i class="far {{ competitor[competitor1]['cashback'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                                <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor['O2']['cashback'] }} fa-2x"></i>
-                        </span>
-                    {% endif %}
+                    <span class="td-swap td-active">{{ competitor['PYB']['cashback']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['cashback']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['cashback']|raw }}</span>
                 </div>
             </td>
         </tr>
         <tr>
-            <td class="td-30 bb1" colspan="2" align="center">
-                <strong>Loss, Theft &amp; Accidental Damage included as standard</strong>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Excess from</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a"><strong>{{ lowest_excess }}</strong></td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['excessFrom']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['excessFrom']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['excessFrom']|raw }}</span>
+                </div>
             </td>
         </tr>
         <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Damage: time to repair once received</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['timeToRepair']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['timeToRepair']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['timeToRepair']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['timeToRepair']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Theft/Loss: time to replace after approval</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['timeToReplace']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['timeToReplace']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['timeToReplace']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['timeToReplace']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Send phone for repair via</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['repairVia']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['repairVia']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['repairVia']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['repairVia']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Insure used phones</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['oldPhones']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['oldPhones']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['oldPhones']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['oldPhones']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Cover for phones purchased up to</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['phoneage']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['phoneage']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['phoneage']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['phoneage']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Loss included as standard</strong></td>
+        </tr>
+        <tr>
             <td class="b2a">
-                <i class="far fa-check fa-2x"></i>
+                {{ competitor['SS']['lossAsStandard']|raw }}
                 <a href="#"
                    class="td-info-btn"
                    data-toggle="modal"
@@ -142,212 +138,9 @@
             </td>
             <td class="wh">
                 <div class="td-container">
-                    {% if affiliate_page is defined%}
-                        <span class="td-swap td-active">
-                            <i class="far {{ competitor[competitor1]['cover'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                                <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor['O2']['cover'] }} fa-2x"></i>
-                        </span>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="td-30 bb1" colspan="2" align="center">
-                <strong>Insure second hand phones</strong>
-            </td>
-        </tr>
-        <tr>
-            <td class="b2a">
-                <i class="far fa-check fa-2x"></i>
-            </td>
-            <td class="wh">
-                <div class="td-container">
-                    {% if affiliate_page is defined %}
-                        <span class="td-swap td-active">
-                            {{ competitor[competitor1]['oldphones'] }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor[competitor2]['oldphones'] }}
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                                {{ competitor[competitor3]['oldphones'] }}
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            {{ competitor['PYB']['oldphones'] }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['GC']['oldphones'] }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['O2']['oldphones'] }}
-                        </span>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="td-30 bb1" colspan="2" align="center">
-                <strong>Cover for phones purchased up to</strong>
-            </td>
-        </tr>
-        <tr>
-            <td class="b2a">
-                <strong>3 years</strong> <div>from purchase</div>
-            </td>
-            <td class="wh">
-                <div class="td-container">
-                    {% if affiliate_page is defined %}
-                        <span class="td-swap td-active">
-                            {{ competitor[competitor1]['phoneage']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor[competitor2]['phoneage']|raw }}
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                                {{ competitor[competitor3]['phoneage']|raw }}
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            {{ competitor['PYB']['phoneage']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['GC']['phoneage']|raw }}
-                        </span>
-                        <span class="td-swap">
-                            {{ competitor['O2']['phoneage']|raw }}
-                        </span>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="td-30 bb1" colspan="2" align="center">
-                <strong>Save up to &pound;100 off your excess</strong>
-            </td>
-        </tr>
-        <tr>
-            <td class="b2a">
-                <i class="far fa-check fa-2x"></i>
-                <a href="#"
-                   class="td-info-btn"
-                   data-toggle="modal"
-                   data-target="#policy_excess_50"
-                   role="button">
-                    <i class="fal fa-info-circle fa-lg"></i>
-                </a>
-            </td>
-            <td class="wh">
-                <div class="td-container">
-                    {% if affiliate_page is defined and affiliate_page != 'vouchercodes' %}
-                        <span class="td-swap td-active">
-                            <i class="far {{ competitor[competitor1]['saveexcess'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                                <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            <i class="far {{ competitor['PYB']['saveexcess'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
-                        </span>
-                        <span class="td-swap">
-                            <i class="far {{ competitor['O2']['saveexcess'] }} fa-2x"></i>
-                        </span>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td class="td-30 bb1" colspan="2" align="center">
-                <strong>Trustpilot rating</strong>
-            </td>
-        </tr>
-        <tr>
-            <td class="b2a">
-                <i class="fas fa-star text-white"></i>
-                <i class="fas fa-star text-white"></i>
-                <i class="fas fa-star text-white"></i>
-                <i class="fas fa-star text-white"></i>
-                <i class="fas fa-star-half text-white"></i>
-            </td>
-            <td class="wh">
-                <div class="td-container">
-                    {% if affiliate_page is defined %}
-                        <span class="td-swap td-active">
-                            {% set score1 = competitor[competitor1]['trustpilot'] %}
-                            {% for i in range(0, 4) %}
-                                {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
-                                <i class="fas {{ starClass1 }}"></i>
-                            {% endfor %}
-                        </span>
-                        <span class="td-swap">
-                            {% set score2 = competitor[competitor2]['trustpilot'] %}
-                            {% for i in range(0, 4) %}
-                                {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
-                                <i class="fas {{ starClass2 }}"></i>
-                            {% endfor %}
-                        </span>
-                        {% if competitor3 is defined %}
-                            <span class="td-swap">
-                                {% set score3 = competitor[competitor3]['trustpilot'] %}
-                                {% for i in range(0, 4) %}
-                                    {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
-                                    <i class="fas {{ starClass3 }}"></i>
-                                {% endfor %}
-                            </span>
-                        {% endif %}
-                    {% else %}
-                        <span class="td-swap td-active">
-                            {% set score1 = competitor['PYB']['trustpilot'] %}
-                            {% for i in range(0, 4) %}
-                                {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
-                                <i class="fas {{ starClass1 }}"></i>
-                            {% endfor %}
-                        </span>
-                        <span class="td-swap">
-                            {% set score2 = competitor['GC']['trustpilot'] %}
-                            {% for i in range(0, 4) %}
-                                {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
-                                <i class="fas {{ starClass2 }}"></i>
-                            {% endfor %}
-                        </span>
-                        <span class="td-swap">
-                                {% set score3 = competitor['O2']['trustpilot'] %}
-                                {% for i in range(0, 4) %}
-                                    {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
-                                    <i class="fas {{ starClass3 }}"></i>
-                                {% endfor %}
-                        </span>
-                    {% endif %}
+                    <span class="td-swap td-active">{{ competitor['PYB']['lossAsStandard']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['lossAsStandard']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['lossAsStandard']|raw }}</span>
                 </div>
             </td>
         </tr>
@@ -358,47 +151,15 @@
         <tr>
             <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
             <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
-            {% if affiliate_page is defined %}
-                <th width="19%" class="b4 bs-l">{{ competitor[competitor1]['name']|raw }}</th>
-                <th width="19%" class="b4">{{ competitor[competitor2]['name']|raw }}</th>
-                {% if competitor3 is defined %}
-                    <th width="19%" class="b4">{{ competitor[competitor3]['name']|raw }}</th>
-                {% endif %}
-            {% else %}
-                <th width="19%" class="b4 bs-l">{{ competitor['PYB']['name']|raw }}</th>
-                <th width="19%" class="b4">{{ competitor['GC']['name']|raw }}</th>
-                <th width="19%" class="b4">{{ competitor['O2']['name']|raw }}</th>
-            {% endif %}
+            <th width="19%" class="b4 bs-l">{{ competitor['PYB']['name']|raw }}</th>
+            <th width="19%" class="b4">{{ competitor['LICI']['name']|raw }}</th>
+            <th width="19%" class="b4">{{ competitor['LCANI']['name']|raw }}</th>
     </thead>
     <tbody>
         <tr>
-            <td class="bb1 text-left"><strong>Time to repair / replace after approval</strong></td>
+            <td class="bb1 text-left"><strong>Up to 80% no claims cashback every policy year</strong></td>
             <td class="b2">
-                <strong>24 - 72</strong> <div>hours</div>
-                <a href="#"
-                   class="td-info-btn"
-                   data-toggle="modal"
-                   data-target="#policy_24_72_hours"
-                   role="button">
-                    <i class="fal fa-info-circle fa-lg"></i>
-                </a>
-            </td>
-            {% if affiliate_page is defined %}
-                <td class="bb1 bs-l">{{ competitor[competitor1]['days']|raw }}</td>
-                <td class="bb1">{{ competitor[competitor2]['days']|raw }}</td>
-                {% if competitor3 is defined %}
-                    <td class="bb1">{{ competitor[competitor3]['days']|raw }}</td>
-                {% endif %}
-            {% else %}
-                <td class="bb1 bs-l">{{ competitor['PYB']['days']|raw }}</td>
-                <td class="bb1">{{ competitor['GC']['days']|raw }}</td>
-                <td class="bb1">{{ competitor['LICI']['days']|raw }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td class="wh text-left"><strong>Up to 80% Cashback at end of policy year</strong></td>
-            <td class="b2a">
-                <i class="far fa-check fa-2x"></i>
+                {{ competitor['SS']['cashback']|raw }}
                 <a href="#"
                    class="td-info-btn"
                    data-toggle="modal"
@@ -407,36 +168,58 @@
                     <i class="fal fa-info-circle fa-lg"></i>
                 </a>
             </td>
-            {% if affiliate_page is defined %}
-                <td class="wh bs-l">
-                    <i class="far {{ competitor[competitor1]['cashback'] }} fa-2x"></i>
-                </td>
-                <td class="wh">
-                    <i class="far {{ competitor[competitor2]['cashback'] }} fa-2x"></i>
-                </td>
-                {% if competitor3 is defined %}
-                    <td class="wh">
-                        <i class="far {{ competitor[competitor3]['cashback'] }} fa-2x"></i>
-                    </td>
-                {% endif %}
-            {% else %}
-                <td class="wh bs-l">
-                    <i class="far {{ competitor['PYB']['cashback'] }} fa-2x"></i>
-                </td>
-                <td class="wh">
-                    <i class="far {{ competitor['GC']['cashback'] }} fa-2x"></i>
-                </td>
-                <td class="wh">
-                    <i class="far {{ competitor['O2']['cashback'] }} fa-2x"></i>
-                </td>
-            {% endif %}
+            <td class="bb1 bs-l">{{ competitor['PYB']['cashback']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['cashback']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['cashback']|raw }}</td>
         </tr>
         <tr>
-            <td class="bb1 text-left">
-                <strong>Loss, Theft &amp; Accidental Damage included as standard</strong>
+            <td class="wh text-left"><strong>Excess from</strong></td>
+            <td class="b2a"><strong>{{ lowest_excess }}</strong></td>
+            <td class="wh bs-l">{{ competitor['PYB']['excessFrom']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['excessFrom']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['excessFrom']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="bb1 text-left"><strong>Damage: time to repair once received</strong></td>
+            <td class="b2">{{ competitor['SS']['timeToRepair']|raw }}</td>
+            <td class="bb1 bs-l">{{ competitor['PYB']['timeToRepair']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['timeToRepair']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['timeToRepair']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="wh text-left"><strong>Theft/Loss: time to replace after approval</strong></td>
+            <td class="b2a">{{ competitor['SS']['timeToReplace']|raw }}</td>
+            <td class="wh bs-l">{{ competitor['PYB']['timeToReplace']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['timeToReplace']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['timeToReplace']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="bb1 text-left"><strong>Send phone for repair via</strong></td>
+            <td class="b2">{{ competitor['SS']['repairVia']|raw }}</td>
+            <td class="bb1 bs-l">{{ competitor['PYB']['repairVia']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['repairVia']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['repairVia']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="wh text-left"><strong>Insure used phones</strong></td>
+            <td class="b2a">{{ competitor['SS']['oldPhones']|raw }}</td>
+            <td class="wh bs-l">{{ competitor['PYB']['oldPhones']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['oldPhones']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['oldPhones']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="bb1 text-left"><strong>Cover for phones purchased up to</strong></td>
+            <td class="b2">{{ competitor['SS']['phoneage']|raw }}</td>
+            <td class="bb1 bs-l">{{ competitor['PYB']['phoneage']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['phoneage']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['phoneage']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="wh text-left">
+                <strong>Loss included as standard</strong>
             </td>
-            <td class="b2">
-                <i class="far fa-check fa-2x"></i>
+            <td class="b2a">
+                {{ competitor['SS']['lossAsStandard']|raw }}
                 <a href="#"
                    class="td-info-btn"
                    data-toggle="modal"
@@ -445,161 +228,11 @@
                     <i class="fal fa-info-circle fa-lg"></i>
                 </a>
             </td>
-            {% if affiliate_page is defined %}
-                <td class="bb1 bs-l">
-                    <i class="far {{ competitor[competitor1]['cover'] }} fa-2x"></i>
-                </td>
-                <td class="bb1">
-                    <i class="far {{ competitor[competitor2]['cover'] }} fa-2x"></i>
-                </td>
-                {% if competitor3 is defined %}
-                    <td class="bb1">
-                       <i class="far {{ competitor[competitor3]['cover'] }} fa-2x"></i>
-                    </td>
-                {% endif %}
-            {% else %}
-                <td class="bb1 bs-l">
-                    <i class="far {{ competitor['PYB']['cover'] }} fa-2x"></i>
-                </td>
-                <td class="bb1">
-                    <i class="far {{ competitor['GC']['cover'] }} fa-2x"></i>
-                </td>
-                <td class="bb1">
-                   <i class="far {{ competitor['O2']['cover'] }} fa-2x"></i>
-                </td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td class="wh text-left"><strong>Insure second hand phones</strong></td>
-            <td class="b2a">
-                <i class="far fa-check fa-2x"></i>
-            </td>
-            {% if affiliate_page is defined %}
-                <td class="wh bs-l">
-                    {{ competitor[competitor1]['oldphones'] }}
-                </td>
-                <td class="wh">
-                    {{ competitor[competitor2]['oldphones'] }}
-                </td>
-                {% if competitor3 is defined %}
-                    <td class="wh">
-                        {{ competitor[competitor3]['oldphones'] }}
-                    </td>
-                {% endif %}
-            {% else %}
-                <td class="wh bs-l">
-                    {{ competitor['PYB']['oldphones'] }}
-                </td>
-                <td class="wh">
-                    {{ competitor['GC']['oldphones'] }}
-                </td>
-                <td class="wh">
-                    {{ competitor['O2']['oldphones'] }}
-                </td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td class="bb1 text-left"><strong>Cover for phones purchased up to</strong></td>
-            <td class="b2"><strong>3 years</strong> <div>from purchase</div></td>
-            {% if affiliate_page is defined %}
-                <td class="bb1 bs-l">{{ competitor[competitor1]['phoneage']|raw }}</td>
-                <td class="bb1">{{ competitor[competitor2]['phoneage']|raw }}</td>
-                {% if competitor3 is defined %}
-                    <td class="bb1">{{ competitor[competitor3]['phoneage']|raw }}</td>
-                {% endif %}
-            {% else %}
-                <td class="bb1 bs-l">{{ competitor['PYB']['phoneage']|raw }}</td>
-                <td class="bb1">{{ competitor['GC']['phoneage']|raw }}</td>
-                <td class="bb1">{{ competitor['O2']['phoneage']|raw }}</td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td class="wh text-left"><strong>Save up to &pound;100 off your excess</strong></td>
-            <td class="b2a">
-                <i class="far fa-check fa-2x"></i>
-                <a href="#"
-                   class="td-info-btn"
-                   data-toggle="modal"
-                   data-target="#policy_excess_50"
-                   role="button">
-                    <i class="fal fa-info-circle fa-lg"></i>
-                </a>
-            </td>
-            {% if affiliate_page is defined %}
-                <td class="wh bs-l">
-                    <i class="far {{ competitor[competitor1]['saveexcess'] }} fa-2x"></i>
-                </td>
-                <td class="wh">
-                    <i class="far {{ competitor[competitor2]['saveexcess'] }} fa-2x"></i>
-                </td>
-                {% if competitor3 is defined %}
-                    <td class="wh">
-                        <i class="far {{ competitor[competitor3]['saveexcess'] }} fa-2x"></i>
-                    </td>
-                {% endif %}
-            {% else %}
-                <td class="wh bs-l">
-                    <i class="far {{ competitor['PYB']['saveexcess'] }} fa-2x"></i>
-                </td>
-                <td class="wh">
-                    <i class="far {{ competitor['GC']['saveexcess'] }} fa-2x"></i>
-                </td>
-                <td class="wh">
-                    <i class="far {{ competitor['O2']['saveexcess'] }} fa-2x"></i>
-                </td>
-            {% endif %}
-        </tr>
-        <tr>
-            <td class="bb1 text-left"><strong>Trustpilot rating</strong></td>
-            <td class="b2">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star-half"></i>
-            </td>
-            {% if affiliate_page is defined %}
-                <td class="bb1 bs-l">
-                    {% for i in range(0, 4) %}
-                        {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
-                        <i class="fas {{ starClass1 }}"></i>
-                    {% endfor %}
-                </td>
-                <td class="bb1">
-                    {% for i in range(0, 4) %}
-                        {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
-                        <i class="fas {{ starClass2 }}"></i>
-                    {% endfor %}
-                </td>
-                {% if competitor3 is defined %}
-                    <td class="bb1">
-                        {% for i in range(0, 4) %}
-                            {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
-                            <i class="fas {{ starClass3 }}"></i>
-                        {% endfor %}
-                    </td>
-                {% endif %}
-            {% else %}
-                <td class="bb1 bs-l">
-                    {% for i in range(0, 4) %}
-                        {% set starClass1 = score1 - i >= 1 ? 'fa-star' : (score1 - i >= 0.5 ? 'fa-star-half' : '') %}
-                        <i class="fas {{ starClass1 }}"></i>
-                    {% endfor %}
-                </td>
-                <td class="bb1">
-                    {% for i in range(0, 4) %}
-                        {% set starClass2 = score2 - i >= 1 ? 'fa-star' : (score2 - i >= 0.5 ? 'fa-star-half' : '') %}
-                        <i class="fas {{ starClass2 }}"></i>
-                    {% endfor %}
-                </td>
-                <td class="bb1">
-                    {% for i in range(0, 4) %}
-                        {% set starClass3 = score3 - i >= 1 ? 'fa-star' : (score3 - i >= 0.5 ? 'fa-star-half' : '') %}
-                        <i class="fas {{ starClass3 }}"></i>
-                    {% endfor %}
-                </td>
-            {% endif %}
+            <td class="wh bs-l">{{ competitor['PYB']['lossAsStandard']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['lossAsStandard']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['lossAsStandard']|raw }}</td>
         </tr>
     </tbody>
 </table>
-<p class="updated-text text-center mt-2"><small><em>Info correct as of Oct 24 2019 - data taken on a first phone covered basis</em></small></em>
+<p class="updated-text text-center mt-2"><small><em>Info correct as of Oct 21 2020 - data taken on a first phone covered basis
+</em></small></em>

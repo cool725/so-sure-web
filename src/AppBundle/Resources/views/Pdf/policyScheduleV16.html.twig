@@ -85,8 +85,8 @@
         </li>
     </ul>
     <p>Your policy covers you for:</p>
-    <ul>
-        {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+    {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+        <ul>
             <li>
                 Accidental Damage
             </li>
@@ -94,37 +94,55 @@
                 Breakdown
             </li>
             <li>
-                Two claims per year max
+                Accessories: up to £50 (inc VAT)
             </li>
-        {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+        </ul>
+        <p>As defined in the policy terms and conditions.</p>
+    {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+        <ul>
             <li>
-                Accidental Damage: One claim per year
-            </li>
-            <li>
-                Breakdown: One claim per year
-            </li>
-            <li>
-                Loss: One claim per year
+                Accidental Damage
             </li>
             <li>
-                Theft: One claim per year
-            </li>
-        {% else %}
-            <li>
-                Accidental Damage: Unlimited claims per year
+                Breakdown
             </li>
             <li>
-                Breakdown: Unlimited claims per year
+                Loss
             </li>
             <li>
-                Loss: Two claims per year
+                Theft
             </li>
             <li>
-                Theft: Two claims per year
+                Accessories: up to £50 (inc VAT)
             </li>
-        {% endif %}
-    </ul>
-    <p>As defined in the policy terms and conditions.</p>
+            <li>
+                Unauthorised Charges: up to £1,000
+            </li>
+        </ul>
+        <p>As defined in the policy terms and conditions. You are limited to a maximum of two Loss or Theft claims per year.</p>
+    {% else %}
+        <ul>
+            <li>
+                Accidental Damage
+            </li>
+            <li>
+                Breakdown
+            </li>
+            <li>
+                Loss
+            </li>
+            <li>
+                Theft
+            </li>
+            <li>
+                Accessories: up to £100 (inc VAT)
+            </li>
+            <li>
+                Unauthorised Charges: up to £2,000
+            </li>
+        </ul>
+        <p>As defined in the policy terms and conditions. You are limited to a maximum of two Loss or Theft claims per year.</p>
+    {% endif %}
     {% if policy.picSureStatus == 'preapproved' %}
         <p>Excess to be paid at point of claim:</p>
         <ul>
@@ -180,10 +198,10 @@
                     Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
                 </li>
             {% else %}
                 <li>
@@ -193,10 +211,10 @@
                     Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
                 </li>
                 <li>
-                    Loss: £{{ policy.premium.picSureExcess.loss|number_format(0, '.', ',') }}
+                    Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
                 </li>
             {% endif %}
         </ul>
@@ -239,6 +257,45 @@
             {% endif %}
         </ul>
         <p>Validation is only done through the so-sure app, unless requested otherwise in writing by the so-sure team.</p>
+        {% if not policy.isPicSureRequired %}
+            <p>If, before claiming, you have not validated your phone using the so-sure app, then the Excess is:</p>
+            <ul>
+                {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
+                    <li>
+                        Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
+                    <li>
+                        Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                    </li>
+                {% else %}
+                    <li>
+                        Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Loss: £{{ policy.premium.excess.loss|number_format(0, '.', ',') }}
+                    </li>
+                {% endif %}
+            </ul>
+        {% endif %}
     {% endif %}
     <p style="font-size: 12px; margin-top: 20mm"><em>The insurance cover is underwritten by Helvetia Schweizerische Versicherungsgesellschaft AG which is authorised by the Financial Conduct Authority under registration number 454140 with registered office Dufourstrasse 40 9001 St. Gallen, Switzerland.</em></p>
 </body>

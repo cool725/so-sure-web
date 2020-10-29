@@ -52,7 +52,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for policy in policies %}
+                            {% for policy in policies|reverse %}
                                 {# TODO: Set table row colour based of ML score eventually #}
                                 <tr>
                                     {# Policy #}
@@ -71,7 +71,7 @@
                                     {# Submitted image(s) #}
                                     <td>
                                         {% for file in policy.getPolicyPicSureFiles %}
-                                            <a href="{{ path('admin_picsure_image', {'file': file.key }) }}"
+                                            <a href="{{ path('picsure_image', {'file': file.key }) }}"
                                                class="no-style"
                                                data-fancybox="{{ policy.policyNumber }}"
                                                data-caption="
@@ -93,13 +93,13 @@
                                                     {% endif %}
                                                 {% endif %}
                                                ">
-                                                <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" width="40px" height="40px" class="mb-1">
+                                                <img src="{{ path('picsure_image', {'file': file.key }) }}" width="40px" height="40px" class="mb-1 lozad">
                                             </a>
                                         {% endfor %}
                                     </td>
                                     <td>
                                         {% if policy.picSureStatus == 'manual' %}
-                                            <a href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"
+                                            <a href="{{ path('picsure_approve', {'id': policy.id}) }}"
                                                class="btn btn-success btn-confirm btn-sm mb-1 mr-md-2"
                                                title="Approve pic-sure"
                                                >
@@ -111,10 +111,10 @@
                                                data-toggle="modal"
                                                data-target="#invalid_modal"
                                                data-policy-number="{{ policy.policyNumber }}"
-                                               data-submit="{{ path('admin_picsure_invalid', {'id': policy.id}) }}">
+                                               data-submit="{{ path('picsure_invalid', {'id': policy.id}) }}">
                                                <i class="far fa-exclamation-triangle fa-lg fa-fw"></i>
                                                <span class="sr-only">Invalid</span></a>
-                                            <a href="{{ path('admin_picsure_reject', {'id': policy.id}) }}"
+                                            <a href="{{ path('picsure_reject', {'id': policy.id}) }}"
                                                class="btn btn-danger btn-sm btn-reject mb-1 mr-md-2"
                                                title="Reject Damaged pic-sure"
                                                >
@@ -174,6 +174,7 @@
                             <label for="message">Message to send to user:</label>
                             <textarea type="text"
                                       class="form-control"
+                                      placeholder="(You can specify your own feedback message...)"
                                       id="message"
                                       name="message"></textarea>
                         </div>

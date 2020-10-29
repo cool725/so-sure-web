@@ -1,0 +1,154 @@
+{{ form_start(purchase_form, {'attr': {
+    'data-toggle': 'validator',
+    'class': 'validate-form form-400',
+    'data-client-validation': form_client_validation,
+    'autocomplete': 'off'
+}}) }}
+    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+    {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
+        {% set premium = 'monthly' %}
+    {% else %}
+        {% set premium = 'yearly' %}
+    {% endif %}
+    {% set withoutDiscount = phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') * 12 %}
+    {% set yearlyMonthly = phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) / 12 %}
+    {% set saving = withoutDiscount - phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
+
+    <div class="hideme">
+        {{ form_label(purchase_form.amount, 'Payment options') }}
+        {{ form_widget(purchase_form.amount) }}
+    </div>
+
+    <h2 class="h4 text-dodger-blue text-center mb-4">How would you like to pay?</h2>
+
+    {% if app.user.allowedYearly %}
+        <div class="form-group">
+            <div class="payment-card payment-card-cycle {% if purchase_form.vars.value.amount == phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}active{% endif %}"
+                 data-value="{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}"
+                 data-premium-type="year"
+                 data-premium-param="yearly">
+                <div class="payment-card-body">
+                    <span class="h5">
+                        Pay Yearly ⭐️<br />
+                        <small class="sub">
+                            &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}/year (&pound;{{ yearlyMonthly }}/month)
+                        </small><br />
+                        <small class="sub text-success">
+                            <strong>Best value:</strong> Includes {{ free_months }} FREE!
+                        </small>
+                    </span>
+                    <span class="h5">
+                        <span class="badge badge-success">Save &pound;{{ saving }}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if app.user.allowedMonthly %}
+        <div class="form-group">
+            <div class="payment-card payment-card-cycle {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}active{% endif %}"
+                 data-value="{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}"
+                 data-premium-type="month"
+                 data-premium-param="monthly">
+                <div class="payment-card-body">
+                    <span class="h5">
+                        Pay Monthly<br />
+                        <small class="sub">
+                            &pound;{{ phone.currentMonthlyPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}/month (&pound;{{ withoutDiscount }}/year)
+                        </small>
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <hr />
+
+    <h2 id="payment-option-title" class="h5 text-dodger-blue text-center mb-4">Choose a payment method</h2>
+
+    <div id="payment-option-credit-card" class="form-group">
+        <div class="payment-card payment-card-type active"
+             data-option="card">
+            <div class="payment-card-body">
+                <span class="h5">Pay via Card</span>
+                <img src="{{ cdn_url }}/images/rebrand/misc/so-sure-card-color-logos.svg " alt="Mastercard and Visa" title="Mastercard and Visa" width="80px">
+            </div>
+        </div>
+    </div>
+
+    <div id="payment-option-direct-debit" class="form-group">
+        <div class="payment-card payment-card-type"
+             data-option="direct-debit">
+            <div class="payment-card-body">
+                <span class="h5">Setup Direct Debit</span>
+                <img src="{{ cdn_url }}/images/rebrand/misc/so-sure-direct-debit-dark-logo.svg" alt="Direct Debit" title="Direct Debit" width="80px">
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="form-group {% if form_errors(purchase_form.promoCode) %}has-error{% endif %} mb-4">
+        {{ form_widget(purchase_form.promoCode, {'attr':{
+            'class': 'form-control',
+            'placeholder': 'Have a promocode or referral code? Enter it here'
+        }}) }}
+        <div class="with-errors">{{ form_errors(purchase_form.promoCode) }}</div>
+    </div>
+
+    {% if feature_enabled('card-option-with-bacs') %}
+        <div id="payment-cta-direct-debit" class="form-group text-center hideme">
+            {{ form_widget(purchase_form.next, {
+                'label': 'Pay Now',
+                'fa': 'fas fa-lock fa-lg mr-2',
+                'left': true,
+                'attr': {
+                    'class': 'btn btn-success btn-block-xs'
+            }}) }}
+        </div>
+    {% else %}
+        <div id="payment-cta-direct-debit" class="form-group text-center hideme">
+            {{ form_widget(purchase_form.next, {
+                'attr': {
+                    'hidden': 'hidden'
+            }}) }}
+        </div>
+    {% endif %}
+{{ form_end(purchase_form) }}
+
+<form class="payment-form"
+        method="POST"
+        data-public-key="{{ checkoutApiKey(policy) }}"
+        data-customer-email="{{ app.user.email }}"
+        data-value="{{ convert_to_pennies(purchase_form.amount.vars.value) }}"
+        data-currency="GBP"
+        data-csrf="{{ csrf_token('checkout') }}"
+        data-payment-mode="cards"
+        data-card-form-mode="cardTokenisation"
+        data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+        data-url="{{ url('purchase_checkout', {'id': policy.id, 'pennies': convert_to_pennies(purchase_form.amount.vars.value), 'premium': premium }) }}"
+        data-redirect-url="
+        {% if instore is not null and instore == true %}
+        {{ path('user_instore', {id: policy.id}) }}
+        {% elseif validation_required is not null and validation_required is not null %}
+        {{ path('user_validation_required', {id: policy.id}) }}
+        {% else %}
+        {{ path('user_welcome', {id: policy.id}) }}
+        {% endif %}"
+        data-title="Pay now"
+        data-subtitle="Please enter your card details"
+        data-scode="{% if user_code is not null %}{{ user_code }}{% endif %}">
+</form>
+{% block to_card_form %}
+    {{ form_start(to_card_form, {'attr':{'class':'form-400 text-center'}}) }}
+        <div id="payment-cta-credit-card" class="form-group">
+            {{ form_widget(to_card_form.submit, {
+                'label': 'Pay Now',
+                'fa': 'fas fa-lock fa-lg mr-2',
+                'left': true,
+                'attr': {
+                    'class': 'btn btn-success btn-block-xs btn-card-pay'
+        }}) }}
+        </div>
+    {{ form_end(to_card_form) }}
+{% endblock to_card_form %}

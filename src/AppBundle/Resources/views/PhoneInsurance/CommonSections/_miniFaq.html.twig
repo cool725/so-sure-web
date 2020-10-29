@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="text-center text-lg-left">
-                    <h2 class="h3 mb-3 text-primary">{% if phone is defined and phone %}{% if phone.model matches '/^\\d+$/' %}{{ phone.make }} {% endif %} {{ phone.model }}{% else %}Phone{% endif %} Insurance <br><span class="sub">FAQs</span></h2>
+                    <h2 class="h3 mb-3 text-primary">{% if phone is defined and phone %}{% if phone.model|length < 3 %}{{ phone.make }} {% endif %} {{ phone.model }}{% else %}Phone{% endif %} Insurance <br><span class="sub">FAQs</span></h2>
                     <p class="mb-4">Here's the top questions we get asked.</p>
                     <a href="{{ path('faq') }}" class="d-none d-md-inline btn btn-primary btn-block-xs mx-auto mb-5">I have more Q's</a>
                 </div>
@@ -11,10 +11,10 @@
             <div class="col-md-8">
                 <div class="expanding-cardbox expanding-cardbox-white mb-4">
                     <div class="expanding-cardbox__body">
-                        <h3 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                            Why should I use you? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        <h3 class="h5 expanding-cardbox__title">
+                            Why should I use you? <i class="far fa-chevron-down fa-lg"></i>
                         </h3>
-                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="expanding-cardbox__expand text-zaffre">
                             <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you <a href="#social-insurance-and-reward-pot">money back</a>.</p>
                             <ul class="mb-0">
                                 <li class="mb-2">Instant cover from purchase</li>
@@ -34,20 +34,20 @@
                 </div>
                 <div class="expanding-cardbox expanding-cardbox-white mb-4">
                     <div class="expanding-cardbox__body">
-                        <h3 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                            I bought a used phone/my friend gave me an older phone can I still insure it? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        <h3 class="h5 expanding-cardbox__title">
+                            I bought a used phone/my friend gave me an older phone can I still insure it? <i class="far fa-chevron-down fa-lg"></i>
                         </h3>
-                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="expanding-cardbox__expand text-zaffre">
                             Yes we are able to insure second-hand phones provided they are in full working condition, without any damage, and less than 3 years old.
                         </div>
                     </div>
                 </div>
                 <div class="expanding-cardbox expanding-cardbox-white mb-4">
                     <div class="expanding-cardbox__body">
-                        <h3 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                            Can I insure a mobile phone I bought from eBay or another auction site? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        <h3 class="h5 expanding-cardbox__title">
+                            Can I insure a mobile phone I bought from eBay or another auction site? <i class="far fa-chevron-down fa-lg"></i>
                         </h3>
-                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="expanding-cardbox__expand text-zaffre">
                             <p>Yes, you can take out insurance on a second hand phone.</p>
                             <p class="mb-0">The phone bought needs to have originally been sold into the UK or European Union market prior your purchase (e.g. we don't insure models sold in China).</p>
                         </div>
@@ -55,10 +55,10 @@
                 </div>
                 <div class="expanding-cardbox expanding-cardbox-white mb-4">
                     <div class="expanding-cardbox__body">
-                        <h3 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                            How much is excess? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        <h3 class="h5 expanding-cardbox__title">
+                            How much is excess? <i class="far fa-chevron-down fa-lg"></i>
                         </h3>
-                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="expanding-cardbox__expand text-zaffre">
                             {% if instore is defined and instore is null %}
                                 <p>Our excess is as low as {{ excessDefined }} when you validate your phone with our app.</p>
                                 <p>Download our app and prove to us your device is in good working order and the screen isn't cracked by taking a selfie of your phone!</p>
@@ -72,20 +72,20 @@
                 </div>
                 <div class="expanding-cardbox expanding-cardbox-white mb-4">
                     <div class="expanding-cardbox__body">
-                        <h3 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                            Is there an age limit on the mobile phone I want to insure? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        <h3 class="h5 expanding-cardbox__title">
+                            Is there an age limit on the mobile phone I want to insure? <i class="far fa-chevron-down fa-lg"></i>
                         </h3>
-                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="expanding-cardbox__expand text-zaffre">
                             The phone you want to insure must be <mark>less than 3 years old</mark> from when your policy begins.
                         </div>
                     </div>
                 </div>
                 <div class="expanding-cardbox expanding-cardbox-white mb-4">
                     <div class="expanding-cardbox__body">
-                        <h3 class="h5 expanding-cardbox__title text-zaffre mb-0">
-                            What is an IMEI number and how do I find out the IMEI of my mobile phone? <i class="far fa-chevron-down text-dodger-blue fa-lg"></i>
+                        <h3 class="h5 expanding-cardbox__title">
+                            What is an IMEI number and how do I find out the IMEI of my mobile phone? <i class="far fa-chevron-down fa-lg"></i>
                         </h3>
-                        <div class="expanding-cardbox__expand text-zaffre mt-4">
+                        <div class="expanding-cardbox__expand text-zaffre">
                             <p>The IMEI (International Mobile Equipment Identification) number of your mobile phone is a unique identification code that is specific to your mobile phone.  If you change your mobile phone, it is important that you call us so we can update your policy with the correct details.</p>
                             <h4 class="h6 text-zaffre">For iOS (Apple) users:</h4>
                             <p>Unfortunately, as we need your serial number on iOS you can’t just dial a number (although dialing the same number as above will reveal your IMEI number).</p>

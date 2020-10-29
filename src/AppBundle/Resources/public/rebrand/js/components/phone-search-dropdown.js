@@ -1,5 +1,6 @@
 // phone-search-dropdown.js
 require('./select.js');
+let MobileDetect = require('mobile-detect');
 
 $(function() {
 
@@ -12,7 +13,18 @@ $(function() {
             memory = $('.phone-search-dropdown__memory'),
             button = $('.phone-search-dropdown__button'),
             quote  = $('.get-a-quote'),
-            arule  = $('#a-rule');
+            arule  = $('#a-rule'),
+            fiveG  = $('.five-g-warning');
+
+        // Phone detection using mobile-detect
+        let mobileDetected = new MobileDetect(window.navigator.userAgent),
+            makeDetected = mobileDetected.phone();
+
+        let phonesToMatch = $.map(phones, function(key, make) {
+            return [make];
+        });
+
+        let makeIs = makeDetected;
 
         const updateModels = () => {
 
@@ -69,6 +81,17 @@ $(function() {
 
         updateModels();
 
+        // Check match and set if found using mobile-detect
+        if (makeIs == 'iPhone') {
+            makeIs = 'Apple';
+        }
+
+        if (phonesToMatch.includes(makeIs) && !make.val()) {
+            make.val(makeIs);
+            updateModels();
+            model.prop('disabled', '');
+        }
+
         make.resizeselect();
 
         make.on('change', function() {
@@ -110,6 +133,12 @@ $(function() {
             } else {
                 memory.prop('disabled', 'disabled').val('');
                 $(this).removeClass('valid-select');
+            }
+
+            if ($(this).val().includes('5G')) {
+                fiveG.removeClass('hideme');
+            } else {
+                fiveG.addClass('hideme');
             }
 
             memory.resizeselect();

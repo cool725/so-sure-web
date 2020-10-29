@@ -6,6 +6,7 @@
 @import "../abstracts/mixins";
 @import "../abstracts/palette";
 @import "../abstracts/variables";
+@import "../base/fonts";
 
 .hero {
     position: relative;
@@ -119,7 +120,6 @@
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-b.svg');
         }
     }
-
 }
 
 .intro {

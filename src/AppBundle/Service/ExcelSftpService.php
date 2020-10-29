@@ -18,8 +18,10 @@ abstract class ExcelSftpService
     use CurrencyTrait;
     use DateTrait;
 
+    const SUBMITTED_FOLDER = 'Submitted';
     const PROCESSED_FOLDER = 'Processed';
     const FAILED_FOLDER = 'Failed';
+    const RENAME_ATTEMPTS = 3;
 
     /** @var DocumentManager */
     protected $dm;
@@ -189,7 +191,10 @@ abstract class ExcelSftpService
                 if (file_exists($tempFile)) {
                     unlink($tempFile);
                 }
-                $this->moveSftp($file, self::PROCESSED_FOLDER);
+                $this->moveSftp(
+                    $file,
+                    sprintf('%s/%s', self::PROCESSED_FOLDER, basename($file))
+                );
             } else {
                 if (file_exists($tempFile)) {
                     $lines[] = sprintf('Skipping cleanup for %s', $tempFile);
@@ -243,7 +248,7 @@ abstract class ExcelSftpService
         if (!$this->sftp) {
             $this->loginSftp();
         }
-        $files = $this->sftp->nlist('.', false);
+        $files = $this->sftp->nlist(self::SUBMITTED_FOLDER, false);
         if ($files === false) {
             throw new \Exception(sprintf(
                 'List folder Failed. Msg: %s',
@@ -253,31 +258,46 @@ abstract class ExcelSftpService
         $list = [];
         foreach ($files as $file) {
             if (mb_stripos($file, $extension) !== false) {
-                $list[] = $file;
+                $list[] = sprintf(
+                    '%s/%s',
+                    self::SUBMITTED_FOLDER,
+                    $file
+                );
             }
         }
 
         return $list;
     }
 
-    public function moveSftp($file, $folder)
+    /**
+     * Moves a file to another file.
+     * @param string $from is the original file location.
+     * @param string $to   is the file for it to become.
+     */
+    public function moveSftp($from, $to)
     {
         if (!$this->sftp) {
             $this->loginSftp();
         }
-
-        // it may take too long to process the file - if it fails, try logging in again
-        if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
-            $this->loginSftp();
-            if (!$this->sftp->rename($file, sprintf('%s/%s', $folder, $file))) {
-                throw new \Exception(sprintf(
-                    'Login Failed. Msg: %s',
-                    $this->sftp->getLastSFTPError()
-                ));
+        for ($i = 0; $i < self::RENAME_ATTEMPTS; $i++) {
+            if ($this->sftp->rename($from, $to)) {
+                return;
             }
+            $this->loginSftp();
         }
+        throw new \Exception(sprintf(
+            'Move Failed because it could not log in. Msg: %s',
+            $this->sftp->getLastSFTPError()
+        ));
     }
 
+    /**
+     * Uploads the given file to s3.
+     * @param string $file   is the path to the file to upload.
+     * @param string $name   is the name to give the file on s3.
+     * @param string $folder is the name of the s3 folder to put it in.
+     * @return string the s3 key for the file.
+     */
     public function uploadS3($file, $name, $folder)
     {
         $now = \DateTime::createFromFormat('U', time());
@@ -293,17 +313,15 @@ abstract class ExcelSftpService
         );
         $result = $this->s3->putObject(array(
             'Bucket' => $this->bucket,
-            'Key'    => $s3Key,
+            'Key' => $s3Key,
             'SourceFile' => $file,
         ));
-
         $file = $this->getNewS3File();
         $file->setBucket($this->bucket);
         $file->setKey($s3Key);
         $file->setSuccess($folder == self::PROCESSED_FOLDER);
         $this->dm->persist($file);
         $this->dm->flush();
-
         return $s3Key;
     }
 
