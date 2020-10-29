@@ -292,9 +292,15 @@ class BacsPayment extends Payment
      * @param boolean   $ignoreReversedDate whether to make sure payment is not approved while it could still be undone.
      * @param boolean   $setCommission      whether to set the commission. If setting it has already been attempted then
      *                                      there is not any point doing it again.
+     * @param boolean   $allowRefund        If true then if you are approving a payment on a cancelled policy it also
+     *                                      adds refund scheduled later.
      */
-    public function approve(\DateTime $date = null, $ignoreReversedDate = false, $setCommission = true)
-    {
+    public function approve(
+        \DateTime $date = null,
+        $ignoreReversedDate = false,
+        $setCommission = true,
+        $allowRefund = true
+    ) {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
@@ -333,7 +339,7 @@ class BacsPayment extends Payment
 
         // if the policy is owning this payment no longer active then we have to refund.
         $policy = $this->getPolicy();
-        if ($policy && $policy->isCancelled()) {
+        if ($policy && $policy->isCancelled() && $allowRefund) {
             $refund = $policy->getRefundAmount(false, false, true);
             if ($refund > 0) {
                 $scheduledPayment = new ScheduledPayment();
