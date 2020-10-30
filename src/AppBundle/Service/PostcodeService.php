@@ -7,6 +7,7 @@ use AppBundle\Document\Postcode;
 use AppBundle\Repository\PostcodeRepository;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use GuzzleHttp\Client;
 
 class PostcodeService
 {
@@ -26,6 +27,19 @@ class PostcodeService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
+    }
+
+    public function isValidPostcode($postcode)
+    {
+        // Validate postcode with postcodes.io
+        $url = 'https://api.postcodes.io/postcodes/' . $postcode. '/validate';
+        $client = new Client();
+        $res = $client->request('GET', $url);
+        if ($res->getStatusCode()== '200') {
+            return boolval(json_decode($res->getBody())->result);
+        } else {
+            return false;
+        }
     }
 
     public function getOutCodes()

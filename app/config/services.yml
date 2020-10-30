@@ -756,6 +756,7 @@ services:
             - "@app.sixpack"
             - "@app.feature"
             - "@app.price"
+            - "@app.postcode"
         calls:
             - [setCheckoutService, ["@app.checkout"]]
 
