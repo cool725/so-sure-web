@@ -312,6 +312,10 @@ class PolicyService
                 throw new GeoRestrictedException();
             }
         }
+
+        if ($this->postcodeService->getIsBannedPostcode($address->getPostcode())) {
+            throw new GeoRestrictedException();
+        }
     }
 
     private function validateImei($imei)

@@ -45,9 +45,12 @@ class PostcodeRepository extends DocumentRepository
         $postcodeDoc->setPostcode($postcode);
         $outcode = $postcodeDoc->getOutCode();
         $outcodes = $this->findBy(['type' => 'outcode', 'postcode' => $outcode, 'banned' => true]);
-        if (count($outcodes) > 0) {
-            return true;
-        }
         $canonicalPostcode = $postcodeDoc->getPostcodeCanonical();
+        $postcodes = $this->findBy(['type' => 'postcode', "postcodeCanonical" => $canonicalPostcode, 'banned' => true]);
+        if ((count($outcodes) + count($postcodes)) > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
