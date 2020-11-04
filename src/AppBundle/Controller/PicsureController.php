@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\EmailTrait;
 use AppBundle\Helpers\StringHelper;
 use AppBundle\Event\PicsureEvent;
 use AppBundle\Form\Type\PicSureSearchType;
@@ -27,6 +28,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class PicsureController extends BaseController implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
+    use EmailTrait;
 
     /**
      * @Route("", name="picsure_index")
@@ -109,6 +111,9 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $user);
         $this->getManager()->flush();
         $mailer = $this->get('app.mailer');
+        $trustpilot = 'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com';
+        // Don't ask Gmail users for Truspilot review
+        $bcc = $this->isGmail($policy->getUser()->getEmail()) ? null : $trustpilot;
         $mailer->sendTemplateToUser(
             'Phone validation successful ✅',
             $policy->getUser(),
@@ -117,7 +122,7 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
             'AppBundle:Email:picsure/accepted.txt.twig',
             ['policy' => $policy],
             null,
-            'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com'
+            $bcc
         );
         try {
             $push = $this->get('app.push');
