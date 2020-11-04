@@ -38,10 +38,12 @@ class UpdatePricingCommand extends ContainerAwareCommand
             'make',
             'model',
             'memory',
-            'monthlyPrice',
-            'annualPrice',
-            'monthlyGwp',
-            'annualGwp',
+            'mobMonthlyGwp',
+            'mobYearlyGwp',
+            'damMonthlyGwp',
+            'damYearlyGwp',
+            'essMonthlyGwp',
+            'essYearlyGwp',
             'damage',
             'warranty',
             'extendedWarranty',
@@ -189,10 +191,12 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 }
 
                 $premiums = [
-                    'monthlyPrice', // not actually used
-                    'annualPrice', // not actually used
-                    'monthlyGwp',
-                    'annualGwp'
+                    'mobMonthlyGwp',
+                    'mobAnnualGwp',
+                    'essMonthlyGwp',
+                    'essAnnualGwp',
+                    'damMonthlyGwp',
+                    'damAnnualGwp',
                 ];
 
                 $excesses = [
@@ -252,28 +256,21 @@ class UpdatePricingCommand extends ContainerAwareCommand
         $monthlyPicSureExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess();
 
         $currentValues = [
-            'monthlyGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)
-                ->getGwp(),
-            'annualGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)
-                ->getGwp(),
-            'damage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getDamage(),
-            'warranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getWarranty(),
+            'monthlyGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp(),
+            'annualGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp(),
+            'damage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getDamage(),
+            'warranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getWarranty(),
             'extendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
                 ->getExtendedWarranty(),
-            'loss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getLoss(),
-            'theft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getTheft(),
+            'loss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getLoss(),
+            'theft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()->getTheft(),
             'validatedDamage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
                 ->getDamage(),
             'validatedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
                 ->getWarranty(),
             'validatedExtendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
                 ->getExtendedWarranty(),
-            'validatedLoss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
-                ->getLoss(),
+            'validatedLoss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()->getLoss(),
             'validatedTheft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
                 ->getTheft()
         ];
