@@ -119,7 +119,19 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $template = 'AppBundle:Default:indexQuickQuote.html.twig';
+        // A/B Test Homepage Design
+        $homepageDesign = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN,
+            ['current', 'new-design'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
+        if ($homepageDesign == 'new-design') {
+            $template = 'AppBundle:Default:indexHomepage.html.twig';
+        } else {
+            $template = 'AppBundle:Default:indexQuickQuote.html.twig';
+        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 

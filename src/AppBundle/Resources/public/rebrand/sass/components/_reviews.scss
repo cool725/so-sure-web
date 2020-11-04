@@ -148,10 +148,15 @@
 }
 
 .reviews-mobile {
+    background-color: $white;
+    @include border-bottom-radius(20px);
+    @include border-top-left-radius(20px);
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                0 5px 15px 0 rgba(8,27,154,0.08);
 
     &-controls {
         height: 40px;
-        margin-bottom: 3rem;
+        margin-bottom: 1rem;
         display: flex;
         justify-content: flex-end;
 
@@ -182,6 +187,7 @@
 
     &-item {
         display: none;
+        padding: 0 1rem 1rem;
 
         &.active {
             display: block;

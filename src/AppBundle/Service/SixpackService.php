@@ -32,7 +32,7 @@ class SixpackService
     const EXPERIMENT_PAYMENT_STEP = 'Purchase Payment Step';
 
     // Exp 3
-    // const EXPERIMENT_LANDING_PAGES = 'Landing Page Design';
+    const EXPERIMENT_HOMEPAGE_DESIGN = 'Homepage Design';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -137,7 +137,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_PAYMENT_STEP,
         // Exp 3
-        // self::EXPERIMENT_LANDING_PAGES,
+        self::EXPERIMENT_HOMEPAGE_DESIGN,
     ];
 
     public static $authExperiments = [
@@ -175,9 +175,9 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
-        // self::EXPERIMENT_SCODE_CONTENT,
+        // self::EXPERIMENT_HOMEPAGE_DESIGN,
         // Exp 3
-        // self::EXPERIMENT_LANDING_PAGES,
+        self::EXPERIMENT_HOMEPAGE_DESIGN,
     ];
 
     /** @var LoggerInterface */

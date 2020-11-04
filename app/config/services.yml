@@ -1463,6 +1463,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.phonecombined:
+        class: AppBundle\Form\Type\PhoneCombinedType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%", "@app.request"]
+        tags:
+            - { name: form.type }
+
     app.form.type.bacsuploadfile:
         class: AppBundle\Form\Type\UploadFileType
         tags:

@@ -1,0 +1,39 @@
+{{ form_start(form_phone_combined, { 'attr': {
+    'data-toggle': 'validator',
+    'class': 'form-inline phone-search-combined validate-form',
+    'data-client-validation': form_client_validation,
+    'data-phones': phones|json_encode|raw,
+    'autocomplete': 'off'
+}}) }}
+    <div class="form-group">
+        {{ form_label(form_phone_combined.make, 'Select Make', { 'label_attr': {'class': 'sr-only'} }) }}
+        {{ form_widget(form_phone_combined.make, {
+            'attr': {
+            'class': 'form-control phone-search-make phone-search-select'
+        }}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form_phone_combined.model, 'Select Model', { 'label_attr': {'class': 'sr-only'} }) }}
+        {{ form_widget(form_phone_combined.model, {
+            'attr': {
+            'class': 'form-control phone-search-model phone-search-select',
+            'disabled': 'disabled'
+        }}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form_phone_combined.email, 'Enter Email for Quote*', { 'label_attr': {'class': 'sr-only'} }) }}
+        {{ form_widget(form_phone_combined.email, {
+            'attr': {
+            'class': 'form-control phone-search-email phone-search-text',
+            'placeholder': 'Enter Email for Quote*'
+        }}) }}
+    </div>
+    <div class="form-group">
+        {{ form_widget(form_phone_combined.next, {
+            'label': 'Get Quote',
+            'attr': {
+            'class': 'btn btn-success btn-block phone-search-button'
+        }}) }}
+    </div>
+    <input type="hidden" name="token" value="{{ csrf_token('quote') }}"/>
+{{ form_end(form_phone_combined) }}
