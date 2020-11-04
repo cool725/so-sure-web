@@ -1934,14 +1934,16 @@ class UserController extends BaseController
                 'policy_date' => $policy->getStart(),
                 'claim_form' => $claimForm->createView(),
                 'claim_confirm_form' => $claimConfirmForm->createView(),
-                'warn_pay' => $policy->fullPremiumToBePaidForClaim(new \DateTime(), Claim::TYPE_THEFT)
+                'warn_pay' => $policy->fullPremiumToBePaidForClaim(new \DateTime(), Claim::TYPE_THEFT),
+                'user_number' => $user->getMobileNumber()
             ];
         } else {
             $data = [
                 'current' => 'claim',
                 'username' => $user->getName(),
                 'claim_form' => $claimForm->createView(),
-                'warn_pay' => $user->hasPolicyForFullPaymentClaim(new \DateTime())
+                'warn_pay' => $user->hasPolicyForFullPaymentClaim(new \DateTime()),
+                'user_number' => $user->getMobileNumber()
             ];
         }
         return $this->render('AppBundle:User:claim.html.twig', $data);
