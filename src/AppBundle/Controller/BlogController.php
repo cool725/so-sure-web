@@ -714,4 +714,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/halloween-horror-stories",
+     * name="halloween_horror_stories", options={"sitemap" = true})
+     * @Template
+     */
+    public function halloweenHorrorStoriesAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/halloween-horror-stories.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

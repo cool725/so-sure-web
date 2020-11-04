@@ -1,0 +1,250 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'home-b' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}SO-SURE | Social Mobile Phone Insurance That's Better{% endblock %}
+{% block meta %}
+    <meta name="description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from SO-SURE."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context" : "http://schema.org",
+    "@graph":
+    [
+        {
+            "@type" : "Organization",
+            "url": "https://wearesosure.com/",
+            "legalName": "SO-SURE Ltd",
+            "location": {
+                "@type": "Place",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "Tower Hamlets",
+                  "addressRegion": "London",
+                  "postalCode": "E1 7PT",
+                  "streetAddress": "114 Whitechapel High Street"
+                },
+                "name": "Relay Building"
+            },
+            "logo": "{{ cdn_url }}/images/rebrand/logo/so-sure_logo_square.png",
+            "description": "The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from SO-SURE.",
+            "sameAs": ["https://twitter.com/wearesosure", "https://www.facebook.com/wearesosure"]
+        },
+        {
+            "@type" : "WebSite",
+            "url": "https://wearesosure.com/"
+        }
+    ]
+}
+</script>
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/homepage-b.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <h1 class="text-md-center fit">
+                <span class="sub text-azureeradiance">Simply Better</span>
+                <br class="d-md-none" />
+                Mobile Insurance.
+            </h1>
+            <p class="lead text-md-center mb-4 mb-md-5">Easy, Fast and Great Value 🇬🇧</p>
+            <div class="hero-badge">
+                <div class="hero-badge-inner">
+                    Pay yearly =<br>
+                    {{ free_months|upper }}<br>
+                    <span class="h5 mb-0">FREE!</span>
+                </div>
+                <span class="hero-badge-splat hero-badge-splat-1"></span>
+                <span class="hero-badge-splat hero-badge-splat-2"></span>
+                <span class="hero-badge-splat hero-badge-splat-3"></span>
+            </div>
+            {% if phone is defined and phone %}
+                {{ render(controller('AppBundle:Search:phoneSearchCombined', {
+                    'type': 'homepage-b',
+                    'id': phone.id }|merge(app.request.query.all)))
+                }}
+            {% else %}
+                {{ render(controller('AppBundle:Search:phoneSearchCombined', {
+                    'type': 'homepage-b' }|merge(app.request.query.all)))
+                }}
+            {% endif %}
+            <div class="hero-usps row no-gutters">
+                <div class="hero-usps-item d-md-none">
+                    <span class="fa-stack fa-2x mr-2">
+                        <i class="fas fa-circle fa-stack-2x text-primary"></i>
+                        <i class="fas fa-badge-percent fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <span class="hero-usps-item-text">
+                        <span class="h5">{{ free_months|upper }} FREE!</span><br />
+                        <small>When you pay yearly</small>
+                    </span>
+                </div>
+                <div class="hero-usps-item col-md-6 col-lg">
+                    <span class="fa-stack fa-2x mr-2">
+                        <i class="fas fa-circle fa-stack-2x text-success"></i>
+                        <i class="fas fa-star fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <div class="trustpilot-widget" data-locale="en-GB" data-template-id="53aa8807dec7e10d38f59f32" data-businessunit-id="588f81d20000ff00059bc1e1" data-style-height="55px" data-style-width="150px" data-theme="light">
+                    <a href="https://uk.trustpilot.com/review/wearesosure.com" target="_blank" rel="noopener">Trustpilot</a>
+                    </div>
+                </div>
+                <div class="hero-usps-item col-md-6 col-lg">
+                    <span class="fa-stack fa-2x mr-2">
+                        <i class="fas fa-circle fa-stack-2x text-success"></i>
+                        <i class="far fa-clock fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <span class="hero-usps-item-text">
+                        <span class="h5">24-72 hour</span><br />
+                        <small>Replacement or Repair</small>
+                    </span>
+                </div>
+                <div class="hero-usps-item col-md-6 col-lg">
+                    <span class="fa-stack fa-2x mr-2">
+                        <i class="fas fa-circle fa-stack-2x text-success"></i>
+                        <i class="far fa-smile fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <span class="hero-usps-item-text">
+                        <span class="h5">Low Excess</span><br />
+                        <small>From as little as {{ lowest_excess }}</small>
+                    </span>
+                </div>
+                <div class="hero-usps-item col-md-6 col-lg">
+                    <span class="fa-stack fa-2x mr-2">
+                        <i class="fas fa-circle fa-stack-2x text-success"></i>
+                        <i class="far fa-pound-sign fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <span class="hero-usps-item-text">
+                        <span class="h5">80% Cashback</span><br />
+                        <small>With our reward pot</small>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-polaroid-left-cropped-alt.png"
+             alt="so-sure - social insurance"
+             class="hero-polaroid hero-polaroid-one lozad">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-polaroid-right-mobile-cropped.png"
+             alt="so-sure - social insurance"
+             class="hero-polaroid hero-polaroid-two d-md-none lozad">
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-polaroid-right-cropped.png"
+             alt="so-sure - social insurance"
+             class="hero-polaroid hero-polaroid-two d-none d-md-inline lozad">
+    </section>
+
+    <section class="credbar py-2">
+        <div class="container-large">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/credbar/credbar_so-sure_fca.svg"
+                 alt="FCA"
+                 class="lozad"
+                 width="100px">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/credbar/credbar_so-sure_sky_white.svg"
+                 alt="Sky"
+                 class="lozad"
+                 width="100px">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/credbar/credbar_so-sure_mgaa.svg"
+                 alt="MGAA"
+                 class="lozad"
+                 width="100px">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/credbar/credbar_so-sure_financial-times.svg"
+                 alt="Financial Times"
+                 class="lozad"
+                 width="150px">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/credbar/credbar_so-sure_insurance-times_white.svg"
+                 alt="Insurance Times"
+                 class="lozad"
+                 width="100px">
+        </div>
+    </section>
+
+    <section class="reviews py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Don't just take our<br class="d-md-none"> word for it!</h2>
+            <p class="mb-5">Our customers love us – that's why thousands of customers have joined the SO-SURE family.</p>
+            {% include 'AppBundle::Components/_trustpilotReviews.html.twig' %}
+        </div>
+    </section>
+
+    <section class="video d-flex align-items-center justify-content-center">
+        <a href="#"
+           data-toggle="modal"
+           data-target="#sosure-video-modal"
+           data-src="https://www.youtube.com/embed/rF6zxVRT5Fc"
+           class="watch-video video__play">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_video_play_shadow.svg"
+                 alt="Play buttonn"
+                 class="lozad"
+                 width="120px"></a>
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/video/so-sure_video_background_woman_swoosh.png"
+             alt="Woman polaroid swoosh"
+             class="lozad video-img">
+    </section>
+
+    <section class="knowledge-base">
+        <div class="container-large">
+            {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
+        </div>
+    </section>
+
+    <section id="table-compare" class="comparison py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-deep-sky-blue-d mb-4">Why SO-SURE mobile phone insurance?</h2>
+            <p class="mb-md-5 text-white">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
+            {% include 'AppBundle::Default/_comparisonTableDark.html.twig' %}
+        </div>
+    </section>
+
+    <section class="banner py-5">
+        <div class="container-large">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline lozad" alt="so-sure App Icon">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h2 class="h4 text-white">Mobile insurance <br class="d-md-none"> designed for you</h2>
+                        <p class="lead text-white">Cover your phone in minutes </p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    <a href="#"
+                       class="btn btn-outline-white watch-video btn-block-xs mr-sm-2"
+                       data-event="watch-video-index-bottom-banner"
+                       data-toggle="modal"
+                       data-target="#sosure-video-modal"
+                       data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                        <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                        Watch our Video
+                    </a>
+                    <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/homepage-b.js') }}"></script>
+{% endblock %}

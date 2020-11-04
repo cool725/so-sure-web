@@ -756,6 +756,7 @@ services:
             - "@app.sixpack"
             - "@app.feature"
             - "@app.price"
+            - "@app.postcode"
         calls:
             - [setCheckoutService, ["@app.checkout"]]
 
@@ -1458,6 +1459,12 @@ services:
 
     app.form.type.phonedropdown:
         class: AppBundle\Form\Type\PhoneDropdownType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%", "@app.request"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.phonecombined:
+        class: AppBundle\Form\Type\PhoneCombinedType
         arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%", "@app.request"]
         tags:
             - { name: form.type }

@@ -1333,6 +1333,9 @@ class UserController extends BaseController
         // A/B Manufacturers Landing Pages USPs
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
+        // A/B Test Homepage Design
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN);
+
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));
@@ -1931,14 +1934,16 @@ class UserController extends BaseController
                 'policy_date' => $policy->getStart(),
                 'claim_form' => $claimForm->createView(),
                 'claim_confirm_form' => $claimConfirmForm->createView(),
-                'warn_pay' => $policy->fullPremiumToBePaidForClaim(new \DateTime(), Claim::TYPE_THEFT)
+                'warn_pay' => $policy->fullPremiumToBePaidForClaim(new \DateTime(), Claim::TYPE_THEFT),
+                'user_number' => $user->getMobileNumber()
             ];
         } else {
             $data = [
                 'current' => 'claim',
                 'username' => $user->getName(),
                 'claim_form' => $claimForm->createView(),
-                'warn_pay' => $user->hasPolicyForFullPaymentClaim(new \DateTime())
+                'warn_pay' => $user->hasPolicyForFullPaymentClaim(new \DateTime()),
+                'user_number' => $user->getMobileNumber()
             ];
         }
         return $this->render('AppBundle:User:claim.html.twig', $data);

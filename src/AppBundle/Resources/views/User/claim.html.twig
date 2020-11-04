@@ -112,7 +112,10 @@
                                         <div class="form-row">
                                             <div class="col-md form-group">
                                                 {{ form_label(claim_form.phone, 'Best number to reach you on?') }}
-                                                {{ form_widget(claim_form.phone, { 'attr': {'class': 'form-control'}}) }}
+                                                {{ form_widget(claim_form.phone, { 'attr': {
+                                                    'class': 'form-control',
+                                                    'value': user_number
+                                                }}) }}
                                                 <small class="form-text">Only use your current mobile number if your phone is damaged, but able to receive calls</small>
                                                 <div class="with-errors">{{ form_errors(claim_form.phone) }}</div>
                                             </div>

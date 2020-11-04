@@ -30,7 +30,7 @@
         {{ policy.user.billingAddress.city }} {{ policy.user.billingAddress.postcode }}<br />
         United Kingdom
     </p>
-    <p>Date of Birth: {{ policy.user.birthday|date('d M Y') }}</p>
+    <p>Date of Birth: {{ policy.user.birthday|date('d M Y', 'Europe/London') }}</p>
     <h4>Policy Reference</h4>
     <ul>
         <li>Policy Number: {{ policy.policyNumber }}</li>
