@@ -1,0 +1,277 @@
+// homepage.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+@import "../base/fonts";
+
+.hero {
+    padding: 7rem 0 5rem;
+    position: relative;
+
+    > div {
+        position: relative;
+        z-index: 4;
+    }
+
+    &-usps {
+        margin: 4rem 0 0;
+
+        &-item {
+            display: flex;
+            align-items: center;
+            overflow: visible;
+            margin-bottom: 2rem;
+
+            @include media-breakpoint-up(md) {
+                &:nth-child(1),
+                &:nth-child(3) {
+                    padding-right: 1rem;
+                }
+            }
+
+            @include media-breakpoint-up(lg) {
+                &:nth-child(2) {
+                    padding-right: 1rem;
+                }
+
+                &:last-of-type {
+                    padding-right: 0;
+                }
+            }
+        }
+    }
+
+    &-badge {
+        width: 120px; height: 120px;
+        position: absolute;
+        top: -30px; right: 60px;
+
+        color: $white;
+        background-color: $froly;
+        box-shadow: 0 0 0 0.4rem rgba(243, 108, 108, 0.4);
+
+        @include border-radius(50%);
+
+        text-align: center;
+        line-height: 1.6;
+
+        display: none;
+        align-items: center;
+        justify-content: center;
+
+        &-inner {
+            transform: rotate(15deg);
+        }
+
+        @include media-breakpoint-up(lg) {
+            display: flex;
+        }
+
+        @include media-breakpoint-up(xl) {
+            right: 0;
+        }
+    }
+
+    &-polaroid {
+        width: 220px;
+        position: absolute;
+    }
+
+    &-polaroid-one {
+        display: none;
+        top: 30px; left: 0;
+
+        @include media-breakpoint-up(lg) {
+            display: inline;
+        }
+    }
+
+    &-polaroid-two {
+        width: 180px;
+        bottom: -50px; right: 0;
+
+        @include media-breakpoint-up(lg) {
+            width: 220px;
+            bottom: -250px;
+        }
+    }
+
+    @include media-breakpoint-up(md) {
+        padding: 10rem 0 3rem;
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            width: 100%; height: 100%;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            content: '';
+            z-index: 1;
+            background-size: cover;
+            opacity: 0.3;
+            transform: scaleX(-1);
+        }
+    }
+}
+
+.credbar {
+    @include blue-gradient-45;
+
+    > div {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        img {
+            margin: 0 0.5rem;
+        }
+
+        @include media-breakpoint-up(lg) {
+            flex-wrap: nowrap;
+
+            img {
+                margin: 0 2rem;
+            }
+        }
+
+        @include media-breakpoint-up(xl) {
+            img {
+                margin: 0 3rem;
+            }
+        }
+    }
+}
+
+.reviews {
+    text-align: left;
+    background-color: $athens-gray;
+
+    &-item {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+
+      p {
+        flex-grow: 1;
+      }
+    }
+
+    &-author {
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      color: $dark;
+    }
+
+    @include media-breakpoint-up(lg) {
+      text-align: center;
+    }
+  }
+
+  .video {
+    min-height: 400px;
+    position: relative;
+    overflow: hidden;
+    z-index: 3;
+
+    @include video-background;
+
+    &-img {
+        width: 580px;
+        margin-left: -360px;
+        position: absolute;
+        top: 0; left: 50%;
+
+        @include media-breakpoint-up(lg) {
+            top: -20px;
+            position: absolute;
+            margin-left: -440px;
+        }
+    }
+
+    &__play {
+        width: 120px; height: 120px;
+        display: block;
+        position: relative;
+        z-index: 100;
+
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        min-height: 450px;
+    }
+}
+
+.knowledge-base {
+    background-color: $athens-gray;
+    position: relative;
+    z-index: 4;
+
+    &__mobile {
+        position: relative;
+    }
+
+    &__desktop {
+        position: relative;
+    }
+}
+
+.comparison {
+    position: relative;
+    text-align: center;
+    background-color: $ultramarine;
+
+    .container-large {
+      position: relative;
+      z-index: 4;
+    }
+
+    &:before {
+      width: 100%; height: 100%;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      content: '';
+      z-index: 1;
+      background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+      background-size: cover;
+      opacity: 0.44;
+      transform: scaleX(-1);
+    }
+
+    @include media-breakpoint-up(lg) {
+      padding-top: 5.8rem;
+
+      &:before {
+          background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+          transform: scaleX(-1);
+      }
+    }
+  }
+
+.banner {
+    position: relative;
+    text-align: center;
+
+    @include blue-gradient-45;
+
+    &__close {
+        position: absolute;
+        top: 2rem; right: 2rem;
+    }
+
+    @include media-breakpoint-up(lg) {
+        text-align: left;
+    }
+}

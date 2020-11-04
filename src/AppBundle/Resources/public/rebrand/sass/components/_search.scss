@@ -133,9 +133,7 @@
         }
 
         option {
-            // &:focus {
-                background-color: transparent;
-            // }
+            background-color: transparent;
         }
 
     }
@@ -165,5 +163,149 @@
         }
 
         @include placeholder-color($azureeradiance-50);
+    }
+}
+
+.phone-search-combined {
+    visibility: hidden;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+
+    padding: 1rem;
+    background-color: rgba(0, 187, 255, 0.15);
+
+    label.is-invalid {
+        position: absolute;
+        left: 0;
+        top: 100%;
+    }
+
+    .form-group {
+        width: 100%;
+        position: relative;
+
+        .form-control {
+            width: 100%;
+        }
+
+        @include media-breakpoint-up(md) {
+            margin-right: 1rem;
+            flex: 2;
+
+            &:last-of-type {
+                margin-right: 0;
+            }
+        }
+
+        @include media-breakpoint-up(lg) {
+            flex: 2;
+
+            &:last-of-type {
+                flex: 1;
+            }
+        }
+
+        &:last-of-type {
+            margin: 1rem 0 0;
+
+            @include media-breakpoint-up(md) {
+                margin: 0;
+            }
+        }
+    }
+
+    .phone-search-button {
+        min-width: 150px;
+        border-color: $alachite;
+        box-shadow: 0 4px 10px 0 rgba(15,8,157,0.25);
+        @include border-radius(3px);
+    }
+
+    .phone-search-select {
+        // Reset
+        appearance: none;
+        -webkit-appearance: none;
+        // -moz-appearance: none;
+        -o-appearance: none;
+
+        // Style;
+        border-radius: 3px;
+        background-size: 10px;
+        border-width: 1.2px;
+        border-color: $deep-sky-blue-d;
+        background: $white url('#{$cdn_url}/images/rebrand/icns/so-sure_select-arrow-normal.svg') no-repeat 95% 15px;
+        font-weight: bold;
+        outline: none;
+
+        box-shadow: 0 4px 10px 0 rgba(15,8,157,0.25);
+
+        &.is-invalid {
+            border-color: $lust;
+            box-shadow: 0 4px 10px 0 rgba(118, 116, 158, 0.25);
+        }
+
+        &:focus {
+            border-color: $deep-sky-blue-d;
+            outline: none;
+
+            &.is-invalid {
+                border-color: $lust;
+            }
+        }
+
+        &:-moz-focusring {
+            border: 0;
+        }
+
+        &:hover {
+            cursor: pointer;
+            outline: none;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            border-color: $deep-sky-blue-d;
+            background: $blacksqueeze url('#{$cdn_url}/images/rebrand/icns/so-sure_select-arrow-disabled.svg') no-repeat 95% 15px;
+        }
+    }
+
+    .phone-search-text {
+        // Style;
+        border-radius: 3px;
+        background-size: 10px;
+        border-width: 1.2px;
+        border-color: $azureeradiance;
+        background-color: $blacksqueeze;
+        outline: none;
+
+        &.is-invalid {
+            border-color: $lust;
+        }
+
+        &:focus {
+            border-color: $dodger-blue;
+            background: $white;
+            box-shadow: none;
+            outline: none;
+
+            &.is-invalid {
+                color: $lust;
+                border-color: $lust;
+            }
+
+            @include placeholder-color($zaffre);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            background: $blacksqueeze;
+            color: $azureeradiance-50;
+        }
+
+        @include placeholder-color($azureeradiance-50);
+    }
+
+    @include media-breakpoint-up(md) {
+        flex-flow: row wrap;
     }
 }

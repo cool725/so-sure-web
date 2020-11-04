@@ -1,0 +1,238 @@
+<table width="100%" class="table-comparison table-comparison-carousel light-table d-table d-md-none mx-auto">
+    <thead>
+        <tr>
+            <th width="50%" class="blue-gradient">
+                <img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure">
+            </th>
+            <th width="50%" class="wh">
+                <a href="#" class="td-prev-btn"><i class="fal fa-angle-left fa-3x text-columbia-blue-e"></i></a>
+                <div class="td-container">
+                    <span class="td-swap td-active">
+                        {{ competitor['PYB']['name']|raw }}
+                    </span>
+                    <span class="td-swap">
+                        {{ competitor['LICI']['name']|raw }}
+                    </span>
+                    <span class="td-swap">
+                        {{ competitor['LCANI']['name']|raw }}
+                    </span>
+                </div>
+                <a href="#" class="td-next-btn"><i class="fal fa-angle-right fa-3x text-columbia-blue-e"></i></a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Up to 80% no claims cashback every policy year</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">
+                {{ competitor['SS']['cashback']|raw }}
+                <a href="#"
+                   class="td-info-btn"
+                   data-toggle="modal"
+                   data-target="#policy_cashback"
+                   role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['cashback']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['cashback']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['cashback']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Excess from</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a"><strong>{{ lowest_excess }}</strong></td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['excessFrom']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['excessFrom']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['excessFrom']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Damage: time to repair once received</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['timeToRepair']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['timeToRepair']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['timeToRepair']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['timeToRepair']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Theft/Loss: time to replace after approval</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['timeToReplace']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['timeToReplace']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['timeToReplace']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['timeToReplace']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Send phone for repair via</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['repairVia']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['repairVia']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['repairVia']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['repairVia']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Insure used phones</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['oldPhones']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['oldPhones']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['oldPhones']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['oldPhones']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Cover for phones purchased up to</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">{{ competitor['SS']['phoneage']|raw }}</td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['phoneage']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['phoneage']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['phoneage']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Loss included as standard</strong></td>
+        </tr>
+        <tr>
+            <td class="b2a">
+                {{ competitor['SS']['lossAsStandard']|raw }}
+                <a href="#"
+                   class="td-info-btn"
+                   data-toggle="modal"
+                   data-target="#policy_comprehensive"
+                   role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            <td class="wh">
+                <div class="td-container">
+                    <span class="td-swap td-active">{{ competitor['PYB']['lossAsStandard']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LICI']['lossAsStandard']|raw }}</span>
+                    <span class="td-swap">{{ competitor['LCANI']['lossAsStandard']|raw }}</span>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<table class="table-comparison light-table d-none d-md-block mx-auto mt-lg-5">
+    <thead>
+        <tr>
+            <th width="24%" class="wh text-left"><span class="h5 text-primary">Features</span></th>
+            <th width="19%" class="blue-gradient"><img src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" class="img-fluid" alt="so-sure"></th>
+            <th width="19%" class="wh bs-l">{{ competitor['PYB']['name']|raw }}</th>
+            <th width="19%" class="wh">{{ competitor['LICI']['name']|raw }}</th>
+            <th width="19%" class="wh">{{ competitor['LCANI']['name']|raw }}</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="bb1 text-left"><strong>Up to 80% no claims cashback every policy year</strong></td>
+            <td class="b2">
+                {{ competitor['SS']['cashback']|raw }}
+                <a href="#"
+                   class="td-info-btn"
+                   data-toggle="modal"
+                   data-target="#policy_cashback"
+                   role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            <td class="bb1 bs-l">{{ competitor['PYB']['cashback']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['cashback']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['cashback']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="wh text-left"><strong>Excess from</strong></td>
+            <td class="b2a"><strong>{{ lowest_excess }}</strong></td>
+            <td class="wh bs-l">{{ competitor['PYB']['excessFrom']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['excessFrom']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['excessFrom']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="bb1 text-left"><strong>Damage: time to repair once received</strong></td>
+            <td class="b2">{{ competitor['SS']['timeToRepair']|raw }}</td>
+            <td class="bb1 bs-l">{{ competitor['PYB']['timeToRepair']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['timeToRepair']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['timeToRepair']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="wh text-left"><strong>Theft/Loss: time to replace after approval</strong></td>
+            <td class="b2a">{{ competitor['SS']['timeToReplace']|raw }}</td>
+            <td class="wh bs-l">{{ competitor['PYB']['timeToReplace']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['timeToReplace']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['timeToReplace']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="bb1 text-left"><strong>Send phone for repair via</strong></td>
+            <td class="b2">{{ competitor['SS']['repairVia']|raw }}</td>
+            <td class="bb1 bs-l">{{ competitor['PYB']['repairVia']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['repairVia']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['repairVia']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="wh text-left"><strong>Insure used phones</strong></td>
+            <td class="b2a">{{ competitor['SS']['oldPhones']|raw }}</td>
+            <td class="wh bs-l">{{ competitor['PYB']['oldPhones']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['oldPhones']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['oldPhones']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="bb1 text-left"><strong>Cover for phones purchased up to</strong></td>
+            <td class="b2">{{ competitor['SS']['phoneage']|raw }}</td>
+            <td class="bb1 bs-l">{{ competitor['PYB']['phoneage']|raw }}</td>
+            <td class="bb1">{{ competitor['LICI']['phoneage']|raw }}</td>
+            <td class="bb1">{{ competitor['LCANI']['phoneage']|raw }}</td>
+        </tr>
+        <tr>
+            <td class="wh text-left">
+                <strong>Loss included as standard</strong>
+            </td>
+            <td class="b2a">
+                {{ competitor['SS']['lossAsStandard']|raw }}
+                <a href="#"
+                   class="td-info-btn"
+                   data-toggle="modal"
+                   data-target="#policy_comprehensive"
+                   role="button">
+                    <i class="fal fa-info-circle fa-lg"></i>
+                </a>
+            </td>
+            <td class="wh bs-l">{{ competitor['PYB']['lossAsStandard']|raw }}</td>
+            <td class="wh">{{ competitor['LICI']['lossAsStandard']|raw }}</td>
+            <td class="wh">{{ competitor['LCANI']['lossAsStandard']|raw }}</td>
+        </tr>
+    </tbody>
+</table>
+<p class="updated-text text-center text-white mt-2"><small><em>Info correct as of Oct 21 2020 - data taken on a first phone covered basis
+</em></small></em>

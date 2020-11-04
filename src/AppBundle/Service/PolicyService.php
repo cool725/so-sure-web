@@ -166,6 +166,9 @@ class PolicyService
     /** @var PriceService */
     protected $priceService;
 
+    /** @var PostcodeService */
+    protected $postcodeService;
+
     /** @var CheckoutService */
     protected $checkoutService;
 
@@ -228,6 +231,7 @@ class PolicyService
      * @param SixpackService           $sixpackService
      * @param FeatureService           $featureService
      * @param PriceService             $priceService
+     * @param PostcodeService          $postcodeService
      */
     public function __construct(
         DocumentManager $dm,
@@ -253,7 +257,8 @@ class PolicyService
         SCodeService $scodeService,
         SixpackService $sixpackService,
         FeatureService $featureService,
-        PriceService $priceService
+        PriceService $priceService,
+        PostcodeService $postcodeService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -279,6 +284,7 @@ class PolicyService
         $this->sixpackService = $sixpackService;
         $this->featureService = $featureService;
         $this->priceService = $priceService;
+        $this->postcodeService = $postcodeService;
     }
 
     /**
@@ -301,6 +307,13 @@ class PolicyService
         /** @var Address $address */
         $address = $user->getBillingAddress();
         if (!$address || !$this->searchService->validatePostcode($address->getPostcode())) {
+            // If the postcode in not in our database it might still be valid
+            if (!$this->postcodeService->isValidPostcode($address->getPostcode())) {
+                throw new GeoRestrictedException();
+            }
+        }
+
+        if ($this->postcodeService->getIsBannedPostcode($address->getPostcode())) {
             throw new GeoRestrictedException();
         }
     }
