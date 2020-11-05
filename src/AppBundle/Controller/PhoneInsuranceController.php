@@ -128,8 +128,9 @@ class PhoneInsuranceController extends BaseController
     /**
      * SEO Pages - Second Hand Phone Insurance
      * @Route("/phone-insurance/second-hand", name="phone_insurance_second_hand", options={"sitemap" = true})
+     * @Route("/phone-insurance/second-hand/m", name="phone_insurance_second_hand_m")
      */
-    public function secondHandPhoneInsuranceAction()
+    public function secondHandPhoneInsuranceAction(Request $request)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -154,9 +155,16 @@ class PhoneInsuranceController extends BaseController
         // Select the lowest
         $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'phone_insurance_second_hand_m') {
+            $noindex = true;
+        }
+
         $data = [
             'from_price' => $fromPrice,
             'from_phones' => $fromPhones,
+            'is_noindex' => $noindex
         ];
 
         return $this->render('AppBundle:PhoneInsurance:secondHandPhoneInsurance.html.twig', $data);
@@ -165,8 +173,9 @@ class PhoneInsuranceController extends BaseController
     /**
      * SEO Pages - Refurbished Phone Insurance
      * @Route("/phone-insurance/refurbished", name="phone_insurance_refurbished", options={"sitemap" = true})
+     * @Route("/phone-insurance/refurbished/m", name="phone_insurance_refurbished_m")
      */
-    public function refurbishedPhoneInsuranceAction()
+    public function refurbishedPhoneInsuranceAction(Request $request)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -191,9 +200,16 @@ class PhoneInsuranceController extends BaseController
         // Select the lowest
         $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'phone_insurance_refurbished_m') {
+            $noindex = true;
+        }
+
         $data = [
             'from_price' => $fromPrice,
             'from_phones' => $fromPhones,
+            'is_noindex' => $noindex
         ];
 
         return $this->render('AppBundle:PhoneInsurance:refurbishedHandPhoneInsurance.html.twig', $data);
@@ -202,8 +218,9 @@ class PhoneInsuranceController extends BaseController
     /**
      * SEO Pages - Phone Insurance
      * @Route("/phone-insurance", name="phone_insurance", options={"sitemap" = true})
+     * @Route("/phone-insurance/m", name="phone_insurance_m")
      */
-    public function phoneInsuranceAction()
+    public function phoneInsuranceAction(Request $request)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
@@ -230,10 +247,17 @@ class PhoneInsuranceController extends BaseController
 
         $competitorData = new Competitors();
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'phone_insurance_m') {
+            $noindex = true;
+        }
+
         $data = [
             'from_price' => $fromPrice,
             'from_phones' => $fromPhones,
             'competitor' => $competitorData::$competitorComparisonData,
+            'is_noindex' => $noindex
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig', $data);
@@ -279,6 +303,8 @@ class PhoneInsuranceController extends BaseController
      * name="phone_insurance_make", requirements={"make":"[a-zA-Z]+"})
      * @Route("/phone-insurance/{make}/money",
      * name="phone_insurance_make_money", requirements={"make":"[a-zA-Z]+"})
+     * @Route("/phone-insurance/{make}/m",
+     * name="phone_insurance_make_m", requirements={"make":"[a-zA-Z]+"})
      */
     public function phoneInsuranceMakeAction(Request $request, $make = null)
     {
@@ -353,12 +379,19 @@ class PhoneInsuranceController extends BaseController
 
         $competitorData = new Competitors();
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'phone_insurance_make_m' or $money == true) {
+            $noindex = true;
+        }
+
         $data = [
             'phone' => $phone,
             'top_phones' => $topPhones,
             'from_price' => $fromPrice,
             'competitor' => $competitorData::$competitorComparisonData,
-            'money_version' => $money
+            'money_version' => $money,
+            'is_noindex' => $noindex
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -391,6 +424,8 @@ class PhoneInsuranceController extends BaseController
     /**
      * SEO Pages - Phone Insurance > Make > Model
      * @Route("/phone-insurance/{make}/{model}", name="phone_insurance_make_model",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/phone-insurance/{make}/{model}/m", name="phone_insurance_make_model_m",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      * @Route("/phone-insurance/{make}/{model}/money", name="phone_insurance_make_model_money",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
@@ -482,6 +517,12 @@ class PhoneInsuranceController extends BaseController
 
         $competitorData = new Competitors();
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'phone_insurance_make_model_m' or $money == true) {
+            $noindex = true;
+        }
+
         $data = [
             'phone' => $phone,
             'prices' => $priceService->userPhonePriceStreams(null, $phone, new \DateTime()),
@@ -491,7 +532,8 @@ class PhoneInsuranceController extends BaseController
             'hide_section' => $hideSection,
             'competitor' => $competitorData::$competitorComparisonData,
             'manufacturer_landing_usps' => $manufacturerLandingUsps,
-            'money_version' => $money
+            'money_version' => $money,
+            'is_noindex' => $noindex
         ];
 
         return $this->render($template, $data);
