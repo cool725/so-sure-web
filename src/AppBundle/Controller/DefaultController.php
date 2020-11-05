@@ -81,7 +81,6 @@ class DefaultController extends BaseController
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/reimagined", name="reimagined")
      * @Route("/hasslefree", name="hasslefree")
-     * @Route("/home", name="home")
      */
     public function indexAction(Request $request)
     {
@@ -138,18 +137,11 @@ class DefaultController extends BaseController
 
         $competitorData = new Competitors();
 
-        // Is indexed?
-        $noindex = false;
-        if ($request->get('_route') == 'home') {
-            $noindex = true;
-        }
-
         $data = array(
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $competitorData::$competitorComparisonData,
             'from_price' => $fromPrice,
-            'is_noindex' => $noindex
         );
 
         return $this->render($template, $data);
@@ -387,8 +379,6 @@ class DefaultController extends BaseController
      *  name="company_phone_insurance", options={"sitemap" = true})
      * @Route("/company-phone-insurance/thank-you",
      *  name="company_phone_insurance_thanks")
-     * @Route("/company-phone-insurance/m",
-     *  name="company_phone_insurance_m")
      */
     public function companyAction(Request $request)
     {
@@ -440,16 +430,8 @@ class DefaultController extends BaseController
             }
         }
 
-        // Is indexed?
-        $noindex = false;
-        // @codingStandardsIgnoreStart
-        if ($request->get('_route') == 'company_phone_insurance_m' or $request->get('_route') == 'company_phone_insurance_thanks') {
-            $noindex = true;
-        }
-
         $data = [
             'lead_form' => $leadForm->createView(),
-            'is_noindex' => $noindex
         ];
 
         return $this->render('AppBundle:Default:indexCompany.html.twig', $data);
