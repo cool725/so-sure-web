@@ -7,9 +7,11 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
+use AppBundle\Document\Claim;
 use AppBundle\Document\User;
 use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Service\PriceService;
+use AppBundle\Tests\Create;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -78,40 +80,6 @@ class PriceServiceTest extends WebTestCase
                 new \DateTime('2019-03-09')
             )
         );
-    }
-
-    /**
-     * Makes sure the price service can accurately set the premium on a policy.
-     */
-    public function testPolicySetPhonePremium()
-    {
-        $data = $this->userData();
-        self::$dm->flush();
-        self::$priceService->setPhonePolicyPremium(
-            $data["policy"],
-            PhonePrice::STREAM_YEARLY,
-            0,
-            new \DateTime('2019-04-08')
-        );
-        $this->assertEquals("phone", $data["policy"]->getPremium()->getSource());
-        $this->assertEquals(1.23, $data["policy"]->getPremium()->getGwp());
-        self::$priceService->setPhonePolicyPremium(
-            $data["policy"],
-            PhonePrice::STREAM_YEARLY,
-            0,
-            new \DateTime('2019-07-08')
-        );
-        $this->assertEquals(41, $data["policy"]->getPremium()->getGwp());
-        self::$priceService->setPhonePolicyPremium(
-            $data["policy"],
-            PhonePrice::STREAM_MONTHLY,
-            0,
-            new \DateTime('2019-07-08')
-        );
-        $this->assertEquals("phone", $data["policy"]->getPremium()->getSource());
-        $this->assertEquals(20, $data["policy"]->getPremium()->getGwp());
-        // Yearly on price A after price B starts.
-        // Monthly on price B.
     }
 
     /**
@@ -190,6 +158,71 @@ class PriceServiceTest extends WebTestCase
             $exceptions++;
         }
         $this->assertEquals(4, $exceptions);
+    }
+
+    /**
+     * Tests that it is following the renewal pricing logic which is as this table states:
+     * nClaims new price lower                new price higher
+     * 0       higher of old - 10% or higher  old price
+     * 1       old price                      old price
+     * more    old price                      new price
+     */
+    public function testSetPhonePolicyRenewalPremium()
+    {
+        $this->renewalPolicyTester(7, 5, 12, 0, 6.3);
+        $this->renewalPolicyTester(8, 6, 12, 1, 8);
+        $this->renewalPolicyTester(9, 4, 12, 2, 9);
+        $this->renewalPolicyTester(10, 5, 12, 6, 10);
+        $this->renewalPolicyTester(3, 5, 12, 0, 3);
+        $this->renewalPolicyTester(2, 6, 12, 1, 2);
+        $this->renewalPolicyTester(4, 8, 12, 2, 8);
+        $this->renewalPolicyTester(3, 6, 12, 6, 6);
+    }
+
+    /**
+     * Creates a renewal policy and then tests what price it gets.
+     * @param number $oldPrice     is the old phone gwp on the previous policy.
+     * @param number $newPrice     is the phone's gwp at time of purchase.
+     * @param int    $installments is the number of payment installments the policies have.
+     * @param int    $claims       is the number of claims the previous policy has.
+     * @param number $expectedGwp  is the gwp the new policy should end up with.
+     */
+    private function renewalPolicyTester(
+        $oldPrice,
+        $newPrice,
+        $installments,
+        $claims,
+        $expectedGwp,
+        $subvariant = null
+    ) {
+        $startDate = new \DateTime();
+        $oldStartDate = (clone $startDate)->sub(new \DateInterval('P1Y'));
+        $newPriceStart = (clone $startDate)->sub(new \DateInterval('P3M'));
+        $phone = Create::phone();
+        $phone->addPhonePrice(Create::phonePrice(
+            $oldStartDate,
+            PhonePrice::installmentsStream($installments),
+            $subvariant,
+            $oldPrice
+        ));
+        $phone->addPhonePrice(Create::phonePrice(
+            $newPriceStart,
+            PhonePrice::installmentsStream($installments),
+            $subvariant,
+            $newPrice
+        ));
+        $user = Create::user();
+        Create::save(self::$dm, $phone, $user);
+        $oldPolicy = Create::policy($user, $oldStartDate, Policy::STATUS_EXPIRED, $installments, $phone, $subvariant);
+        Create::save(self::$dm, $oldPolicy);
+        for ($i = 0; $i < $claims; $i++) {
+            $claim = Create::claim($oldPolicy, Claim::TYPE_DAMAGE, $newPriceStart, Claim::STATUS_APPROVED);
+            Create::save(self::$dm, $claim);
+        }
+        $policy = Create::policy($user, $startDate, Policy::STATUS_ACTIVE, $installments, $phone, $subvariant);
+        $oldPolicy->link($policy);
+        self::$priceService->setPhonePolicyRenewalPremium($policy, 0, $startDate);
+        $this->assertEquals($expectedGwp, $policy->getPremium()->getGwp());
     }
 
     /**

@@ -17,6 +17,7 @@ use AppBundle\Document\Premium;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SCode;
 use AppBundle\Document\PhonePremium;
+use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\Payment;
@@ -24,6 +25,7 @@ use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\LogEntry;
 use AppBundle\Document\PhonePolicyIteration;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Classes\Salva;
@@ -84,16 +86,18 @@ class Create
      *                                       policy end will be a year after this date.
      * @param string           $status       is the status that the policy will have.
      * @param int              $installments is the number of premium installments.
+     * @param Phone|null       $phone        is the phone to set on the policy if one is given.
+     * @param Subvariant|null  $subvariant   the policy's subvariant if any.
      * @return PhonePolicy the newly created policy.
      */
-    public static function policy($user, $start, $status, $installments)
+    public static function policy($user, $start, $status, $installments, $phone = null, $subvariant = null)
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy = null;
         if ($startDate < Salva::getSalvaBinderEndDate()) {
-            $policy = self::salvaPhonePolicy($user, $startDate, $status, $installments);
+            $policy = self::salvaPhonePolicy($user, $startDate, $status, $installments, $phone, $subvariant);
         } else {
-            $policy = self::helvetiaPhonePolicy($user, $startDate, $status, $installments);
+            $policy = self::helvetiaPhonePolicy($user, $startDate, $status, $installments, $phone, $subvariant);
         }
         $policy->setImei(ImeiTrait::generateRandomImei());
         return $policy;
@@ -105,9 +109,11 @@ class Create
      * @param \DateTime|string $start        is the start date of the policy.
      * @param string           $status       is the status of the policy.
      * @param int              $installments is the number of premium installments the policy is to pay.
+     * @param Phone|null       $phone        is the phone to set on the policy if one is given.
+     * @param Subvariant|null  $subvariant   is the subvariant of the policy if any.
      * @return SalvaPhonePolicy the new phone policy.
      */
-    public static function salvaPhonePolicy($user, $start, $status, $installments, $phone = null)
+    public static function salvaPhonePolicy($user, $start, $status, $installments, $phone = null, $subvariant = null)
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy = new SalvaPhonePolicy();
@@ -117,10 +123,17 @@ class Create
         $policy->setStaticEnd($policy->getEnd());
         if ($phone) {
             $policy->setPhone($phone);
+            $price = $phone->getCurrentPhonePrice(
+                PhonePrice::installmentsStream($installments),
+                $start,
+                $subvariant ? $subvariant->getName() : null
+            );
+            $policy->setPremium($price->createPremium());
+        } else {
+            $premium = new PhonePremium();
+            $premium->setGwp(rand(20, 100) / 8);
+            $policy->setPremium($premium);
         }
-        $premium = new PhonePremium();
-        $premium->setGwp(rand(20, 100) / 8);
-        $policy->setPremium($premium);
         $policy->setStatus($status);
         $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
         $policy->setPremiumInstallments($installments);
@@ -135,10 +148,17 @@ class Create
      * @param \DateTime|string $start        is the start date of the policy.
      * @param string           $status       is the status of the policy.
      * @param int              $installments is the number of premium installments the policy is to pay.
+     * @param Phone|null       $phone        is the phone to set on the policy if one is given.
      * @return HelvetiaPhonePolicy the new phone policy.
      */
-    public static function helvetiaPhonePolicy($user, $start, $status, $installments, $phone = null)
-    {
+    public static function helvetiaPhonePolicy(
+        $user,
+        $start,
+        $status,
+        $installments,
+        $phone = null,
+        $subvariant = null
+    ) {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy = new HelvetiaPhonePolicy();
         $policy->setUser($user);
@@ -147,10 +167,17 @@ class Create
         $policy->setStaticEnd($policy->getEnd());
         if ($phone) {
             $policy->setPhone($phone);
+            $price = $phone->getCurrentPhonePrice(
+                PhonePrice::installmentsStream($installments),
+                $start,
+                $subvariant ? $subvariant->getName() : null
+            );
+            $policy->setPremium($price->createPremium());
+        } else {
+            $premium = new PhonePremium();
+            $premium->setGwp(rand(20, 100) / 8);
+            $policy->setPremium($premium);
         }
-        $premium = new PhonePremium();
-        $premium->setGwp(rand(20, 100) / 8);
-        $policy->setPremium($premium);
         $policy->setStatus($status);
         $policy->setPolicyNumber(sprintf("TEST/%s/%d", rand(1000, 9999), rand()));
         $policy->setPremiumInstallments($installments);
@@ -182,11 +209,12 @@ class Create
      * @param \DateTime|string $validFrom  is the date that the price is valid from as a string or a date.
      * @param string           $stream     is the stream that the price is in.
      * @param string|null      $subvariant is the subvariant to apply the price to if any.
+     * @param number|null      $gwp        is the gwp to give to it if you want one, otherwise it's random.
      */
-    public static function phonePrice($validFrom, $stream, $subvariant = null)
+    public static function phonePrice($validFrom, $stream, $subvariant = null, $gwp = null)
     {
         $date = is_string($validFrom) ? new \DateTime($validFrom) : $validFrom;
-        $gwp = rand(100, 600) / 90;
+        $gwp = ($gwp === null) ? (rand(100, 600) / 90) : $gwp;
         $price = new PhonePrice();
         $price->setGwp($gwp);
         $price->setValidFrom($date);
@@ -368,5 +396,23 @@ class Create
         $terms->setLatest($latest);
         $terms->setAggregator($aggregator);
         return $terms;
+    }
+
+    /**
+     * Creates a claim.
+     * @param Policy    $policy is the policy that the claim is on.
+     * @param string    $type   is the type of claim.
+     * @param \DateTime $date   is the date the claim was created.
+     * @param string    $status is the statue of the claim.
+     * @return Claim the claim created.
+     */
+    public static function claim($policy, $type, $date, $status)
+    {
+        $claim = new Claim();
+        $claim->setType($type);
+        $claim->setCreatedDate($date);
+        $claim->setStatus($status);
+        $policy->addClaim($claim);
+        return $claim;
     }
 }
