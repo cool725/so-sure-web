@@ -38,10 +38,12 @@ class UpdatePricingCommand extends ContainerAwareCommand
             'make',
             'model',
             'memory',
-            'monthlyPrice',
-            'annualPrice',
-            'monthlyGwp',
-            'annualGwp',
+            'mobMonthlyGwp',
+            'mobYearlyGwp',
+            'essMonthlyGwp',
+            'essYearlyGwp',
+            'damMonthlyGwp',
+            'damYearlyGwp',
             'damage',
             'warranty',
             'extendedWarranty',
@@ -189,10 +191,12 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 }
 
                 $premiums = [
-                    'monthlyPrice', // not actually used
-                    'annualPrice', // not actually used
-                    'monthlyGwp',
-                    'annualGwp'
+                    'mobMonthlyGwp',
+                    'mobYearlyGwp',
+                    'essMonthlyGwp',
+                    'essYearlyGwp',
+                    'damMonthlyGwp',
+                    'damYearlyGwp'
                 ];
 
                 $excesses = [
@@ -246,76 +250,67 @@ class UpdatePricingCommand extends ContainerAwareCommand
 
     private function newValues($phone, $update)
     {
-        $monthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp();
-        $yearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp();
-        $monthlyExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess();
-        $monthlyPicSureExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess();
-
+        $mobMonthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp();
+        $mobYearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp();
+        $essMonthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'essentials')->getGwp();
+        $essYearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'essentials')->getGwp();
+        $damMonthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'damage')->getGwp();
+        $damYearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'damage')->getGwp();
+        $excess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess();
+        $picSureExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess();
         $currentValues = [
-            'monthlyGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)
-                ->getGwp(),
-            'annualGwp' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)
-                ->getGwp(),
-            'damage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getDamage(),
-            'warranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getWarranty(),
-            'extendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getExtendedWarranty(),
-            'loss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getLoss(),
-            'theft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess()
-                ->getTheft(),
-            'validatedDamage' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
-                ->getDamage(),
-            'validatedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
-                ->getWarranty(),
-            'validatedExtendedWarranty' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
-                ->getExtendedWarranty(),
-            'validatedLoss' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
-                ->getLoss(),
-            'validatedTheft' => $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess()
-                ->getTheft()
+            'mobMonthlyGwp' => $mobMonthlyGwp,
+            'mobYearlyGwp' => $mobYearlyGwp,
+            'essMonthlyGwp' => $essMonthlyGwp,
+            'essYearlyGwp' => $essYearlyGwp,
+            'damMonthlyGwp' => $damMonthlyGwp,
+            'damYearlyGwp' => $damYearlyGwp,
+            'damage' => $excess->getDamage(),
+            'warranty' => $excess->getWarranty(),
+            'extendedWarranty' => $excess->getExtendedWarranty(),
+            'loss' => $excess->getLoss(),
+            'theft' => $excess->getTheft(),
+            'validatedDamage' => $picSureExcess->getDamage(),
+            'validatedWarranty' => $picSureExcess->getWarranty(),
+            'validatedExtendedWarranty' => $picSureExcess->getExtendedWarranty(),
+            'validatedLoss' => $picSureExcess->getLoss(),
+            'validatedTheft' => $picSureExcess->getTheft()
         ];
-
         if ($this->premiumOnly || (!$this->premiumOnly && !$this->excessOnly)) {
-            $monthlyGwp = $update["monthlyGwp"];
-            $yearlyGwp = $update["annualGwp"];
-        } elseif ($this->excessOnly || (!$this->premiumOnly && !$this->excessOnly)) {
-            $monthlyExcess->setDamage((int) $update["damage"]);
-            $monthlyExcess->setWarranty((int) $update["warranty"]);
-            $monthlyExcess->setExtendedWarranty((int) $update["extendedWarranty"]);
-            $monthlyExcess->setLoss((int) $update["loss"]);
-            $monthlyExcess->setTheft((int) $update["theft"]);
-            $monthlyPicSureExcess->setDamage((int) $update["validatedDamage"]);
-            $monthlyPicSureExcess->setWarranty((int) $update["validatedWarranty"]);
-            $monthlyPicSureExcess->setExtendedWarranty((int) $update["validatedExtendedWarranty"]);
-            $monthlyPicSureExcess->setLoss((int) $update["validatedLoss"]);
-            $monthlyPicSureExcess->setTheft((int) $update["validatedTheft"]);
+            $mobMonthlyGwp = $update["mobMonthlyGwp"];
+            $mobYearlyGwp = $update["mobYearlyGwp"];
+            $essMonthlyGwp = $update["essMonthlyGwp"];
+            $essYearlyGwp = $update["essYearlyGwp"];
+            $damMonthlyGwp = $update["damMonthlyGwp"];
+            $damYearlyGwp = $update["damYearlyGwp"];
         }
-
+        if ($this->excessOnly || (!$this->premiumOnly && !$this->excessOnly)) {
+            $excess->setDamage((int) $update["damage"]);
+            $excess->setWarranty((int) $update["warranty"]);
+            $excess->setExtendedWarranty((int) $update["extendedWarranty"]);
+            $excess->setLoss((int) $update["loss"]);
+            $excess->setTheft((int) $update["theft"]);
+            $picSureExcess->setDamage((int) $update["validatedDamage"]);
+            $picSureExcess->setWarranty((int) $update["validatedWarranty"]);
+            $picSureExcess->setExtendedWarranty((int) $update["validatedExtendedWarranty"]);
+            $picSureExcess->setLoss((int) $update["validatedLoss"]);
+            $picSureExcess->setTheft((int) $update["validatedTheft"]);
+        }
         $this->outputChanges($phone, $currentValues, $update);
-
         if ($this->wet) {
-            $phone->changePrice(
-                $monthlyGwp,
-                $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
-                $monthlyExcess,
-                $monthlyPicSureExcess,
-                null,
-                "monthly"
-            );
-            $phone->changePrice(
-                $yearlyGwp,
-                $date = new \DateTime('+2 hour', SoSure::getSoSureTimezone()),
-                $monthlyExcess,
-                $monthlyPicSureExcess,
-                null,
-                "yearly"
-            );
+            $updateDate = new \DateTime('+2 hour', SoSure::getSoSureTimezone());
+            // TODO: subvariants are defined in the DB so would be better to handle any arbitrary subvariant names but
+            //       that is something for another day.
+            $dam = 'damage';
+            $ess = 'essentials';
+            $phone->changePrice($mobMonthlyGwp, $updateDate, $excess, $picSureExcess, null, "monthly");
+            $phone->changePrice($mobYearlyGwp, $updateDate, $excess, $picSureExcess, null, "yearly");
+            $phone->changePrice($essMonthlyGwp, $updateDate, $excess, $picSureExcess, null, "monthly", null, $ess);
+            $phone->changePrice($essYearlyGwp, $updateDate, $excess, $picSureExcess, null, "yearly", null, $ess);
+            $phone->changePrice($damMonthlyGwp, $updateDate, $excess, $picSureExcess, null, "monthly", null, $dam);
+            $phone->changePrice($damYearlyGwp, $updateDate, $excess, $picSureExcess, null, "yearly", null, $dam);
             $this->dm->flush();
         }
-
         return $phone;
     }
 
@@ -326,7 +321,6 @@ class UpdatePricingCommand extends ContainerAwareCommand
             $update["model"].'" "'.
             $update["memory"]
         ).'"'."\n";
-
         foreach ($this->headers as $header) {
             if ($header != "make"
                     && $header != "model"
@@ -336,7 +330,6 @@ class UpdatePricingCommand extends ContainerAwareCommand
                 $overview .= "$header: ".$currentValues[$header]." -> ".$update[$header]."\n";
             }
         }
-
         $this->output->writeln($overview);
     }
 
