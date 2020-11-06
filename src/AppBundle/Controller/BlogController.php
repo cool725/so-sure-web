@@ -728,4 +728,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/excessive-phone-use-can-lead-to-stress-and-anxiety",
+     * name="excessive_phone_use_can_lead_to_stress_and_anxiety", options={"sitemap" = true})
+     * @Template
+     */
+    public function excessivePhoneUseCanLeadToStressAndAnxietyAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/excessive-phone-use-can-lead-to-stress-and-anxiety.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

@@ -78,6 +78,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/sony-xperia-1-II-release-rumours' => 'New Sony Xperia 1 II Release Rumour Hub',
             '/blog/how-long-do-mobile-phones-last' => 'How Long Do Mobile Phones Last?',
             '/blog/halloween-horror-stories' => 'Halloween Horror Stories',
+            '/blog/excessive-phone-use-can-lead-to-stress-and-anxiety' => 'Excessive Phone Use Can Lead To Stress And Anxiety.',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

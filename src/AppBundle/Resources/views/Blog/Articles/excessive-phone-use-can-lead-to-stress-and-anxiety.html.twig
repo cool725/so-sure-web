@@ -1,0 +1,120 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Excessive Phone Use Can Lead To Stress And Anxiety. - Blog | so-sure{% endblock %}
+
+{% block meta %}
+    <meta name="description" content=""/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Excessive Phone Use Can Lead To Stress And Anxiety. - Blog | so-sure' %}
+{% set og_description = "Did you know that, on average, most people use their phone for 2 hours and 51 minutes per day? That’s quite excessive! Between looking at meme’s on the internet, constantly checking social media or shopping straight from our smartphones..." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/excessive-phone-use-can-lead-to-stress-and-anxiety-1.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Excessive Phone Use Can Lead To Stress And Anxiety.</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Excessive Phone Use Can Lead To Stress And Anxiety.</h1>
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item">
+                                            <div rel="author">Rachel</div>
+                                        </li>
+                                        <li class="list-inline-item">|</li>
+                                        <li class="list-inline-item">
+                                            <time>Nov 4, 2020</time>
+                                        </li>
+                                    </ul>
+                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/excessive-phone-use-can-lead-to-stress-and-anxiety-1.jpg"
+                                     alt="so-sure - phone anxiety"
+                                     class="img-fluid lozad mb-5">
+                                <p class="lead"><em>It’s time to put your phones down and de-stress.</em></p>
+                                <p>Did you know that, on average, most people use their phone for <a href="https://www.ukwebhostreview.com/blog/smartphone-statistics/" target="_blank" rel="noopener noreferrer">2 hours and 51 minutes</a> per day? That’s quite excessive! Between looking at meme’s on the internet, constantly checking social media or shopping straight from our smartphones, the reality is that we’re a society that’s always connected. <a href="https://www.ukwebhostreview.com/blog/smartphone-statistics/" target="_blank" rel="noopener noreferrer">Statistics show</a> that nearly 66% of smartphone users are addicted to their phones.</p>
+                                <p>Experts have found that excessive smartphone use is linked to stress and health concerns. Dr. Nancy Cheever, <a href="https://abcnews.go.com/Lifestyle/excessive-cellphone-anxiety-experts-warn/story?id=48842476" target="_blank" rel="noopener noreferrer">research</a> leader at California State University, says “If you're constantly connected, you're going to feel anxiety. The more people feel anxiety, that can lead to other things like mental health and physical ailments”. So, this Stress Awareness Day (November 6th), we want to share some easy tips that can help you create healthy habits to break away from your phone and minimize stress.</p>
+                                <h2>It’s OK To Put Your Phone Down</h2>
+                                <p>Always being connected to your phone can lead to a stress and anxiety loop. This is when people become anxious by reacting to stimuli (like hearing your ringer, feeling your phone buzz or seeing a notification pop up). The response is to continuously pick up your phone, feeding into the loop of phone dependency. Break the cycle by making a conscious effort to put your phone down and step away. You don’t have to answer that text right this second. You also don’t need to browse Facebook for the fiftieth time today. Instead, make time for activities that help you relax, like making a cuppa or going out for fresh air.</p>
+                                <h2>Unwind With Your Favourite Activities</h2>
+                                <p>Staring at a screen for a good part of the day can leave you feeling drained. Take the time to step away from your devices and unwind. Make a habit of doing activities that will help you destress. Take bedtime, for instance. Rather than taking your phone to bed to obsess over the work emails you haven’t gotten to, pick up the book you’ve been neglecting (you know the one. You got it ages ago and haven’t read it yet). Or perhaps you can and do an activity you enjoy - like colouring, playing board games with your family or friends, or picking up a sudoku book to give your mind a bit of exercise. The important thing is you disconnect from your phone and give yourself some breathing space.</p>
+                                <h2>Create A Self-care Routine</h2>
+                                <p>Just like we recharge our phones after a long day, we need to recharge our bodies. Get into the habit of taking care of yourself. Go for a walk, play some sports, exercise, meditate or even make yourself well-balanced meals.  Just remember to create a self-care routine that's easily to manage so you don’t add to your already busy lifestyle. Drink your water, take some deep breaths and keep your body happy and healthy.</p>
+                                <h2>Connect with People, Not Devices</h2>
+                                <p>2020 has been a hard year for all of us. In times of uncertainty and change, it’s normal to feel anxious and stressed. That’s why it's important to talk about it. Reach out to people who you trust and feel comfortable with to talk about how you feel. Getting things off your chest can also help clear your mind. Meet up with your best mate for a social distance walk or simply ring your mum to have a chat. It’s important to connect with the people you trust and love so you have an outlet to chat through things you may have going on.</p>
+                                <p>We hope these tips can enable you to ‘unplug’ from your phone and create healthier habits that help you destress. Although smartphones are a vital part of our everyday lives, It's important to find a balance. Take the time to look out for your well-being and connect with other things you enjoy. Your phone will always be there later.</p>
+                                <h2>Stress-free Solution To Protecting Your Phone</h2>
+                                <p>Are you a smartphone user who is attached to your handset? Maybe it’s time to consider protecting it. Repair costs can range between £250-£300 for high end phones. The cost of replacing your phone, in the event of theft or loss, can also be stressful. Our insurance  makes life stress-free when you need it most and rewards you when you don’t. SO-SURE offers lower premiums, lower excess and a chance to earn up to 80% cashback for being extra careful with your handset.  Learn how you can get ‘peace of mind’ protection for your phone <a href="{{ path('phone_insurance') }}">here</a>.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

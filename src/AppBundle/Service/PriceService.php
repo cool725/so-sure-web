@@ -6,6 +6,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\Claim;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Premium;
 use AppBundle\Document\PhonePremium;
@@ -208,19 +209,29 @@ class PriceService
             ));
         }
         $oldPremium = $previous->getPremium();
-        $newPrice = $policy->getPhone()->getCurrentPhonePrice(
+        $newPremium = $policy->getPhone()->getCurrentPhonePrice(
             PhonePrice::installmentsStream($policy->getPremiumInstallments()),
             $date
-        );
-        if ($newPrice->getGwp() > $oldPremium->getGwp()) {
-            $policy->setPremium($oldPremium);
+        )->createPremium($additionalPremium, $date);
+        $midPremium = clone $oldPremium;
+        $midPremium->setGwp($midPremium->getGwp() * 0.9);
+        $nClaims = count($previous->getApprovedClaims());
+        if ($newPremium->getGwp() > $oldPremium->getGwp()) {
+            if ($nClaims < 2) {
+                $policy->setPremium($oldPremium);
+            } else {
+                $policy->setPremium($newPremium);
+            }
         } else {
-            $this->setPhonePolicyPremium(
-                $policy,
-                PhonePrice::installmentsStream($policy->getPremiumInstallments()),
-                $additionalPremium,
-                $date
-            );
+            if ($nClaims == 0) {
+                if ($midPremium->getGwp() > $newPremium->getGwp()) {
+                    $policy->setPremium($midPremium);
+                } else {
+                    $policy->setPremium($newPremium);
+                }
+            } else {
+                $policy->setPremium($oldPremium);
+            }
         }
         $this->dm->persist($policy);
         $this->dm->flush();
