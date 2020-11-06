@@ -122,7 +122,7 @@ class DefaultController extends BaseController
         // A/B Test Homepage Design
         $homepageDesign = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN,
+            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V2,
             ['current', 'new-design'],
             SixpackService::LOG_MIXPANEL_ALL
         );

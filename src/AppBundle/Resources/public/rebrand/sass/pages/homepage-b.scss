@@ -9,7 +9,7 @@
 @import "../base/fonts";
 
 .hero {
-    padding: 7rem 0 5rem;
+    padding: 7rem 0 3rem;
     position: relative;
 
     > div {
@@ -129,6 +129,7 @@
 
         img {
             margin: 0 0.5rem;
+            align-self: center;
         }
 
         @include media-breakpoint-up(lg) {
