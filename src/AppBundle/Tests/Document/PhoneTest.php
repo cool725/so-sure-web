@@ -549,7 +549,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceC = new PhonePrice();
         $priceA->setValidFrom(new \DateTime('2018-02-19'));
         $priceB->setValidFrom(new \DateTime('2019-05-02'));
-        $priceC->setValidFrom(new \DateTime('2020-11-08'));
+        $priceC->setValidFrom((new \DateTime())->add(new \DateInterval("P2M")));
         $this->assertEquals([], $phone->getPreviousPhonePrices());
         $phone->addPhonePrice($priceB);
         $phone->addPhonePrice($priceA);
@@ -573,7 +573,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $priceC = new PhonePrice();
         $priceA->setValidFrom(new \DateTime('2018-02-19'));
         $priceB->setValidFrom(new \DateTime('2019-05-02'));
-        $priceC->setValidFrom(new \DateTime('2020-11-08'));
+        $priceC->setValidFrom((new \DateTime())->add(new \DateInterval("P2M")));
         $this->assertEmpty($phone->getFuturePhonePrices());
         $phone->addPhonePrice($priceB);
         $phone->addPhonePrice($priceA);
