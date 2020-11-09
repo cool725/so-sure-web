@@ -1074,6 +1074,15 @@ class ReceperioService extends BaseImeiService
             }
         }
 
+        //We need to investigate the reason we get some imei mismatches
+        $this->logger->error(
+            sprintf(
+                "IMEI mismatch for Recipero device: %s on phone %s",
+                $modelData['modelreference'],
+                $phone->getModel()
+            )
+        );
+
         throw new ReciperoManualProcessException(sprintf(
             "Make/Model/Memory mismatch for serial %s",
             $serialNumber
