@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
 
 {% block title %}UK Phone Statistics | so-sure{% endblock %}
 
@@ -81,7 +82,7 @@
                                     {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                 </hgroup>
                             </header>
-                            <div class="blog__contents">                                
+                            <div class="blog__contents">
                                 <img src="{{ cdn_url }}/images/onexone.png"
                                      data-src="{{ cdn_url }}/images/rebrand/blog/uk-phone-statistics-1.jpg"
                                      alt="UK Phone Stats"
