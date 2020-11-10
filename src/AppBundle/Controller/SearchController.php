@@ -70,6 +70,7 @@ class SearchController extends BaseController
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $price = null;
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
@@ -84,12 +85,7 @@ class SearchController extends BaseController
             }
             // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_phone');
-        } elseif ($phone && in_array($type, ['learn-more'])) {
-            if ($session = $request->getSession()) {
-                $session->set('quote', $phone->getId());
-            }
         }
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown'),
@@ -104,7 +100,16 @@ class SearchController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     $this->setPhoneSession($request, $phone);
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_TO_DETAILS);
+                    $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+                    $event = MixpanelService::EVENT_QUOTE_TO_DETAILS;
+                    $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+                        'Device Selected' => $phone->__toString(),
+                        'Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ]);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        'First Device Selected' => $phone->__toString(),
+                        'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ], true);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
             }
@@ -129,6 +134,7 @@ class SearchController extends BaseController
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $price = null;
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
@@ -136,7 +142,6 @@ class SearchController extends BaseController
                 $phoneMake->setMake($phone->getMake());
             }
         }
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown_two'),
@@ -194,7 +199,15 @@ class SearchController extends BaseController
                         // @codingStandardsIgnoreEnd
                     }
                     $this->setPhoneSession($request, $phone);
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_TO_DETAILS);
+                    $event = MixpanelService::EVENT_HOME_TO_DETAILS;
+                    $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+                        'Device Selected' => $phone->__toString(),
+                        'Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ]);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        'First Device Selected' => $phone->__toString(),
+                        'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ], true);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
             }
@@ -219,6 +232,7 @@ class SearchController extends BaseController
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $price = null;
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
@@ -226,7 +240,6 @@ class SearchController extends BaseController
                 $phoneMake->setMake($phone->getMake());
             }
         }
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_dropdown_three'),
@@ -282,7 +295,15 @@ class SearchController extends BaseController
                         ));
                     }
                     $this->setPhoneSession($request, $phone);
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_QUOTE_TO_DETAILS);
+                    $event = MixpanelService::EVENT_QUOTE_TO_DETAILS;
+                    $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+                        'Device Selected' => $phone->__toString(),
+                        'Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ]);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        'First Device Selected' => $phone->__toString(),
+                        'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ], true);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
             }
@@ -307,6 +328,7 @@ class SearchController extends BaseController
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $price = null;
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
@@ -327,7 +349,6 @@ class SearchController extends BaseController
                 $session->set('quote', $phone->getId());
             }
         }
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('model_search_dropdown'),
@@ -342,7 +363,16 @@ class SearchController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     $this->setPhoneSession($request, $phone);
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS);
+                    $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+                    $event = MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS;
+                    $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+                        'Device Selected' => $phone->__toString(),
+                        'Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ]);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        'First Device Selected' => $phone->__toString(),
+                        'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ], true);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
             }
@@ -367,6 +397,7 @@ class SearchController extends BaseController
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $price = null;
         $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
@@ -387,7 +418,6 @@ class SearchController extends BaseController
                 $session->set('quote', $phone->getId());
             }
         }
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
                 'action' => $this->generateUrl('memory_search_dropdown'),
@@ -402,7 +432,16 @@ class SearchController extends BaseController
                         throw new \Exception('unknown phone');
                     }
                     $this->setPhoneSession($request, $phone);
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS);
+                    $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+                    $event = MixpanelService::EVENT_MODEL_PAGE_TO_DETAILS;
+                    $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+                        'Device Selected' => $phone->__toString(),
+                        'Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ]);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        'First Device Selected' => $phone->__toString(),
+                        'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ], true);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
             }
@@ -427,6 +466,7 @@ class SearchController extends BaseController
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $price = null;
         $phoneMake = new PhoneCombined();
         if ($id) {
             $phone = $phoneRepo->find($id);
@@ -434,7 +474,6 @@ class SearchController extends BaseController
                 $phoneMake->setMake($phone->getMake());
             }
         }
-
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneCombinedType::class, $phoneMake, [
                 'action' => $this->generateUrl('phone_search_combined'),
@@ -492,7 +531,15 @@ class SearchController extends BaseController
                         // @codingStandardsIgnoreEnd
                     }
                     $this->setPhoneSession($request, $phone);
-                    $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_TO_DETAILS);
+                    $event = MixpanelService::EVENT_HOME_TO_DETAILS;
+                    $this->get('app.mixpanel')->queueTrackWithUtm($event, [
+                        'Device Selected' => $phone->__toString(),
+                        'Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ]);
+                    $this->get('app.mixpanel')->queuePersonProperties([
+                        'First Device Selected' => $phone->__toString(),
+                        'First Monthly Cost' => $price->getMonthlyPremiumPrice(),
+                    ], true);
                     return $this->redirectToRoute('purchase', [], 301);
                 }
             }
