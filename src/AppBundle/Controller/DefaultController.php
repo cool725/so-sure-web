@@ -81,6 +81,7 @@ class DefaultController extends BaseController
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/reimagined", name="reimagined")
      * @Route("/hasslefree", name="hasslefree")
+     * @Route("/home", name="home")
      */
     public function indexAction(Request $request)
     {
@@ -137,11 +138,18 @@ class DefaultController extends BaseController
 
         $competitorData = new Competitors();
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'home') {
+            $noindex = true;
+        }
+
         $data = array(
             'referral'  => $referral,
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $competitorData::$competitorComparisonData,
             'from_price' => $fromPrice,
+            'is_noindex' => $noindex
         );
 
         return $this->render($template, $data);
@@ -379,6 +387,8 @@ class DefaultController extends BaseController
      *  name="company_phone_insurance", options={"sitemap" = true})
      * @Route("/company-phone-insurance/thank-you",
      *  name="company_phone_insurance_thanks")
+     * @Route("/company-phone-insurance/m",
+     *  name="company_phone_insurance_m")
      */
     public function companyAction(Request $request)
     {
@@ -430,8 +440,16 @@ class DefaultController extends BaseController
             }
         }
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'company_phone_insurance_m' or
+            $request->get('_route') == 'company_phone_insurance_thanks') {
+            $noindex = true;
+        }
+
         $data = [
             'lead_form' => $leadForm->createView(),
+            'is_noindex' => $noindex
         ];
 
         return $this->render('AppBundle:Default:indexCompany.html.twig', $data);
@@ -475,6 +493,7 @@ class DefaultController extends BaseController
                     $message = $request->get('_route') == 'claim_login' ? "Thank you. For our policy holders, an email with further instructions on how to proceed with updating your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy." : "Thank you. For our policy holders, an email with further instructions on how to proceed with your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy.";
 
                     $this->addFlash('success', $message);
+                    // @codingStandardsIgnoreEnd
                 }
             }
         }
@@ -487,58 +506,6 @@ class DefaultController extends BaseController
             return $this->redirectToRoute('claim', [], 301);
         }
         return $this->render('AppBundle:Default:claim.html.twig', $data);
-    }
-
-    /**
-     * @Route("/claim/login/{tokenId}", name="claim_login_token")
-     * @Template
-     */
-    public function claimLoginAction(Request $request, $tokenId = null)
-    {
-        $user = $this->getUser();
-
-        if ($user) {
-            return $this->redirectToRoute('user_claim');
-        }
-
-        if ($tokenId) {
-            /** @var ClaimsService $claimsService */
-            $claimsService = $this->get('app.claims');
-            $userId = $claimsService->getUserIdFromLoginLinkToken($tokenId);
-            if (!$userId) {
-                // @codingStandardsIgnoreStart
-                $this->addFlash(
-                    'error',
-                    "Sorry, it looks like your link as expired. Please re-enter the email address you have created your policy under and try again."
-                );
-                return $this->redirectToRoute('claim');
-            }
-
-            $dm = $this->getManager();
-            $userRepo = $dm->getRepository(User::class);
-            $user = $userRepo->find($userId);
-
-            if ($user) {
-                if ($user->isLocked() || !$user->isEnabled()) {
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'error',
-                        "Sorry, it looks like your user account is locked or expired. Please email support@wearesosure.com"
-                    );
-
-                    return $this->redirectToRoute('claim');
-                }
-
-                $this->get('fos_user.security.login_manager')->loginUser(
-                    $this->getParameter('fos_user.firewall_name'),
-                    $user
-                );
-
-                return $this->redirectToRoute('user_claim');
-            }
-        }
-
-        throw $this->createNotFoundException('Invalid link');
     }
 
     /**

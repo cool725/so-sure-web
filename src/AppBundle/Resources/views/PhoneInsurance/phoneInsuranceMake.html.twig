@@ -4,11 +4,7 @@
 {% set body_class = 'phone-insurance phone-insurance-make' %}
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
-
-{# Money Version? #}
-{% if money_version is defined and money_version == true  %}
-    {% set robots_noindex = true %}
-{% endif %}
+{% set robots_noindex = is_noindex %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
