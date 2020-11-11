@@ -1115,6 +1115,7 @@ nelmio_security:
                 - https://cdn.so-sure.com
                 - https://facebook.com
                 - https://*.facebook.com
+                - https://*.facebook.net
                 - https://platform-lookaside.fbsbx.com
                 - https://*.gravatar.com
                 - https://*.wp.com
