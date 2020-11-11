@@ -153,9 +153,6 @@ class SearchController extends BaseController
             $session = $this->get('session');
             $session->set('email', $email);
             if ($request->request->has('launch_phone')) {
-                if (!$this->isCsrfTokenValid('quote', $request->get('token'))) {
-                    throw new \InvalidArgumentException('Invalid CSRF');
-                }
                 $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
                 if ($phoneId) {
                     $phone = $phoneRepo->find($phoneId);
@@ -248,9 +245,6 @@ class SearchController extends BaseController
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('launch_phone')) {
-                if (!$this->isCsrfTokenValid('quote', $request->get('token'))) {
-                    throw new \InvalidArgumentException('Invalid CSRF');
-                }
                 $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
                 if ($phoneId) {
                     $phone = $phoneRepo->find($phoneId);
@@ -485,9 +479,6 @@ class SearchController extends BaseController
             $session = $this->get('session');
             $session->set('email', $email);
             if ($request->request->has('launch_phone')) {
-                if (!$this->isCsrfTokenValid('quote', $request->get('token'))) {
-                    throw new \InvalidArgumentException('Invalid CSRF');
-                }
                 $phoneId = $this->getDataString($request->get('launch_phone'), 'model');
                 if ($phoneId) {
                     $phone = $phoneRepo->find($phoneId);

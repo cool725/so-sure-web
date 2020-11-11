@@ -77,7 +77,7 @@ class PhoneCombinedType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => 'AppBundle\Document\Form\PhoneCombined',
-            'csrf_protection'   => false,
+            'csrf_protection'   => true,
         ));
     }
 }
