@@ -758,14 +758,9 @@ class ApiController extends BaseController
                               422
                           );
                     } else {
-                        // fix for same person getting quote multiple times
-                        $policies = $user->getPolicies();
-                        foreach ($policies as $policy) {
-                            $dm->remove($policy);
-                            $dm->flush();
-                        }
-                        $dm->remove($user);
-                        $dm->flush();
+                        /** @var FOSUBUserProvider $userService */
+                        $userService = $this->get('app.user');
+                        $userService->deleteUser($user, false, true);
                         $userExists = false;
                     }
                 }
