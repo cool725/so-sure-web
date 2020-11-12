@@ -32,6 +32,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Validator\Constraints\UkMobileValidator;
+use AppBundle\Security\FOSUBUserProvider;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
