@@ -32,6 +32,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Validator\Constraints\UkMobileValidator;
+use AppBundle\Security\FOSUBUserProvider;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -758,14 +759,9 @@ class ApiController extends BaseController
                               422
                           );
                     } else {
-                        // fix for same person getting quote multiple times
-                        $policies = $user->getPolicies();
-                        foreach ($policies as $policy) {
-                            $dm->remove($policy);
-                            $dm->flush();
-                        }
-                        $dm->remove($user);
-                        $dm->flush();
+                        /** @var FOSUBUserProvider $userService */
+                        $userService = $this->get('app.user');
+                        $userService->deleteUser($user, false, true);
                         $userExists = false;
                     }
                 }
