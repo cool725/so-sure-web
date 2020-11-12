@@ -7,11 +7,13 @@
 
 {% block title %}
     {% if scode is defined and scode and scode.user and not custom %}
-        Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | so-sure
+        Get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | SO-SURE
     {% elseif scode is defined and scode and scode.user and custom %}
-        Mobile Insurance that's simply better | so-sure
+        Mobile Insurance that's simply better | SO-SURE
+    {% elseif custom == 'hotukdeals' %}
+        Mobile Insurance - HotUKDeals | SO-SURE
     {% else %}
-        Promo code {{ use_code }} not found! | so-sure
+        Promo code {{ use_code }} not found! | SO-SURE
     {% endif %}
 {% endblock %}
 
@@ -22,15 +24,11 @@
 
 {% if scode is defined and scode and scode.user and scode.reward and not custom %}
     {% set og_title = 'Get £' ~ scode.reward.defaultValue|number_format(0, '.', ',') ~ ' in your reward pot' %}
-    {% set og_description = 'Hey, use this special code to insure your mobile phone with so-sure. And get £'~scode.reward.defaultValue|number_format(0, '.',',')~' cashback if you don\'t claim' %}
-    {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
-{% elseif scode is defined and scode and scode.user and scode.reward and custom %}
-    {% set og_title = 'Get £' ~ scode.reward.defaultValue|number_format(0, '.', ',') ~ ' in your reward pot' %}
-    {% set og_description = 'Hey, use this special code to insure your mobile phone with so-sure and grab yourself a free reward' %}
+    {% set og_description = 'Hey, use this special code to insure your mobile phone with SO-SURE. And get £'~scode.reward.defaultValue|number_format(0, '.',',')~' cashback if you don\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% else %}
     {% set og_title = 'Sign up and save' %}
-    {% set og_description = 'Hey, insure your mobile phone with so-sure. Here\'s a special code to get cash back if you dont\'t claim' %}
+    {% set og_description = 'Hey, insure your mobile phone with SO-SURE. Here\'s a special code to get a reward or cash back if you dont\'t claim' %}
     {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 {% endif %}
 
@@ -53,19 +51,37 @@
                     {% if scode is defined and scode and scode.reward %}
                         {% if custom == 'amazon' %}
                             <div class="hero__intro">
-                                <h1 class="mb-4 h2 text-white">Insure your mobile <br><span class="sub text-columbia-blue-e">and get a &pound;15 Amazon voucher 🤑</span></h1>
+                                <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} Amazon voucher 💰</span></h1>
                                 <div class="hero__step mb-4">
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">1</div></span>
-                                    <div class="h4 text-white">Instant quote</div>
+                                    <div class="h4 text-white">Instant quote, speedy sign-up</div>
                                 </div>
                                 <div class="hero__step mb-4">
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">2</div></span>
-                                    <div class="h4 text-white">Covered in minutes</div>
+                                    <div class="h4 text-white">Low cost, up to 80% cashback</div>
                                 </div>
                                 <div class="hero__step mb-5">
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">3</div></span>
-                                    <div class="h4 text-white">Enter <span class="promo-code">{{ scode.code }}</span> before checkout to claim your voucher 😎</div>
+                                    <div class="h4 text-white">Use code <span class="promo-code">{{ scode.code }}</span> at checkout 😎</div>
                                 </div>
+                            </div>
+                        {% elseif custom == 'uswitch' %}
+                            <div class="hero__intro">
+                                <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} Amazon voucher 💰</span></h1>
+                                <ul class="list-unstyled icn-fa-list mb-5 hero-usps">
+                                    <li class="mb-4 text-white">
+                                        <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                        Instant quote, speedy sign-up
+                                    </li>
+                                    <li class="mb-4 text-white">
+                                        <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                        Low cost, up to 80% cashback
+                                    </li>
+                                    <li class="text-white">
+                                        <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                        Use code <span class="promo-code">{{ scode.code }}</span> at checkout 😎
+                                    </li>
+                                </ul>
                             </div>
                         {% elseif custom == 'pizzaexpress' %}
                             <div class="hero__intro">
@@ -125,12 +141,60 @@
                             </div>
                         {% endif %}
                         <div class="hero__controls">
-                            <div class="mb-4"><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">🥳 Instant quote</a></div>
+                            <div class="mb-4"><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Quote me</a></div>
+                            {% if custom == 'uswitch' %}
+                                <div class="partner-logo text-center d-md-flex align-items-md-center mb-4">
+                                    <div class="text-white mb-2 mb-md-0 mr-md-2">In partnership with:</div>
+                                    <img src="{{ cdn_url }}/images/onexone.png"
+                                         data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_uswitch-logo.svg" alt="uswitch"
+                                         title="so-sure in partnership with uswitch"
+                                         width="200px"
+                                         class="lozad">
+                                </div>
+                            {% endif %}
                             <p class="text-center text-md-left">
                                 <small>
                                     <a href="#terms_and_conditions"
                                        data-toggle="modal"
                                        data-target="#page_terms"
+                                       class="terms-link text-white">
+                                       <u>Term &amp; Conditions</u></a>
+                                </small>
+                            </p>
+                        </div>
+                    {% elseif custom == 'hotukdeals' %}
+                        <div class="hero__intro">
+                            <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} Amazon voucher 💰</span></h1>
+                            <ul class="list-unstyled icn-fa-list mb-5 hero-usps">
+                                <li class="mb-4 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    Instant quote, speedy sign-up
+                                </li>
+                                <li class="mb-4 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    Up to 80% no claim cashback
+                                </li>
+                                <li class="text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    Lower cost, better cover, no catch 😎
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="hero__controls">
+                            <div class="mb-4"><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Quote me</a></div>
+                            <div class="partner-logo text-center d-md-flex align-items-md-center mb-4">
+                                <div class="text-white mb-2 mb-md-0 mr-md-2">In partnership with:</div>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                        data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hotukdeals-logo.svg" alt="hotukdeals"
+                                        title="so-sure in partnership with hotukdeals"
+                                        width="200px"
+                                        class="lozad">
+                            </div>
+                            <p class="text-center text-md-left">
+                                <small>
+                                    <a href="#page_terms_hotukdeals"
+                                       data-toggle="modal"
+                                       data-target="#page_terms_hotukdeals"
                                        class="terms-link text-white">
                                        <u>Term &amp; Conditions</u></a>
                                 </small>
@@ -161,7 +225,7 @@
                 </div>
             </div>
             <div class="hero__illustration-mobile d-block d-lg-none text-center">
-                {% if custom == 'amazon' %}
+                {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% elseif custom == 'pizzaexpress' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
@@ -173,7 +237,7 @@
             </div>
         </div>
         <div class="hero__illustration-desktop d-none d-lg-block">
-            {% if custom == 'amazon' %}
+            {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% elseif custom == 'pizzaexpress' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
@@ -187,9 +251,6 @@
 
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
-
-    {# Reviews #}
-    {# {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %} #}
 
     {# Page Modals #}
     <div class="modal fade"
@@ -214,6 +275,37 @@
                             <p>Code expires: <strong>{{ scode.reward.expiryDate|date('d/m/Y') }}</strong></p>
                         {% endif %}
                     {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="page_terms_hotukdeals"
+         tabindex="-1" role="dialog"
+         aria-labelledby="page_terms_hotukdeals"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Terms &amp; Conditions
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>The purchase of “SO-SURE Mobile Phone Insurance ' must take place while being logged in at PepperBonus through the provided referral link.</li>
+                        <li>The offer is NOT valid for upgrading or renewing existing So-Sure contracts.</li>
+                        <li>Only valid for purchases fully completed online before 22:00 on 30/11/2020.</li>
+                        <li>Purchases completed via SO-SURE's phone line, online chat do not qualify for the reward.</li>
+                        <li>The plan must not be revoked, cancelled or altered before the reward is available.</li>
+                        <li>The offer cannot be combined with any other offer, cashback, reward or discount code.</li>
+                        <li>A maximum of one qualified purchase per PepperBonus account will be rewarded.</li>
+                        <li>PepperBonus is the sole contact for all questions regarding the £20 Amazon.co.uk eGift voucher.</li>
+                    </ul>
                 </div>
             </div>
         </div>

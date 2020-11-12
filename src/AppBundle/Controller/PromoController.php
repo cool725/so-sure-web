@@ -31,6 +31,8 @@ class PromoController extends BaseController
      * @Route("/pizzaexpress/{code}", name="pizzaexpress_promo")
      * @Route("/xiaomi/{code}", name="xiaomi_promo")
      * @Route("/share/{code}", name="share_promo")
+     * @Route("/uswitch/{code}", name="uswitch_promo")
+     * @Route("/offer/{code}", name="offer_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -41,6 +43,7 @@ class PromoController extends BaseController
 
         $scode = null;
         $custom = null;
+        $amazonVoucher = null;
         $code = mb_strtoupper($code);
 
         try {
@@ -62,12 +65,18 @@ class PromoController extends BaseController
         // Check route so we can use custom to update template
         if ($request->get('_route') == 'amazon_promo') {
             $custom = 'amazon';
+            $amazonVoucher = 15;
         } elseif ($request->get('_route') == 'pizzaexpress_promo') {
             $custom = 'pizzaexpress';
         } elseif ($request->get('_route') == 'xiaomi_promo') {
             $custom = 'xiaomi';
         } elseif ($request->get('_route') == 'share_promo') {
             $template = 'AppBundle:Promo:influencer.html.twig';
+        } elseif ($request->get('_route') == 'uswitch_promo') {
+            $custom = 'uswitch';
+            $amazonVoucher = 15;
+        } elseif ($request->get('_route') == 'offer_promo') {
+            $template = 'AppBundle:Promo:indexOffer.html.twig';
         }
 
         $lead = new Lead();
@@ -131,6 +140,25 @@ class PromoController extends BaseController
             'custom' => $custom,
             'lead_form' => $leadForm->createView(),
             'competitor' => $competitorData::$competitorComparisonData,
+            'amazon_voucher' => $amazonVoucher
+        ];
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/hotukdeals", name="hotukdeals_promo")
+     * @Template
+     */
+    public function promoHotukdealsAction()
+    {
+        $custom = 'hotukdeals';
+        $amazonVoucher = 20;
+        $template = 'AppBundle:Promo:promo.html.twig';
+
+        $data = [
+            'custom' => $custom,
+            'amazon_voucher' => $amazonVoucher
         ];
 
         return $this->render($template, $data);

@@ -1,0 +1,248 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'landing' %}
+{% set robots_noindex = true %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Beer 52 | SO-SURE{% endblock %}
+{% block meta %}
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/landing-search.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-md-6">
+                    <h1 class="fit text-white mt-md-5 mb-4">
+                        Protect your phone <br>
+                        <span class="sub text-deep-sky-blue-d">and get a FREE Case of Craft Beer 🍺</span>
+                    </h1>
+                    <ul class="list-unstyled icn-fa-list mb-4 hero-usps">
+                        <li class="mb-3 text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Low premium, low excess, no catch
+                        </li>
+                        <li class="mb-3 text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Up to 80% no claim cashback
+                        </li>
+                        {% if scode is defined and scode and scode.reward %}
+                            <li class="text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                Use code <span class="promo-code"><u>{{ scode.code }}</u></span> at checkout 😎
+                            </li>
+                        {% endif %}
+                    </ul>
+                    <hr class="divider">
+                    <div class="mb-4">
+                        <p class="lead text-columbia-blue-e">Get stocked up for Xmas with an exclusive offer from our friends at Beer52. 8 delicious craft beers sourced from breweries across the planet.</p>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_beer52-logo.svg" alt="Beer52"
+                            title="so-sure in partnership with Beer52"
+                            width="200px"
+                            class="lozad">
+                    </div>
+                    <p>
+                        <small>
+                            <a href="#terms_and_conditions"
+                                data-toggle="modal"
+                                data-target="#page_terms"
+                                class="terms-link text-white">
+                                <u>Term &amp; Conditions</u></a>
+                        </small>
+                    </p>
+                </div>
+                <div class="col-md-6 col-lg-5 offset-lg-1">
+                    {% if phone is defined and phone %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCardLanding', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCardLanding', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="reviews py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Don't just take our<br class="d-md-none"> word for it!</h2>
+            <p class="mb-5">Our customers love us – that's why thousands of customers have joined the so-sure family.</p>
+            {% include 'AppBundle::Components/_trustpilotReviews.html.twig' %}
+        </div>
+    </section>
+
+    {% include 'AppBundle::Components/_cover.html.twig' %}
+
+    <section id="table-compare" class="comparison py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Why so-sure mobile phone insurance?</h2>
+            <p class="mb-md-5">Our insurance is simple and hassle free so you don't need to worry, we've got you covered</p>
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
+        </div>
+    </section>
+
+    <section class="top-questions py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h4 mb-4 d-md-none">Top questions about so-sure insurance</h2>
+            <div class="row">
+                <div class="col-md-6 col-lg-5 order-md-2">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions_mobile.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad mb-4 d-md-none">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad d-none d-md-inline">
+                </div>
+                <div class="col-md-6 col-lg-7 order-md-1">
+                    <h2 class="h4 mb-4 d-none d-md-block">Top questions about so-sure insurance</h2>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                Why should I use you? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                <p>Unlike other insurers, we're less focused on profit, and more focused on giving customers value.  Our mission is to make insurance better and cheaper for honest people,  and that's why we've developed clever anti-fraud tech that makes your life easier. Plus we're the only insurer that gives you money back</p>
+                                <ul class="mb-0">
+                                    <li class="mb-2">Instant cover from purchase</li>
+                                    <li class="mb-2">We aim for 24-72 hour replacement or repair once your claim is approved</li>
+                                    <li class="mb-2">Hassle-Free Claims</li>
+                                    <li class="mb-2">Low excess from just {{ lowest_excess }}</li>
+                                    <li class="mb-2">We insure mobiles purchased in the last three years</li>
+                                    <li class="mb-2">No proof of purchase required upfront, or at all when you use our anti-fraud technology</li>
+                                    <li>Rewards when you and your connections don't claim - up to 80% of your premium back</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                How much is excess? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                <p>Our excess is as low as {{ lowest_excess }} when you validate your phone with our app.</p>
+                                <p>Download our app and prove to us your device is in good working order and the screen isn't cracked by taking a selfie of your phone!</p>
+                                <p><strong>Depending on your policy, validating your phone may be mandatory.</strong></p>
+                                <p class="mb-0">Excess levels vary by make, model and memory size and might be higher for latest, more-expensive new handsets- check your quote for more details.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                Do you have a discount for annual payments? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                Yes! If you pay yearly, you get {{ free_months }} free. In addition to that, you can add money to your reward pot by connecting with friends and family to earn up to 80% cashback.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-5">
+            <h2 class="h4 mb-4 d-md-none">More about claiming cash back & social insurance</h2>
+            <div class="row">
+                <div class="col-md-6 col-lg-5 order-md-1">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions_cashback_mobile.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad mb-4 d-md-none">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/landing/so-sure_cover_top_questions_cashback.jpg"
+                         alt="so-sure family"
+                         class="img-fluid lozad d-none d-md-inline">
+                </div>
+                <div class="col-md-6 col-lg-7 order-md-2">
+                    <h2 class="h4 mb-4 d-none d-md-block">More about claiming cash back & social insurance</h2>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                What is the Reward Pot? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                <p>The reward pot is basically a <mark>group no claims bonus</mark>.  For each person that buys insurance with us and connects together, for example You buy a policy and invite your mum to buy.  She buys a policy and then you connect, each of you receive up to &pound;10 into your reward pots.</p>
+
+                                <div class="h4 text-zaffre">4 people connected to you = &pound;40 in your reward pot, £10 in each of theirs.</div>
+
+                                <div class="h4 text-zaffre">8 people connected = &pound;80 in your reward pot, £10 in each of theirs.</div>
+
+                                <p class="mb-0">If neither you nor your connected friends claim, we will payout to you the value of your reward pot at the end of the policy year.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                Can anyone connect to anyone? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                Yes, that is the beauty of social insurance, you can have as many connections as you like, as long as they have a policy with so-sure.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expanding-cardbox mb-4">
+                        <div class="expanding-cardbox__body">
+                            <h3 class="h5 expanding-cardbox__title">
+                                How do I make connections to people? <i class="far fa-chevron-down fa-lg"></i>
+                            </h3>
+                            <div class="expanding-cardbox__expand">
+                                Once you buy a policy its super easy to make connections either through our app or via SMS, email or WhatsApp.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="page_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="page_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Terms &amp; Conditions
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>SO-SURE</strong>: Enter the code BEER52 into your customer dashboard within 7 days once you have bought your policy.
+                    You will not be eligible for a voucher if the policy is cancelled or terminated within 14 days, or before the reward has been approved by so-sure.
+                    </p>
+                    <p>The promo code will not be sent in conjunction with any other offer, cashback, reward or discount code unless listed on this page, or with any other discounts.</p>
+                    <p>Once the above terms have been met, you will be sent an email with the promo code. If the promo code is unclaimed after 30 days from the date this email is sent, the claim will expire, and you will not receive your promo code.</p>
+                    <p>Once you have claimed your promo code, you will be subject to the terms and conditions of Beer52. Please read these carefully once you have received your promo code.</p>
+                    <p><strong>Beer52</strong>: Offer valid for new UK customers only. One per household. After your free case, you’ll be subscribed as a member of Beer52 (£24/m for 8 beers, magazine, snack). No minimum commitment, simply contact customer support to cancel.</p>
+                    <p>18+ only. See website for full T&Cs <a href="http://www.beer52.com"  target="_blank" rel="noopener noreferrer">www.beer52.com</a>. Beer selection may vary. Promotion runs for 30 days.</p>
+                    <p><strong>Please Drink Responsibly.</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/landing-search.js') }}"></script>
+{% endblock %}

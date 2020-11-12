@@ -13,7 +13,7 @@
     padding-top: 6rem;
     overflow: hidden;
 
-    @include blue-gradient;
+    @include blue-gradient-45;
 
     .container-large {
         position: relative;
@@ -67,6 +67,26 @@
 
         @include media-breakpoint-up(fk) {
             right: 400px;
+        }
+    }
+
+    &-usps {
+        font-family: $g-bold;
+
+        li {
+            padding-left: 30px;
+        }
+
+        @include media-breakpoint-up(lg) {
+            font-size: 17px;
+
+            li {
+                padding-left: 40px;
+
+                .far {
+                    top: 6px;
+                }
+            }
         }
     }
 
