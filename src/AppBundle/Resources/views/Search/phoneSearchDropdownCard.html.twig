@@ -2,7 +2,7 @@
     <div class="mb-2 h4 text-primary fit">
         Easy, Fast &amp; Great Value 🇬🇧
     </div>
-    {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
+    {# {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
         {% set greeting = 'Good morning ⏰' %}
     {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
         {% set greeting = 'Good afternoon 😎' %}
@@ -11,7 +11,7 @@
     {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
         {% set greeting = 'Hello night owl 🦉' %}
     {% endif %}
-    <p class="lead mb-2">{{ greeting }}</p>
+    <p class="lead mb-2">{{ greeting }}</p> #}
     <ul class="list-unstyled icn-fa-list mb-4">
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>
