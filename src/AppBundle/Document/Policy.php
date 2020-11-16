@@ -660,6 +660,16 @@ abstract class Policy
      */
     protected $subvariant = null;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", mappedBy="policy", cascade={"persist"})
+     */
+    protected $policyReportLine = null;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", mappedBy="policy", cascade={"persist"})
+     */
+    protected $scodeReportLine = null;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -3011,6 +3021,44 @@ abstract class Policy
     public function setSubvariant($subvariant)
     {
         $this->subvariant = $subvariant;
+    }
+
+    /**
+     * Gives you a report line for the given type of report.
+     * @param string $type is the name of the type of report that you are getting.
+     * @return ReportLine|null the reportline found.
+     */
+    public function getReportLineByType($type)
+    {
+        switch ($type) {
+            case PolicyReport::TYPE_POLICY:
+                return $this->policyReportLine;
+            case PolicyReport::TYPE_SCODE:
+                return $this->scodeReportLine;
+        }
+        throw new \Exception(sprintf(
+            "%s is not a value type of policy report",
+            $type
+        ));
+    }
+
+    /**
+     * Sets a reportline object on this policy based on the type that it is.
+     * @param string          $type  is the type of reportline to change.
+     * @param ReportLine|null $value is the value to set this reportline to.
+     */
+    public function setReportLineByType($type, $value)
+    {
+        switch ($type) {
+            case PolicyReport::TYPE_POLICY:
+                $this->policyReportLine = $value;
+            case PolicyReport::TYPE_SCODE:
+                $this->scodeReportLine = $value;
+        }
+        throw new \Exception(sprintf(
+            "%s is not a value type of policy report",
+            $type
+        ));
     }
 
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)

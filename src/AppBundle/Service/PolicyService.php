@@ -2935,4 +2935,36 @@ class PolicyService
             ));
         }
     }
+
+    /**
+     * Takes a policy and gives it up to date report lines for each relevant policy report type. If the policy has
+     * ReportLine objects for the report types already it updates them and if it lacks them then it creates them. If
+     * the policy is not eligible for reportlines for whatever reason then they are removed if present and nothing is
+     * done otherwise.
+     * @param Policy $policy is the policy for which we are to create report lines.
+     */
+    public function generateReportLines($policy)
+    {
+        $reportLineRepo = $this->dm->getRepository(ReportLine::class);
+        foreach (PolicyReport::TYPES as $reportType) {
+            $report = PolicyReport::createReport($reportType, $this->dm, new \DateTimeZone());
+            $line = $policy->getReportLineByType($reportType);
+            if ($report->isReportable($policy)) {
+                if (!$line) {
+                    $line = new ReportLine();
+                    $line->setNumber($this->sequence->getSequenceId(SequenceService::SEQUENCE_REPORT_LINE));
+                    $line->setPolicy($policy);
+                    $line->setReport($reportType);
+                    $policy->setReportLineByType($reportType, $line);
+                }
+                $line->setDate(new \DateTime());
+                $line->setContent($report->process($policy));
+                $this->dm->persist($line);
+            } elseif ($line) {
+                $this->dm->remove($line);
+                $policy->setReportLineByType($reportType, null);
+            }
+        }
+        $this->dm->flush();
+    }
 }

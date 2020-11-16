@@ -20,6 +20,8 @@ class SequenceService
     const SEQUENCE_BACS_SERIAL_NUMBER = 'bacs-serial-number';
     const SEQUENCE_BACS_SERIAL_NUMBER_INVALID = 'bacs-serial-number-invalid';
 
+    const SEQUENCE_REPORT_LINE = 'report-line';
+
     /** @var DocumentManager */
     protected $dm;
 

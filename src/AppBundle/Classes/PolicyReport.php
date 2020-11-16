@@ -14,6 +14,15 @@ use RuntimeException;
  */
 abstract class PolicyReport
 {
+    const TYPE_POLICY = 'policy';
+    const TYPE_PICSURE = 'picsure';
+    const TYPE_SCODE = 'scode';
+    const TYPES = [
+        TYPE_POLICY,
+        TYPE_PICSURE,
+        TYPE_SCODE
+    ];
+
     /**
      * @var DocumentManager $dm
      */
@@ -58,8 +67,36 @@ abstract class PolicyReport
     }
 
     /**
+     * Adds a policy to the report. There is not a complete guarantee that this policy will appear in the final report
+     * as the report can skip it if it does not pass the check in reportable($policy)
+     * @param mixed ...$column is each of the columns to add.
+     */
+    public function add(...$column)
+    {
+        // Column is the varargs name so the standards are too dumb to understand it serves a purpose.
+        NoOp::ignore($column);
+        $args = func_get_args();
+        if (count($args) != $this->columns) {
+            throw new RuntimeException(sprintf(
+                'Invalid line \'%s\' given for report \'%s\'',
+                CsvHelper::line(...$args),
+                $this->getFile()
+            ));
+        }
+        $this->lines[] = CsvHelper::line(...$args);
+    }
+
+    /**
+     * Tells you if this report can actually report on this policy.
+     * @param Policy $policy is the policy we are checking.
+     * @return boolean true iff the policy is reportable.
+     */
+    abstract public function reportable(Policy $policy);
+
+    /**
      * Takes a policy and adds lines to the report with it.
      * @param Policy $policy is the policy to process.
+     * @return string the processed version.
      */
     abstract public function process(Policy $policy);
 
@@ -88,34 +125,14 @@ abstract class PolicyReport
         DateTimeZone $tz
     ) {
         switch ($name) {
-            case 'policy':
+            case static::TYPE_POLICY:
                 return new PolicyBiReport($dm, $tz);
-            case 'picsure':
+            case static::TYPE_PICSURE:
                 return new PolicyPicSureReport($dm, $tz);
-            case 'scode':
+            case static::TYPE_SCODE:
                 return new PolicyScodeReport($dm, $tz);
             default:
                 return null;
         }
-    }
-
-    /**
-     * Adds a policy to the report. There is not a complete guarantee that this policy will appear in the final report
-     * as the report can skip it if it does not think that it is relevant.
-     * @param mixed ...$column is each of the columns to add.
-     */
-    protected function add(...$column)
-    {
-        // Column is the varargs name so the standards are too dumb to understand it serves a purpose.
-        NoOp::ignore($column);
-        $args = func_get_args();
-        if (count($args) != $this->columns) {
-            throw new RuntimeException(sprintf(
-                'Invalid line \'%s\' given for report \'%s\'',
-                CsvHelper::line(...$args),
-                $this->getFile()
-            ));
-        }
-        $this->lines[] = CsvHelper::line(...$args);
     }
 }

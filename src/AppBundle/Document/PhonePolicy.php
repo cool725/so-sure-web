@@ -235,6 +235,11 @@ abstract class PhonePolicy extends Policy
     protected $picSureRequired;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", mappedBy="policy", cascade={"persist"})
+     */
+    protected $picsureReportLine = null;
+
+    /**
      * @return Phone
      */
     public function getPhone()
@@ -906,6 +911,29 @@ abstract class PhonePolicy extends Policy
     public function setPicSureRequired($picSureRequired)
     {
         $this->picSureRequired = $picSureRequired;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getReportLineByType($type)
+    {
+        if ($type == PolicyReport::TYPE_PICSURE) {
+            return $this->picsureReportLine;
+        }
+        return parent::getReportByType($type);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setReportLineByType($type, $value)
+    {
+        if ($type == PolicyReport::TYPE_PICSURE) {
+            $this->picsureReportLine = $value;
+        } else {
+            parent::setReportLineByType($type, $value);
+        }
     }
 
     public function isSameInsurable(Policy $policy)
