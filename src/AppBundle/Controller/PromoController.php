@@ -33,6 +33,7 @@ class PromoController extends BaseController
      * @Route("/share/{code}", name="share_promo")
      * @Route("/uswitch/{code}", name="uswitch_promo")
      * @Route("/offer/{code}", name="offer_promo")
+     * @Route("/hotukdeals/{code}", name="hotukdeals_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -77,6 +78,9 @@ class PromoController extends BaseController
             $amazonVoucher = 15;
         } elseif ($request->get('_route') == 'offer_promo') {
             $template = 'AppBundle:Promo:indexOffer.html.twig';
+        } elseif ($request->get('_route') == 'hotukdeals_promo') {
+            $custom = 'hotukdeals';
+            $amazonVoucher = 20;
         }
 
         $lead = new Lead();
@@ -146,21 +150,21 @@ class PromoController extends BaseController
         return $this->render($template, $data);
     }
 
-    /**
-     * @Route("/hotukdeals", name="hotukdeals_promo")
-     * @Template
-     */
-    public function promoHotukdealsAction()
-    {
-        $custom = 'hotukdeals';
-        $amazonVoucher = 20;
-        $template = 'AppBundle:Promo:promo.html.twig';
+    // /**
+    //  * @Route("/hotukdeals", name="hotukdeals_promo")
+    //  * @Template
+    //  */
+    // public function promoHotukdealsAction()
+    // {
+    //     $custom = 'hotukdeals';
+    //     $amazonVoucher = 20;
+    //     $template = 'AppBundle:Promo:promo.html.twig';
 
-        $data = [
-            'custom' => $custom,
-            'amazon_voucher' => $amazonVoucher
-        ];
+    //     $data = [
+    //         'custom' => $custom,
+    //         'amazon_voucher' => $amazonVoucher
+    //     ];
 
-        return $this->render($template, $data);
-    }
+    //     return $this->render($template, $data);
+    // }
 }
