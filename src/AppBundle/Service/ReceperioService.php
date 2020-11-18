@@ -893,13 +893,13 @@ class ReceperioService extends BaseImeiService
             ), ReciperoManualProcessException::NO_MAKES);
         }
 
-        if (count($data['makes']) != 1) {
-            throw new ReciperoManualProcessException(sprintf(
-                "Unable to check serial number (multiple makes) %s. Data: %s",
-                $serialNumber,
-                json_encode($data)
-            ), ReciperoManualProcessException::MULTIPLE_MAKES);
-        }
+        // if (count($data['makes']) != 1) {
+        //     throw new ReciperoManualProcessException(sprintf(
+        //         "Unable to check serial number (multiple makes) %s. Data: %s",
+        //         $serialNumber,
+        //         json_encode($data)
+        //     ), ReciperoManualProcessException::MULTIPLE_MAKES);
+        // }
     }
 
     private function validateMakeModeResponseModels($serialNumber, $makeData, $data)
