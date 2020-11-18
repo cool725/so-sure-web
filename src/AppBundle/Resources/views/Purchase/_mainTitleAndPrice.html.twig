@@ -1,0 +1,36 @@
+<a href="{{ url('homepage') }}" class="d-block text-center text-lg-left mx-4 mt-5 mx-lg-5">
+    <img src="{{ cdn_url }}/images/onexone.png"
+        data-src="{{ cdn_url }}/images/rebrand/logo/so-sure_logo-white-dark.svg" width="160px"
+        class="lozad"
+        alt="so-sure">
+</a>
+<div class="qpw__main mx-4 mx-lg-5">
+    <img src="{{ cdn_url }}/images/onexone.png"
+        data-src="{{ cdn_url }}/images/rebrand/misc/{{ device_is }}"
+        alt="SO-SURE Phones"
+        width="240px"
+        class="qpw__main_img mr-2 lozad">
+    <div class="qpw__main_text">
+        <div class="qpw__h5">Here are your quote details, insure your:</div>
+        <h1 class="qpw__h1 mb-4 fit">
+            {{ make_desc }} {{ phone.model }} <span class="sub">({{ phone.memory }}GB)</span>
+        </h1>
+        <div class="qpw__h3 h4 fit">
+            {% if not app.user or app.user.allowedMonthly %}
+                &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
+            {% else %}
+                <span class="sub">For only</span> &pound;{{ yearly }} <span class="sub">a year</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="qpw__h5 h5 pb-4 d-block d-lg-none text-center">
+    <a href="#qpw-info-mobile"
+        id="qpw-info-btn"
+        class="text-white">
+        View my excess <i class="fas fa-caret-down ml-2"></i>
+    </a>
+</div>
+<div id="qpw-info" class="qpw__info__container d-none d-lg-block">
+    {% include 'AppBundle::Purchase/_seeFullDetails.html.twig' %}
+</div>

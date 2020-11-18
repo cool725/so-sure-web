@@ -39,11 +39,11 @@
     }
 
     &__main {
-        padding-top: 5rem;
+        padding-top: 2rem;
         padding-bottom: 1.76rem;
 
         @include media-breakpoint-up(lg) {
-            padding-top: 10rem;
+            padding-top: 3rem;
         }
     }
 
@@ -97,65 +97,30 @@
     }
 
     // Contents
-    h1 {
-        border-bottom: 2px solid $columbia-blue-e;
-
-        &.qpw__h1-policy {
-            border-bottom: transparent;
-        }
-    }
-
     &__h1 {
-        font-size: 1.4rem;
+        color: $deep-sky-blue-d;
+        text-align: center;
 
-        @include media-breakpoint-up(ss) {
-            font-size: 1.5rem;
-        }
-
-        @include media-breakpoint-up(sm) {
-            font-size: 1.6rem;
-        }
-
-        @include media-breakpoint-up(sm) {
-            font-size: 2.2rem;
-        }
-
-        .far {
-            cursor: pointer;
+        @include media-breakpoint-up(lg) {
+            text-align: left;
         }
     }
 
     &__h3 {
-        line-height: 1.5;
+        color: $white;
+        text-align: center;
+
+        @include media-breakpoint-up(lg) {
+            text-align: left;
+        }
     }
 
     &__h5 {
-        @include media-breakpoint-down(xs) {
-            font-size: 0.9rem;
-            opacity: 0.6;
-        }
-    }
-
-    &__alt__phones {
-
-        a.dropdown-toggle {
-            &:before {
-                display: none;
-            }
-        }
-    }
-
-    &__sticky {
-        position: fixed;
-        bottom: -1px; left: 0; right: 0;
-        z-index: 1000;
         color: $white;
-        @include blue-gradient;
-        box-shadow: 0 -15px 30px 0 rgba(8,27,154,0.08),
-                    0 -5px 15px 0 rgba(8,27,154,0.08);
+        text-align: center;
 
-        @include media-breakpoint-up(md) {
-            display: none;
+        @include media-breakpoint-up(lg) {
+            text-align: left;
         }
     }
 
@@ -167,11 +132,19 @@
 .policy {
 
     &__info {
+        border-bottom: 1px solid $deep-sky-blue-d;
+        border-top-width: 0;
+        border-left-width: 0;
+        border-right-width: 0;
+        border-image-source: linear-gradient(
+        45deg,
+        rgba(0, 186, 255, 1) 0%,
+        rgba(0, 81, 232, 1) 80%
+        );
+        border-image-slice: 1;
 
-        border-top: 1px solid $columbia-blue-e;
-
-        &:first-of-type {
-            border-top: none;
+        &:last-of-type {
+            border-bottom: none;
         }
 
         .table-list {

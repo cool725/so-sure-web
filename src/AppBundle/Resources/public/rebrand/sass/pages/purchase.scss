@@ -9,11 +9,37 @@
 
 body {
     background-color: $crayon-blue;
-    @include blue-gradient;
+    // @include blue-gradient-45;
 }
 
 .qpw {
+    &__main {
+        @include media-breakpoint-up(lg) {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-bottom: 0;
 
+            border-bottom: 1px solid $deep-sky-blue-d;
+            border-top-width: 0;
+            border-left-width: 0;
+            border-right-width: 0;
+            border-image-source: linear-gradient(
+            45deg,
+            rgba(0, 186, 255, 1) 0%,
+            rgba(0, 81, 232, 1) 80%
+            );
+            border-image-slice: 1;
+        }
+    }
+
+    &__main_img {
+        display: none;
+
+        @include media-breakpoint-up(xl) {
+            display: inline;
+        }
+    }
 }
 
 // Old Form CSS
