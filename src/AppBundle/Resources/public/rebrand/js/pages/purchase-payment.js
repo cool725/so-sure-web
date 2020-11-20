@@ -133,20 +133,20 @@ $(function(){
         let val   = $(this).data('value'),
             cycle = $(this).data('premium-type');
 
-        if (cycle === 'month') {
-            payOptionCC.addClass('hideme');
-            payOptionDD.find('.payment-card-type').addClass('active');
-            payCtaCC.addClass('hideme');
-            payCtaDD.removeClass('hideme');
-            payOptionTl.addClass('hideme');
-        } else {
-            payOptionCC.removeClass('hideme');
-            payOptionDD.find('.payment-card-type').removeClass('active');
-            payOptionCC.find('.payment-card-type').addClass('active');
-            payCtaCC.removeClass('hideme');
-            payCtaDD.addClass('hideme');
-            payOptionTl.removeClass('hideme');
-        }
+        // if (cycle === 'month') {
+        //     payOptionCC.addClass('hideme');
+        //     payOptionDD.find('.payment-card-type').addClass('active');
+        //     payCtaCC.addClass('hideme');
+        //     payCtaDD.removeClass('hideme');
+        //     payOptionTl.addClass('hideme');
+        // } else {
+        //     payOptionCC.removeClass('hideme');
+        //     payOptionDD.find('.payment-card-type').removeClass('active');
+        //     payOptionCC.find('.payment-card-type').addClass('active');
+        //     payCtaCC.removeClass('hideme');
+        //     payCtaDD.addClass('hideme');
+        //     payOptionTl.removeClass('hideme');
+        // }
 
         // Set the linked radio
         $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
