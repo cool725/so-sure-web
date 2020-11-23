@@ -43,9 +43,17 @@ class PolicyScodeReport extends PolicyReport
     /**
      * @inheritDoc
      */
+    public function getType()
+    {
+        return PolicyReport::TYPE_SCODE;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getHeaders()
     {
-        return ["Scode", "Scode Type", "User Id", "Policy Number", "Date"];
+        return ['Scode', 'Scode Type', 'User Id', 'Policy Number', 'Date'];
     }
 
     /**
@@ -53,6 +61,7 @@ class PolicyScodeReport extends PolicyReport
      */
     public function process(Policy $policy)
     {
+        $content = '';
         foreach ($policy->getSCodes() as $scode) {
             $type = $scode->getType();
             $connection = null;
@@ -64,14 +73,18 @@ class PolicyScodeReport extends PolicyReport
                 $connection = $this->connectionRepo->connectedByPolicy($policy, $other);
             }
             if ($connection) {
-                $this->add(
+                $content .= CsvHelper::line(
                     $scode->getCode(),
                     $scode->getType(),
                     $policy->getUser()->getId(),
                     $policy->getPolicyNumber(),
-                    $connection->getDate()->format("Y-m-d H:i")
-                );
+                    $connection->getDate()->format('Y-m-d H:i')
+                ) . '\n';
             }
         }
+        if ($content == '') {
+            return null;
+        }
+        return $content;
     }
 }

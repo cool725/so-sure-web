@@ -3,10 +3,14 @@
 namespace AppBundle\Command;
 
 use AppBundle\Classes\PolicyReport;
+use AppBundle\Helpers\CsvHelper;
+use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\ReportLine;
 use AppBundle\Repository\PhonePolicyRepository;
 use Aws\S3\S3Client;
 use DateTime;
+use AppBundle\Service\PolicyService;
 use DateTimeZone;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use IOException;
@@ -24,6 +28,8 @@ use AppBundle\Classes\SoSure;
  */
 class PolicyReportCommand extends ContainerAwareCommand
 {
+    const BATCH_SIZE = 1024;
+
     /** @var S3Client */
     protected $s3;
 
@@ -36,24 +42,30 @@ class PolicyReportCommand extends ContainerAwareCommand
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var PolicyService */
+    protected $policyService;
+
     /**
      * inserts the required dependencies into the command.
-     * @param S3Client        $s3          is the amazon s3 client for uploading generated reports.
-     * @param DocumentManager $dm          is the document manager for loading data.
-     * @param string          $environment is the environment name used to upload to the right location in amazon s3.
-     * @param LoggerInterface $logger      is used for logging.
+     * @param S3Client        $s3            is the amazon s3 client for uploading generated reports.
+     * @param DocumentManager $dm            is the document manager for loading data.
+     * @param string          $environment   is the environment name used to upload to the right location in amazon s3.
+     * @param LoggerInterface $logger        is used for logging.
+     * @param PolicyService   $policyService is used to update report lines on policies.
      */
     public function __construct(
         S3Client $s3,
         DocumentManager $dm,
         $environment,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        PolicyService $policyService
     ) {
         parent::__construct();
         $this->s3 = $s3;
         $this->dm = $dm;
         $this->environment = $environment;
         $this->logger = $logger;
+        $this->policyService = $policyService;
     }
 
     /**
@@ -81,6 +93,18 @@ class PolicyReportCommand extends ContainerAwareCommand
                 'Choose a timezone to use for policies report'
             )
             ->addOption(
+                'clear-cache',
+                null,
+                InputOption::VALUE_NONE,
+                'removed all cached report lines and redoes them first'
+            )
+            ->addOption(
+                'only-cache',
+                null,
+                InputOption::VALUE_NONE,
+                'Cache report lines but do not generate reports'
+            )
+            ->addOption(
                 'n',
                 0,
                 InputOption::VALUE_REQUIRED,
@@ -93,12 +117,48 @@ class PolicyReportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $start = time();
-        // Set up reports to run.
+        $clearCache = $input->getOption('clear-cache') == true;
+        $onlyCache = $input->getOption('only-cache') == true;
         $reports = $input->getArgument('reports');
         $debug = $input->getOption('debug') == true;
         $n = $input->getOption('n');
         $timezone = new DateTimeZone($input->getOption('timezone') ?: 'UTC');
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $reportLineRepo = $this->dm->getRepository(ReportLine::class);
+        // if clear cache then clear cache
+        if ($clearCache) {
+            $output->writeln('<info>Clearing Cache</info>');
+            foreach ($reports as $report) {
+                while ($policyRepo->countPoliciesForReportLine($report, true) > 0) {
+                    $policies = $policyRepo->findPoliciesForReportLine($report, true);
+                    foreach ($policies as $policy) {
+                        $this->policyService->deleteReportLines($policy);
+                    }
+                    $this->dm->flush();
+                }
+            }
+        }
+        // First make sure that all reportlines exist.
+        $output->writeln('<info>Checking for uncached policies</info>');
+        foreach ($reports as $report) {
+            $remaining = $policyRepo->countPoliciesForReportLine($report);
+            while ($remaining > 0) {
+                $output->writeln("<info>{$remaining} uncached {$report} lines");
+                $policies = $policyRepo->findPoliciesForReportLine($report);
+                foreach ($policies as $policy) {
+                    $this->policyService->generateReportLines($policy);
+                }
+                $this->dm->flush();
+                $remaining = $policyRepo->countPoliciesForReportLine($report);
+            }
+        }
+        // If only cache stop now.
+        if ($onlyCache) {
+            $output->writeln('<info>Caching complete. Terminating.</info>');
+            return;
+        }
+        $start = time();
+        // Set up reports to run.
         $executingReports = [];
         foreach ($reports as $report) {
             $createdReport = PolicyReport::createReport($report, $this->dm, $timezone);
@@ -108,29 +168,25 @@ class PolicyReportCommand extends ContainerAwareCommand
             }
             $executingReports[] = $createdReport;
         }
-        // Load policies.
-        /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $phonePolicyRepo->findAllStartedPoliciesBatched(new DateTime(SoSure::POLICY_START), null, $n);
-        // Now run the reports.
-        foreach ($policies as $policy) {
-            foreach ($executingReports as $report) {
-                try {
-                    $report->process($policy);
-                } catch (RuntimeException $e) {
-                    $output->writeln("<error>{$e->getMessage()}</error>");
+        foreach ($executingReports as $executingReport) {
+            [$min, $max] = $reportLineRepo->getBoundsForType($executingReport->getType());
+            $file = [CsvHelper::line(...$executingReport->getHeaders())];
+            for ($i = $min; $i <= $max; $i += static::BATCH_SIZE) {
+                $reportLines = $reportLineRepo->findInBounds(
+                    $executingReport->getType(),
+                    $i,
+                    min($i + static::BATCH_SIZE, $max)
+                );
+                foreach ($reportLines as $reportLine) {
+                    $content = $reportLine->getContent();
+                    if ($content) {
+                        $file[] = $content;
+                    }
                 }
             }
-        }
-        // Output and upload.
-        foreach ($executingReports as $report) {
-            if ($debug) {
-                $output->writeln("<info>{$report->getFile()}</info>");
-                $output->writeln($report->getLines());
-            }
             try {
-                $this->uploadS3($report->getLines(), $report->getFile());
-                $output->writeln("<info>Uploaded {$report->getFile()}");
+                $this->uploadS3($file, $executingReport->getFile());
+                $output->writeln("<info>Uploaded {$executingReport->getFile()}");
             } catch (IOException $e) {
                 $output->writeln("<error>{$e->getMessage()}</error>");
             }
@@ -149,7 +205,7 @@ class PolicyReportCommand extends ContainerAwareCommand
     private function uploadS3($data, $filename)
     {
         $result = file_put_contents($filename, implode(PHP_EOL, $data));
-        if (!$result) {
+        if ($result === false) {
             throw new IOException("Could not create tmp file at '{$filename}'");
         }
         $s3Key = sprintf('%s/bi/%s', $this->environment, $filename);

@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\NoOp;
+use AppBundle\Classes\PolicyReport;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -235,7 +236,7 @@ abstract class PhonePolicy extends Policy
     protected $picSureRequired;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", mappedBy="policy", cascade={"persist"})
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", cascade={"persist"})
      */
     protected $picsureReportLine = null;
 
@@ -921,7 +922,7 @@ abstract class PhonePolicy extends Policy
         if ($type == PolicyReport::TYPE_PICSURE) {
             return $this->picsureReportLine;
         }
-        return parent::getReportByType($type);
+        return parent::getReportLineByType($type);
     }
 
     /**

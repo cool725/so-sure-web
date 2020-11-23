@@ -3,8 +3,10 @@
 namespace AppBundle\Listener;
 
 use AppBundle\Document\Charge;
+use AppBundle\Event\UserEvent;
 use AppBundle\Service\SmsService;
 use AppBundle\Service\BranchService;
+use AppBundle\Service\PolicyService;
 use Psr\Log\LoggerInterface;
 use AppBundle\Event\PolicyEvent;
 
@@ -32,74 +34,14 @@ class PolicyReportListener
         $this->logger = $logger;
     }
 
-    public function onUserNameUpdated(UserEvent $event)
+    public function userRefresh(UserEvent $event)
     {
         foreach ($user->getPolicies() as $policy) {
             $this->policyService->generateReportLines($policy);
         }
     }
 
-    public function onPolicyCreatedEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyStartEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyCancelledEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyExpiredEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyRenewedEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyCashbackEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyUnpaidEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyReactivatedEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyUpdatedPremiumEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyUpdatedBillingEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyUpgradedEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyUpdatedPotEvent(PolicyEvent $event)
-    {
-        $this->policyService->generateReportLines($event->getPolicy());
-    }
-
-    public function onPolicyPaymentMethodChangedEvent(PolicyEvent $event)
+    public function policyRefresh(PolicyEvent $event)
     {
         $this->policyService->generateReportLines($event->getPolicy());
     }

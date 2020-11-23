@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\NoOp;
+use AppBundle\Classes\PolicyReport;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\Note;
@@ -661,12 +662,12 @@ abstract class Policy
     protected $subvariant = null;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", mappedBy="policy", cascade={"persist"})
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", cascade={"persist"})
      */
     protected $policyReportLine = null;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", mappedBy="policy", cascade={"persist"})
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", cascade={"persist"})
      */
     protected $scodeReportLine = null;
 
@@ -3035,11 +3036,9 @@ abstract class Policy
                 return $this->policyReportLine;
             case PolicyReport::TYPE_SCODE:
                 return $this->scodeReportLine;
+            default:
+                throw new \Exception(sprintf('%s is not a value type of policy report', $type));
         }
-        throw new \Exception(sprintf(
-            "%s is not a value type of policy report",
-            $type
-        ));
     }
 
     /**
@@ -3052,13 +3051,13 @@ abstract class Policy
         switch ($type) {
             case PolicyReport::TYPE_POLICY:
                 $this->policyReportLine = $value;
+                break;
             case PolicyReport::TYPE_SCODE:
                 $this->scodeReportLine = $value;
+                break;
+            default:
+                throw new \Exception(sprintf('%s is not a value type of policy report', $type));
         }
-        throw new \Exception(sprintf(
-            "%s is not a value type of policy report",
-            $type
-        ));
     }
 
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)

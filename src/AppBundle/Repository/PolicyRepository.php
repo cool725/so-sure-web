@@ -406,4 +406,33 @@ class PolicyRepository extends BaseDocumentRepository
             ->field('paymentMethod.reference')->equals($reference)
             ->getQuery()->execute();
     }
+
+    /**
+     * Tells you the number of policies there are that lack the given report line.
+     * @param string $report is the report we are looking at.
+     * @return number the number of policies that lack.
+     */
+    public function countPoliciesForReportLine($report, $exists=false)
+    {
+        return $this->createQueryBuilder()
+            ->field("{$report}ReportLine")->exists($exists)
+            ->getQuery()
+            ->execute()
+            ->count();
+    }
+
+    /**
+     * Finds all the policies that lack a report line of the given type.
+     * @param string $report is the name of the report whose lines we are sniffing out.
+     * @param number $max    is the maximum number of report lines to return at a time.
+     * @return Cursor over the policies.
+     */
+    public function findPoliciesForReportLine($report, $exists=false, $max=666)
+    {
+        return $this->createQueryBuilder()
+            ->field("{$report}ReportLine")->exists($exists)
+            ->limit($max)
+            ->getQuery()
+            ->execute();
+    }
 }
