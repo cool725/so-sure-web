@@ -404,7 +404,7 @@ class PolicyRepository extends BaseDocumentRepository
     {
         $policy = $this->createQueryBuilder()
             ->field('paymentMethod.bankAccount.reference')->equals($reference)
-            ->field('status')->in(Policy::activeStatuses)
+            ->field('status')->in(Policy::$activeStatuses)
             ->getQuery()
             ->getSingleResult();
         if ($policy) {
