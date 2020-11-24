@@ -642,8 +642,9 @@ class BacsService
             $newAccountNumber = trim($this->getNodeValue($element, 'payer-new-account-number'));
             $bacs = $this->getLatestBacsPaymentMethodByReference($reference);
             if ($bacs) {
-                $bacs->setSortCode($newSortCode);
-                $bacs->setAccountNumber($newAccountNumber);
+                $bacs->getBankAccount()->setSortCode($newSortCode);
+                $bacs->getBankAccount()->setAccountNumber($newAccountNumber);
+                $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
                 $this->dm->flush();
                 $results['changes']++;
             }
