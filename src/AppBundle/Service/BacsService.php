@@ -640,20 +640,10 @@ class BacsService
             $reference = trim($this->getNodeValue($element, 'reference'));
             $newSortCode = trim($this->getNodeValue($element, 'payer-new-sort-code'));
             $newAccountNumber = trim($this->getNodeValue($element, 'payer-new-account-number'));
-            $policies = $policyRepo->findPoliciesByBacsReference($reference);
-            $used = false;
-            /** @var Policy $policy */
-            foreach ($policies as $policy) {
-                $paymentMethod = $policy->getPaymentMethod();
-                if ($paymentMethod instanceof BacsPaymentMethod) {
-                    /** @var BacsPaymentMethod $paymentMethod */
-                    $used = true;
-                    $bankAccount = $paymentMethod->getBankAccount();
-                    $bankAccount->setSortCode($newSortCode);
-                    $bankAccount->setAccountNumber($newAccountNumber);
-                }
-            }
-            if ($used) {
+            $bacs = $this->getLatestBacsPaymentMethodByReference($reference);
+            if ($bacs) {
+                $bacs->setSortCode($newSortCode);
+                $bacs->setAccountNumber($newAccountNumber);
                 $this->dm->flush();
                 $results['changes']++;
             }
@@ -694,7 +684,7 @@ class BacsService
             $reason = $this->getReason($element);
             $reference = $this->getReference($element);
 
-            $bacs = $this->getBacsPaymentMethodByReference($reference);
+            $bacs = $this->getLatestBacsPaymentMethodByReference($reference);
             if (!$bacs) {
                 $results['success'] = false;
                 $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
@@ -748,13 +738,27 @@ class BacsService
         return $results;
     }
 
+    /**
+     * Finds you the bacs payment method containing the given reference that is newest, since only a single policy
+     * should be active with a given bacs reference at a time, this should give you the active one as renewals don't
+     * get it until they actually begin.
+     * @param string $reference is the reference to seek.
+     * @return BacsPaymentMethod|null the payment method unless it found nothing then you get null.
+     */
+    private function getLatestBacsPaymentMethodByReference($reference)
+    {
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policy = $policyRepo->getLatestPolicyByBacsReference($reference);
+        return ($policy) ? $policy->getPaymentMethod() : null;
+    }
+
     private function getBacsPaymentMethodByReference($reference)
     {
         $policy = $this->getPolicyByReference($reference);
         if ($policy) {
             return $policy->getBacsPaymentMethod();
         }
-
         return null;
     }
 
