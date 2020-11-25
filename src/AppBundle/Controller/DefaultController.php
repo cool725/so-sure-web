@@ -826,6 +826,14 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/quiz", name="quiz")
+     */
+    public function quizAction()
+    {
+        return $this->render('AppBundle:Quiz:quiz.html.twig');
+    }
+
+    /**
      * @Route("/sitemap", name="sitemap")
      * @Template()
      */
