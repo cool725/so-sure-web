@@ -14,18 +14,13 @@
 {% block body %}
 
     <section class="cp py-lg-5">
-        <div class="container-large py-5">
-            <div class="mt-5 pt-5 mx-auto" style="max-width: 670px;">
-                <div class="quizz-container" data-width="100%" data-iframe-title="Phone Friend or Foe?" data-height="auto" data-quiz="480088"></div>
-            </div>
-            <p class="lead text-center mt-5">Whether you’re wary, clumsy or just prone to smashing your mobile, SO-SURE has your back. <br>Protection for your phone and peace of mind? Thats a win-win 👍</p>
-            <div class="text-center"><a href="{{ path('homepage') }}" class="btn btn-success">Learn more</a></div>
+        <div class="container-large text-center py-5">
+            <iframe id="quizWidget-480088" width="100%" frameborder="0" border="none" src="https://www.qzzr.com/widget/quiz/fi9xdWl6emVzLzQ4MDA4OA"></iframe>
         </div>
     </section>
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="https://dcc4iyjchzom0.cloudfront.net/widget/loader.js" async></script>
     <script src="{{ asset('css-js/content-pages.js') }}"></script>
 {% endblock %}
