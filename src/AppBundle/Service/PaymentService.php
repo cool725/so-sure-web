@@ -338,6 +338,7 @@ class PaymentService
      */
     private function labelBacs($date = null)
     {
+        $date = $date ?: new \DateTime();
         // Delete existing paymentType field.
         $this->dm->createQueryBuilder(ScheduledPayment::class)
             ->updateMany()
@@ -349,6 +350,7 @@ class PaymentService
         $scheduleds = $this->dm->createQueryBuilder(ScheduledPayment::class)
             ->hydrate(false)
             ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field('scheduled')->lt($date)
             ->getQuery()
             ->execute();
         foreach ($scheduleds as $scheduled) {
