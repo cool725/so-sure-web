@@ -49,6 +49,23 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
         return $total;
     }
 
+    /**
+     * Finds all scheduled bacs payments relatively quickly as long as they have been labelled as such.
+     * @param \DateTime|null $date is the date after which to stop looking which if null defaults to now.
+     * @return Cursor over the found scheduled bacs payments.
+     */
+    public function findScheduledBacs(\DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        return $this->createQueryBuilder()
+            ->field('payment')->equals(null)
+            ->field('scheduled')->lt($date)
+            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field('paymentType')->equals('bacs')
+            ->getQuery()
+            ->execute();
+    }
+
     public function findScheduled(\DateTime $date = null)
     {
         if (!$date) {
