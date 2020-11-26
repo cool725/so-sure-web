@@ -2039,10 +2039,7 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $this->warnings = [];
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            BacsPaymentMethod::class,
-            $advanceDate
-        );
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs($advanceDate);
         $metadata['debit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
