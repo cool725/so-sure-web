@@ -120,28 +120,32 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // A/B Test Homepage Design
-        $homepageDesign = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V2,
-            ['current', 'new-design'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
-        if ($homepageDesign == 'new-design') {
-            $template = 'AppBundle:Default:indexHomepage.html.twig';
-        } else {
-            $template = 'AppBundle:Default:indexQuickQuote.html.twig';
-        }
-
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        $template = 'AppBundle:Default:indexQuickQuote.html.twig';
 
         $competitorData = new Competitors();
 
         // Is indexed?
         $noindex = false;
+        $homepageDesign = null;
         if ($request->get('_route') == 'home') {
             $noindex = true;
+
+            // A/B Test Homepage Design
+            $homepageDesign = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3,
+                ['control', 'curent-new-copy', 'new-design-old-copy', 'new-design-new-copy'],
+                SixpackService::LOG_MIXPANEL_ALL
+            );
+
+            if ($homepageDesign == 'new-design-new-copy' or $homepageDesign == 'new-design-old-copy') {
+                $template = 'AppBundle:Default:indexHomepage.html.twig';
+            }
+
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Homepage - '.$homepageDesign.' - LP']);
+        } else {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
         }
 
         $data = array(
@@ -149,7 +153,8 @@ class DefaultController extends BaseController
             'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $competitorData::$competitorComparisonData,
             'from_price' => $fromPrice,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
+            'homepage_exp' => $homepageDesign
         );
 
         return $this->render($template, $data);

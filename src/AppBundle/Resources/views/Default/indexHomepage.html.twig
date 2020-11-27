@@ -57,20 +57,23 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="text-center h5 mb-0 fit">
-                Not sure there’s a mobile insurance <br class="d-md-none"> company that gives a damn?
-            </h1>
-            <div class="h1 display-4 text-center text-azureeradiance mb-3 mb-md-4 fit">We are SO-SURE</div>
-            <p class="lead text-center mb-4 mb-md-5">Designed to align your interests with ours. Easy. Fair. Win-win 🙌</p>
+            {% if homepage_exp is defined and homepage_exp == 'new-design-new-copy' %}
+                <h1 class="text-center mb-3 mb-md-4 fit">
+                    Mobile Insurance <br class="d-lg-none"> that gives a damn
+                </h1>
+                <p class="lead text-center mb-4 mb-md-5">Designed to align our interests with yours. Easy. Fair. Win-win 🙌</p>
+            {% else %}
+                <h1 class="text-center mb-3 mb-md-4 fit">
+                    Simply Better Mobile Insurance
+                </h1>
+                <div class="h4 text-center mb-4 mb-md-5"><span class="sub">Easy, Fast & Great Value 🇬🇧</span></div>
+            {% endif %}
             <div class="hero-badge">
                 <div class="hero-badge-inner">
                     Pay yearly =<br>
                     {{ free_months|upper }}<br>
                     <span class="h5 mb-0">FREE!</span>
                 </div>
-                <span class="hero-badge-splat hero-badge-splat-1"></span>
-                <span class="hero-badge-splat hero-badge-splat-2"></span>
-                <span class="hero-badge-splat hero-badge-splat-3"></span>
             </div>
             {% if phone is defined and phone %}
                 {{ render(controller('AppBundle:Search:phoneSearchCombined', {
@@ -108,8 +111,12 @@
                         <i class="far fa-clock fa-stack-1x fa-inverse"></i>
                     </span>
                     <span class="hero-usps-item-text">
-                        <span class="h5">Sorted in 24-72hr</span><br />
-                        <small>Replacement or Repair</small>
+                        {% if homepage_exp is defined and homepage_exp == 'new-design-new-copy' %}
+                            <span class="h5">Sorted in 24-72hr</span><br />
+                            <small>Replacement or Repair</small>
+                        {% else %}
+                            <span class="h6">Fast replace and repair service</span>
+                        {% endif %}
                     </span>
                 </div>
                 <div class="hero-usps-item col-md-6 col-lg">
@@ -118,8 +125,12 @@
                         <i class="far fa-smile fa-stack-1x fa-inverse"></i>
                     </span>
                     <span class="hero-usps-item-text">
-                        <span class="h5">Save up to &pound;100</span><br />
-                        <small>Slash excess with a phone selfie</small>
+                        {% if homepage_exp is defined and homepage_exp == 'new-design-new-copy' %}
+                            <span class="h5">Save up to &pound;100</span><br />
+                            <small>Slash excess with a phone selfie</small>
+                        {% else %}
+                            <span class="h6">Up to 80% no claims cashback</span>
+                        {% endif %}
                     </span>
                 </div>
                 <div class="hero-usps-item col-md-6 col-lg">
@@ -128,8 +139,12 @@
                         <i class="far fa-pound-sign fa-stack-1x fa-inverse"></i>
                     </span>
                     <span class="hero-usps-item-text">
-                        <span class="h5">Earn 80% Cashback</span><br />
-                        <small>Friends win together</small>
+                        {% if homepage_exp is defined and homepage_exp == 'new-design-new-copy' %}
+                            <span class="h5">Earn 80% Cashback</span><br />
+                            <small>Friends win together</small>
+                        {% else %}
+                            <span class="h6">Low price and excess from {{ lowest_excess }}</span>
+                        {% endif %}
                     </span>
                 </div>
             </div>

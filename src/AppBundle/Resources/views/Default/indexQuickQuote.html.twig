@@ -57,9 +57,16 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="mb-4 text-white text-center fit">
-                <span class="sub text-deep-sky-blue-d">Simply Better</span> Mobile Insurance
-            </h1>
+            {% if homepage_exp is defined and homepage_exp == 'curent-new-copy' %}
+                <h1 class="text-white text-center fit">
+                    Mobile Insurance <span class="sub text-deep-sky-blue-d">that gives a damn</span>
+                </h1>
+                <p class="lead mb-4 text-white text-center">Designed to align our interests with yours.</p>
+            {% else %}
+                <h1 class="mb-4 text-white text-center fit">
+                    <span class="sub text-deep-sky-blue-d">Simply Better</span> Mobile Insurance
+                </h1>
+            {% endif %}
             <div class="row">
                 <div class="col-md-6 d-none d-md-block">
                     <div class="hero__illustration mt-md-4">
@@ -76,9 +83,16 @@
                 </div>
                 <div class="col-md-6 col-lg-5 offset-lg-1">
                     {% if phone is defined and phone %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
+                            'type': homepage_exp,
+                            'homepage_exp': homepage_exp,
+                            'id': phone.id }|merge(app.request.query.all)
+                        )) }}
                     {% else %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
+                            'type': homepage_exp,
+                            'homepage_exp': homepage_exp }|merge(app.request.query.all)
+                        )) }}
                     {% endif %}
                 </div>
             </div>
