@@ -67,7 +67,22 @@
       table td { border-collapse: collapse; }
       </style>
       <![endif]-->
-    <title>Welcome to so-sure 🎉</title>
+    <title>Welcome to SO-SURE 🎉</title>
+    <style>
+      @media only screen and (max-width:600px) {
+
+        .column,
+        .column-filler {
+          box-sizing: border-box;
+          float: left;
+        }
+
+        .col-sm-12 {
+          display: block;
+          width: 100% !important;
+        }
+      }
+    </style>
     <style>
       @media only screen and (min-width:641px) {
         .text-left-res {
@@ -79,6 +94,7 @@
         }
       }
     </style><!-- content -->
+    <link href="http://emailfonts.so-sure.com.s3-website-eu-west-1.amazonaws.com/gordita.css" rel="stylesheet" />
     <!--[if gte mso 9]><xml>
        <o:OfficeDocumentSettings>
         <o:AllowPNG/>
@@ -86,128 +102,46 @@
        </o:OfficeDocumentSettings>
       </xml><![endif]-->
   </head>
-  <body class="body" style="background-color: #E0EFFF; margin: 0; width: 100%;">
-    <div class="preview" style="color: #E0EFFF; display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all;">Nice to have you on board {{ policy.user.firstName }} 🥳&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
-    <table class="bodyTable" role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #E0EFFF; margin: 0;" bgcolor="#E0EFFF">
+  <body class="body" style="background-color: #FFFFFF; margin: 0; width: 100%;">
+    <div class="preview" style="color: #FFFFFF; display: none; font-size: 1px; line-height: 1px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; mso-hide: all;">Nice to have you on board {{ policy.user.firstName }}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+    <table class="bodyTable" role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; background-color: #FFFFFF; margin: 0;" bgcolor="#FFFFFF">
       <tr>
-        <td class="body__content" align="left" width="100%" valign="top" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif;">
-          <div class="pad block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
+        <td class="body__content" align="left" width="100%" valign="top" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif;">
+          <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%;" width="100%">
               <tr>
                 <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                     <tr class="block__row">
-                      <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
-                        <div class="header container" style="margin: 0 auto; width: 100%; max-width: 550px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                      <td class="block__cell" width="100%" align="left" valign="top">
+                        <div class="hero container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
                             <tr>
                               <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                   <tr class="container__row">
-                                    <td class="container__cell" width="100%" align="left" valign="top" style="padding: 30px 0;">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="padding: 20px 40px; background-color: #0051E8; background: linear-gradient(45deg,#0051E8,#00BAFF);" bgcolor="#0051E8">
                                       <div class="row">
                                         <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                                           <tr class="row__row">
                                             <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
-                                              <a href="https://www.wearesosure.com" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">
-                                                  <img src="https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo-blue.png" alt="so-sure" width="140px" class="img-center img__block" border="0" style="max-width: 100%; margin: 0 auto; display: block;" />
+                                              <a class="img-link a" href="https://www.wearesosure.com" style="color: #081A9A; text-decoration: none;"><span class="a__text" style="color: #081A9A; text-decoration: none;">
+                                                  <img src="https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo-white.png" alt="so-sure" class="img-center spacer img__block" width="180px" border="0" style="max-width: 100%; margin: 0 auto; display: block; margin-bottom: 30px;" />
                                                 </span></a>
-                                            </td>
-                                          </tr>
-                                        </table>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </table> <!--[if mso | IE]> </td>
-                            </tr>
-                          </table> <![endif]--> </div>
-                        <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
-                            <tr>
-                              <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
-                                  <tr class="container__row">
-                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #FFFFFF; border-radius: 15px; box-shadow: 0 15px 30px 0 rgba(8,27,154,.08),0 5px 15px 0 rgba(8,27,154,.08); padding: 40px;" bgcolor="#FFFFFF">
-                                      <div class="row">
-                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
-                                          <tr class="row__row">
-                                            <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
-                                              <img src="https://cdn.so-sure.com/images/rebrand/icns/so-sure_icon_friends-connect.png" alt="so-sure" width="200px" class="img-center img__block" border="0" style="max-width: 100%; margin: 0 auto; display: block;" />
-                                              <h2 class="header h2" style="margin: 20px 0; line-height: 30px; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; color: #2593F3; margin-bottom: 25px; margin-top: 15px;">Welcome to so-sure!</h2> {% if policy.status == 'picsure-required' %} <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Almost there! Your policy details are below, however your policy will NOT commence until you have verified the condition of phone with our app. Click the link below to install the app and follow the instructions.</p> {% if policy.phone.isITunes %} <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
+                                              <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-hero-connections.png" alt="so-sure" class="img-center spacer img__block" width="240px" border="0" style="max-width: 100%; margin: 0 auto; display: block; margin-bottom: 30px;" />
+                                              <h2 class="text-deep-sky-blue-d header h2" style="margin: 20px 0; line-height: 30px; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; margin-bottom: 25px; margin-top: 15px; text-align: center; color: #00D9FF;">
+                                                <span class="sub" style="font-weight: 400; font-family: 'Helvetica Neue',Arial,sans-serif;">Welcome to SO-SURE {{ policy.user.firstName }}!</span><br />
+                                                <span class="text-white" style="color: #FFFFFF;">Your phone is now covered.</span>
+                                              </h2>
+                                              <p class="text-white text-center spacer text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: center; color: #FFFFFF; margin-bottom: 30px;">Now it’s time to download our app <br /> and save money on your excess.</p>
+                                              <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
                                                   <tr>
                                                     <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr class="block__row">
-                                                          <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
+                                                          <td class="block__cell" width="100%" align="left" valign="top">
                                                             <div class="green spacer button" style="margin-bottom: 30px;">
                                                               <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                                                                 <tr>
                                                                   <td>
                                                                     <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
                                                                       <tr>
-                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{{ url('download_apple', {'medium': 'pic-sure-required-welcome-email'}) }}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Download the app</span></a></td>
-                                                                      </tr>
-                                                                    </table>
-                                                                  </td>
-                                                                </tr>
-                                                              </table>
-                                                            </div>
-                                                          </td>
-                                                        </tr>
-                                                      </table> <!--[if mso | IE]> </td>
-                                                  </tr>
-                                                </table> <![endif]--> </div> {% elseif policy.phone.isGooglePlay %} <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
-                                                  <tr>
-                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
-                                                        <tr class="block__row">
-                                                          <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
-                                                            <div class="green spacer button" style="margin-bottom: 30px;">
-                                                              <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
-                                                                <tr>
-                                                                  <td>
-                                                                    <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
-                                                                      <tr>
-                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{{ url('download_google', {'medium': 'pic-sure-required-welcome-email'}) }}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Download the app</span></a></td>
-                                                                      </tr>
-                                                                    </table>
-                                                                  </td>
-                                                                </tr>
-                                                              </table>
-                                                            </div>
-                                                          </td>
-                                                        </tr>
-                                                      </table> <!--[if mso | IE]> </td>
-                                                  </tr>
-                                                </table> <![endif]--> </div> {% endif %} {% else %} <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Nice to have you on board {{ policy.user.firstName }} 🥳</p>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Your phone is now covered and the policy details are below.</p> {% if feature_enabled('referral') %} <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Now for the exciting bits 😀</p>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Get a month free each time one of your friends signs up with your sharing code. On top of that, you also get &pound;10 in your No Claims Reward Pot each time you connect with friends on so-sure.</p>
-                                              <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">Download the app or log in to start earning rewards now!</p> {% if policy.phone.isITunes %} <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
-                                                  <tr>
-                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
-                                                        <tr class="block__row">
-                                                          <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
-                                                            <div class="green spacer button" style="margin-bottom: 30px;">
-                                                              <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
-                                                                <tr>
-                                                                  <td>
-                                                                    <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
-                                                                      <tr>
-                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{{ url('download_apple', {'medium': 'pic-sure-required-welcome-email'}) }}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Download the app</span></a></td>
-                                                                      </tr>
-                                                                    </table>
-                                                                  </td>
-                                                                </tr>
-                                                              </table>
-                                                            </div>
-                                                          </td>
-                                                        </tr>
-                                                      </table> <!--[if mso | IE]> </td>
-                                                  </tr>
-                                                </table> <![endif]--> </div> {% elseif policy.phone.isGooglePlay %} <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
-                                                  <tr>
-                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
-                                                        <tr class="block__row">
-                                                          <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
-                                                            <div class="green spacer button" style="margin-bottom: 30px;">
-                                                              <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
-                                                                <tr>
-                                                                  <td>
-                                                                    <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
-                                                                      <tr>
-                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{{ url('download_google', {'medium': 'pic-sure-required-welcome-email'}) }}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Download the app</span></a></td>
+                                                                        <td align="center" class="button__cell" style="border-radius: 3px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{% if policy.phone.isITunes %}{{ url('download_apple', {'medium': 'welcome-email-hero-button'}) }}{% elseif policy.phone.isGooglePlay %}{{ url('download_google', {'medium': 'welcome-email-hero-button'}) }}{% endif %}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Download now</span></a></td>
                                                                       </tr>
                                                                     </table>
                                                                   </td>
@@ -219,20 +153,39 @@
                                                       </table> <!--[if mso | IE]> </td>
                                                   </tr>
                                                 </table> <![endif]--> </div>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><a href="{{ url('user_home', {'id': policy.id }) }}" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">Or login here</span></a></p> {% endif %} {% else %} <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;">Now for the fun bits 😀 share the love and earn up to <strong>&pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback</strong> if you don't claim.</p>
-                                              <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">Head to your dashboard to get sharing now!</p>
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table> <!--[if mso | IE]> </td>
+                            </tr>
+                          </table> <![endif]--> </div>
+                        <div class="card-athens-gray container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                            <tr>
+                              <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr class="container__row">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #F5F7F9; padding: 40px;" bgcolor="#F5F7F9">
+                                      <div class="row">
+                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+                                          <tr class="row__row">
+                                            <td class="text-left column col-sm-12" width="550" style="text-align: left;width: 100%" align="left" valign="top">
+                                              <h3 class="text-zaffre header h3" style="margin: 20px 0; line-height: 24px; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; margin-bottom: 25px; margin-top: 15px; text-align: left; color: #081A9A;">Save £100 on your excess 🙌</h3>
+                                              <p class="text-zaffre text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; color: #081A9A;">Your excess is currently <strong>&pound;{{ policy.premium.excess.damage }}</strong>{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (<strong>&pound;{{ policy.premium.excess.loss }}</strong> for Theft/Loss){% endif %} but you can easily reduce it to <strong>&pound;{{ policy.premium.picSureExcess.damage }}</strong>{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (<strong>&pound;{{ policy.premium.picSureExcess.loss }}</strong> for Theft/Loss){% endif %} by just downloading our app and validating your phone.</p>
+                                              <p class="text-zaffre spacer text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; color: #081A9A; margin-bottom: 30px;">Validating your phone is so easy, and takes less that 3 minutes. What are you waiting for?</p>
                                               <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
                                                   <tr>
                                                     <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                                         <tr class="block__row">
-                                                          <td class="block__cell" width="100%" align="left" valign="top" style="padding-left: 15px; padding-right: 15px;">
-                                                            <div class="green spacer button" style="margin-bottom: 30px;">
+                                                          <td class="block__cell" width="100%" align="left" valign="top">
+                                                            <div class="blue-outline spacer button" style="margin-bottom: 30px;">
                                                               <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
                                                                 <tr>
                                                                   <td>
                                                                     <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
                                                                       <tr>
-                                                                        <td align="center" class="button__cell" style="border-radius: 28px; padding: 12px 30px; background-color: #3FC67D;" bgcolor="#3FC67D"><a href="{{ url('user_home', {'id': policy.id }) }}" class="button__link" style="color: #FFFFFF; text-decoration: none; font-weight: 700; background-color: #3FC67D; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">Start earning rewards</span></a></td>
+                                                                        <td align="center" class="button__cell" style="border-radius: 3px; padding: 12px 30px; background-color: transparent; border: 1px solid #2593F3;" bgcolor="transparent"><a href="{% if policy.phone.isITunes %}{{ url('download_apple', {'medium': 'welcome-email-excess-section'}) }}{% elseif policy.phone.isGooglePlay %}{{ url('download_google', {'medium': 'welcome-email-excess-section'}) }}{% endif %}" class="button__link" style="text-decoration: none; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; background-color: transparent; color: #2593F3; display: inline-block;"><span class="button__text" style="text-decoration: none; color: #2593F3;">Reduce my excess</span></a></td>
                                                                       </tr>
                                                                     </table>
                                                                   </td>
@@ -243,7 +196,33 @@
                                                         </tr>
                                                       </table> <!--[if mso | IE]> </td>
                                                   </tr>
-                                                </table> <![endif]--> </div> {% endif %} {% endif %}
+                                                </table> <![endif]--> </div>
+                                              <h3 class="text-zaffre header h3" style="margin: 20px 0; line-height: 24px; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; margin-bottom: 25px; margin-top: 15px; text-align: left; color: #081A9A;">Let’s talk about rewards 🎁</h3>
+                                              <p class="text-zaffre text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; color: #081A9A;">We’re giving you 1 month free cover every time one of your friends or family signs up to SO-SURE using your unique sharing code.</p>
+                                              <p class="text-zaffre spacer text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; color: #081A9A; margin-bottom: 30px;">On top of that, you’ll also get a further £10 in your no claims ‘Reward Pot’ for every connection you make.</p>
+                                              <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
+                                                  <tr>
+                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr class="block__row">
+                                                          <td class="block__cell" width="100%" align="left" valign="top">
+                                                            <div class="blue-outline spacer button" style="margin-bottom: 30px;">
+                                                              <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                                                                <tr>
+                                                                  <td>
+                                                                    <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
+                                                                      <tr>
+                                                                        <td align="center" class="button__cell" style="border-radius: 3px; padding: 12px 30px; background-color: transparent; border: 1px solid #2593F3;" bgcolor="transparent"><a href="{{ url('user_home', {'id': policy.id }) }}" class="button__link" style="text-decoration: none; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; background-color: transparent; color: #2593F3; display: inline-block;"><span class="button__text" style="text-decoration: none; color: #2593F3;">Learn more</span></a></td>
+                                                                      </tr>
+                                                                    </table>
+                                                                  </td>
+                                                                </tr>
+                                                              </table>
+                                                            </div>
+                                                          </td>
+                                                        </tr>
+                                                      </table> <!--[if mso | IE]> </td>
+                                                  </tr>
+                                                </table> <![endif]--> </div>
                                             </td>
                                           </tr>
                                         </table>
@@ -253,22 +232,53 @@
                                 </table> <!--[if mso | IE]> </td>
                             </tr>
                           </table> <![endif]--> </div>
-                        <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                        <div class="card-white container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
                             <tr>
                               <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                   <tr class="container__row">
-                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #FFFFFF; border-radius: 15px; box-shadow: 0 15px 30px 0 rgba(8,27,154,.08),0 5px 15px 0 rgba(8,27,154,.08); padding: 40px;" bgcolor="#FFFFFF">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #FFFFFF; padding: 40px;" bgcolor="#FFFFFF">
                                       <div class="row">
                                         <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                                           <tr class="row__row">
                                             <td class="text-left column col-sm-12" width="550" style="text-align: left;width: 100%" align="left" valign="top">
-                                              <h3 class="header h3" style="margin: 20px 0; line-height: 24px; font-family: 'Helvetica Neue',Arial,sans-serif; color: #2593F3; margin-bottom: 25px; margin-top: 15px; text-align: left;">Important boring bits:</h3>
-                                              <ul class="spacer text ul" style="margin-left: 20px; margin-top: 16px; padding: 0; list-style-type: disc; font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: left; margin-bottom: 30px;">
-                                                <li class="spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Your policy is for a <strong>{{ policy.phone }}</strong></li>
-                                                <li class="spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Policy starts: <strong>{{ policy.start | date('d M Y', 'Europe/London') }}</strong></li>
-                                                <li class="spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Policy ends: <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong></li>
-                                              </ul> {% if policy.phone.newHighDemand %} <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; margin-bottom: 30px;"><strong>Note: </strong> As you have a shiny new model, we wanted to let you know your repair or replacement may take longer than usual. This is unfortunately out of our control and due to market shortages for this new model, but it’s only temporary.</p> {% endif %} {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %} <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; margin-bottom: 30px;">Cover includes: <strong>Accidental Damage, Global Travel</strong> 😍.</p> {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %} <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; margin-bottom: 30px;">Cover includes: <strong>Loss, Theft, Accidental Damage, Accessories, Global Travel</strong> 😍.</p> {% else %} <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; margin-bottom: 30px;">Cover includes: <strong>Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel</strong> 😍.</p> {% endif %} <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; margin-bottom: 30px;">Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions please don't hesitate to contact us.</p> {% if policy.status == 'picsure-required' %} <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left;"><strong>Don't forget to download the app and verify the condition of your phone to start your policy.</strong></p> {% elseif policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %} {% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %} <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; margin-bottom: 30px;">Your excess is currently <strong>&pound;{{ policy.premium.excess.damage }}</strong>, you can easily reduce this amount to <strong>&pound;{{ policy.premium.picSureExcess.damage }}</strong> by validating your phone with our app. {% else %} <p class="spacer text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: left; margin-bottom: 30px;">Your excess is currently <strong>&pound;{{ policy.premium.excess.damage }}</strong> (<strong>&pound;{{ policy.premium.excess.loss }}</strong> for Theft/Loss), you can easily reduce this amount to <strong>&pound;{{ policy.premium.picSureExcess.damage }}</strong> (<strong>&pound;{{ policy.premium.picSureExcess.loss }}</strong> for Theft/Loss) by validating your phone with our app. {% endif %} {% if policy.phone.isITunes %} <a href="{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;"><u>Download the app</u></span></a>, login and complete the validation process. {% elseif policy.phone.isGooglePlay %} <a href="{{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;"><u>Download the app</u></span></a>, login and complete the validation process. {% else %} Just email a picture of your phone's screen in the mirror to <a href="support@wearesosure.com" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">support@wearesosure.com</span></a> and we'll get started on that process. {% endif %} </p> {% endif %} <p class="text-center text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: center;"><em>Have a question or issue? <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">contact us</span></a></em></p>
-                                              </p>
+                                              <h3 class="text-zaffre header h3" style="margin: 20px 0; line-height: 24px; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; margin-bottom: 25px; margin-top: 15px; text-align: left; color: #081A9A;">The important <span class="sub" style="font-weight: 400; font-family: 'Helvetica Neue',Arial,sans-serif;">(but boring 😴)</span> bits</h3>
+                                              <table border="0" class="table">
+                                                <tr class="tr">
+                                                  <td width="34px" class="padding-b td" style="padding-bottom: 15px;">
+                                                    <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-phone-bullet.jpg" alt="phone" class="img-inline img__block" width="32px" border="0" style="max-width: 100%; display: inline;" />
+                                                  </td>
+                                                  <td class="padding-b td" style="padding-bottom: 15px;">Your policy is for an <strong>{{ policy.phone }}</strong></td>
+                                                </tr>
+                                                <tr class="tr">
+                                                  <td width="34px" class="padding-b td" style="padding-bottom: 15px;">
+                                                    <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-cal-start-bullet.jpg" alt="calendar start" class="img-inline img__block" width="32px" border="0" style="max-width: 100%; display: inline;" />
+                                                  </td>
+                                                  <td class="padding-b td" style="padding-bottom: 15px;">Your policy starts: <strong>{{ policy.start | date('d M Y', 'Europe/London') }}</strong></td>
+                                                </tr>
+                                                <tr class="tr">
+                                                  <td width="34px" class="padding-b td" style="padding-bottom: 15px;">
+                                                    <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-cal-end-bullet.jpg" alt="calendar end" class="img-inline img__block" width="32px" border="0" style="max-width: 100%; display: inline;" />
+                                                  </td>
+                                                  <td class="padding-b td" style="padding-bottom: 15px;">Your policy ends: <strong>{{ policy.end | date('d M Y H:i', 'Europe/London') }}</strong></td>
+                                                </tr>
+                                              </table> {% if policy.phone.newHighDemand %} <div class="alert alert-info block" style="width: 100%; border-radius: 3px; padding: 10px; background-color: #99E3FF;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
+                                                  <tr>
+                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr class="block__row">
+                                                          <td class="block__cell" width="100%" align="left" valign="top" style="border-radius: 3px; padding: 10px; background-color: #99E3FF;" bgcolor="#99E3FF">
+                                                            <strong>Note:</strong>
+                                                            <p class="m-0 text p" style="display: block; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; margin: 0; text-align: left;"><small>As you have a shiny new model, we wanted to let you know your repair or replacement may take longer than usual. This is unfortunately out of our control and due to market shortages for this new model, but it’s only temporary.</small></p>
+                                                          </td>
+                                                        </tr>
+                                                      </table> <!--[if mso | IE]> </td>
+                                                  </tr>
+                                                </table> <![endif]--> </div> {% endif %} <h4 class="text-left header h4" style="margin: 20px 0; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left;">Your cover includes:</h4>
+                                              <ul class="text ul" style="margin-left: 20px; margin-top: 16px; margin-bottom: 16px; padding: 0; list-style-type: disc; font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left;"> {% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} <li class="text-left spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Loss</li>
+                                                <li class="text-left spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Theft</li> {% endif %} <li class="text-left spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Accidental Damage</li>
+                                                <li class="text-left spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Out of Warranty Breakdown</li>
+                                                <li class="text-left spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Accessories</li>
+                                                <li class="text-left spacer-15 text li" style="font-size: 16px; line-height: 20px; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: left; margin-bottom: 15px;">Global Travel</li>
+                                              </ul>
                                             </td>
                                           </tr>
                                         </table>
@@ -278,18 +288,39 @@
                                 </table> <!--[if mso | IE]> </td>
                             </tr>
                           </table> <![endif]--> </div>
-                        <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                        <div class="card-athens-gray container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
                             <tr>
                               <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                   <tr class="container__row">
-                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #FFFFFF; border-radius: 15px; box-shadow: 0 15px 30px 0 rgba(8,27,154,.08),0 5px 15px 0 rgba(8,27,154,.08); padding: 40px;" bgcolor="#FFFFFF">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #F5F7F9; padding: 40px;" bgcolor="#F5F7F9">
                                       <div class="row">
                                         <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                                           <tr class="row__row">
-                                            <td class="text-center column col-sm-12" width="550" style="text-align: center;width: 100%" align="center" valign="top">
-                                              <h3 class="text-red header h3" style="margin: 20px 0; line-height: 24px; font-family: 'Helvetica Neue',Arial,sans-serif; margin-bottom: 25px; margin-top: 15px; text-align: center; color: #ED1C23;">If your phone is already broken 👮</h3>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: center;">On a serious note, if your phone was already damaged before you purchased this policy, you should <a href="{{ url('purchase_cancel', {'id': policy.id }) }}" class="text-red a" style="color: #ED1C23;"><span class="a__text" style="color: #ED1C23;">cancel it now</span></a> or risk prosecution. <a href="{{ url('faq') }}#the-insurance-policy" class="a" style="color: #081A9A;"><span class="a__text" style="color: #081A9A;">Find out why this is no joke</span></a>!</p>
-                                            </td>
+                                            <h3 class="text-red header h3" large="4" style="margin: 20px 0; line-height: 24px; text-align: center; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; margin-bottom: 25px; margin-top: 15px; color: #ED1C23;">If your phone is already broken 👮</h3>
+                                            <p class="spacer text p" large="4" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">On a serious note, if your phone was already damaged before you purchased this policy, you should <a href="{{ url('purchase_cancel', {'id': policy.id }) }}" class="text-red a" style="color: #ED1C23;"><span class="a__text" style="color: #ED1C23;">cancel it now</span></a> or risk prosecution.</p>
+                                            <div large="4" class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="550">
+                                                <tr>
+                                                  <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                                      <tr class="block__row">
+                                                        <td class="block__cell" width="100%" align="left" valign="top">
+                                                          <div class="blue-outline spacer button" style="margin-bottom: 30px;">
+                                                            <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                                                              <tr>
+                                                                <td>
+                                                                  <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
+                                                                    <tr>
+                                                                      <td align="center" class="button__cell" style="border-radius: 3px; padding: 12px 30px; background-color: transparent; border: 1px solid #2593F3;" bgcolor="transparent"><a href="{{ url('faq') }}#the-insurance-policy" class="button__link" style="text-decoration: none; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; background-color: transparent; color: #2593F3; display: inline-block;"><span class="button__text" style="text-decoration: none; color: #2593F3;">Find out why this is no joke</span></a></td>
+                                                                    </tr>
+                                                                  </table>
+                                                                </td>
+                                                              </tr>
+                                                            </table>
+                                                          </div>
+                                                        </td>
+                                                      </tr>
+                                                    </table> <!--[if mso | IE]> </td>
+                                                </tr>
+                                              </table> <![endif]--> </div>
                                           </tr>
                                         </table>
                                       </div>
@@ -298,19 +329,92 @@
                                 </table> <!--[if mso | IE]> </td>
                             </tr>
                           </table> <![endif]--> </div>
-                        <div class="card container" style="margin: 0 auto; width: 100%; max-width: 550px; margin-bottom: 30px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                        <div class="card-gradient-signature container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
                             <tr>
                               <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                   <tr class="container__row">
-                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #FFFFFF; border-radius: 15px; box-shadow: 0 15px 30px 0 rgba(8,27,154,.08),0 5px 15px 0 rgba(8,27,154,.08); padding: 40px;" bgcolor="#FFFFFF">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #0051E8; background: linear-gradient(45deg,#0051E8,#00BAFF); padding: 20px 40px 0;" bgcolor="#0051E8">
                                       <div class="row">
                                         <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                                           <tr class="row__row">
                                             <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
-                                              <img src="https://cdn.so-sure.com/images/rebrand/trustpilot/logo-black-5.png" alt="Trustpilot" class="img-center img__block" width="130px" border="0" style="max-width: 100%; margin: 0 auto; display: block;" />
-                                              <h4 class="header h4" style="margin: 20px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center;">Katie Booth so-sure customer 😎</h4>
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><em>"This insurance is your peace of mind when you spend so much on technology these days it’s better to insure them"</em></p>
-                                              <img src="https://cdn.so-sure.com/images/rebrand/reviews/so-sure_reviews-female-gravatar.png" width="100px" height="100px" alt="user" class="img-center img-avatar img__block" border="0" style="max-width: 100%; margin: 0 auto; display: block; margin-top: 20px; border-radius: 50%;" />
+                                              <h2 class="text-white header h2" style="margin: 20px 0; line-height: 30px; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; margin-bottom: 25px; margin-top: 15px; text-align: center; color: #FFFFFF;">From the SO-SURE Team</h2>
+                                              <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-sig.png" alt="so-sure team" class="img-center img__block" width="280px" border="0" style="max-width: 100%; margin: 0 auto; display: block;" />
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </table> <!--[if mso | IE]> </td>
+                            </tr>
+                          </table> <![endif]--> </div>
+                        <div class="card-gradient-contact container" style="margin: 0 auto; width: 100%; max-width: 550px;"> <!--[if mso | IE]> <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 550px" width="550" align="center">
+                            <tr>
+                              <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                  <tr class="container__row">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="background-color: #081B9B; background: linear-gradient(80deg,#170B38,#081B9B); padding: 20px 40px;" bgcolor="#081B9B">
+                                      <div class="row">
+                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+                                          <tr class="row__row">
+                                            <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
+                                              <h2 class="text-white header h2" style="margin: 20px 0; line-height: 30px; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; margin-bottom: 25px; margin-top: 15px; text-align: center; color: #FFFFFF;">Have a question?</h2>
+                                            </td>
+                                          </tr>
+                                        </table>
+                                      </div>
+                                      <div class="row">
+                                        <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+                                          <tr class="row__row">
+                                            <td class="column col-sm-12" width="275" style="width: 50%" align="left" valign="top">
+                                              <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="275">
+                                                  <tr>
+                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr class="block__row">
+                                                          <td class="block__cell" width="100%" align="left" valign="top">
+                                                            <div class="white-outline spacer button" style="margin-bottom: 30px;">
+                                                              <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                                                                <tr>
+                                                                  <td>
+                                                                    <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
+                                                                      <tr>
+                                                                        <td align="center" class="button__cell" style="border-radius: 3px; padding: 12px 30px; background-color: transparent; border: 1px solid #FFFFFF;" bgcolor="transparent"><a href="{{ url('faq') }}" class="button__link" style="text-decoration: none; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; background-color: transparent; color: #FFFFFF; display: inline-block;"><span class="button__text" style="text-decoration: none; color: #FFFFFF;">Read our FAQs</span></a></td>
+                                                                      </tr>
+                                                                    </table>
+                                                                  </td>
+                                                                </tr>
+                                                              </table>
+                                                            </div>
+                                                          </td>
+                                                        </tr>
+                                                      </table> <!--[if mso | IE]> </td>
+                                                  </tr>
+                                                </table> <![endif]--> </div>
+                                            </td>
+                                            <td class="column col-sm-12" width="275" style="width: 50%" align="left" valign="top">
+                                              <div class="block" style="width: 100%;"> <!--[if mso | IE]> <table class="block__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="width: 100%" width="275">
+                                                  <tr>
+                                                    <td> <![endif]--> <table class="block__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                                                        <tr class="block__row">
+                                                          <td class="block__cell" width="100%" align="left" valign="top">
+                                                            <div class="white-outline spacer button" style="margin-bottom: 30px;">
+                                                              <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+                                                                <tr>
+                                                                  <td>
+                                                                    <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto; margin-bottom: 30px;">
+                                                                      <tr>
+                                                                        <td align="center" class="button__cell" style="border-radius: 3px; padding: 12px 30px; background-color: transparent; border: 1px solid #FFFFFF;" bgcolor="transparent"><a href="{{ url('about_how_to_contact_so_sure') }}" class="button__link" style="text-decoration: none; font-family: 'Gordita Bold','Helvetica Neue Bold','Arial Bold',sans-serif; font-weight: 700; background-color: transparent; color: #FFFFFF; display: inline-block;"><span class="button__text" style="text-decoration: none; color: #FFFFFF;">Contact Us</span></a></td>
+                                                                      </tr>
+                                                                    </table>
+                                                                  </td>
+                                                                </tr>
+                                                              </table>
+                                                            </div>
+                                                          </td>
+                                                        </tr>
+                                                      </table> <!--[if mso | IE]> </td>
+                                                  </tr>
+                                                </table> <![endif]--> </div>
                                             </td>
                                           </tr>
                                         </table>
@@ -324,12 +428,39 @@
                             <tr>
                               <td> <![endif]--> <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
                                   <tr class="container__row">
-                                    <td class="container__cell" width="100%" align="left" valign="top">
+                                    <td class="container__cell" width="100%" align="left" valign="top" style="padding: 20px 40px; background-color: #0051E8; background: linear-gradient(45deg,#0051E8,#00BAFF);" bgcolor="#0051E8">
                                       <div class="row">
                                         <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                                           <tr class="row__row">
                                             <td class="column col-sm-12" width="550" style="width: 100%" align="left" valign="top">
-                                              <p class="text p" style="display: block; margin: 14px 0; color: #081A9A; font-family: 'Helvetica Neue',Arial,sans-serif; text-align: center; font-size: 15px; line-height: 1.6;"><small style="color: #777777;">Copyright &copy; {{ 'now'|date('Y') }} so-sure Limited, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK. All rights reserved. {% if unsubscribe_url is defined %}<a href="{{ unsubscribe_url }}" class="a" style="color: #777777;"><span class="a__text" style="color: #777777;"><u>Unsubscribe</u></span></a> from these emails{% else %}<a href="mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!" class="a" style="color: #777777;"><span class="a__text" style="color: #777777;">Unsubscribe from this list</span></a>{% endif %}</small></p>
+                                              <p class="text-center text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; color: #FFFFFF; text-align: center;">
+                                                <a class="img-link a" href="https://www.wearesosure.com" style="color: #081A9A; text-decoration: none;"><span class="a__text" style="color: #081A9A; text-decoration: none;">
+                                                    <img src="https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo-white.png" alt="so-sure" class="img-inline img__block" width="180px" border="0" style="max-width: 100%; display: inline;" />
+                                                  </span></a>
+                                              </p>
+                                              <p class="text-center text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; color: #FFFFFF; text-align: center;">
+                                                <a class="img-link a" href="https://www.facebook.com/wearesosure" style="color: #081A9A; text-decoration: none;"><span class="a__text" style="color: #081A9A; text-decoration: none;">
+                                                    <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-fb-2x-social.png" alt="so-sure - facebook" class="img-inline img__block" width="32px" border="0" style="max-width: 100%; display: inline;" />
+                                                  </span></a>
+                                                <a class="img-link a" href="https://twitter.com/wearesosure" style="color: #081A9A; text-decoration: none;"><span class="a__text" style="color: #081A9A; text-decoration: none;">
+                                                    <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-tw-2x-social.png" alt="so-sure - twitter" class="img-inline img__block" width="32px" border="0" style="max-width: 100%; display: inline;" />
+                                                  </span></a>
+                                                <a class="img-link a" href="https://www.instagram.com/wearesosure" style="color: #081A9A; text-decoration: none;"><span class="a__text" style="color: #081A9A; text-decoration: none;">
+                                                    <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-ig-2x-social.png" alt="so-sure - instagram" class="img-inline img__block" width="32px" border="0" style="max-width: 100%; display: inline;" />
+                                                  </span></a>
+                                              </p>
+                                              <img src="https://cdn.so-sure.com/images/rebrand/emails/so-sure_email-tp-2x.png" alt="so-sure - instagram" class="img-center spacer img__block" width="280px" border="0" style="max-width: 100%; margin: 0 auto; display: block; margin-bottom: 30px;" />
+                                              <p class="text-center text-white text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: center; color: #FFFFFF;">
+                                                <small> Copyright © {{ 'now'|date('Y') }} SO-SURE Limited <br />
+                                                  {{ business_address|replace({'\n':','}) }}
+                                                </small>
+                                                <p class="text-center text-white spacer text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: center; color: #FFFFFF; margin-bottom: 30px;"><small>All rights reserved</small></p>
+                                                <p class="text-center text-white text p" style="display: block; margin: 14px 0; font-family: 'Gordita Regular','Helvetica Neue Bold',Arial,sans-serif; font-size: 15px; line-height: 1.6; text-align: center; color: #FFFFFF;">
+                                                  <small>
+                                                    <a href="{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% else %}mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!{% endif %}" class="text-white a" style="color: #FFFFFF;"><span class="a__text" style="color: #FFFFFF;">Unsubscribe</span></a>
+                                                  </small>
+                                                </p>
+                                              </p>
                                             </td>
                                           </tr>
                                         </table>
