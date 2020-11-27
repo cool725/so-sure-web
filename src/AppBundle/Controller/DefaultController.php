@@ -126,7 +126,7 @@ class DefaultController extends BaseController
 
         // Is indexed?
         $noindex = false;
-        $homepageDesign = null;
+        $homepageDesign = 'normal';
         if ($request->get('_route') == 'home') {
             $noindex = true;
 
