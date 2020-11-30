@@ -32,7 +32,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_DESIGN_V3 = 'Homepage Design V3';
 
     // Exp 3
-    //
+    const EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME = 'Homepage A/B/C/D';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -140,7 +140,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_HOMEPAGE_DESIGN_V3,
         // Exp 3
-        //
+        self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
     ];
 
     public static $authExperiments = [
@@ -180,7 +180,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_HOMEPAGE_DESIGN_V3,
         // Exp 3
-        //
+        self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
     ];
 
     /** @var LoggerInterface */
