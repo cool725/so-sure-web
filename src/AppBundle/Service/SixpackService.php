@@ -32,7 +32,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_DESIGN_V3 = 'Homepage Design V3';
 
     // Exp 3
-    const EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME = 'Homepage A/B/C/D';
+    const EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME = 'Homepage Design and Copy';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
