@@ -40,7 +40,6 @@ if ($('.phone-search-combined').length) {
                     required: true
                 },
                 "launch_phone[email]": {
-                    required: true,
                     email: true,
                     emaildomain: true
                 },
