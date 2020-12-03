@@ -1334,7 +1334,7 @@ class UserController extends BaseController
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
         // A/B Test Homepage Design
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME);
 
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;

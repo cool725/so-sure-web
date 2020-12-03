@@ -201,12 +201,12 @@ class DefaultController extends BaseController
         // A/B Test Homepage Design
         $homepageDesign = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3,
-            ['control', 'curent-new-copy', 'new-design-old-copy', 'new-design-new-copy'],
+            SixpackService::EXPERIMENT_MARKETING_HOMEPAGE,
+            ['control', 'new-design-new-copy'],
             SixpackService::LOG_MIXPANEL_ALL
         );
 
-        if ($homepageDesign == 'new-design-new-copy' or $homepageDesign == 'new-design-old-copy') {
+        if ($homepageDesign == 'new-design-new-copy') {
             $template = 'AppBundle:Default:indexHomepage.html.twig';
         }
 

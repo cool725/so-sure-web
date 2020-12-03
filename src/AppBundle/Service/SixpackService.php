@@ -29,7 +29,7 @@ class SixpackService
     const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
 
     // Exp 2
-    const EXPERIMENT_HOMEPAGE_DESIGN_V3 = 'Homepage Design V3';
+    const EXPERIMENT_MARKETING_HOMEPAGE = 'Marketing Homepage Design';
 
     // Exp 3
     const EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME = 'Homepage Design and Copy';
@@ -131,14 +131,15 @@ class SixpackService
         'Scode Layout Variation',
         'Purchase Payment Step',
         'Homepage Design',
-        'Homepage Design V2'
+        'Homepage Design V2',
+        'Homepage Design V3'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
-        self::EXPERIMENT_HOMEPAGE_DESIGN_V3,
+        self::EXPERIMENT_MARKETING_HOMEPAGE,
         // Exp 3
         self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
     ];
@@ -178,7 +179,7 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
-        self::EXPERIMENT_HOMEPAGE_DESIGN_V3,
+        self::EXPERIMENT_MARKETING_HOMEPAGE,
         // Exp 3
         self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
     ];
