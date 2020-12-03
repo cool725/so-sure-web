@@ -49,6 +49,18 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
         return $total;
     }
 
+    public function findScheduledBacs(\DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        return $this->createQueryBuilder()
+            ->field('payment')->equals(null)
+            ->field('scheduled')->lt($date)
+            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field('paymentType')->equals('bacs')
+            ->getQuery()
+            ->execute();
+    }
+
     public function findScheduled(\DateTime $date = null)
     {
         if (!$date) {

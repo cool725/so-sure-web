@@ -162,6 +162,39 @@ class PaymentService
         return $results;
     }
 
+    /**
+     * Finds all scheduled bacs payments up to the given date and can check if they are billable or not.
+     * @param \DateTime|null $scheduledDate    is the date up to which the payments can be for.
+     * @param boolean        $validateBillable is whether to exclude those that cannot be charged.
+     * @return array containing the selected scheduled payments.
+     */
+    public function getAllValidScheduledPaymentsForBacs(\DateTime $scheduledDate = null, $validateBillable = true)
+    {
+        $results = [];
+        /** @var ScheduledPaymentRepository $repo */
+        $repo = $this->dm->getRepository(ScheduledPayment::class);
+        $this->labelBacs();
+        $scheduledPayments = $repo->findScheduledBacs($scheduledDate);
+        foreach ($scheduledPayments as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
+            if ($validateBillable && !$scheduledPayment->isBillable()) {
+                continue;
+            }
+            if (!$scheduledPayment->getPolicy()->isValidPolicy()) {
+                continue;
+            }
+            if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {
+                $this->logger->info(sprintf(
+                    'Policy %s or User %s does not have a valid payment method',
+                    $scheduledPayment->getPolicy()->getId(),
+                    $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
+                ));
+            }
+            $results[] = $scheduledPayment;
+        }
+        return $results;
+    }
+
     public function scheduledPayment(
         ScheduledPayment $scheduledPayment,
         \DateTime $date = null,
@@ -297,5 +330,46 @@ class PaymentService
         }
 
         $this->dispatcher->dispatch(PolicyEvent::EVENT_BACS_CREATED, new PolicyEvent($policy));
+    }
+
+    /**
+     * Sets the field paymentType to bacs for all scheduled payments that reference a bacs payment.
+     * @param \DateTime|null $date is the date up to which to label scheduled payments.
+     */
+    private function labelBacs($date = null)
+    {
+        $date = $date ?: new \DateTime();
+        // Delete existing paymentType field.
+        $this->dm->createQueryBuilder(ScheduledPayment::class)
+            ->updateMany()
+            ->field('paymentType')->unsetField()->exists(true)
+            ->getQuery()
+            ->execute();
+        // Finds those with bacs policies.
+        $scheduledIds = [];
+        $scheduleds = $this->dm->createQueryBuilder(ScheduledPayment::class)
+            ->hydrate(false)
+            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field('scheduled')->lt($date)
+            ->getQuery()
+            ->execute();
+        foreach ($scheduleds as $scheduled) {
+            $policy = $this->dm->createQueryBuilder(Policy::class)
+                ->hydrate(false)
+                ->field('_id')->equals($scheduled['policy']['$id'])
+                ->getQuery()
+                ->getSingleResult();
+            if ($policy) {
+                $scheduledIds[] = $scheduled['_id'];
+            }
+        }
+        // Sets paymentType: bacs for those found.
+        $this->dm->createQueryBuilder(ScheduledPayment::class)
+            ->updateMany()
+            ->field('_id')->in($scheduledIds)
+            ->field('paymentType')->set('bacs')
+            ->getQuery()
+            ->execute();
+        $this->dm->flush();
     }
 }

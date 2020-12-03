@@ -1,21 +1,19 @@
 <div class="cardbox cardbox-100 p-4 p-lg-5 pb-lg-0 🍆">
     <div class="mb-2 h4 text-primary fit">
-        Easy, Fast &amp; Great Value 🇬🇧
+        {% if type is defined and type == 'curent-new-copy' %}
+            Easy. Fair. Win-win 🙌
+        {% else %}
+            Easy, Fast &amp; Great Value 🇬🇧
+        {% endif %}
     </div>
-    {# {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
-        {% set greeting = 'Good morning ⏰' %}
-    {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
-        {% set greeting = 'Good afternoon 😎' %}
-    {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
-        {% set greeting = 'Good evening 🌛' %}
-    {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
-        {% set greeting = 'Hello night owl 🦉' %}
-    {% endif %}
-    <p class="lead mb-2">{{ greeting }}</p> #}
     <ul class="list-unstyled icn-fa-list mb-4">
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Fast replace and repair service
+            {% if type is defined and type == 'curent-new-copy' %}
+                24-72h repair or replace service
+            {% else %}
+                Fast replace and repair service
+            {% endif %}
         </li>
         <li class="mb-2">
             <i class="far fa-check fa-lg fa-fw text-success"></i>
@@ -57,10 +55,9 @@
         <div class="form-group">
             <input type="email"
                    class="form-control phone-search-dropdown-card__text phone-search-email"
-                   placeholder="Enter Email for Quote*"
+                   placeholder="Enter Email for Quote"
                    disabled="disabled"
-                   name="launch_phone[email]"
-                   data-required="true">
+                   name="launch_phone[email]">
         </div>
         <div class="form-group">
             {{ form_widget(form_phone.next, {

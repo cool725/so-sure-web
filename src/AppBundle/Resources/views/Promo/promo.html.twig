@@ -49,7 +49,7 @@
                     {% if scode is defined and scode and scode.reward %}
                         <div class="hero__intro">
                             {% if custom == 'amazon' %}
-                                <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} Amazon voucher 💰</span></h1>
+                                <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ scode.code|replace({'AMAZON': ''}) }} Amazon voucher 💰</span></h1>
                                 <div class="hero__step mb-4">
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">1</div></span>
                                     <div class="h4 text-white">Instant quote, speedy sign-up</div>

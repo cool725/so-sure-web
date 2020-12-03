@@ -95,7 +95,7 @@ class SCode
     public static function getNameForCode(User $user, $type)
     {
         if (!$type) {
-            $type == self::TYPE_STANDARD;
+            $type = self::TYPE_STANDARD;
         }
 
         $prefix = self::getPrefix($type);
@@ -108,8 +108,8 @@ class SCode
             throw new \Exception(sprintf('Unknown type %s', $type));
         }
 
-        $firstName = str_pad($user->getFirstName(), 1, "0");
-        $lastName = str_pad($user->getLastName(), $length, "0");
+        $firstName = str_pad(self::removeSpecialChar($user->getFirstName()), 1, "0");
+        $lastName = str_pad(self::removeSpecialChar($user->getLastName()), $length, "0");
         $lastNameStripped = str_replace("'", "", $lastName);
         $name = sprintf("%s%s%s", $prefix, mb_substr($firstName, 0, 1), mb_substr($lastNameStripped, 0, $length - 1));
 
@@ -125,6 +125,12 @@ class SCode
         } else {
             throw new \Exception(sprintf('Unknown type %s', $type));
         }
+    }
+
+    public static function removeSpecialChar($str)
+    {
+        $fstr = str_replace(array('"', "'", ',', chr(34), chr(39), "’"), '', $str);
+        return $fstr;
     }
 
     public function generateNamedCode(User $user, $count)
