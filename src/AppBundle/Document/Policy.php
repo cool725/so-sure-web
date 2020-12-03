@@ -197,6 +197,12 @@ abstract class Policy
         self::RISK_RENEWED_NO_PREVIOUS_CLAIM => self::RISK_LEVEL_LOW,
     ];
 
+    public static $activeStatuses = [
+        Policy::STATUS_ACTIVE,
+        Policy::STATUS_UNPAID,
+        Policy::STATUS_PICSURE_REQUIRED
+    ];
+
     public static $expirationStatuses = [
         Policy::STATUS_EXPIRED,
         Policy::STATUS_EXPIRED_CLAIMABLE,
