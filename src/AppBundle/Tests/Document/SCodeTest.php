@@ -47,4 +47,17 @@ class SCodeTest extends \PHPUnit\Framework\TestCase
         $scode->generateNamedCode($user, 5);
         $this->assertEquals("żeżb0005", $scode->getCode());
     }
+
+    public function testBadSyntaxGeneratedNamedCode()
+    {
+        $user = new User();
+
+        $user->setFirstName("ż’b'ieta");
+        $user->setLastName("Eżbieta");
+
+        $scode = new SCode();
+        $scode->setType(SCode::TYPE_STANDARD);
+        $scode->generateNamedCode($user, 5);
+        $this->assertEquals("żeżb0005", $scode->getCode());
+    }
 }
