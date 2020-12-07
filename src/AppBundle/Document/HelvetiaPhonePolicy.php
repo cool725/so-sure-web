@@ -372,7 +372,11 @@ class HelvetiaPhonePolicy extends PhonePolicy
         /** @var PhonePolicyIteration $previousIteration */
         foreach ($this->getPreviousIterations() as $previousIteration) {
             if ($previousIteration->getPhone()) {
-                return $previousIteration->getPhone()->getMakeModelMemory();
+                return [
+                    'Phone' => $previousIteration->getPhone()->getMakeModelMemory(),
+                    'IMEI'  => $previousIteration->getImei(),
+                    'Updated' => $previousIteration->getRealEnd()->format('Y-m-d H:i:s')
+                    ];
             }
         }
         return null;

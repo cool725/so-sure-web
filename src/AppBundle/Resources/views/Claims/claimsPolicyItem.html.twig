@@ -89,7 +89,12 @@
                                 </tr>
                                 <tr>
                                     <td>Previous phone upgrade </td>
-                                    <td>{% if upgrade_data.is_upgraded %}{{ upgrade_data.previous_iteration }}{% else %} No previous upgrade done {% endif %}</td>
+                                    <td>{% if upgrade_data.is_upgraded %}
+                                            {% for key, value in upgrade_data.previous_iteration %}
+                                                {{ key }}: {{ value }}<br />
+                                            {% endfor %}
+                                        {% else %} No previous upgrade done {% endif %}
+                                    </td>
                                 </tr>
 
                                 <tr>
