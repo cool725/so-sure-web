@@ -126,7 +126,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         } elseif (in_array($this->getStatus(), [
             self::STATUS_ACTIVE,
             self::STATUS_UNPAID,
-            self::STATUS_PICSURE_REQUIRED,
+            self::STATUS_PICSURE_REQUIRED
         ])) {
             $expectedCommission = $expectedMonthlyCommission;
         } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
