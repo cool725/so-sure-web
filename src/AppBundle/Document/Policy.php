@@ -5277,6 +5277,25 @@ abstract class Policy
         return SoSure::FULL_POLICY_NAME;
     }
 
+    public function getPreviousIteration() : array
+    {
+        $isUpgraded = false;
+        $previousIteration = null;
+        if ($this instanceof SalvaPhonePolicy) {
+            $isUpgraded = false;
+        } elseif ($this instanceof HelvetiaPhonePolicy) {
+            $previousIteration = $this->getLastIterationOrFalse();
+            if(null !== $previousIteration) {
+                $isUpgraded = true;
+            }
+        }
+
+        return [
+            'is_upgraded' => $isUpgraded,
+            'previous_iteration' => $previousIteration
+        ];
+    }
+
     /**
      * Tells you if this policy has been upgraded.
      * @return boolean true if so and false otherwise.

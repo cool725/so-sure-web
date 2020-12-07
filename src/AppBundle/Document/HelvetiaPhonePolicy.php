@@ -126,7 +126,7 @@ class HelvetiaPhonePolicy extends PhonePolicy
         } elseif (in_array($this->getStatus(), [
             self::STATUS_ACTIVE,
             self::STATUS_UNPAID,
-            self::STATUS_PICSURE_REQUIRED
+            self::STATUS_PICSURE_REQUIRED,
         ])) {
             $expectedCommission = $expectedMonthlyCommission;
         } elseif ($this->isCancelled() && (!$this->isRefundAllowed() || $isMoneyOwed)) {
@@ -363,6 +363,18 @@ class HelvetiaPhonePolicy extends PhonePolicy
             return true;
         }
         return false;
+    }
+
+    /**
+     */
+    public function getLastIterationOrFalse() {
+        /** @var PhonePolicyIteration $previousIteration */
+        foreach ($this->getPreviousIterations() as $previousIteration) {
+            if ($previousIteration->getPhone()) {
+                return $previousIteration->getPhone()->getMakeModelMemory();
+            }
+        }
+        return null;
     }
 
     /**
