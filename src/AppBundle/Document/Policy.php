@@ -5285,7 +5285,7 @@ abstract class Policy
             $isUpgraded = false;
         } elseif ($this instanceof HelvetiaPhonePolicy) {
             $previousIteration = $this->getLastIterationOrFalse();
-            if(null !== $previousIteration) {
+            if (null !== $previousIteration) {
                 $isUpgraded = true;
             }
         }

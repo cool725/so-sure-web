@@ -367,7 +367,8 @@ class HelvetiaPhonePolicy extends PhonePolicy
 
     /**
      */
-    public function getLastIterationOrFalse() {
+    public function getLastIterationOrFalse()
+    {
         /** @var PhonePolicyIteration $previousIteration */
         foreach ($this->getPreviousIterations() as $previousIteration) {
             if ($previousIteration->getPhone()) {
