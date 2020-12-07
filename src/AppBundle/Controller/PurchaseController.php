@@ -13,6 +13,7 @@ use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Postcode;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Opt\MarketingOptIn;
 use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
@@ -156,6 +157,14 @@ class PurchaseController extends BaseController
         // TEMP - As using skip add extra event
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
 
+        // A/B Test Opt In Copy
+        $optInCopyExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_OPT_IN_COPY,
+            ['copy-a', 'copy-b'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         // A/B Test Homepage Design
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME);
@@ -209,6 +218,10 @@ class PurchaseController extends BaseController
                     if ($newUser) {
                         $dm->persist($user);
                     }
+                    if ($purchase->getUserOptIn() === true) {
+                        $user->optInMarketing();
+                    }
+
                     if (!$user->getIdentityLog()) {
                         $user->setIdentityLog($this->getIdentityLog($request));
                     }
@@ -260,6 +273,10 @@ class PurchaseController extends BaseController
 
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
+                    if ($user->isOptedInForMarketing()) {
+                        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OPT_IN_COPY);
+                    }
+
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
                             $this->generateUrl('purchase_step_phone_id', [
@@ -302,6 +319,7 @@ class PurchaseController extends BaseController
             // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
             'validation_required' => $validationRequired,
+            'opt_in_copy_experiment' => $optInCopyExperiment
         );
 
         return $this->render($template, $data);
@@ -900,10 +918,24 @@ class PurchaseController extends BaseController
             $this->setSessionQuotePhone($request, $phone);
         }
 
+        // A/B Test Opt In Copy
+        $optInCopyExperiment = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_OPT_IN_COPY,
+            ['copy-a', 'copy-b'],
+            SixpackService::LOG_MIXPANEL_ALL
+        );
+
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPledgeType::class, $purchase)
             ->getForm();
+
+        // Check if opted in and remove field
+        if ($user->isOptedInForMarketing() === true) {
+            $purchaseForm->remove('userOptIn');
+        }
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
@@ -914,6 +946,19 @@ class PurchaseController extends BaseController
                         'OS' => $phone ? $phone->getOs() : null,
                         'Policy Id' => $policy->getId(),
                     ]);
+
+                    if ($user->isOptedInForMarketing() === null) {
+                        if ($purchase->getUserOptIn() == true) {
+                            $user->optInMarketing();
+                        } else {
+                            $user->optOutMarketing();
+                        }
+                        if ($user->isOptedInForMarketing() === true) {
+                            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OPT_IN_COPY);
+                        }
+                        $dm->flush();
+                    }
+
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_payment_id', [
                             'id' => $policy->getId()
@@ -947,6 +992,8 @@ class PurchaseController extends BaseController
             'instore' => $instore,
             'validation_required' => $validationRequired,
             'aggregator' => $this->get('session')->get('aggregator'),
+            'opt_in_copy_experiment' => $optInCopyExperiment,
+            'show_opt_in' => $user->isOptedInForMarketing()
         );
 
         return $this->render($template, $data);

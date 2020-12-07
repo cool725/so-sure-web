@@ -5,6 +5,8 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\MarketingOptIn;
+use AppBundle\Document\Opt\MarketingOptOut;
 use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Service\PostcodeService;
@@ -321,7 +323,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $multipays;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="user")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="user", cascade={"persist"})
      */
     protected $opts = array();
 
@@ -906,6 +908,44 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getOpts()
     {
         return $this->opts;
+    }
+
+    public function optInMarketing()
+    {
+        $optIn = new MarketingOptIn;
+        $optIn->setCategory(MarketingOptIn::OPTIN_CAT_MARKETING);
+        $this->addOpt($optIn);
+    }
+
+    public function optOutMarketing()
+    {
+        $optOut = new MarketingOptOut;
+        $optOut->setCategory(MarketingOptIn::OPTOUT_CAT_MARKETING);
+        $this->addOpt($optOut);
+    }
+
+    public function isOptedInForMarketing()
+    {
+        if ($this->getOpts()) {
+            $currentOpt = null;
+            foreach ($this->getOpts() as $key => $opt) {
+                if (!$key = 0) {
+                    $currentOpt = $opt;
+                } elseif ($currentOpt->getCreated() < $opt->getCreated()) {
+                    $currentOpt = $opt;
+                }
+            }
+            if ($currentOpt) {
+                if ($currentOpt instanceof MarketingOptIn) {
+                    return true;
+                } elseif ($currentOpt instanceof MarketingOptOut) {
+                    return false;
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
     public function getMultiPays()
