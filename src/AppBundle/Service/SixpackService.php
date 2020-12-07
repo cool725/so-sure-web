@@ -34,6 +34,9 @@ class SixpackService
     // Exp 3
     const EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME = 'Homepage Design and Copy';
 
+    // Exp 4
+    const EXPERIMENT_OPT_IN_COPY = 'User Opt In copy';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -142,6 +145,8 @@ class SixpackService
         self::EXPERIMENT_MARKETING_HOMEPAGE,
         // Exp 3
         self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
+        // Exp 4
+        self::EXPERIMENT_OPT_IN_COPY,
     ];
 
     public static $authExperiments = [
@@ -182,6 +187,8 @@ class SixpackService
         self::EXPERIMENT_MARKETING_HOMEPAGE,
         // Exp 3
         self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
+        // Exp 4
+        self::EXPERIMENT_OPT_IN_COPY,
     ];
 
     /** @var LoggerInterface */

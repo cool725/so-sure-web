@@ -591,6 +591,10 @@ class IntercomService
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
         }
+        $marketingOpt =  $user->isOptedInForMarketing();
+        if ($marketingOpt === true || $marketingOpt === false) {
+            $data['custom_attributes']['Marketing OptIn'] = $marketingOpt;
+        }
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
             if ($user->getIdentityLog() && $user->getIdentityLog()->getIp()) {
@@ -855,23 +859,24 @@ class IntercomService
                     }
 
                     $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_MARKETING);
+                    /** @var User $sosureUser */
+                    $sosureUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->email)]);
                     if ($user->unsubscribed_from_emails && !$optedOut) {
                         // Webhook callback from intercom issue
                         if (!$dry) {
                             $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_MARKETING);
+                            if ($sosureUser) {
+                                $sosureUser->optOutMarketing();
+                            }
                         }
                         $output[] = sprintf("Added optout for %s", $user->email);
                     } elseif (!$user->unsubscribed_from_emails && $optedOut) {
                         // sosure user listener -> queue -> intercom update issue
-                        /** @var User $sosureUser */
-                        $sosureUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->email)]);
                         if ($sosureUser) {
                             if (!$dry) {
-                                $this->updateUser($sosureUser);
+                                $this->queue($sosureUser);
                             }
                             $output[] = sprintf("Resync intercom user for %s", $user->email);
-                        } else {
-                            $output[] = sprintf("Unable to find so-sure user for %s", $user->email);
                         }
                     }
                 }
