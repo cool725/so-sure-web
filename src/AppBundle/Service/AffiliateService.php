@@ -302,7 +302,7 @@ class AffiliateService
                 }
             } else {
                 /** @var Policy */
-                $policy = $policyRepo->find($row[$header["ConversionReference"]]);
+                $policy = $policyRepo->find($row[$header["OrderID"]]);
                 if (!$policy) {
                     $row[$header["ConversionStatus"]] = "rejected";
                     $row[$header["RejectionReason"]] = "policy does not exist";
