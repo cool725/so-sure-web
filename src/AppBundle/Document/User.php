@@ -1241,6 +1241,24 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
+    public function getTotalClaims()
+    {
+        $claims = 0;
+
+        /** @var Policy $policy */
+        foreach ($this->getAllPolicies() as $policy) {
+            // TODO: Blend upgrades
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED &&
+                $policy->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+                continue;
+            }
+
+            $claims += count($policy->getApprovedClaims());
+        }
+
+        return $claims;
+    }
+
     public function getAvgPolicyClaims()
     {
         $claims = 0;
@@ -1371,7 +1389,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                     Claim::STATUS_SETTLED,
                     Claim::STATUS_DECLINED,
                     Claim::STATUS_PENDING_CLOSED,
-                    Claim::STATUS_WITHDRAWN
+                    Claim::STATUS_WITHDRAWN,
                 ])) {
                     $noOpenClaim = false;
                     break;
@@ -2441,7 +2459,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             'payment_method' => $policy && $policy->getPaymentMethod() ?
                 $policy->getPaymentMethod()->getType() :
                 null,
-            'has_mobile_number_verified' => $this->getMobileNumberVerified()
+            'has_mobile_number_verified' => $this->getMobileNumberVerified(),
         ];
     }
 
