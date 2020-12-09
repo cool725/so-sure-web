@@ -100,17 +100,14 @@ class DefaultController extends BaseController
         $template = 'AppBundle:Default:indexQuickQuote.html.twig';
 
         $competitorData = new Competitors();
+
         // A/B Test Homepage Design
         $homepageDesign = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
-            ['control', 'curent-new-copy', 'new-design-old-copy', 'new-design-new-copy'],
+            SixpackService::EXPERIMENT_HOMEPAGE_COPY,
+            ['control', 'curent-new-copy'],
             SixpackService::LOG_MIXPANEL_ALL
         );
-
-        if ($homepageDesign == 'new-design-new-copy' or $homepageDesign == 'new-design-old-copy') {
-            $template = 'AppBundle:Default:indexHomepage.html.twig';
-        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
@@ -146,19 +143,14 @@ class DefaultController extends BaseController
 
         // Is indexed?
         $noindex = true;
-        $homepageDesign = 'normal';
 
         // A/B Test Homepage Design
         $homepageDesign = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_MARKETING_HOMEPAGE,
-            ['control', 'new-design-new-copy'],
+            SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
+            ['control', 'curent-new-copy'],
             SixpackService::LOG_MIXPANEL_ALL
         );
-
-        if ($homepageDesign == 'new-design-new-copy') {
-            $template = 'AppBundle:Default:indexHomepage.html.twig';
-        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
             'page' => 'Homepage - '.$homepageDesign.' - LP']);
