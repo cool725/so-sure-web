@@ -1,0 +1,25 @@
+// signup.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+@import "../base/fonts";
+
+.page-contents {
+    padding: 6rem 0 3rem;
+    text-align: center;
+
+    form,
+    .share {
+        width: 100%;
+        margin: 0 auto;
+        text-align: left;
+
+        @include media-breakpoint-up(lg) {
+            width: 500px;
+        }
+    }
+}

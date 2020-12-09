@@ -52,7 +52,6 @@ class CreateReward
 
     /**
      * @var \DateTime
-     * @Assert\NotNull(message="Must provide expiry date for reward")
      */
     protected $expiryDate;
 
