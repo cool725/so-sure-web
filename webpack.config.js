@@ -100,9 +100,6 @@ Encore
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
-    // Third Party
-    .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
-
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
     .addEntry('rollbar-js-error', './src/AppBundle/Resources/public/rebrand/js/pages/rollbar-js-error.js')

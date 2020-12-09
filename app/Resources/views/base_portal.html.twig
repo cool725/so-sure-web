@@ -9,12 +9,14 @@
 
         {% block meta %}{% endblock %}
 
-        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.11.2/css/all.css" integrity="sha384-zrnmn8R8KkWl12rAZFt4yKjxplaDaT7/EUkKm7AovijfrQItFWR7O/JJn4DAa/gx" crossorigin="anonymous">
-
-        {% if include_emoji is defined and include_emoji == true %}
-            <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
-        {% endif %}
-
+        {# Preload Fonts #}
+        <link rel="preload" href="{{ cdn_url }}/fonts/gordita-regular-webfont.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="{{ cdn_url }}/fonts/gordita-bold-webfont.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="{{ cdn_url }}/fonts/gordita-medium-webfont.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="{{ cdn_url }}/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="{{ cdn_url }}/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="{{ cdn_url }}/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="{{ cdn_url }}/fonts/fa-duotone-900.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
 
         {% block cssPage %}{% endblock %}
