@@ -40,7 +40,6 @@ abstract class PolicyReport
      */
     public function __construct(DocumentManager $dm, DateTimeZone $tz)
     {
-        $this->lines = [CsvHelper::line(...$this->getHeaders())];
         $this->dm = $dm;
         $this->tz = $tz;
     }

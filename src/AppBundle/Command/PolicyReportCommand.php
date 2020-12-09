@@ -7,7 +7,8 @@ use AppBundle\Helpers\CsvHelper;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\ReportLine;
-use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\ReportLineRepository;
 use Aws\S3\S3Client;
 use DateTime;
 use AppBundle\Service\PolicyService;
@@ -123,7 +124,9 @@ class PolicyReportCommand extends ContainerAwareCommand
         $debug = $input->getOption('debug') == true;
         $n = $input->getOption('n');
         $timezone = new DateTimeZone($input->getOption('timezone') ?: 'UTC');
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
+        /** @var ReportLineRepository $reportLineRepo */
         $reportLineRepo = $this->dm->getRepository(ReportLine::class);
         // if clear cache then clear cache
         if ($clearCache) {
@@ -177,6 +180,7 @@ class PolicyReportCommand extends ContainerAwareCommand
                     $i,
                     min($i + static::BATCH_SIZE, $max)
                 );
+                /** @var ReportLine $reportLine */
                 foreach ($reportLines as $reportLine) {
                     $content = $reportLine->getContent();
                     if ($content) {

@@ -4,6 +4,8 @@ namespace AppBundle\Repository;
 
 use AppBundle\Document\ReportLine;
 use Doctrine\ODM\MongoDB\MongoDBException;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 
 /**
  * Repository for report lines.
@@ -31,12 +33,14 @@ class ReportLineRepository extends BaseDocumentRepository
      */
     public function getBoundsForType($type)
     {
+        /** @var ReportLine $min */
         $min = $this->createQueryBuilder()
             ->field('report')->equals($type)
             ->sort('number', 'asc')
             ->limit(1)
             ->getQuery()
             ->getSingleResult();
+        /** @var ReportLine $max */
         $max = $this->createQueryBuilder()
             ->field('report')->equals($type)
             ->sort('number', 'desc')

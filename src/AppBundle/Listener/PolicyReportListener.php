@@ -36,6 +36,7 @@ class PolicyReportListener
 
     public function userRefresh(UserEvent $event)
     {
+        $user = $event->getUser();
         foreach ($user->getPolicies() as $policy) {
             $this->policyService->generateReportLines($policy);
         }
