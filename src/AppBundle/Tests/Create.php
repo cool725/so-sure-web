@@ -428,7 +428,7 @@ class Create
      * @param number $extendedWarranty is the extended warranty excess.
      * @param number $loss             is the loss excess.
      * @param number $theft            is the theft excess.
-     * @return the created excess.
+     * @return PhoneExcess the created excess.
      */
     public static function phoneExcess(
         $damage = -1,
