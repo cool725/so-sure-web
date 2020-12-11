@@ -405,17 +405,17 @@ class Create
 
     /**
      * Creates a claim.
-     * @param Policy    $policy is the policy that the claim is on.
-     * @param string    $type   is the type of claim.
-     * @param \DateTime $date   is the date the claim was created.
-     * @param string    $status is the statue of the claim.
+     * @param Policy           $policy is the policy that the claim is on.
+     * @param string           $type   is the type of claim.
+     * @param \DateTime|string $date   is the date the claim was created.
+     * @param string           $status is the statue of the claim.
      * @return Claim the claim created.
      */
     public static function claim($policy, $type, $date, $status)
     {
         $claim = new Claim();
         $claim->setType($type);
-        $claim->setCreatedDate($date);
+        $claim->setCreatedDate(is_string($date) ? new \DateTime($date) : $date);
         $claim->setStatus($status);
         $policy->addClaim($claim);
         return $claim;

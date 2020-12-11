@@ -1371,26 +1371,6 @@ class Claim
         $this->shippingAddress = $shippingAddress;
     }
 
-    public function getFnolRisk()
-    {
-        return $this->fnolRisk;
-    }
-
-    public function setFnolRisk($fnolRisk)
-    {
-        $this->fnolRisk = $fnolRisk;
-    }
-
-    public function getFnolRiskReason()
-    {
-        return $this->fnolRiskReason;
-    }
-
-    public function setFnolRiskReason($fnolRiskReason)
-    {
-        $this->fnolRiskReason = $fnolRiskReason;
-    }
-
     public function getFnolPicSureValidated()
     {
         return $this->fnolPicSureValidated;
@@ -1741,9 +1721,11 @@ class Claim
      */
     public function getRisk(\DateTime $date = null)
     {
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $this->getPolicy();
         $date = $date ?: new \DateTime();
-        $picsure = $this->getPolicy()->isPicSureValidated();
-        $delta = $date->diff($this->getPolicy()->getUser()->getFirstPolicy()->getStart());
+        $picsure = $phonePolicy->isPicSureValidated();
+        $delta = $date->diff($phonePolicy->getUser()->getFirstPolicy()->getStart());
         $age = $delta->y * 12 + $delta->m;
         if ($age <= 5) {
             return $picsure ? self::RISK_RED : self::RISK_BLACK;
@@ -1751,17 +1733,6 @@ class Claim
             return $picsure ? self::RISK_AMBER : self::RISK_BLACK;
         }
         return self::RISK_GREEN;
-    }
-
-    /**
-     * Gives you the description of the risk surrounding this claim.
-     * @param \DateTime|null $date the date for which the risk is being calculated. When left as null it will default
-     *                             to the current time and date.
-     * @return string containing the description.
-     */
-    public function getRiskDescription(\DateTime $date = null)
-    {
-        return static::RISK_DESCRIPTIONS[$this->getRisk($date)];
     }
 
     public static function sumClaims($claims)
