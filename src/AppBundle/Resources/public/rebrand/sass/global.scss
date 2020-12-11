@@ -7,7 +7,15 @@
 @import "abstracts/variables";
 
 // Import Bootstrap
-@import "vendor/bs4/bootstrap.scss";
+@import "vendor/bs4/bootstrap";
+
+// Import Fontawesome
+@import "vendor/fontawesome/fontawesome";
+@import "vendor/fontawesome/solid";
+@import "vendor/fontawesome/regular";
+@import "vendor/fontawesome/light";
+@import "vendor/fontawesome/brands";
+@import "vendor/fontawesome/duotone";
 
 // Base
 // - animations, typography, utilies

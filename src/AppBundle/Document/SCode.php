@@ -100,7 +100,7 @@ class SCode
 
         $prefix = self::getPrefix($type);
 
-        if ($type == self::TYPE_STANDARD) {
+        if ($type == self::TYPE_STANDARD || $type == self::TYPE_REWARD) {
             $length = 4;
         } elseif ($type == self::TYPE_MULTIPAY) {
             $length = 2;
@@ -118,7 +118,7 @@ class SCode
 
     public static function getPrefix($type)
     {
-        if ($type == self::TYPE_STANDARD) {
+        if ($type == self::TYPE_STANDARD || $type == self::TYPE_REWARD) {
             return null;
         } elseif ($type == self::TYPE_MULTIPAY) {
             return 'P-';

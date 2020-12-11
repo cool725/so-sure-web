@@ -95,6 +95,24 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findScodePoliciesByStatus($status = null)
+    {
+        $defaultStatus = [
+            Policy::STATUS_ACTIVE,
+            Policy::STATUS_PENDING_RENEWAL,
+            Policy::STATUS_PENDING,
+            Policy::STATUS_RENEWAL
+        ];
+        if (null !== $status) {
+            $defaultStatus = $status;
+        }
+        return $this->createQueryBuilder()
+                    ->field('scodes')->exists(true)
+                    ->field('status')->in($defaultStatus)
+                    ->getQuery()
+                    ->execute();
+    }
+
     public function findPoliciesForPendingRenewal($date = null)
     {
         if (!$date) {

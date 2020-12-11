@@ -1,0 +1,37 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set instore_mode = true %}
+{% set robots_noindex = true %}
+
+{% block title %}Influencer Signup Complete | SO-SURE{% endblock %}
+{% block meta %}{% endblock %}
+{% block schema %}{% endblock %}
+{% set share_url = url('student_promo', {'code': scode.code})|replace({(api_base_url): web_base_url}) %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/signup.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="page-contents">
+        <div class="container-large">
+            <h1 class="h2 mb-4">Signup Complete</h1>
+            <p>This is your personal referral link.</p>
+            <div class="share">
+                <div class="form-group">
+                    <input type="text" name="" value="{{ share_url }}" class="form-control" readonly />
+                </div>
+                <a href="#"
+                class="btn btn-outline-primary btn-copy"
+                data-clipboard-text="{{ share_url }}">🔗 Copy link</a>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+     <script src="{{ asset('css-js/signup.js') }}"></script>
+{% endblock %}

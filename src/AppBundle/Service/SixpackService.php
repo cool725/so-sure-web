@@ -29,10 +29,10 @@ class SixpackService
     const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
 
     // Exp 2
-    const EXPERIMENT_MARKETING_HOMEPAGE = 'Marketing Homepage Design';
+    const EXPERIMENT_HOMEPAGE_COPY = 'Homepage Copy';
 
     // Exp 3
-    const EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME = 'Homepage Design and Copy';
+    const EXPERIMENT_MARKETING_HOMEPAGE_COPY = 'Marketing Homepage Copy';
 
     // Exp 4
     const EXPERIMENT_OPT_IN_COPY = 'User Opt In copy';
@@ -135,16 +135,18 @@ class SixpackService
         'Purchase Payment Step',
         'Homepage Design',
         'Homepage Design V2',
-        'Homepage Design V3'
+        'Homepage Design V3',
+        'Marketing Homepage Design',
+        'Homepage Design and Copy'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
-        self::EXPERIMENT_MARKETING_HOMEPAGE,
+        self::EXPERIMENT_HOMEPAGE_COPY,
         // Exp 3
-        self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
+        self::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
         // Exp 4
         self::EXPERIMENT_OPT_IN_COPY,
     ];
@@ -184,9 +186,9 @@ class SixpackService
         // Exp 1
         self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
         // Exp 2
-        self::EXPERIMENT_MARKETING_HOMEPAGE,
+        self::EXPERIMENT_HOMEPAGE_COPY,
         // Exp 3
-        self::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
+        self::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
         // Exp 4
         self::EXPERIMENT_OPT_IN_COPY,
     ];

@@ -84,30 +84,7 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
         $noindex = false;
-
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-        ]);
-
-        $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
-
-        // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
-
         $referral = $request->get('referral');
         $session = $this->get('session');
 
@@ -127,22 +104,15 @@ class DefaultController extends BaseController
         // A/B Test Homepage Design
         $homepageDesign = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME,
-            ['control', 'curent-new-copy', 'new-design-old-copy', 'new-design-new-copy'],
+            SixpackService::EXPERIMENT_HOMEPAGE_COPY,
+            ['control', 'curent-new-copy'],
             SixpackService::LOG_MIXPANEL_ALL
         );
-
-        if ($homepageDesign == 'new-design-new-copy' or $homepageDesign == 'new-design-old-copy') {
-            $template = 'AppBundle:Default:indexHomepage.html.twig';
-        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'referral'  => $referral,
-            'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $competitorData::$competitorComparisonData,
-            'from_price' => $fromPrice,
             'is_noindex' => $noindex,
             'homepage_exp' => $homepageDesign
         );
@@ -155,29 +125,6 @@ class DefaultController extends BaseController
      */
     public function homeLandingAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-        ]);
-
-        $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
-
-        // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
-
         $referral = $request->get('referral');
         $session = $this->get('session');
 
@@ -196,28 +143,21 @@ class DefaultController extends BaseController
 
         // Is indexed?
         $noindex = true;
-        $homepageDesign = 'normal';
 
         // A/B Test Homepage Design
         $homepageDesign = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_MARKETING_HOMEPAGE,
-            ['control', 'new-design-new-copy'],
+            SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
+            ['control', 'curent-new-copy'],
             SixpackService::LOG_MIXPANEL_ALL
         );
-
-        if ($homepageDesign == 'new-design-new-copy') {
-            $template = 'AppBundle:Default:indexHomepage.html.twig';
-        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
             'page' => 'Homepage - '.$homepageDesign.' - LP']);
 
         $data = array(
             'referral'  => $referral,
-            'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $competitorData::$competitorComparisonData,
-            'from_price' => $fromPrice,
             'is_noindex' => $noindex,
             'homepage_exp' => $homepageDesign
         );
