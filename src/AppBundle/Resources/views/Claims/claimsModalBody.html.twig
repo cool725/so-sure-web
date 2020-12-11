@@ -58,6 +58,14 @@
             </div>
 
             <div class="col-xs-6"><label>Tier</label><p>{{ claim.policy.subvariantName }}</p></div>
+            <div class="col-xs-6">
+                <label>Risk: {{ claim.risk }}</label>
+                {% if claim.needPictureOfPhone %}<p>Need Picture of Phone</p>{% endif %}
+                {% if claim.needProofOfUsage %}<p>Need Proof of Usage</p>{% endif %}
+                {% if claim.needProofOfBarring %}<p>Need Proof of Barring</p>{% endif %}
+                {% if claim.needVeriphy %}<p>Need Veriphy</p>{% endif %}
+            </div>
+
 
             {% if app.user.handlingTeam != 'davies' %}
                 <div class="col-xs-6">
