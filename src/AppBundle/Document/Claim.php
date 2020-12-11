@@ -1743,10 +1743,11 @@ class Claim
     {
         $date = $date ?: new \DateTime();
         $picsure = $this->getPolicy()->isPicSureValidated();
-        $age = $date->diff($this->getPolicy()->getUser()->getFirstPolicy()->getStart())->m;
-        if ($age <= 6) {
+        $delta = $date->diff($this->getPolicy()->getUser()->getFirstPolicy()->getStart());
+        $age = $delta->y * 12 + $delta->m;
+        if ($age <= 5) {
             return $picsure ? self::RISK_RED : self::RISK_BLACK;
-        } elseif ($age <= 12) {
+        } elseif ($age <= 11) {
             return $picsure ? self::RISK_AMBER : self::RISK_BLACK;
         }
         return self::RISK_GREEN;
