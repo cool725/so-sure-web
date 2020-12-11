@@ -3,6 +3,8 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Company;
+use AppBundle\Helpers\CsvHelper;
 use AppBundle\Classes\SoSure;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Service\RouterService;
@@ -22,6 +24,7 @@ use Symfony\Component\Routing\RouterInterface;
 class SlackCommand extends ContainerAwareCommand
 {
     use DateTrait;
+    const CORPORATE_CHECK_DAYS = 9;
 
     /** @var DocumentManager  */
     protected $dm;
@@ -68,6 +71,13 @@ class SlackCommand extends ContainerAwareCommand
                 '#customer-contact'
             )
             ->addOption(
+                'corporate-end-channel',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Channel to post about ending corporate policies',
+                '#dev'
+            )
+            ->addOption(
                 'weeks',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -94,6 +104,7 @@ class SlackCommand extends ContainerAwareCommand
     {
         $policyChannel = $input->getOption('policy-channel');
         $customerChannel = $input->getOption('customer-channel');
+        $corporateEndChannel = $input->getOption('corporate-end-channel');
         $weeks = $input->getOption('weeks');
         $message = $input->getOption('message');
         $skipSlack = $input->getOption('skip-slack');
@@ -120,6 +131,14 @@ class SlackCommand extends ContainerAwareCommand
         }
         $output->writeln('');
 
+        $output->writeln('Corporate Endings');
+        $output->writeln('----');
+        $lines = $this->corporateEnding($corporateEndChannel, $skipSlack, $message);
+        foreach ($lines as $line) {
+            $output->writeln($line);
+        }
+        $output->writeln('');
+
         $output->writeln('Cancelled w/Payment Owed');
         $output->writeln('----');
         $lines = $this->cancelledAndPaymentOwed($customerChannel, $skipSlack, $message);
@@ -127,6 +146,51 @@ class SlackCommand extends ContainerAwareCommand
             $output->writeln($line);
         }
         $output->writeln('');
+    }
+
+    /**
+     * Sends info about corporate policies that are ending soon to slack.
+     * @param string  $channel   is the name of the slack channel to write to.
+     * @param boolean $skipSlack is whether to skip actually doing the writing to slack part.
+     * @param string  $message   is some text to append to the start of what is written to slack or something.
+     * @return array containing each message sent which is in this case just the one.
+     */
+    private function corporateEnding($channel, $skipSlack, $message)
+    {
+        /** @var CompanyRepository $companyRepo */
+        $companyRepo = $this->dm->getRepository(Company::class);
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $list = [];
+        $firstItem = true;
+        $companies = $companyRepo->findAll();
+        /* @var Company $company */
+        foreach ($companies as $company) {
+            $firstForCompany = true;
+            $policies = $policyRepo->findEndingPoliciesForCompany($company, self::CORPORATE_CHECK_DAYS);
+            /** @var Policy $policy */
+            foreach ($policies as $policy) {
+                if ($firstItem) {
+                    $list[] = sprintf('*Corporate Policies Ending in next %d days*', self::CORPORATE_CHECK_DAYS);
+                    $firstItem = false;
+                }
+                if ($firstForCompany) {
+                    $list[] = sprintf('*%s*', $company->getName());
+                    $firstForCompany = false;
+                }
+                $list[] = sprintf(
+                    '- <%s|%s> ends %s',
+                    $this->routerService->generateUrl('admin_policy', ['id' => $policy->getId()]),
+                    $policy->getPolicyNumber(),
+                    $policy->getEnd()->format('Y-m-d')
+                );
+            }
+        }
+        $text = implode(PHP_EOL, $list);
+        if (!$skipSlack && count($list) > 0) {
+            $this->send($text, $channel, $message);
+        }
+        return $list;
     }
 
     private function cancelledAndPaymentOwed($channel, $skipSlack, $message)

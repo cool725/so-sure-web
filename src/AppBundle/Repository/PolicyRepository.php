@@ -433,6 +433,22 @@ class PolicyRepository extends BaseDocumentRepository
             ->sort('start', 'desc')
             ->getQuery()
             ->getSingleResult();
+    }
 
+    /**
+     * Finds all the policies for a given company that are ending within the given number of days.
+     * @param Company $company    is the company to look for.
+     * @param int     $cutoffDays is the number of days into the future within which the policy must end to be found.
+     * @return Cursor over the found companies.
+     */
+    public function findEndingPoliciesForCompany($company, $cutoffDays)
+    {
+        $cutoff = (new \DateTime())->add(new \DateInterval("P{$cutoffDays}D"));
+        return $this->createQueryBuilder()
+            ->field('company')->references($company)
+            ->field('status')->in(Policy::$activeStatuses)
+            ->field('end')->lte($cutoff)
+            ->getQuery()
+            ->execute();
     }
 }
