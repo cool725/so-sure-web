@@ -3,12 +3,12 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\Connection\Connection;
-use AppBundle\Document\LogEntry;
+use AppBundle\Document\Influencer;
 use AppBundle\Document\Reward;
-use AppBundle\Repository\PolicyRepository;
 
 use AppBundle\Repository\RewardRepository;
 use AppBundle\Service\MailerService;
+use AppBundle\Service\RouterService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -19,7 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\DateTrait;
-use Symfony\Component\Routing\RouterInterface;
 
 class PromoCodeCommand extends ContainerAwareCommand
 {
@@ -40,24 +39,29 @@ class PromoCodeCommand extends ContainerAwareCommand
 
     protected $setPromoCodes;
 
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
+    /** @var RouterService */
+    protected $route;
 
     protected $adminPolicyRoute;
+
+    /** @var string */
+    protected $environment;
+
+    protected $emailAccounts;
 
     public function __construct(
         DocumentManager $dm,
         MailerService $mailerService,
         Client $redis,
-        RouterInterface $router
+        $environment,
+        RouterService $route
     ) {
         parent::__construct();
         $this->dm = $dm;
         $this->redis = $redis;
         $this->mailerService = $mailerService;
-        $this->router = $router;
+        $this->environment = $environment;
+        $this->route = $route;
     }
 
 
@@ -74,11 +78,11 @@ class PromoCodeCommand extends ContainerAwareCommand
                 false
             )
             ->addOption(
-                'reward-valid-date',
+                'email-accounts',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Filter reward open by specified date',
-                false
+                'What email address(s) to send to',
+                self::PROMO_EMAIL_ADDRESS
             )
         ;
     }
@@ -95,20 +99,22 @@ class PromoCodeCommand extends ContainerAwareCommand
             $promoCodesArr = explode(",", $promoCodes);
             $this->setPromoCodes = implode('","', $promoCodesArr);
         }
-        try {
-            $routeRaw = $this->router->getRouteCollection()->get('admin_policy');
-            $this->adminPolicyRoute = dirname($routeRaw->getPath());
-        } catch (\Exception $exception) {
-            $output->writeln($exception->getMessage());
-        }
 
-//        /**
-//         * This will grab all policy users with created times from date set
-//         * Get passed date argument or use beginning of the month
-//         */
-//        $rewardValidDate = $input->getOption('reward-valid-date') ?
-//            new \DateTime($input->getOption('reward-valid-date')) :
-//            $this->startOfYear();
+        $this->emailAccounts = $input->getOption('email-accounts');
+        if ($this->emailAccounts !== self::PROMO_EMAIL_ADDRESS) {
+            $emailArr = explode(",", $this->emailAccounts);
+            $emailF = [];
+            foreach ($emailArr as $emailAccount) {
+                if (filter_var($emailAccount, FILTER_VALIDATE_EMAIL)) {
+                    $emailF[] = $emailAccount;
+                }
+            }
+            if (!empty($emailF)) {
+                $this->emailAccounts = $emailF;
+            } else {
+                $this->emailAccounts = self::PROMO_EMAIL_ADDRESS;
+            }
+        }
 
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
@@ -167,6 +173,7 @@ class PromoCodeCommand extends ContainerAwareCommand
         $activeRewardsData = [];
         /** @var Reward $reward */
         foreach ($rewards as $reward) {
+
             /** @var SCode $scode */
             $scode = $reward->getSCode();
             if ($scode) {
@@ -207,6 +214,19 @@ class PromoCodeCommand extends ContainerAwareCommand
             $scode = $reward->getSCode();
         }
 
+
+        $organisation = null;
+
+        $influencerRepo = $this->dm->getRepository(Influencer::class);
+        /** @var Influencer $influencer */
+        $influencer = $influencerRepo->find($reward->getId());
+        if ($influencer instanceof Influencer) {
+            $organisation = $influencer->getOrganisation();
+        }
+
+
+
+
         /** @var SCode $scode */
         return [
             'First name'                      => $policy->getUser()->getName(),
@@ -219,8 +239,9 @@ class PromoCodeCommand extends ContainerAwareCommand
             'Number of claims'                => $policy->getUser()->getTotalClaims(),
             'Policy Status'                   => $policy->getStatus(),
             'Promo Code'                      => $scode ? $scode->getCode() : '',
+            'Organisation'                    => $organisation,
             'Reward code redeemed date'       => $policy->getCreated()->format('Y-m-d H:i:s'),
-            'Link to policy on Admin'         => $this->adminPolicyRoute . '/' . $policy->getId()
+            'Link to policy on Admin'         => $this->route->generateUrl('admin_policy', ['id' => $policy->getId()])
         ];
     }
 
@@ -242,7 +263,7 @@ class PromoCodeCommand extends ContainerAwareCommand
 
         $this->mailerService->send(
             self::COMMAND_REPORT_NAME,
-            self::PROMO_EMAIL_ADDRESS,
+            $this->emailAccounts,
             "<h4>".self::COMMAND_REPORT_NAME . ": </h4><br /><br />"
             . "Number of Policies found: " . count($filteredItems) . "<br />"
             . "File: " . $fileName . "<br />"
