@@ -47,12 +47,6 @@ class Claim
     const RISK_AMBER = 'amber';
     const RISK_RED = 'red';
     const RISK_BLACK = 'black';
-    const RISKS = [
-        self::RISK_GREEN,
-        self::RISK_AMBER,
-        self::RISK_RED,
-        self::RISK_BLACK
-    ];
 
     const WARNING_FLAG_CLAIMS_NAME_MATCH = 'claim-name-match';
     const WARNING_FLAG_CLAIMS_POSTCODE = 'claim-postcode';
