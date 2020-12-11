@@ -43,6 +43,17 @@ class Claim
     // Temporary status to allow the system to suggest closing a claim, as the policy is about to be cancelled
     const STATUS_PENDING_CLOSED = 'pending-closed';
 
+    const RISK_GREEN = 'green';
+    const RISK_AMBER = 'amber';
+    const RISK_RED = 'red';
+    const RISK_BLACK = 'black';
+    const RISKS = [
+        self::RISK_GREEN,
+        self::RISK_AMBER,
+        self::RISK_RED,
+        self::RISK_BLACK
+    ];
+
     const WARNING_FLAG_CLAIMS_NAME_MATCH = 'claim-name-match';
     const WARNING_FLAG_CLAIMS_POSTCODE = 'claim-postcode';
     const WARNING_FLAG_CLAIMS_REPLACEMENT_COST_HIGHER = 'claim-replacement-cost-higher';
@@ -596,22 +607,6 @@ class Claim
     protected $shippingAddress;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="50")
-     * @MongoDB\Field(type="string")
-     * @Gedmo\Versioned
-     */
-    protected $fnolRisk;
-
-    /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="50")
-     * @MongoDB\Field(type="string")
-     * @Gedmo\Versioned
-     */
-    protected $fnolRiskReason;
-
-    /**
      * @Assert\Type("bool")
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
@@ -826,12 +821,6 @@ class Claim
 
     public function setPolicy(Policy $policy)
     {
-        if (!$this->getFnolRisk()) {
-            $this->setFnolRisk($policy->getRisk());
-        }
-        if (!$this->getFnolRiskReason()) {
-            $this->setFnolRiskReason($policy->getRiskReason());
-        }
         if ($policy instanceof PhonePolicy && $this->getFnolPicSureValidated() == null) {
             /** @var PhonePolicy $phonePolicy */
             $phonePolicy = $policy;
@@ -1744,6 +1733,36 @@ class Claim
         return false;
     }
 
+    /**
+     * Gives you the risk surrounding this claim.
+     * @param \DateTime|null $date the date for which the risk is being calculated. When left as null it will default
+     *                             to the current time and date.
+     * @return string containing the name of the risk rating.
+     */
+    public function getRisk(\DateTime $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        $picsure = $this->getPolicy()->isPicSureValidated();
+        $age = $date->diff($this->getPolicy()->getUser()->getFirstPolicy()->getStart())->m;
+        if ($age <= 6) {
+            return $picsure ? self::RISK_RED : self::RISK_BLACK;
+        } elseif ($age <= 12) {
+            return $picsure ? self::RISK_AMBER : self::RISK_BLACK;
+        }
+        return self::RISK_GREEN;
+    }
+
+    /**
+     * Gives you the description of the risk surrounding this claim.
+     * @param \DateTime|null $date the date for which the risk is being calculated. When left as null it will default
+     *                             to the current time and date.
+     * @return string containing the description.
+     */
+    public function getRiskDescription(\DateTime $date = null)
+    {
+        return static::RISK_DESCRIPTIONS[$this->getRisk($date)];
+    }
+
     public static function sumClaims($claims)
     {
         $data = [
@@ -1988,7 +2007,7 @@ class Claim
 
     public function needProofOfUsage()
     {
-        return $this->getFnolRisk() != Policy::RISK_LEVEL_LOW;
+        return $this->getRisk() !== self::RISK_GREEN;
     }
 
     public function needProofOfBarring()
@@ -1998,15 +2017,16 @@ class Claim
 
     public function needProofOfPurchase()
     {
-        /** @var PhonePolicy  $policy */
-        $policy = $this->getPolicy();
-        if ($policy->hasInvalidImei()) {
-            return true;
-        }
+        return $this->getRisk() === self::RISK_BLACK;
+    }
 
-        // TODO: Consider if we should be using claim FNOL pic-sure validation
-        // or current policy pic-sure validation
-        return $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH && !$policy->isPicSureValidated();
+    /**
+     * Says if the claims handlers need to do veriphy.
+     * @return true if so otherwise false.
+     */
+    public function needVeriphy()
+    {
+        return in_array($this->getRisk(), [self::RISK_RED, self::RISK_BLACK]);
     }
 
     public function needPictureOfPhone()
@@ -2015,7 +2035,8 @@ class Claim
         $policy = $this->getPolicy();
         // TODO: Consider if we should be using claim FNOL pic-sure validation
         // or current policy pic-sure validation
-        return $this->getType() == self::TYPE_DAMAGE && $this->getFnolRisk() == Policy::RISK_LEVEL_HIGH &&
+        return $this->getType() == self::TYPE_DAMAGE &&
+            in_array($this->getRisk(), [self::RISK_RED, self::RISK_BLACK]) &&
             !$policy->isPicSureValidated();
     }
 
