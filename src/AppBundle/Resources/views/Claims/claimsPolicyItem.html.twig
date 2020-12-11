@@ -88,6 +88,16 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td>Previous phone upgrade </td>
+                                    <td>{% if upgrade_data.is_upgraded %}
+                                            {% for key, value in upgrade_data.previous_iteration %}
+                                                {{ key }}: {{ value }}<br />
+                                            {% endfor %}
+                                        {% else %} No previous upgrade done {% endif %}
+                                    </td>
+                                </tr>
+
+                                <tr>
                                     <td>Phone Warranty Status</td>
                                     <td class="{% if policy.phone.underWarranty == 'likely'%}success{% elseif policy.phone.underWarranty == 'maybe'%}warning{% else %}danger{% endif %}">
                                         Phone is {{ policy.phone.underWarranty }} under warranty. Warranty likely ends between {{ policy.phone.warrantyEarlist|date('M Y') }} and {{ policy.phone.warrantyLatest|date('M Y') }}.
