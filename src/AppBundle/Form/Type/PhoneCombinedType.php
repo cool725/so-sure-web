@@ -66,7 +66,7 @@ class PhoneCombinedType extends AbstractType
                 'required' => $this->required
             ])
             ->add('email', EmailType::class, [
-                'required' => $this->required,
+                'required' => false,
                 'disabled' => true
             ])
             ->add('next', SubmitType::class)

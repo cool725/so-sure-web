@@ -51,6 +51,7 @@ class PurchaseStepPersonalAddressType extends AbstractType
         $builder
             ->add('firstName', TextType::class, ['required' => $this->required])
             ->add('lastName', TextType::class, ['required' => $this->required])
+            ->add('userOptIn', CheckboxType::class, ['required' => false])
             ->add('birthday', BirthdayType::class, [
                   'required' => $this->required,
                   'format'   => 'dd/MM/yyyy',

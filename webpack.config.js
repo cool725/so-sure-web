@@ -100,8 +100,8 @@ Encore
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
-    // Third Party
-    .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
+    // Signup
+    .addEntry('signup', './src/AppBundle/Resources/public/rebrand/js/pages/signup.js')
 
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')

@@ -40,7 +40,6 @@ if ($('.phone-search-combined').length) {
                     required: true
                 },
                 "launch_phone[email]": {
-                    required: true,
                     email: true,
                     emaildomain: true
                 },
@@ -77,19 +76,19 @@ if ($('.phone-search-combined').length) {
         // Get phones from list that are featured
         $.each(phones[make.val()], function(key, value) {
             $.each(value, function(item, id) {
-                if (id['featured'] && !model.find('option[value="' + key +'"]').length) {
+                if (!model.find('option[value="' + key +'"]').length) {
                     model.append($('<option />').val(item).text(key + ' ' + id['memory'] + 'GB'));
                 }
             });
         });
         // Get phones from list that are not featured
-        $.each(phones[make.val()], function(key, value) {
-            $.each(value, function(item, id) {
-                if (!id['featured'] && !model.find('option[value="' + key +'"]').length) {
-                    model.append($('<option />').val(item).text(key + ' ' + id['memory'] + 'GB'));
-                }
-            });
-        });
+        // $.each(phones[make.val()], function(key, value) {
+        //     $.each(value, function(item, id) {
+        //         if (!id['featured'] && !model.find('option[value="' + key +'"]').length) {
+        //             model.append($('<option />').val(item).text(key + ' ' + id['memory'] + 'GB'));
+        //         }
+        //     });
+        // });
     }
 
     // Dev

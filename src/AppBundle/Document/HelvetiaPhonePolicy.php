@@ -366,6 +366,23 @@ class HelvetiaPhonePolicy extends PhonePolicy
     }
 
     /**
+     */
+    public function getLastIterationOrFalse()
+    {
+        /** @var PhonePolicyIteration $previousIteration */
+        foreach ($this->getPreviousIterations() as $previousIteration) {
+            if ($previousIteration->getPhone()) {
+                return [
+                    'Phone' => $previousIteration->getPhone()->getMakeModelMemory(),
+                    'IMEI'  => $previousIteration->getImei(),
+                    'Updated' => $previousIteration->getRealEnd()->format('Y-m-d H:i:s')
+                    ];
+            }
+        }
+        return null;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getCurrentIteration()

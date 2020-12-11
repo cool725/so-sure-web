@@ -14,6 +14,17 @@
     {% set yearlyMonthly = phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) / 12 %}
     {% set saving = withoutDiscount - phone.currentYearlyPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
 
+    {% set cta_class = '' %}
+    {% set hide_options = 'd-none' %}
+    {% set dd_active = '' %}
+    {% set cc_active = 'active' %}
+    {% if feature_enabled('allow-bacs-payment-method') %}
+        {% set cta_class = 'hideme' %}
+        {% set hide_options = '' %}
+        {% set dd_active = 'active' %}
+        {% set cc_active = '' %}
+    {% endif %}
+
     <div class="hideme">
         {{ form_label(purchase_form.amount, 'Payment options') }}
         {{ form_widget(purchase_form.amount) }}
@@ -64,10 +75,20 @@
 
     <hr />
 
-    <!-- <h2 id="payment-option-title" class="h5 text-dodger-blue text-center mb-4">Choose a payment method</h2> -->
+    <h2 id="payment-option-title" class="h5 text-dodger-blue text-center mb-4 {{ hide_options }}">Choose a payment method</h2>
+
+    <div id="payment-option-direct-debit" class="form-group {{ hide_options }}">
+        <div class="payment-card payment-card-type {{ dd_active }}"
+            data-option="direct-debit">
+            <div class="payment-card-body">
+                <span class="h5">Setup Direct Debit</span>
+                <img src="{{ cdn_url }}/images/rebrand/misc/so-sure-direct-debit-dark-logo.svg" alt="Direct Debit" title="Direct Debit" width="80px">
+            </div>
+        </div>
+    </div>
 
     <div id="payment-option-credit-card" class="form-group">
-        <div class="payment-card payment-card-type active"
+        <div class="payment-card payment-card-type"
              data-option="card">
             <div class="payment-card-body">
                 <span class="h5">Pay via Card</span>
@@ -75,16 +96,6 @@
             </div>
         </div>
     </div>
-
-    <!-- <div id="payment-option-direct-debit" class="form-group">
-        <div class="payment-card payment-card-type"
-            data-option="direct-debit">
-            <div class="payment-card-body">
-                <span class="h5">Setup Direct Debit</span>
-                <img src="{{ cdn_url }}/images/rebrand/misc/so-sure-direct-debit-dark-logo.svg" alt="Direct Debit" title="Direct Debit" width="80px">
-            </div>
-        </div>
-    </div> -->
 
     <hr />
 
@@ -96,24 +107,15 @@
         <div class="with-errors">{{ form_errors(purchase_form.promoCode) }}</div>
     </div>
 
-    {% if feature_enabled('card-option-with-bacs') %}
-        <div id="payment-cta-direct-debit" class="form-group text-center hideme">
-            {{ form_widget(purchase_form.next, {
-                'label': 'Pay Now',
-                'fa': 'fas fa-lock fa-lg mr-2',
-                'left': true,
-                'attr': {
-                    'class': 'btn btn-success btn-block-xs'
-            }}) }}
-        </div>
-    {% else %}
-        <div id="payment-cta-direct-debit" class="form-group text-center hideme">
-            {{ form_widget(purchase_form.next, {
-                'attr': {
-                    'hidden': 'hidden'
-            }}) }}
-        </div>
-    {% endif %}
+    <div id="payment-cta-direct-debit" class="form-group text-center {{ hide_options }}">
+        {{ form_widget(purchase_form.next, {
+            'label': 'Pay Now',
+            'fa': 'fas fa-lock fa-lg mr-2',
+            'left': true,
+            'attr': {
+                'class': 'btn btn-success btn-block-xs'
+        }}) }}
+    </div>
 {{ form_end(purchase_form) }}
 
 <form class="payment-form"
@@ -141,7 +143,7 @@
 </form>
 {% block to_card_form %}
     {{ form_start(to_card_form, {'attr':{'class':'form-400 text-center'}}) }}
-        <div id="payment-cta-credit-card" class="form-group">
+        <div id="payment-cta-credit-card" class="form-group {{ cta_class }}">
             {{ form_widget(to_card_form.submit, {
                 'label': 'Pay Now',
                 'fa': 'fas fa-lock fa-lg mr-2',

@@ -197,6 +197,12 @@ abstract class Policy
         self::RISK_RENEWED_NO_PREVIOUS_CLAIM => self::RISK_LEVEL_LOW,
     ];
 
+    public static $activeStatuses = [
+        Policy::STATUS_ACTIVE,
+        Policy::STATUS_UNPAID,
+        Policy::STATUS_PICSURE_REQUIRED
+    ];
+
     public static $expirationStatuses = [
         Policy::STATUS_EXPIRED,
         Policy::STATUS_EXPIRED_CLAIMABLE,
@@ -2403,6 +2409,29 @@ abstract class Policy
         return $scodes;
     }
 
+    public function getActiveSCodesByPromoCodes(\DateTime $rewardValidDate, $inputPromoCodes = null)
+    {
+        $scodes = null;
+        foreach ($this->getSCodes() as $scode) {
+            /** @var SCode $scode */
+            if ($scode->isActive() && $scode->isReward()) {
+                /** @var Reward $reward */
+                $reward = $scode->getReward();
+                if ($reward) {
+                    if ($reward->isOpen($rewardValidDate)) {
+                        if (null !== $inputPromoCodes) {
+                            if (in_array($scode->getCode(), $inputPromoCodes)) {
+                                return $scode;
+                            }
+                        }
+                        return $scode;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public function createAddSCode($scodeCount)
     {
         $scode = new SCode();
@@ -2419,8 +2448,18 @@ abstract class Policy
     public function getStandardSCode()
     {
         foreach ($this->scodes as $scode) {
-            //\Doctrine\Common\Util\Debug::dump($scode);
             if ($scode->isActive() && $scode->isStandard()) {
+                return $scode;
+            }
+        }
+
+        return null;
+    }
+
+    public function getRewardSCode()
+    {
+        foreach ($this->scodes as $scode) {
+            if ($scode->isActive() && $scode->isReward()) {
                 return $scode;
             }
         }
@@ -2501,6 +2540,7 @@ abstract class Policy
         }
         return null;
     }
+
 
     public function addPolicyFile(S3File $file)
     {
@@ -5271,6 +5311,25 @@ abstract class Policy
         return SoSure::FULL_POLICY_NAME;
     }
 
+    public function getPreviousIteration() : array
+    {
+        $isUpgraded = false;
+        $previousIteration = null;
+        if ($this instanceof SalvaPhonePolicy) {
+            $isUpgraded = false;
+        } elseif ($this instanceof HelvetiaPhonePolicy) {
+            $previousIteration = $this->getLastIterationOrFalse();
+            if (null !== $previousIteration) {
+                $isUpgraded = true;
+            }
+        }
+
+        return [
+            'is_upgraded' => $isUpgraded,
+            'previous_iteration' => $previousIteration
+        ];
+    }
+
     /**
      * Tells you if this policy has been upgraded.
      * @return boolean true if so and false otherwise.
@@ -6787,7 +6846,8 @@ abstract class Policy
             'has_time_bacs_payment' => $this->canBacsPaymentBeMadeInTime(),
             'card_details' => $cardDetails,
             'premium_owed' => $this->getStatus() == self::STATUS_UNPAID ?
-                $this->getOutstandingPremiumToDateWithReschedules(new \DateTime()) : 0
+                $this->getOutstandingPremiumToDateWithReschedules(new \DateTime()) : 0,
+            'bacs_in_progress' => $this->hasBacsPaymentInProgress()
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

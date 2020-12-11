@@ -1,3 +1,7 @@
+{% set opt_in_copy = 'Yes please, I\'d like to receive offers or promotions' %}
+{% if opt_in_copy_experiment is defined and opt_in_copy_experiment == 'copy-b' %}
+    {% set opt_in_copy = 'I\'d like to receive offers or promotions' %}
+{% endif %}
 {{ form_start(purchase_form, {'attr': {
     'data-toggle': 'validator',
     'class': 'validate-form form-400',
@@ -5,12 +9,6 @@
     'autocomplete': 'off'
 }}) }}
     {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
-    {# Set text for pic-sure required policies #}
-    {# TODO: Copy for Xiaomi or use this method to adjust fields #}
-    {% set excessText = 'I understand the standard excess is only reduced when validated with the so-sure app' %}
-    {% if validation_required is not null %}
-        {% set excessText = 'I understand my policy will NOT commence until I have verified the condition of phone with your app' %}
-    {% endif %}
     <h2 class="text-dodger-blue text-center">Pledge of Honesty</h2>
     <p class="text-center mb-4">Before you continue to payment.</p>
     <div class="pledge-items">
@@ -30,7 +28,7 @@
         </div>
         <div class="form-group">
             {{ form_widget(purchase_form.agreedExcess, {
-                'label': excessText,
+                'label': 'I understand the standard excess is only reduced when validated with the so-sure app',
                 'attr': {'class':'custom-control-input'}}
             ) }}
             <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>
@@ -42,15 +40,14 @@
             ) }}
             <div class="with-errors">{{ form_errors(purchase_form.agreedTerms) }}</div>
         </div>
-        <div class="form-group">
-            <small class="form-text text-center">
-                {% if validation_required is not null %}
-                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
-                {% else %}
-                    <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
-                {% endif %}
-            </small>
-        </div>
+        {% if show_opt_in != true %}
+            <div class="form-group">
+                {{ form_widget(purchase_form.userOptIn, {
+                    'label': opt_in_copy,
+                    'attr': {'class':'custom-control-input'}}
+                ) }}
+            </div>
+        {% endif %}
     </div>
     <div class="form-group text-md-center mt-5">
         {{ form_widget(purchase_form.next, {
@@ -60,5 +57,14 @@
             'attr': {
                 'class': 'btn btn-success btn-block-xs'
         }}) }}
+    </div>
+    <div class="form-group">
+        <small class="form-text text-center">
+            {% if validation_required is not null %}
+                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
+            {% else %}
+                <a href="{{ cdn_url }}/files/so-sure_sample_policy_doc_v{{ policy.policyTerms.getVersionNumber }}.pdf" target="_blank" rel="noopener noreferrer"><u>Read our full policy document here</u></a>
+            {% endif %}
+        </small>
     </div>
 {{ form_end(purchase_form) }}

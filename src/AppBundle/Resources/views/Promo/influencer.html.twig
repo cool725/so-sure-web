@@ -29,10 +29,17 @@
                                  src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
                                  alt="Likes hearts stars smileys"
                                  class="img-fluid lozad hero__illustration__img">
-                            <img id="hero_img_1_2"
-                                 src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.user.firstName|lower }}_step_shadow.png"
-                                 alt="{{ scode.reward.user.firstName }}"
-                                 class="img-fluid lozad hero__illustration__img">
+                            {% if scode.reward.type == 'Influencer' %}
+                                <img id="hero_img_1_2"
+                                    src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.gender|lower }}_step_shadow.png"
+                                    alt="{{ scode.reward.user.firstName }}"
+                                    class="img-fluid lozad hero_{{ scode.reward.gender|lower }}_illustration__img">
+                            {% else %}
+                                <img id="hero_img_1_2"
+                                    src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.user.firstName|lower }}_step_shadow.png"
+                                    alt="{{ scode.reward.user.firstName }}"
+                                    class="img-fluid lozad hero__illustration__img">
+                            {% endif %}
                             <img id="hero_img_1_1"
                                  src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png"
                                  alt="Happy so-sure phone"
@@ -54,23 +61,15 @@
                         <ul class="list-unstyled icn-fa-list mb-5">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Full cover from &pound;3.49/month
-                            </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                Low excess from just {{ lowest_excess }}
+                                Fast replace and repair service
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
                                 Up to 80% money back
                             </li>
-                            <li class="mb-3 h5 text-white">
-                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                24-72 hour replace or repair
-                            </li>
                             <li class="h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                New, second hand &amp; refurbished phones
+                                Low excess from just {{ lowest_excess }}
                             </li>
                         </ul>
                     </div>
@@ -98,10 +97,17 @@
                                  src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
                                  alt="Likes hearts stars smileys"
                                  class="img-fluid lozad hero__illustration__img-mb">
-                            <img id="hero_img_1_2"
-                                 src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.user.firstName|lower }}_step_shadow.png"
-                                 alt="{{ scode.reward.user.firstName }}"
-                                 class="img-fluid lozad hero__illustration__img-mb">
+                            {% if scode.reward.type == 'Influencer' %}
+                                 <img id="hero_img_1_2"
+                                     src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.gender|lower }}_step_shadow.png"
+                                     alt="{{ scode.reward.user.firstName }}"
+                                     class="img-fluid lozad hero_{{ scode.reward.gender|lower }}_illustration__img">
+                             {% else %}
+                                 <img id="hero_img_1_2"
+                                     src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.user.firstName|lower }}_step_shadow.png"
+                                     alt="{{ scode.reward.user.firstName }}"
+                                     class="img-fluid lozad hero__illustration__img">
+                             {% endif %}
                             <img id="hero_img_1_1"
                                  src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png"
                                  alt="Happy so-sure phone"
@@ -203,7 +209,7 @@
                 </div>
                 <div class="modal-body">
                     {% if scode is defined and scode and scode.reward %}
-                        <p>{{ scode.reward.termsAndConditions|raw }}</p>
+                        {{ scode.reward.termsAndConditions|raw }}
                         {% if not custom %}
                             <p>Code expires: <strong>{{ scode.reward.expiryDate|date('d/m/Y') }}</strong></p>
                         {% endif %}

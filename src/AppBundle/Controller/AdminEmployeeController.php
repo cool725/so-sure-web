@@ -99,6 +99,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
+use AppBundle\Document\Influencer;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Connection\StandardConnection;
@@ -1199,6 +1200,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
+
         /** @var BacsService $bacsService */
         $bacsService = $this->get('app.bacs');
 
@@ -1937,12 +1939,16 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $hadInvalidPicSureStatus = true;
         }
 
+        /** @var array $phoneUpgrade */
+        $phoneUpgrade = $policy->getPreviousIteration();
+
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
             'note_form' => $noteForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
+            'upgrade_data' => $phoneUpgrade,
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
             'bacs_form' => $bacsForm->createView(),
@@ -3118,6 +3124,22 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'reward' => $reward,
             'connectForm' => $connectForm->createView(),
             'rewardForm' => $rewardForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/influencers", name="admin_influencers")
+     * @Template
+     */
+    public function influencersAction()
+    {
+        $dm = $this->getManager();
+        $influencerRepo = $dm->getRepository(Influencer::class);
+        $userRepo = $dm->getRepository(User::class);
+        $influencers = $influencerRepo->findAll();
+
+        return [
+            'influencers' => $influencers
         ];
     }
 

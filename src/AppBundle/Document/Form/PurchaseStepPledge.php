@@ -47,6 +47,11 @@ class PurchaseStepPledge
      */
     protected $agreedTerms;
 
+    /**
+     * @var boolean
+     */
+    protected $userOptIn;
+
     public function getPolicy()
     {
         return $this->policy;
@@ -105,6 +110,16 @@ class PurchaseStepPledge
     public function setAgreedTerms($agreedTerms)
     {
         $this->agreedTerms = $agreedTerms;
+    }
+
+    public function getUserOptIn()
+    {
+        return $this->userOptIn;
+    }
+
+    public function setUserOptIn($userOptIn)
+    {
+        $this->userOptIn = $userOptIn;
     }
 
     public function areAllAgreed()

@@ -11,11 +11,18 @@ use AppBundle\Document\Connection\Connection;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\RewardRepository")
+ * @MongoDB\InheritanceType("SINGLE_COLLECTION")
+ * @MongoDB\DiscriminatorField("reward_type")
+ * @MongoDB\DiscriminatorMap({Reward::TYPE_REWARD=Reward::class, Reward::TYPE_INFLUENCER=Influencer::class})
+ * @MongoDB\DefaultDiscriminatorValue("reward")
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 class Reward
 {
     use CurrencyTrait;
+
+    const TYPE_REWARD = 'reward';
+    const TYPE_INFLUENCER = 'influencer';
 
     /**
      * @MongoDB\Id(strategy="auto")

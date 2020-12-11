@@ -159,6 +159,8 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
+                    $quoteUrl = $this->setPhoneSession($request, $phone);
+                    $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                     if ($email) {
                         $lead = new Lead();
                         $lead->setEmail($email);
@@ -174,8 +176,6 @@ class SearchController extends BaseController
                         $days = new \DateTime();
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
-                        $quoteUrl = $this->setPhoneSession($request, $phone);
-                        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                         $mailer = $this->get('app.mailer');
                         // @codingStandardsIgnoreStart
                         $mailer->sendTemplate(
@@ -244,6 +244,9 @@ class SearchController extends BaseController
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
+            $email = $this->getDataString($request->get('launch_phone'), 'email');
+            $session = $this->get('session');
+            $session->set('email', $email);
             if ($request->request->has('launch_phone')) {
                 $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
                 if ($phoneId) {
@@ -251,7 +254,8 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
-                    $email = $this->getDataString($request->get('launch_phone'), 'email');
+                    $quoteUrl = $this->setPhoneSession($request, $phone);
+                    $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                     if ($email) {
                         $lead = new Lead();
                         $lead->setEmail($email);
@@ -267,8 +271,6 @@ class SearchController extends BaseController
                         $days = new \DateTime();
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
-                        $quoteUrl = $this->setPhoneSession($request, $phone);
-                        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                         $mailer = $this->get('app.mailer');
                         // @codingStandardsIgnoreStart
                         $mailer->sendTemplate(
@@ -485,6 +487,8 @@ class SearchController extends BaseController
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }
+                    $quoteUrl = $this->setPhoneSession($request, $phone);
+                    $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                     if ($email) {
                         $lead = new Lead();
                         $lead->setEmail($email);
@@ -500,8 +504,6 @@ class SearchController extends BaseController
                         $days = new \DateTime();
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
-                        $quoteUrl = $this->setPhoneSession($request, $phone);
-                        $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
                         $mailer = $this->get('app.mailer');
                         // @codingStandardsIgnoreStart
                         $mailer->sendTemplate(
