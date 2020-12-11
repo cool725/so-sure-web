@@ -38,11 +38,10 @@ class PurchaseStepPersonalAddress
      */
     protected $lastName;
 
-    // *
-    //  * @var string
-    //  * @AppAssert\FullName()
-
-    // protected $name;
+    /**
+     * @var boolean
+     */
+    protected $userOptIn;
 
     /**
      * @var string
@@ -126,6 +125,16 @@ class PurchaseStepPersonalAddress
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
+    }
+
+    public function getUserOptIn()
+    {
+        return $this->userOptIn;
+    }
+
+    public function setUserOptIn($userOptIn)
+    {
+        $this->userOptIn = $userOptIn;
     }
 
     public function getBirthday()
@@ -252,6 +261,7 @@ class PurchaseStepPersonalAddress
         $this->user = $user;
         $this->setEmail($user->getEmail());
         $this->setFirstName($user->getFirstName());
+        // $this->setUserOptIn($user->getUserOptIn());
         $this->setLastName($user->getLastName());
         $this->setMobileNumber($user->getMobileNumber());
         $this->setBirthday($user->getBirthday());
@@ -263,6 +273,7 @@ class PurchaseStepPersonalAddress
         $user->setEmail($this->getEmail());
         $user->setFirstName($this->getFirstName());
         $user->setLastName($this->getLastName());
+        // $user->setUserOptIn($this->getUserOptIn());
         $user->setMobileNumber($this->getMobileNumber());
         $user->setBirthday($this->getBirthday());
         $user->setBillingAddress($this->getAddress());

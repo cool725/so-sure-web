@@ -44,3 +44,4 @@ yarn-error.log
 .vimrc
 .swo
 *.swo
+Vagrantfile

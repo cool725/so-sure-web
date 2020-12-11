@@ -16,7 +16,6 @@ $(function() {
             model   = $('.phone-search-option-model'),
             memory  = $('.phone-search-option-memory'),
             email   = $('.phone-search-email'),
-            emailR  = $('.phone-search-email').data('required'),
             button  = $('.phone-search-button'),
             firstOp = $('.phone-search-option-make option:first'),
             fiveG   = $('.five-g-warning');
@@ -47,7 +46,6 @@ $(function() {
                         required: true
                     },                                        
                     "launch_phone[email]": {
-                        required: emailR,
                         email: true,
                         emaildomain: true
                     },

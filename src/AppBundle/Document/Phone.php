@@ -1217,6 +1217,16 @@ class Phone
         return $name;
     }
 
+    public function getMakeModelMemory() : string
+    {
+        $full_spec = '';
+        if ($this->getMemory() && $this->getMake() && $this->getModel()) {
+            $full_spec = sprintf("%s %s (%s GB)", $this->getMake(), $this->getModel(), $this->getMemory());
+        }
+
+        return $full_spec;
+    }
+
     public function toApiArray()
     {
         return [

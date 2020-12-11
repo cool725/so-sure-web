@@ -1332,10 +1332,11 @@ class UserController extends BaseController
 
         // A/B Manufacturers Landing Pages USPs
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
-
         // A/B Test Homepage Design
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3);
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V3_ON_HOME);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_COPY);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY);
+        // A/B Test Opt In Purchased - Not needed but might as well record it
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OPT_IN_COPY);
 
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {

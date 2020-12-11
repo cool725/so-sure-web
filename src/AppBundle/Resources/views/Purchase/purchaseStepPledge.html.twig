@@ -79,7 +79,7 @@
                 {# Sub Content #}
                 <div class="qpw__sub__container">
                     <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
-                        {% include 'AppBundle::Purchase/_formStepPledge.html.twig' %}
+                        {% include 'AppBundle::Purchase/_formStepPledge.html.twig' with {'opt_in_copy_experiment': opt_in_copy_experiment } %}
                     </div>
                 </div>
                 {# Mobile Info #}

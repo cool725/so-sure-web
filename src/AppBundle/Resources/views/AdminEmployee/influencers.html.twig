@@ -1,0 +1,67 @@
+{% extends 'admin_claims_base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'admin-influencers' %}
+{% set terms_and_conditions_example = '<p>Terms and Conditions apply: Enter the code XXXXX into your customer dashboard within XX days once you have bought your policy and £XX will be added to your account influencer pot. Cashback is redeemable at the end of your policy year term if you (and your connections if you have any) have not made any claim. This offer is only available to new so-sure customers.</p>
+<p>Promotion valid from DAY MONTH YEAR until DAY MONTH YEAR. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time. Promotion code cannot be used in conjunction with any other promotional offer.</p>
+<p>This offer is available to UK residents only. By redeeming the code provided, you agree to these terms and conditions.</p>' %}
+
+{% block title %}Admin influencers{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+   {#  <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}"> #}
+{% endblock %}
+
+{% block body %}
+
+    <section class="py-4 px-md-4">
+        <div class="container-fluid">
+            {# TODO: Heading area #}
+            <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
+                <h1 class="h2">Influencers</h1>
+            </div>
+            {# TODO: Content area #}
+            <div class="table-responsive-sm mb-5">
+                <table class="table table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Email</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Gender</th>
+                            <th>Value</th>
+                            <th>Organisation</th>
+                            <th>Referrals</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for influencer in influencers %}
+                            {# {{ dump(influencer) }} #}
+                            <tr class="{% if influencer.expiryDate %}{% if date(influencer.expiryDate) < date() %}table-danger{% else %}table-success{% endif %}{% else %}table-info{% endif %}">
+                                <td>{{ influencer.user.email }}</td>
+                                <td>
+                                    {% if influencer.sCode %}
+                                        <a href="{{ url('promo', {'code': influencer.sCode.code}) }}" target="_blank"><u>{{ influencer.sCode.code }}</u></a>
+                                    {% else %}
+                                        n/a
+                                    {% endif %}
+                                </td>
+                                <td>{{ influencer.user.name }}</td>
+                                <td>{{ influencer.gender }}</td>
+                                <td>{% if influencer.defaultValue %}£{{ influencer.defaultValue|number_format(2, '.', ',') }}{% else %}n/a{% endif %}</td>
+                                <td>{{ influencer.organisation }}</td>
+                                <td>{{ influencer.connections|length }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/reward.js') }}"></script>
+{% endblock %}

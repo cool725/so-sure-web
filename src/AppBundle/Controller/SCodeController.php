@@ -39,8 +39,8 @@ class SCodeController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(SCode::class);
         $phoneRepo = $dm->getRepository(Phone::class);
-
         $scode = null;
+
         try {
             if ($scode = $repo->findOneBy(['code' => $code])) {
                 // make sure to get policy user in code first rather than in twig in case policy/user was deleted

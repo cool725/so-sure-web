@@ -1,0 +1,230 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'invite' %}
+{% set robots_noindex = true %}
+{% set include_get_a_quote = true %}
+
+{% block title %}
+    {% if scode is defined and scode and scode.user and not custom %}
+        Connect with {{ scode.reward.user.firstName }} &amp; get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | so-sure
+    {% else %}
+        Promo code {{ use_code }} not found! | so-sure
+    {% endif %}
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/invite-influencer.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero__illustration">
+                        {% if scode is defined and scode %}
+                            <img id="hero_img_overlay_1"
+                                 src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
+                                 alt="Likes hearts stars smileys"
+                                 class="img-fluid lozad hero__illustration__img">
+                            {% if scode.reward.type == 'Influencer' %}
+                                <img id="hero_img_1_2"
+                                    src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.gender|lower }}_step_shadow.png"
+                                    alt="{{ scode.reward.user.firstName }}"
+                                    class="img-fluid lozad hero_{{ scode.reward.gender|lower }}_illustration__img">
+                            {% else %}
+                                <img id="hero_img_1_2"
+                                    src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.user.firstName|lower }}_step_shadow.png"
+                                    alt="{{ scode.reward.user.firstName }}"
+                                    class="img-fluid lozad hero__illustration__img">
+                            {% endif %}
+                            <img id="hero_img_1_1"
+                                 src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png"
+                                 alt="Happy so-sure phone"
+                                 class="img-fluid lozad hero__illustration__img">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-6 offset-md-2 offset-lg-0">
+                    <div class="hero__intro">
+                        <h1 class="fit text-white mb-4">
+                            Protect your phone <br>
+                            <span class="sub text-deep-sky-blue-d text-nowrap">and get a £10 Amazon voucher 💰</span>
+                        </h1>
+                        <ul class="list-unstyled icn-fa-list mb-4">
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                24-72 repair or replacement
+                            </li>
+                            <li class="mb-3 h5 text-white">
+                                <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                Up to 80% no claim cashback
+                            </li>
+                            {% if scode is defined and scode %}
+                                <li class="h5 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    Use code <span class="promo-code"><u>{{ scode.code }}</u></span> at checkout 😎
+                                </li>
+                            {% endif %}
+                        </ul>
+                        <p class="lead text-columbia-blue-e mb-4">Instant quote & speedy sign-up ⚡ Second hand and refurbished phones covered! 🙌</p>
+                    </div>
+                    <div class="hero__controls pb-3">
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get a Quote</a>
+                        {% if scode is defined and scode %}
+                            <p class="text-center text-md-left mt-4">
+                                <small>
+                                    <a href="#terms_and_conditions"
+                                       data-toggle="modal"
+                                       data-target="#page_terms"
+                                       class="terms-link text-white">
+                                       <u>Term &amp; Conditions</u></a>
+                                </small>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="hero__illustration d-lg-none mt-4">
+                        {% if scode is defined and scode %}
+                            <img id="hero_img_overlay_1"
+                                 src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_overlay.png "
+                                 alt="Likes hearts stars smileys"
+                                 class="img-fluid lozad hero__illustration__img-mb">
+                            {% if scode.reward.type == 'Influencer' %}
+                                 <img id="hero_img_1_2"
+                                     src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.gender|lower }}_step_shadow.png"
+                                     alt="{{ scode.reward.user.firstName }}"
+                                     class="img-fluid lozad hero_{{ scode.reward.gender|lower }}_illustration__img">
+                             {% else %}
+                                 <img id="hero_img_1_2"
+                                     src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_{{ scode.reward.user.firstName|lower }}_step_shadow.png"
+                                     alt="{{ scode.reward.user.firstName }}"
+                                     class="img-fluid lozad hero__illustration__img">
+                             {% endif %}
+                            <img id="hero_img_1_1"
+                                 src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_hero_step_1_1.png"
+                                 alt="Happy so-sure phone"
+                                 class="img-fluid lozad hero__illustration__img-mb">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-sky.png" alt="so-sure - social insurance" class="img-fluid lozad animated jackInTheBox">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="video d-flex align-items-center justify-content-center">
+        <a href="#"
+           data-toggle="modal"
+           data-target="#sosure-video-modal"
+           data-src="https://www.youtube.com/embed/rF6zxVRT5Fc"
+           class="watch-video video__play">
+            <img src="{{ cdn_url }}/images/onexone.png"
+                 data-src="{{ cdn_url }}/images/rebrand/invite/so-sure_invite_reward_video_play_shadow.svg"
+                 alt="Play buttonn"
+                 class="lozad"
+                 width="120px"></a>
+        <img src="{{ cdn_url }}/images/onexone.png"
+             data-src="{{ cdn_url }}/images/rebrand/video/so-sure_video_background_woman_swoosh.png"
+             alt="Woman polaroid swoosh"
+             class="lozad video-img">
+    </section>
+
+    <section class="knowledge-base pb-lg-5">
+        <div class="container pb-5">
+            {% include 'AppBundle::Components/_knowledgeBase.html.twig' %}
+
+            <div class="end-cta end-cta__mobile d-md-none">
+                <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
+                <a href="#"
+                   class="btn btn-success btn-block-xs track-data get-a-quote"
+                   data-event="
+                   {% if scode is defined and scode and scode.policy %}
+                       scode-bottom-lets-start-btn-{{ user_code }}
+                   {% else %}
+                       scode-bottom-lets-start-btn
+                   {% endif %}">Let's start!</a>
+            </div>
+            <div class="end-cta end-cta__desktop d-none d-md-block">
+                <div class="cardbox cardbox-100">
+                    <div class="cardbox__body d-flex align-items-center justify-content-start">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png"
+                             alt="Happy so-sure phone"
+                             width="180px"
+                             class="lozad">
+                        <div class="ml-5">
+                            <h2 class="h4 mb-4"><span class="sub">Join {% if scode is defined and scode %}{{ scode.reward.user.firstName }} {{ scode.reward.user.lastName }}{% else %}so-sure{% endif %},</span> start your quote <span class="sub">and get mobile insurance that’s designed for you.</span></h2>
+                            <a href="#"
+                               class="btn btn-success btn-block-xs track-data get-a-quote"
+                               data-event="
+                                {% if scode is defined and scode and scode.policy %}
+                                    scode-bottom-lets-start-btn-{{ user_code }}
+                                {% else %}
+                                    scode-bottom-lets-start-btn
+                                {% endif %}
+                               ">Let's start!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="user_feedback" class="feedback py-lg-5">
+        <div class="container-large py-5">
+            {% include 'AppBundle::Components/_feedback.html.twig' %}
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Components/_knowledgeBaseModals.html.twig' %}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+
+    <div class="modal fade"
+         id="page_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="page_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Terms &amp; Conditions
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if scode is defined and scode and scode.reward %}
+                        <ol>
+                            <li>Enter the code <strong>{{ scode.code }}</strong> into your customer dashboard within 7 days once you have bought your policy.</li>
+                            <li>You will not be eligible for a voucher if the policy is cancelled or terminated within 60 days, or before the reward has been approved by so-sure.</li>
+                            <li>The voucher will not be sent in conjunction with any other offer, cashback, reward or discount code unless listed on this page, or with any other discounts.</li>
+                            <li>Once the above terms have been met, you will be sent an email to claim your voucher. If the voucher is unclaimed after 60 days from the date this email is sent, the claim will expire, and you will not receive your voucher.</li>
+                            <li>Once you have claimed your voucher, you will be subject to the terms and conditions of the voucher provider. Please read these carefully once you have received your voucher.</li>
+                        </ol>
+                        <p>Code expires: <strong>{{ scode.reward.expiryDate|date('d/m/Y') }}</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/invite-influencer.js') }}"></script>
+{% endblock %}
