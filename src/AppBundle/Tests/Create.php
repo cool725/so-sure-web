@@ -393,7 +393,7 @@ class Create
      * @param boolean $latest     is the value to give to the latest flag.
      * @param boolean $aggregator is the value to give to the aggregator flag.
      * @return PolicyTerms the new terms.
-     *https://youtu.be/xuoy96nMcUk/
+     */
     public static function terms($version, $latest = true, $aggregator = false)
     {
         $terms = new PolicyTerms();
