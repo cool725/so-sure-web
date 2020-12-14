@@ -140,10 +140,10 @@ class PromoCodeCommand extends ContainerAwareCommand
                 $rewardConnections = $reward->getConnections();
                 if ($rewardConnections) {
                     /** @var Connection $connection */
-                    foreach ($rewardConnections as $connection) {
+                    foreach ($rewardConnections as $idx2 => $connection) {
                         if (null !== $connection->getSourcePolicy()) {
-                            $policies[$idx]['policy'] = $connection->getSourcePolicy();
-                            $policies[$idx]['reward'] = $reward;
+                            $policies[$idx2]['policy'] = $connection->getSourcePolicy();
+                            $policies[$idx2]['reward'] = $reward;
                         }
                     }
                 }
@@ -177,14 +177,12 @@ class PromoCodeCommand extends ContainerAwareCommand
             /** @var SCode $scode */
             $scode = $reward->getSCode();
             if ($scode) {
-                if ($scode->isActive()) {
-                    if (null !== $promoCodesArr) {
-                        if (in_array($scode->getCode(), $promoCodesArr)) {
-                            $activeRewardsData[] = $reward;
-                        }
-                    } else {
+                if (null !== $promoCodesArr) {
+                    if (in_array($scode->getCode(), $promoCodesArr)) {
                         $activeRewardsData[] = $reward;
                     }
+                } else {
+                    $activeRewardsData[] = $reward;
                 }
             }
         }
@@ -224,9 +222,6 @@ class PromoCodeCommand extends ContainerAwareCommand
             $organisation = $influencer->getOrganisation();
         }
 
-
-
-
         /** @var SCode $scode */
         return [
             'First name'                      => $policy->getUser()->getName(),
@@ -248,6 +243,7 @@ class PromoCodeCommand extends ContainerAwareCommand
 
     private function sendCsv(array $filteredItems, OutputInterface $output)
     {
+
         /** create the csv tmp file */
         $fileName = "promocode-".time().".csv";
         $file = "/tmp/" . $fileName;
