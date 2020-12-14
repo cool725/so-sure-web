@@ -359,10 +359,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $claim->getHandlingTeam()),
                 sprintf('"%0.2f"', $claim->getTotalIncurred()),
                 sprintf('"%s"', $this->timezoneFormat($claim->getClosedDate(), $timezone, 'Y-m-d')),
-                sprintf(
-                    '"%s"',
-                    $claim->getFnolRisk() ? $claim->getFnolRisk() : null
-                ),
+                sprintf('"%s"', $claim->getRisk()),
                 sprintf('"%s"', $claim->getNetwork()),
                 sprintf('"%s"', $phonePolicy ? $phonePolicy->getPhone()->__toString() : '')
             ]);
