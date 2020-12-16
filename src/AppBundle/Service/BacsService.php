@@ -253,9 +253,9 @@ class BacsService
 
         if ($newFolder) {
             if ($debit) {
-                $sftp->chdir('Inbound/DD_Collections_helvetia');
+                $sftp->chdir('Inbound/DD_Collections_Helvetia');
             } else {
-                $sftp->chdir('Inbound/DC_Refunds_helvetia');
+                $sftp->chdir('Inbound/DC_Refunds_Helvetia');
             }
         } else {
             if ($debit) {

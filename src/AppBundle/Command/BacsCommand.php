@@ -19,6 +19,8 @@ use AppBundle\Service\BacsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\SequenceService;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\Helvetia;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -373,7 +375,7 @@ class BacsCommand extends ContainerAwareCommand
             $skipS3 = true;
         }
 
-        $wnow = \DateTime::createFromFormat('U', time());
+        $now = \DateTime::createFromFormat('U', time());
         $creditFilename = '';
         if ($policyType) {
             $creditFilename = sprintf(

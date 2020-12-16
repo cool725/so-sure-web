@@ -13,6 +13,8 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Classes\Salva;
+use AppBundle\Classes\Helvetia;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Exception\InvalidPaymentMethodException;
