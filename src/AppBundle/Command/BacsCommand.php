@@ -112,6 +112,18 @@ class BacsCommand extends ContainerAwareCommand
                 'Only run debits (and mandates)'
             )
             ->addOption(
+                'limit',
+                -1,
+                InputOption::VALUE_REQUIRED,
+                'maximum number of payments to include in submission'
+            )
+            ->addOption(
+                'underwriter',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'underwriter to create submission for. If helvetia, folder for helvetia submissions is used'
+            )
+            ->addOption(
                 'metadata',
                 null,
                 InputOption::VALUE_NONE,
@@ -133,7 +145,15 @@ class BacsCommand extends ContainerAwareCommand
         $onlyCredits = true === $input->getOption('only-credits');
         $onlyDebits = true === $input->getOption('only-debits');
         $metadata = true === $input->getOption('metadata');
+        $limit = intval($input->getOption('limit'));
+        $underwriter = $input->getOption('underwriter');
         $processingDate = null;
+        $policyType = null;
+        if ($underwriter == Salva::NAME) {
+            $policyType = 'salva_phone';
+        } elseif ($underwriter == Helvetia::NAME) {
+            $policyType = 'helvetia_phone';
+        }
 
         $now = \DateTime::createFromFormat('U', time());
         if ($this->isWeekendOrBankHoliday($now)) {
@@ -157,21 +177,21 @@ class BacsCommand extends ContainerAwareCommand
         }
 
         $debitPayments = [];
-        $runDebits = $this->bacsService->hasMandateOrPaymentDebit($processingDate);
+        $runDebits = $this->bacsService->hasMandateOrPaymentDebit($processingDate, $policyType);
         if ($onlyCredits) {
             $runDebits = false;
         }
         if ($runDebits) {
-            $debitPayments = $this->runMandatePaymentDebit($input, $output, $processingDate);
+            $debitPayments = $this->runMandatePaymentDebit($input, $output, $processingDate, $policyType, $limit);
         }
 
         $creditPayments = [];
-        $runCredits = $this->bacsService->hasPaymentCredits($processingDate);
+        $runCredits = $this->bacsService->hasPaymentCredits($processingDate, $policyType);
         if ($onlyDebits) {
             $runCredits = false;
         }
         if ($runCredits) {
-            $creditPayments = $this->runPaymentCredits($input, $output, $processingDate);
+            $creditPayments = $this->runPaymentCredits($input, $output, $processingDate, $policyType, $limit);
         }
 
         if ((count($debitPayments) == 0 && count($creditPayments) == 0) || $debug) {
@@ -192,8 +212,13 @@ class BacsCommand extends ContainerAwareCommand
         $output->writeln('Finished');
     }
 
-    private function runMandatePaymentDebit(InputInterface $input, OutputInterface $output, \DateTime $processingDate)
-    {
+    private function runMandatePaymentDebit(
+        InputInterface $input,
+        OutputInterface $output,
+        \DateTime $processingDate,
+        $policyType,
+        $limit
+    ) {
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
@@ -235,7 +260,9 @@ class BacsCommand extends ContainerAwareCommand
             $serialNumber,
             $data,
             false,
-            !$debug
+            !$debug,
+            $policyType,
+            $limit
         );
         $data['debits'] = count($debitPayments);
         if ($debug) {
@@ -250,9 +277,14 @@ class BacsCommand extends ContainerAwareCommand
         }
 
         $now = \DateTime::createFromFormat('U', time());
-        $filename = sprintf('%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
+        $filename = '';
+        if ($policyType) {
+            $filename = sprintf('%s-%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'), $policyType);
+        } else {
+            $filename = sprintf('%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
+        }
         if (!$skipSftp) {
-            $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename, true);
+            $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename, true, $underwriter == Helvetia::NAME);
             if ($debug) {
                 $output->writeln(json_encode($files));
             }
@@ -277,8 +309,13 @@ class BacsCommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function runPaymentCredits(InputInterface $input, OutputInterface $output, \DateTime $processingDate)
-    {
+    private function runPaymentCredits(
+        InputInterface $input,
+        OutputInterface $output,
+        \DateTime $processingDate,
+        $policyType,
+        $limit
+    ) {
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $debug = $input->getOption('debug');
@@ -319,10 +356,25 @@ class BacsCommand extends ContainerAwareCommand
             $skipS3 = true;
         }
 
-        $now = \DateTime::createFromFormat('U', time());
-        $creditFilename = sprintf('credits-%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
+        $wnow = \DateTime::createFromFormat('U', time());
+        $creditFilename = '';
+        if ($policyType) {
+            $creditFilename = sprintf(
+                'credits-%s-%s-%s.csv',
+                $processingDate->format('Ymd'),
+                $now->format('U'),
+                $policyType
+            );
+        } else {
+            $creditFilename = sprintf('credits-%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
+        }
         if (!$skipSftp) {
-            $files = $this->uploadSftp(implode(PHP_EOL, $creditPayments), $creditFilename, false);
+            $files = $this->uploadSftp(
+                implode(PHP_EOL, $creditPayments),
+                $creditFilename,
+                false,
+                $underwriter == Helvetia::NAME
+            );
             if ($debug) {
                 $output->writeln(json_encode($files));
             }
@@ -354,7 +406,7 @@ class BacsCommand extends ContainerAwareCommand
      * @return mixed
      * @throws \Exception
      */
-    public function uploadSftp($data, $filename, $debit = true)
+    public function uploadSftp($data, $filename, $debit = true, $newFolder = false)
     {
         return $this->bacsService->uploadSftp($data, $filename, $debit);
     }

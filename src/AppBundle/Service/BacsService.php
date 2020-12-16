@@ -1845,7 +1845,7 @@ class BacsService
         ]);
     }
 
-    public function hasMandateOrPaymentDebit(\DateTime $date = null)
+    public function hasMandateOrPaymentDebit(\DateTime $date = null, $policyType = null)
     {
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
@@ -1890,7 +1890,7 @@ class BacsService
         return false;
     }
 
-    public function hasPaymentCredits(\DateTime $date = null)
+    public function hasPaymentCredits(\DateTime $date = null, $policyType = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
@@ -2035,7 +2035,9 @@ class BacsService
     public function generatePaymentsDebits(
         \DateTime $date,
         &$metadata,
-        $update = true
+        $update = true,
+        $policyType = null,
+        $limit = -1
     ) {
         $payments = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
@@ -2044,7 +2046,11 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $this->warnings = [];
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs($advanceDate);
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+            $advanceDate,
+            $policyType,
+            $limit
+        );
         $metadata['debit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
@@ -2139,13 +2145,19 @@ class BacsService
 
     /**
      * Converts scheduled refunds for bacs into bacs payments.
-     * @param \DateTime $date     is the date to be considered the current time.
-     * @param array     $metadata is a list of metadata to be updated.
-     * @param boolean   $update   is whether to update the scheduled payments or only return the list of new payments.
+     * @param \DateTime   $date       is the date to be considered the current time.
+     * @param array       $metadata   is a list of metadata to be updated.
+     * @param boolean     $update     is whether to update the scheduled payments or only return the list of new payments.
+     * @param string|null $policyType is the type of policy to exclusively make credits for if any.
      * @return array containing the list of generated credit payments.
      */
-    public function generatePaymentsCredits(\DateTime $date, &$metadata, $update = true)
-    {
+    public function generatePaymentsCredits(
+        \DateTime $date,
+        &$metadata,
+        $update = true,
+        $policyType = null,
+        $limit = -1
+    ) {
         $payments = [];
         $this->warnings = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
@@ -2156,7 +2168,9 @@ class BacsService
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
             BacsPaymentMethod::class,
             $advanceDate,
-            false
+            false,
+            $policyType,
+            $limit
         );
         $metadata['credit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
@@ -2357,7 +2371,9 @@ class BacsService
         $serialNumber,
         &$metadata,
         $includeHeader = false,
-        $update = true
+        $update = true,
+        $policyType = null,
+        $limit = -1
     ) {
         $lines = [];
         $accounts = [];
@@ -2366,7 +2382,7 @@ class BacsService
             $lines[] = $this->getHeader();
         }
 
-        $payments = $this->generatePaymentsDebits($date, $metadata, $update);
+        $payments = $this->generatePaymentsDebits($date, $metadata, $update, $policyType, $limit);
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
@@ -2447,7 +2463,9 @@ class BacsService
         $serialNumber,
         &$metadata,
         $includeHeader = false,
-        $update = true
+        $update = true,
+        $policyType = null,
+        $limit = -1
     ) {
         $lines = [];
         if ($includeHeader) {

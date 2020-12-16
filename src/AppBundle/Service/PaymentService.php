@@ -114,24 +114,33 @@ class PaymentService
     public function getAllValidScheduledPaymentsForType(
         $type,
         \DateTime $scheduledDate = null,
-        $validateBillable = true
+        $validateBillable = true,
+        $policyType = null,
+        $limit = -1
     ) {
-        return $this->getAllValidScheduledPaymentsForTypes([$type], $scheduledDate, $validateBillable);
+        return $this->getAllValidScheduledPaymentsForTypes(
+            [$type],
+            $scheduledDate,
+            $validateBillable,
+            $policyType,
+            $limit
+        );
     }
 
     public function getAllValidScheduledPaymentsForTypes(
         $types,
         \DateTime $scheduledDate = null,
-        $validateBillable = true
+        $validateBillable = true,
+        $policyType = null,
+        $limit = -1
     ) {
         $results = [];
 
         /** @var ScheduledPaymentRepository $repo */
         $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $scheduledPayments = $repo->findScheduled($scheduledDate);
+        $scheduledPayments = $repo->findScheduled($scheduledDate, $policyType, $limit);
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
-
             $foundType = false;
             foreach ($types as $type) {
                 if ($scheduledPayment->getPolicy()->getPaymentMethod() instanceof $type) {
@@ -141,7 +150,6 @@ class PaymentService
             if (!$foundType) {
                 continue;
             }
-
             if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
@@ -155,10 +163,8 @@ class PaymentService
                     $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
                 ));
             }
-
             $results[] = $scheduledPayment;
         }
-
         return $results;
     }
 
@@ -166,15 +172,22 @@ class PaymentService
      * Finds all scheduled bacs payments up to the given date and can check if they are billable or not.
      * @param \DateTime|null $scheduledDate    is the date up to which the payments can be for.
      * @param boolean        $validateBillable is whether to exclude those that cannot be charged.
+     * @param string|null    $policyType       is a policy type to limit the search to.
+     * @param int            $limit            is a limit to put on the number of returned scheduled payments. If you
+     *                                         give a value less than zero it doesn't use it.
      * @return array containing the selected scheduled payments.
      */
-    public function getAllValidScheduledPaymentsForBacs(\DateTime $scheduledDate = null, $validateBillable = true)
-    {
+    public function getAllValidScheduledPaymentsForBacs(
+        \DateTime $scheduledDate = null,
+        $validateBillable = true,
+        $policyType = null,
+        $limit = -1
+    ) {
         $results = [];
         /** @var ScheduledPaymentRepository $repo */
         $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $this->labelBacs();
-        $scheduledPayments = $repo->findScheduledBacs($scheduledDate);
+        $this->labelBacs(null, $policyType);
+        $scheduledPayments = $repo->findScheduledBacs($scheduledDate, $policyType, $limit);
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
             if ($validateBillable && !$scheduledPayment->isBillable()) {
@@ -334,9 +347,10 @@ class PaymentService
 
     /**
      * Sets the field paymentType to bacs for all scheduled payments that reference a bacs payment.
-     * @param \DateTime|null $date is the date up to which to label scheduled payments.
+     * @param \DateTime|null $date       is the date up to which to label scheduled payments.
+     * @param string|null    $policyType is a type of policy to look for exclusively. If you give null it ignores.
      */
-    private function labelBacs($date = null)
+    private function labelBacs($date = null, $policyType = null)
     {
         $date = $date ?: new \DateTime();
         // Delete existing paymentType field.
@@ -347,12 +361,14 @@ class PaymentService
             ->execute();
         // Finds those with bacs policies.
         $scheduledIds = [];
-        $scheduleds = $this->dm->createQueryBuilder(ScheduledPayment::class)
+        $scheduledsQuery = $this->dm->createQueryBuilder(ScheduledPayment::class)
             ->hydrate(false)
             ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
-            ->field('scheduled')->lt($date)
-            ->getQuery()
-            ->execute();
+            ->field('scheduled')->lt($date);
+        if ($policyType) {
+            $scheduledsQuery->field('policy.policy_type')->equals($policyType);
+        }
+        $scheduleds = $scheduledsQuery->getQuery()->execute();
         foreach ($scheduleds as $scheduled) {
             $policy = $this->dm->createQueryBuilder(Policy::class)
                 ->hydrate(false)
