@@ -238,7 +238,7 @@ class BacsService
      * @return mixed
      * @throws \Exception
      */
-    public function uploadSftp($data, $filename, $debit = true)
+    public function uploadSftp($data, $filename, $debit = true, $newFolder = false)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
         file_put_contents($tmpFile, $data);
@@ -251,10 +251,18 @@ class BacsService
             throw new \Exception('Login Failed');
         }
 
-        if ($debit) {
-            $sftp->chdir('Inbound/DD_Collections');
+        if ($newFolder) {
+            if ($debit) {
+                $sftp->chdir('Inbound/DD_Collections_helvetia');
+            } else {
+                $sftp->chdir('Inbound/DC_Refunds_helvetia');
+            }
         } else {
-            $sftp->chdir('Inbound/DC_Refunds');
+            if ($debit) {
+                $sftp->chdir('Inbound/DD_Collections');
+            } else {
+                $sftp->chdir('Inbound/DC_Refunds');
+            }
         }
         $sftp->put($filename, $tmpFile, SFTP::SOURCE_LOCAL_FILE);
         $files = $sftp->nlist('.', false);
@@ -270,7 +278,6 @@ class BacsService
         if ($file && $file->getDate()) {
             return clone $file->getDate();
         }
-
         return null;
     }
 

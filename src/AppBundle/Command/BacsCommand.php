@@ -148,12 +148,12 @@ class BacsCommand extends ContainerAwareCommand
         $limit = intval($input->getOption('limit'));
         $underwriter = $input->getOption('underwriter');
         $processingDate = null;
-        $newFolder = $underwriter === Helvetia::NAME
+        $newFolder = $underwriter === Helvetia::NAME;
         $policyType = null;
         if ($underwriter == Salva::NAME) {
-            $policyType = 'salva_phone';
+            $policyType = 'salva-phone';
         } elseif ($underwriter == Helvetia::NAME) {
-            $policyType = 'helvetia_phone';
+            $policyType = 'helvetia-phone';
         }
 
         $now = \DateTime::createFromFormat('U', time());

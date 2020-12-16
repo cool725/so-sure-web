@@ -188,8 +188,8 @@ class PaymentService
         $repo = $this->dm->getRepository(ScheduledPayment::class);
         $this->labelBacs(null, $policyType);
         $scheduledPayments = $repo->findScheduledBacs($scheduledDate, $policyType, $limit);
+        /** @var ScheduledPayment $scheduledPayment */
         foreach ($scheduledPayments as $scheduledPayment) {
-            /** @var ScheduledPayment $scheduledPayment */
             if ($validateBillable && !$scheduledPayment->isBillable()) {
                 continue;
             }
