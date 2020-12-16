@@ -2482,6 +2482,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $policy->getPaymentMethod()->getType() :
                 null,
             'has_mobile_number_verified' => $this->getMobileNumberVerified(),
+            'is_optin' => $this->isOptedInForMarketing()
         ];
     }
 

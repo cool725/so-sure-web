@@ -726,6 +726,7 @@ class ApiController extends BaseController
             $googleId = $this->getDataString($data, 'google_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
             $attributionData = $data['attribution'];
+            $marketingOptIn = $this->getDataBool($data, 'optin');
             $userExists = $repo->existsUser(
                 $this->getDataString($data, 'email'),
                 $facebookId,
@@ -846,6 +847,9 @@ class ApiController extends BaseController
                 $attribution->setDeviceCategory($deviceCategory);
                 $attribution->setDeviceOS($deviceOS);
                 $user->setAttribution($attribution);
+            }
+            if ($marketingOptIn === true) {
+                $user->optInMarketing();
             }
             try {
                 $this->validateObject($user);
