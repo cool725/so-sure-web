@@ -241,11 +241,19 @@ class DefaultController extends BaseController
                 'affiliate_company' => 'Reward Gateway',
             ];
         } elseif ($request->get('_route') == 'money') {
+            // A/B Background Design
+            $backgroundExp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_MONEY_LANDING,
+                ['control', 'new-background'],
+                SixpackService::LOG_MIXPANEL_ALL
+            );
             $data = [
                 'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'money',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo_light.svg',
+                'exp_background_design' => $backgroundExp,
             ];
         } elseif ($request->get('_route') == 'money_free_phone_case') {
             $data = [

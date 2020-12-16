@@ -2,6 +2,11 @@
 
 {# Set vars #}
 {% set body_class = 'phone-insurance phone-insurance-make' %}
+{% set hero_class = '' %}
+{% if exp_background_design is defined and exp_background_design == 'new-background' %}
+    {% set body_class = 'phone-insurance phone-insurance-make money' %}
+    {% set hero_class = 'hero-money' %}
+{% endif %}
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
 {% set robots_noindex = is_noindex %}
@@ -40,7 +45,7 @@
 
 {% block body %}
 
-    <section class="hero">
+    <section class="hero {{ hero_class }}">
         <div class="container-large">
             <div class="row">
                 <div class="col-lg-6 offset-lg-1 order-lg-2">

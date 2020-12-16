@@ -168,6 +168,8 @@ class PurchaseController extends BaseController
         // A/B Test Homepage Design
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_COPY);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING_IPHONE);
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)

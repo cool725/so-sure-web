@@ -320,6 +320,7 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $noindex = false;
         $money = false;
+        $backgroundExp = 'none';
 
         $phones = $repo->findBy([
             'active' => true,
@@ -382,6 +383,13 @@ class PhoneInsuranceController extends BaseController
         $competitorData = new Competitors();
 
         if ($request->get('_route') == 'phone_insurance_make_money') {
+            // A/B Background Design
+            $backgroundExp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_MONEY_LANDING_IPHONE,
+                ['control', 'new-background'],
+                SixpackService::LOG_MIXPANEL_ALL
+            );
             $money = true;
             $noindex = true;
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
@@ -400,7 +408,8 @@ class PhoneInsuranceController extends BaseController
             'from_price' => $fromPrice,
             'competitor' => $competitorData::$competitorComparisonData,
             'money_version' => $money,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
+            'exp_background_design' => $backgroundExp,
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
