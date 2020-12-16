@@ -148,6 +148,7 @@ class BacsCommand extends ContainerAwareCommand
         $limit = intval($input->getOption('limit'));
         $underwriter = $input->getOption('underwriter');
         $processingDate = null;
+        $newFolder = $underwriter === Helvetia::NAME
         $policyType = null;
         if ($underwriter == Salva::NAME) {
             $policyType = 'salva_phone';
@@ -182,7 +183,14 @@ class BacsCommand extends ContainerAwareCommand
             $runDebits = false;
         }
         if ($runDebits) {
-            $debitPayments = $this->runMandatePaymentDebit($input, $output, $processingDate, $policyType, $limit);
+            $debitPayments = $this->runMandatePaymentDebit(
+                $input,
+                $output,
+                $processingDate,
+                $policyType,
+                $limit,
+                $newFolder
+            );
         }
 
         $creditPayments = [];
@@ -191,7 +199,14 @@ class BacsCommand extends ContainerAwareCommand
             $runCredits = false;
         }
         if ($runCredits) {
-            $creditPayments = $this->runPaymentCredits($input, $output, $processingDate, $policyType, $limit);
+            $creditPayments = $this->runPaymentCredits(
+                $input,
+                $output,
+                $processingDate,
+                $policyType,
+                $limit,
+                $newFolder
+            );
         }
 
         if ((count($debitPayments) == 0 && count($creditPayments) == 0) || $debug) {
@@ -217,7 +232,8 @@ class BacsCommand extends ContainerAwareCommand
         OutputInterface $output,
         \DateTime $processingDate,
         $policyType,
-        $limit
+        $limit,
+        $newFolder
     ) {
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
@@ -284,7 +300,7 @@ class BacsCommand extends ContainerAwareCommand
             $filename = sprintf('%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
         }
         if (!$skipSftp) {
-            $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename, true, $underwriter == Helvetia::NAME);
+            $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename, true, $newFolder);
             if ($debug) {
                 $output->writeln(json_encode($files));
             }
@@ -314,7 +330,8 @@ class BacsCommand extends ContainerAwareCommand
         OutputInterface $output,
         \DateTime $processingDate,
         $policyType,
-        $limit
+        $limit,
+        $newFolder
     ) {
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
@@ -369,12 +386,7 @@ class BacsCommand extends ContainerAwareCommand
             $creditFilename = sprintf('credits-%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
         }
         if (!$skipSftp) {
-            $files = $this->uploadSftp(
-                implode(PHP_EOL, $creditPayments),
-                $creditFilename,
-                false,
-                $underwriter == Helvetia::NAME
-            );
+            $files = $this->uploadSftp(implode(PHP_EOL, $creditPayments), $creditFilename, false, $newFolder);
             if ($debug) {
                 $output->writeln(json_encode($files));
             }
@@ -406,9 +418,9 @@ class BacsCommand extends ContainerAwareCommand
      * @return mixed
      * @throws \Exception
      */
-    public function uploadSftp($data, $filename, $debit = true, $newFolder = false)
+    public function uploadSftp($data, $filename, $debit = true, $newFolder)
     {
-        return $this->bacsService->uploadSftp($data, $filename, $debit);
+        return $this->bacsService->uploadSftp($data, $filename, $debit, $newFolder);
     }
 
     public function uploadS3($data, $filename, $serialNumber, \DateTime $date, $metadata = null)
