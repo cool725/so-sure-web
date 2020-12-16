@@ -417,10 +417,11 @@ class BacsCommand extends ContainerAwareCommand
      * @param mixed   $data
      * @param string  $filename
      * @param boolean $debit
+     * @param boolean $newFolder
      * @return mixed
      * @throws \Exception
      */
-    public function uploadSftp($data, $filename, $debit = true, $newFolder)
+    public function uploadSftp($data, $filename, $debit = true, $newFolder = false)
     {
         return $this->bacsService->uploadSftp($data, $filename, $debit, $newFolder);
     }

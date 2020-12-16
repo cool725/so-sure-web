@@ -2154,7 +2154,8 @@ class BacsService
      * Converts scheduled refunds for bacs into bacs payments.
      * @param \DateTime   $date       is the date to be considered the current time.
      * @param array       $metadata   is a list of metadata to be updated.
-     * @param boolean     $update     is whether to update the scheduled payments or only return the list of new payments.
+     * @param boolean     $update     is whether to update the scheduled payments or only return the list of new
+     *                                payments.
      * @param string|null $policyType is the type of policy to exclusively make credits for if any.
      * @return array containing the list of generated credit payments.
      */
