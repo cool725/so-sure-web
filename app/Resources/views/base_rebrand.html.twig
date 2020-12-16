@@ -9,6 +9,13 @@
         {% endif %}
         {% include '::meta_rebrand.html.twig' %}
         <title>{% block title %}so-sure{% endblock %}</title>
+        {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
+            <script async>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env|raw }}';f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
+        {% endif %}
         <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
         {% block cssPage %}{% endblock %}
         {% block meta %}{% endblock %}
@@ -96,13 +103,6 @@
                 {% block gtm_data %}{% endblock %}
             });
         </script>
-        {% if exclude_remote_scripts is not defined or not exclude_remote_scripts %}
-            <script async>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl+'{{ ga_tag_manager_env|raw }}';f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
-        {% endif %}
         {% block remotestylesheets %}{% endblock %}
         {% block metaend %}{% endblock %}
     </head>
