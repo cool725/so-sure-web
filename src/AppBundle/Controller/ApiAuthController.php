@@ -2339,6 +2339,7 @@ class ApiAuthController extends BaseController
             $email = $this->getDataString($data, 'email');
             $facebookId = $this->getDataString($data, 'facebook_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
+            $marketingOptIn = $this->getDataBool($data, 'optin');
 
             // only need to check for dups for these fields if they have changed
             $emailCheck = null;
@@ -2409,6 +2410,12 @@ class ApiAuthController extends BaseController
                 }
                 $scode->addAcceptor($user);
                 $userChanged = true;
+            }
+
+            if ($marketingOptIn === true) {
+                $user->optInMarketing();
+            } elseif ($marketingOptIn === false) {
+                $user->optOutMarketing();
             }
 
             if ($this->isDataStringPresent($data, 'sns_endpoint')) {
