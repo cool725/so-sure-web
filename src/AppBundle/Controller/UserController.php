@@ -1337,6 +1337,8 @@ class UserController extends BaseController
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY);
         // A/B Test Opt In Purchased - Not needed but might as well record it
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OPT_IN_COPY);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING_IPHONE);
 
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {

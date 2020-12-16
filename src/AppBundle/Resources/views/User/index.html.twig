@@ -551,7 +551,7 @@
         </div>
     </div>
 
-    {# Page Modal #}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
     {% if app.session.has('oauth2Flow') and app.session.get('oauth2Flow') == 'starling' %}
         {% include 'AppBundle::User/_starlingModal.html.twig' %}
     {% endif %}
