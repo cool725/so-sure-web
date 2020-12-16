@@ -115,9 +115,10 @@ class BacsCommand extends ContainerAwareCommand
             )
             ->addOption(
                 'limit',
-                -1,
+                'l',
                 InputOption::VALUE_REQUIRED,
-                'maximum number of payments to include in submission'
+                'maximum number of payments to include in submission',
+                -1
             )
             ->addOption(
                 'underwriter',
