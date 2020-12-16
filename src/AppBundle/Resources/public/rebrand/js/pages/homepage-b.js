@@ -10,6 +10,7 @@ require('bootstrap/js/dist/tab');
 
 // Require components
 require('../components/table.js');
+require('../components/modalVideo.js');
 require('../components/phone-search-combined.js');
 require('../components/reviews-v2.js');
 
