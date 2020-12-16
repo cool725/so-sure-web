@@ -238,7 +238,7 @@ class BacsService
      * @return mixed
      * @throws \Exception
      */
-    public function uploadSftp($data, $filename, $debit = true)
+    public function uploadSftp($data, $filename, $debit = true, $newFolder = false)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
         file_put_contents($tmpFile, $data);
@@ -251,10 +251,18 @@ class BacsService
             throw new \Exception('Login Failed');
         }
 
-        if ($debit) {
-            $sftp->chdir('Inbound/DD_Collections');
+        if ($newFolder) {
+            if ($debit) {
+                $sftp->chdir('Inbound/DD_Collections_Helvetia');
+            } else {
+                $sftp->chdir('Inbound/DC_Refunds_Helvetia');
+            }
         } else {
-            $sftp->chdir('Inbound/DC_Refunds');
+            if ($debit) {
+                $sftp->chdir('Inbound/DD_Collections');
+            } else {
+                $sftp->chdir('Inbound/DC_Refunds');
+            }
         }
         $sftp->put($filename, $tmpFile, SFTP::SOURCE_LOCAL_FILE);
         $files = $sftp->nlist('.', false);
@@ -270,7 +278,6 @@ class BacsService
         if ($file && $file->getDate()) {
             return clone $file->getDate();
         }
-
         return null;
     }
 
@@ -1845,21 +1852,26 @@ class BacsService
         ]);
     }
 
-    public function hasMandateOrPaymentDebit(\DateTime $date = null)
+    public function hasMandateOrPaymentDebit(\DateTime $date = null, $policyType = null)
     {
         /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
-        $policies = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
+        $condition = ['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT];
+        if ($policyType) {
+            $condition['policy_type'] = $policyType;
+        }
+        $policies = $repo->findBy($condition);
         if (count($policies) > 0) {
             return true;
         }
 
-        // TODO: Eventually remove User query
-        /** @var UserRepository $repo */
-        $repo = $this->dm->getRepository(User::class);
-        $users = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
-        if (count($users) > 0) {
-            return true;
+        if ($policyType === null) {
+            /** @var UserRepository $repo */
+            $repo = $this->dm->getRepository(User::class);
+            $users = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
+            if (count($users) > 0) {
+                return true;
+            }
         }
         if ($this->redis->hlen(self::KEY_BACS_CANCEL) > 0) {
             return true;
@@ -1874,7 +1886,8 @@ class BacsService
 
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
             BacsPaymentMethod::class,
-            $advanceDate
+            $advanceDate,
+            $policyType
         );
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
@@ -1883,26 +1896,23 @@ class BacsService
             if (!$bacs || !$bacs->getBankAccount()) {
                 continue;
             }
-
             return true;
         }
-
         return false;
     }
 
-    public function hasPaymentCredits(\DateTime $date = null)
+    public function hasPaymentCredits(\DateTime $date = null, $policyType = null)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
-
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
-
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
             BacsPaymentMethod::class,
             $advanceDate,
-            false
+            false,
+            $policyType
         );
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
@@ -2035,7 +2045,9 @@ class BacsService
     public function generatePaymentsDebits(
         \DateTime $date,
         &$metadata,
-        $update = true
+        $update = true,
+        $policyType = null,
+        $limit = -1
     ) {
         $payments = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
@@ -2044,7 +2056,11 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $this->warnings = [];
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs($advanceDate);
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+            $advanceDate,
+            $policyType,
+            $limit
+        );
         $metadata['debit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
@@ -2139,13 +2155,20 @@ class BacsService
 
     /**
      * Converts scheduled refunds for bacs into bacs payments.
-     * @param \DateTime $date     is the date to be considered the current time.
-     * @param array     $metadata is a list of metadata to be updated.
-     * @param boolean   $update   is whether to update the scheduled payments or only return the list of new payments.
+     * @param \DateTime   $date       is the date to be considered the current time.
+     * @param array       $metadata   is a list of metadata to be updated.
+     * @param boolean     $update     is whether to update the scheduled payments or only return the list of new
+     *                                payments.
+     * @param string|null $policyType is the type of policy to exclusively make credits for if any.
      * @return array containing the list of generated credit payments.
      */
-    public function generatePaymentsCredits(\DateTime $date, &$metadata, $update = true)
-    {
+    public function generatePaymentsCredits(
+        \DateTime $date,
+        &$metadata,
+        $update = true,
+        $policyType = null,
+        $limit = -1
+    ) {
         $payments = [];
         $this->warnings = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
@@ -2156,7 +2179,9 @@ class BacsService
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
             BacsPaymentMethod::class,
             $advanceDate,
-            false
+            false,
+            $policyType,
+            $limit
         );
         $metadata['credit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
@@ -2357,7 +2382,9 @@ class BacsService
         $serialNumber,
         &$metadata,
         $includeHeader = false,
-        $update = true
+        $update = true,
+        $policyType = null,
+        $limit = -1
     ) {
         $lines = [];
         $accounts = [];
@@ -2366,7 +2393,7 @@ class BacsService
             $lines[] = $this->getHeader();
         }
 
-        $payments = $this->generatePaymentsDebits($date, $metadata, $update);
+        $payments = $this->generatePaymentsDebits($date, $metadata, $update, $policyType, $limit);
         foreach ($payments as $payment) {
             /** @var BacsPayment $payment */
             $policy = $payment->getPolicy();
@@ -2447,14 +2474,16 @@ class BacsService
         $serialNumber,
         &$metadata,
         $includeHeader = false,
-        $update = true
+        $update = true,
+        $policyType = null,
+        $limit = -1
     ) {
         $lines = [];
         if ($includeHeader) {
             $lines[] = $this->getHeader();
         }
 
-        $credits = $this->generatePaymentsCredits($date, $metadata, $update);
+        $credits = $this->generatePaymentsCredits($date, $metadata, $update, $policyType, $limit);
 
         $metadata['credit-amount'] = 0;
         foreach ($credits as $payment) {

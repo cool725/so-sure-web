@@ -49,30 +49,46 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
         return $total;
     }
 
-    public function findScheduledBacs(\DateTime $date = null)
+    /**
+     * Finds all scheduled payments labelled as being for bacs.
+     * @param \DateTime|null $date       is the maximum date they can be scheduled for to be found.
+     * @param string|null    $policyType is an optional type of policy to limit for.
+     * @param int            $limit      is the maximum to return. If less than zero not used.
+     * @return Cursor over the found scheduled payments.
+     */
+    public function findScheduledBacs(\DateTime $date = null, $policyType = null, $limit = -1)
     {
         $date = $date ?: new \DateTime();
-        return $this->createQueryBuilder()
+        $query = $this->createQueryBuilder()
             ->field('payment')->equals(null)
             ->field('scheduled')->lt($date)
             ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
-            ->field('paymentType')->equals('bacs')
-            ->getQuery()
-            ->execute();
+            ->field('paymentType')->equals('bacs');
+        if ($policyType) {
+            $query->field('policy.policy_type')->equals($policyType);
+        }
+        if ($limit > 0) {
+            $query->limit($limit);
+        }
+        return $query->getQuery()->execute();
     }
 
-    public function findScheduled(\DateTime $date = null)
+    public function findScheduled(\DateTime $date = null, $policyType = null, $limit = -1)
     {
         if (!$date) {
             $date = \DateTime::createFromFormat('U', time());
         }
-
-        return $this->createQueryBuilder()
+        $query = $this->createQueryBuilder()
             ->field('payment')->equals(null)
             ->field('scheduled')->lt($date)
-            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
-            ->getQuery()
-            ->execute();
+            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED);
+        if ($policyType) {
+            $query->field('policy.policy_type')->equals($policyType);
+        }
+        if ($limit > 0) {
+            $query->limit($limit);
+        }
+        return $query->getQuery()->execute();
     }
 
     /**
