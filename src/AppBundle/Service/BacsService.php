@@ -2058,6 +2058,7 @@ class BacsService
         $this->warnings = [];
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
             $advanceDate,
+            true,
             $policyType,
             $limit
         );

@@ -188,7 +188,7 @@ class PaymentService
         $results = [];
         /** @var ScheduledPaymentRepository $repo */
         $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $this->labelBacs(null, $policyType);
+        $this->labelBacs($scheduledDate, $policyType);
         $scheduledPayments = $repo->findScheduledBacs($scheduledDate, $policyType, $limit);
         /** @var ScheduledPayment $scheduledPayment */
         foreach ($scheduledPayments as $scheduledPayment) {
@@ -375,6 +375,7 @@ class PaymentService
             $policy = $this->dm->createQueryBuilder(Policy::class)
                 ->hydrate(false)
                 ->field('_id')->equals($scheduled['policy']['$id'])
+                ->field('paymentMethod.type')->equals('bacs')
                 ->getQuery()
                 ->getSingleResult();
             if ($policy) {
