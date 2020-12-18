@@ -1719,8 +1719,12 @@ class Claim
         $phonePolicy = $this->getPolicy();
         $date = $date ?: new \DateTime();
         $picsure = $phonePolicy->isPicSureValidated();
-        $delta = $date->diff($phonePolicy->getUser()->getFirstPolicy()->getStart());
-        $age = $delta->y * 12 + $delta->m;
+        $age = 0;
+        $firstPolicy = $phonePolicy->getUser()->getFirstPolicy();
+        if ($firstPolicy) {
+            $delta = $date->diff($firstPolicy->getStart());
+            $age = $delta->y * 12 + $delta->m;
+        }
         if ($age <= 5) {
             return $picsure ? self::RISK_RED : self::RISK_BLACK;
         } elseif ($age <= 11) {

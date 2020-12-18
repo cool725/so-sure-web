@@ -37,6 +37,12 @@ class SixpackService
     // Exp 4
     const EXPERIMENT_OPT_IN_COPY = 'User Opt In copy';
 
+    // Exp 5
+    const EXPERIMENT_MONEY_LANDING = 'Money Landing Page Background';
+
+    // Exp 6
+    const EXPERIMENT_MONEY_LANDING_IPHONE = 'Money iPhone Landing Page Background';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const KPI_POLICY_PURCHASE = 'policy-purchase';
@@ -149,6 +155,10 @@ class SixpackService
         self::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
         // Exp 4
         self::EXPERIMENT_OPT_IN_COPY,
+        // Exp 5
+        self::EXPERIMENT_MONEY_LANDING,
+        // Exp 6
+        self:: EXPERIMENT_MONEY_LANDING_IPHONE,
     ];
 
     public static $authExperiments = [
@@ -191,6 +201,10 @@ class SixpackService
         self::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
         // Exp 4
         self::EXPERIMENT_OPT_IN_COPY,
+        // Exp 5
+        self::EXPERIMENT_MONEY_LANDING,
+        // Exp 6
+        self:: EXPERIMENT_MONEY_LANDING_IPHONE,
     ];
 
     /** @var LoggerInterface */

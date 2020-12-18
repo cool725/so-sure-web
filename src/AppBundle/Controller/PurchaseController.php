@@ -168,6 +168,8 @@ class PurchaseController extends BaseController
         // A/B Test Homepage Design
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_COPY);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING_IPHONE);
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
@@ -405,7 +407,7 @@ class PurchaseController extends BaseController
                 $purchaseFormValid = $purchaseForm->isValid();
 
                 // If there's a file upload, the form submit event bind should have already run the ocr
-                // and data object has the imei/serial
+                // and data object has the imei
                 // however, we need to re-create the form so the fields will display the updated data
                 if ($filename = $purchase->getFile()) {
                     $purchaseForm = $this->get('form.factory')

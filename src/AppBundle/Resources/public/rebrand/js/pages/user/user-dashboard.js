@@ -5,6 +5,7 @@ require('../../../sass/pages/user/user-dashboard.scss');
 // Require BS component(s)
 
 // Require components
+require('../../components/modalVideo.js');
 let ProgressBar = require('progressbar.js');
 
 import tracking from '../../common/track-data.js';
