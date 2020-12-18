@@ -407,7 +407,7 @@ class PurchaseController extends BaseController
                 $purchaseFormValid = $purchaseForm->isValid();
 
                 // If there's a file upload, the form submit event bind should have already run the ocr
-                // and data object has the imei/serial
+                // and data object has the imei
                 // however, we need to re-create the form so the fields will display the updated data
                 if ($filename = $purchase->getFile()) {
                     $purchaseForm = $this->get('form.factory')

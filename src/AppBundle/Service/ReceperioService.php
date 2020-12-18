@@ -675,6 +675,7 @@ class ReceperioService extends BaseImeiService
 
         try {
             $result = $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
+            $this->logger->info("Imei check has been performed for: " . $imei);
             return $result;
         } catch (ReciperoManualProcessException $e) {
             // If apple serial number doesn't work, try imei to get a non-memory match
@@ -691,7 +692,7 @@ class ReceperioService extends BaseImeiService
                         // Don't pass exception as param (string ok) here. Message missing/confusing in rollbar
                         $this->logger->info(
                             sprintf(
-                                "Unable to recheck iPhone using imei as serial number '%s'. Exception: %s",
+                                "Unable to recheck iPhone using imei number '%s'. Exception: %s",
                                 $imei,
                                 $e->getMessage()
                             )
@@ -809,6 +810,8 @@ class ReceperioService extends BaseImeiService
 
             return true;
         }
+        $now = \DateTime::createFromFormat('U', time());
+        $this->logger->info("Running " . __METHOD__ . ' at ' . $now->format('Y-m-d H:i:s'));
 
         try {
             $key = sprintf(self::KEY_MAKEMODEL_FORMAT, $serialNumber);
@@ -833,7 +836,7 @@ class ReceperioService extends BaseImeiService
                 $data = json_decode($response, true);
                 $this->redis->setex($key, self::MAKEMODEL_CACHE_TIME, serialize($data));
 
-                $now = \DateTime::createFromFormat('U', time());
+
                 $logKey = sprintf('receperio:makemodel:%s:%s:%s', $this->storeId, $now->format('Y'), $now->format('d'));
                 $this->redis->zincrby($logKey, 1, $serialNumber);
 
@@ -863,19 +866,6 @@ class ReceperioService extends BaseImeiService
     {
         // This case occurs occasionally
         if (isset($data['makes']) && count($data['makes']) == 0) {
-            // // @codingStandardsIgnoreStart
-            // $this->mailer->send(
-            //     sprintf('Empty Data Response for %s', $serialNumber),
-            //     'tech+ops@so-sure.com',
-            //     sprintf(
-            //         "A recent make/model query via %s for %s returned a successful response but without any data in the makes field. If apple, verify at https://sndeep.info/en?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?",
-            //         $this->viaText(),
-            //         $serialNumber,
-            //         $serialNumber,
-            //         $serialNumber
-            //     )
-            // );
-            // @codingStandardsIgnoreEnd
             $this->statsd->increment('recipero.makeModelEmptyMakes');
 
             // Sending email to process, so no need to log exception
@@ -893,13 +883,6 @@ class ReceperioService extends BaseImeiService
             ), ReciperoManualProcessException::NO_MAKES);
         }
 
-        // if (count($data['makes']) != 1) {
-        //     throw new ReciperoManualProcessException(sprintf(
-        //         "Unable to check serial number (multiple makes) %s. Data: %s",
-        //         $serialNumber,
-        //         json_encode($data)
-        //     ), ReciperoManualProcessException::MULTIPLE_MAKES);
-        // }
     }
 
     private function validateMakeModeResponseModels($serialNumber, $makeData, $data)
@@ -1046,7 +1029,10 @@ class ReceperioService extends BaseImeiService
 
         $this->validateMakeModeResponseModel($phone, $serialNumber, $modelData, $data, $isApple);
 
+
+        $this->logger->info("Apple phone detected: " . $serialNumber);
         if ($isApple) {
+            $this->logger->info("Apple phone validated: " . $serialNumber);
             $result = $this->isSameApplePhone(
                 $phone,
                 $serialNumber,
@@ -1062,6 +1048,7 @@ class ReceperioService extends BaseImeiService
                 }
             }
         } else {
+            $this->logger->info("Non Apple phone validated: " . $serialNumber);
             $result =  $this->isSameNonApplePhone(
                 $phone,
                 $serialNumber,
