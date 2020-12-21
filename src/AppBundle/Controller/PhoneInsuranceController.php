@@ -320,7 +320,6 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $noindex = false;
         $money = false;
-        $backgroundExp = 'none';
 
         $phones = $repo->findBy([
             'active' => true,
@@ -383,13 +382,6 @@ class PhoneInsuranceController extends BaseController
         $competitorData = new Competitors();
 
         if ($request->get('_route') == 'phone_insurance_make_money') {
-            // A/B Background Design
-            $backgroundExp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_MONEY_LANDING_IPHONE,
-                ['control', 'new-background'],
-                SixpackService::LOG_MIXPANEL_ALL
-            );
             $money = true;
             $noindex = true;
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
@@ -408,8 +400,7 @@ class PhoneInsuranceController extends BaseController
             'from_price' => $fromPrice,
             'competitor' => $competitorData::$competitorComparisonData,
             'money_version' => $money,
-            'is_noindex' => $noindex,
-            'exp_background_design' => $backgroundExp,
+            'is_noindex' => $noindex
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -488,14 +479,6 @@ class PhoneInsuranceController extends BaseController
         // Track Page
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE);
 
-        // A/B Pricing Messaging Experiment
-        $manufacturerLandingUsps = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-            ['current', 'same-as-homepage'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         // Model template control
         // Hyphenate Model for images/template
         $modelHyph = str_replace('+', '-', $model);
@@ -555,7 +538,6 @@ class PhoneInsuranceController extends BaseController
             'available_images' => $availableImages,
             'hide_section' => $hideSection,
             'competitor' => $competitorData::$competitorComparisonData,
-            'manufacturer_landing_usps' => $manufacturerLandingUsps,
             'money_version' => $money,
             'is_noindex' => $noindex
         ];
@@ -623,9 +605,6 @@ class PhoneInsuranceController extends BaseController
 
         // In-store
         $instore = $this->get('session')->get('store');
-
-        // A/B Manufacturers Landing Pages USPs
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');
