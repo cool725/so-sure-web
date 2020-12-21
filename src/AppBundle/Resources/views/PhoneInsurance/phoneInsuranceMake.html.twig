@@ -132,6 +132,13 @@
                             <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
                             Watch our Video
                         </a>
+                        {% if money_version is defined and money_version == true  %}
+                            <p class="mt-4 mb-0 text-white">
+                                <span class="h6">Xmas Offer:</span>
+                                £10 Amazon Voucher 🎁 use code MONEY10 at checkout.
+                                <a href="#page_terms" data-toggle="modal" data-target="#page_terms" class="text-white">Terms &amp; Conditions</a>
+                            </p>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-8 offset-md-2 offset-lg-0 col-lg-5 order-lg-1 d-flex align-items-center">
@@ -251,6 +258,35 @@
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
+    {% if money_version is defined and money_version == true  %}
+        <div class="modal fade"
+            id="page_terms"
+            tabindex="-1" role="dialog"
+            aria-labelledby="page_terms"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Terms &amp; Conditions
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <i class="fal fa-times text-white"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ol>
+                            <li>Enter the code MONEY10 into your customer dashboard within 7 days once you have bought your policy.</li>
+                            <li>You will not be eligible for a voucher if the policy is cancelled or terminated within 60 days, or before the reward has been approved by so-sure.</li>
+                            <li>The voucher will not be sent in conjunction with any other offer, cashback, reward or discount code unless listed on this page, or with any other discounts.</li>
+                            <li>Once the above terms have been met, you will be sent an email to claim your voucher. If the voucher is unclaimed after 60 days from the date this email is sent, the claim will expire, and you will not receive your voucher.</li>
+                            <li>Once you have claimed your voucher, you will be subject to the terms and conditions of the voucher provider. Please read these carefully once you have received your voucher.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}
 
