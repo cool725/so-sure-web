@@ -1330,8 +1330,6 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING);
-
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));

@@ -26,7 +26,7 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    const EXPERIMENT_MONEY_LANDING = 'Money Landing Page Background';
+    // const EXPERIMENT_MONEY_LANDING = 'Money Landing Page Background';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -132,12 +132,13 @@ class SixpackService
         'User Opt In copy',
         'Money iPhone Landing Page Background',
         'Homepage Copy',
-        'Manufacturers Landing Pages USPs'
+        'Manufacturers Landing Pages USPs',
+        'Money Landing Page Background'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_MONEY_LANDING,
+        // self::EXPERIMENT_MONEY_LANDING,
     ];
 
     public static $authExperiments = [
@@ -173,7 +174,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_MONEY_LANDING,
+        // self::EXPERIMENT_MONEY_LANDING,
     ];
 
     /** @var LoggerInterface */

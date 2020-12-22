@@ -157,8 +157,6 @@ class PurchaseController extends BaseController
         // TEMP - As using skip add extra event
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
 
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MONEY_LANDING);
-
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
