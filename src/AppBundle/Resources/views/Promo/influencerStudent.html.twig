@@ -7,7 +7,7 @@
 
 {% block title %}
     {% if scode is defined and scode and scode.user and not custom %}
-        Connect with {{ scode.reward.user.firstName }} &amp; get &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} in your reward pot | so-sure
+        Connect with {{ scode.reward.user.firstName }} &amp; get a &pound;10 Amazon Voucher | so-sure
     {% else %}
         Promo code {{ use_code }} not found! | so-sure
     {% endif %}
@@ -58,7 +58,7 @@
                         <ul class="list-unstyled icn-fa-list mb-4">
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                                24-72 repair or replacement
+                                24-72 hour repair or replacement
                             </li>
                             <li class="mb-3 h5 text-white">
                                 <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>

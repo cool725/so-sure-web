@@ -106,7 +106,7 @@
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">3</div></span>
                                     <div class="h4 text-white">Get an extra &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} cash back with the code <span class="promo-code">{{ scode.code }}</span></div>
                                 </div>
-                            {% elseif custom == 'hotukdeals' %}
+                            {% elseif custom == 'hotukdeals' or custom == 'groupon' %}
                                 <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} Amazon voucher 💰</span></h1>
                                 <ul class="list-unstyled icn-fa-list mb-5 hero-usps">
                                     <li class="mb-4 text-white">
@@ -148,7 +148,7 @@
                         </div>
                         <div class="hero__controls">
                             <div class="mb-4"><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Quote me</a></div>
-                            {% if custom == 'uswitch' or custom == 'hotukdeals' %}
+                            {% if custom == 'uswitch' or custom == 'hotukdeals' or custom == 'groupon' %}
                                 <div class="partner-logo text-center d-md-flex align-items-md-center mb-4">
                                     <div class="text-white mb-2 mb-md-0 mr-md-2">In partnership with:</div>
                                     {% if custom == 'uswitch' %}
@@ -161,6 +161,12 @@
                                             <img src="{{ cdn_url }}/images/onexone.png"
                                                     data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_hotukdeals-logo.svg" alt="hotukdeals"
                                                     title="so-sure in partnership with hotukdeals"
+                                                    width="200px"
+                                                    class="lozad">
+                                    {% elseif custom == 'groupon' %}
+                                            <img src="{{ cdn_url }}/images/onexone.png"
+                                                    data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_groupon-white-logo.svg" alt="groupon"
+                                                    title="so-sure in partnership with groupon"
                                                     width="200px"
                                                     class="lozad">
                                     {% endif %}

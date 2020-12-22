@@ -26,22 +26,7 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
-
-    // Exp 2
-    const EXPERIMENT_HOMEPAGE_COPY = 'Homepage Copy';
-
-    // Exp 3
-    const EXPERIMENT_MARKETING_HOMEPAGE_COPY = 'Marketing Homepage Copy';
-
-    // Exp 4
-    const EXPERIMENT_OPT_IN_COPY = 'User Opt In copy';
-
-    // Exp 5
     const EXPERIMENT_MONEY_LANDING = 'Money Landing Page Background';
-
-    // Exp 6
-    const EXPERIMENT_MONEY_LANDING_IPHONE = 'Money iPhone Landing Page Background';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -143,22 +128,16 @@ class SixpackService
         'Homepage Design V2',
         'Homepage Design V3',
         'Marketing Homepage Design',
-        'Homepage Design and Copy'
+        'Homepage Design and Copy',
+        'User Opt In copy',
+        'Money iPhone Landing Page Background',
+        'Homepage Copy',
+        'Manufacturers Landing Pages USPs'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-        // Exp 2
-        self::EXPERIMENT_HOMEPAGE_COPY,
-        // Exp 3
-        self::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
-        // Exp 4
-        self::EXPERIMENT_OPT_IN_COPY,
-        // Exp 5
         self::EXPERIMENT_MONEY_LANDING,
-        // Exp 6
-        self:: EXPERIMENT_MONEY_LANDING_IPHONE,
     ];
 
     public static $authExperiments = [
@@ -194,17 +173,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-        // Exp 2
-        self::EXPERIMENT_HOMEPAGE_COPY,
-        // Exp 3
-        self::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
-        // Exp 4
-        self::EXPERIMENT_OPT_IN_COPY,
-        // Exp 5
         self::EXPERIMENT_MONEY_LANDING,
-        // Exp 6
-        self:: EXPERIMENT_MONEY_LANDING_IPHONE,
     ];
 
     /** @var LoggerInterface */

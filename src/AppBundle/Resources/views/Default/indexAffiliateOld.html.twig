@@ -63,7 +63,14 @@
                 {% else %}
                     <h1 class="mb-2 text-white h2">Mobile Insurance that's Simply Better</h1>
                     <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
-                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-4 mb-5 mx-auto lozad">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-3 mb-2 mx-auto lozad">
+                {% endif %}
+                {% if affiliate_page == 'money' %}
+                    <p class="text-white">
+                        <span class="h6">Xmas Offer:</span>
+                        £10 Amazon Voucher 🎁 use code MONEY10 at checkout.
+                        <a href="#page_terms" data-toggle="modal" data-target="#page_terms" class="text-white">Terms &amp; Conditions</a>
+                    </p>
                 {% endif %}
             </div>
             <div class="hero__controls mb-4">
@@ -109,24 +116,28 @@
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
     <div class="modal fade"
-         id="page_terms"
-         tabindex="-1" role="dialog"
-         aria-labelledby="page_terms"
-         aria-hidden="true">
+        id="page_terms"
+        tabindex="-1" role="dialog"
+        aria-labelledby="page_terms"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        Free phone case
+                        Terms &amp; Conditions
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <i class="fal fa-times text-white"></i>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h5>Terms and conditions</h5>
-                    <p>1 case per new so-sure customer. Code for the free Layer Case only issued 14-16 days after the policy purchase date and only if the customer has made no claims.</p>
-                    <p>Promotion is valid from 23rd January 2019 until 15th February 2019. so-sure reserves the right to cancel or amend the promotion and these terms and conditions without notice and at any time.</p>
+                    <ol>
+                        <li>Enter the code MONEY10 into your customer dashboard within 7 days once you have bought your policy.</li>
+                        <li>You will not be eligible for a voucher if the policy is cancelled or terminated within 60 days, or before the reward has been approved by so-sure.</li>
+                        <li>The voucher will not be sent in conjunction with any other offer, cashback, reward or discount code unless listed on this page, or with any other discounts.</li>
+                        <li>Once the above terms have been met, you will be sent an email to claim your voucher. If the voucher is unclaimed after 60 days from the date this email is sent, the claim will expire, and you will not receive your voucher.</li>
+                        <li>Once you have claimed your voucher, you will be subject to the terms and conditions of the voucher provider. Please read these carefully once you have received your voucher.</li>
+                    </ol>
                 </div>
             </div>
         </div>

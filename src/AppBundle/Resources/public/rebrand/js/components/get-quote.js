@@ -54,4 +54,9 @@ $(function() {
         }
     });
 
+    if (window.location.search.indexOf('showquote=true') > -1) {
+        open = !open;
+        getQuote(open);
+    }
+
 });
