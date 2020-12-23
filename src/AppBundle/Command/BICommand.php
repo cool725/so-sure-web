@@ -53,6 +53,9 @@ class BICommand extends ContainerAwareCommand
 {
     use DateTrait;
 
+    const STREAM_MONTHLY = "monthly";
+    const STREAM_YEARLY = "yearly";
+
     const EXPORT_OPTIONS = [
         'policies',
         'claims',
@@ -231,25 +234,49 @@ class BICommand extends ContainerAwareCommand
             '"Make"',
             '"Model"',
             '"Memory"',
-            '"Current Monthly Cost"',
-            '"Current Yearly Cost"',
+            '"DMG"',
+            '"Loss"',
+            '"Theft"',
+            '"Ext Warranty"',
+            '"Warranty"',
+            '"Before DMG"',
+            '"Before Loss"',
+            '"Before Theft"',
+            '"Before Ext Warranty"',
+            '"Before Warranty"',
             '"Original Retail Price"',
             '"Current Retail Price"'
         ]);
+        $count = 0;
         foreach ($phones as $phone) {
             /** @var Phone $phone */
-            $monthlyPrice = $phone->getCurrentMonthlyPhonePrice();
-            $yearlyPrice = $phone->getCurrentYearlyPhonePrice();
+            $mPhonePrice = $phone->getCurrentPhonePrice(self::STREAM_MONTHLY);
+            $originalExcess = $mPhonePrice ? $mPhonePrice->getExcess()->toPriceArray() : false;
+
             $lines[] = implode(',', [
                 sprintf('"%s"', $phone->getMake()),
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
-                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
-                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : ''),
+
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ''),
+
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ''),
+
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice())
             ]);
+            $count++;
         }
+
+        $this->logger->info('Added ' . $count . ' phones to csv');
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'phones.csv');
         }
