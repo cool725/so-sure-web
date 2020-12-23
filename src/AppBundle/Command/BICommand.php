@@ -247,7 +247,7 @@ class BICommand extends ContainerAwareCommand
         foreach (self::VARIANT_STREAM_TYPE_HEADERS as $idx => $header) {
             $headerTypes .= '"'. $header . '",';
         }
-        $headerTypes = rtrim($headerTypes, ',"');
+        $headerTypes = rtrim($headerTypes, ',');
         $count = 0;
 
         $lines[$count] = implode(',', [
@@ -282,31 +282,38 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
 
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ""),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ""),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : ""),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ""),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ""),
 
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ""),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ""),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ""),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ""),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ""),
 
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice()),
-                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
-                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : '')
+                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ""),
+                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : "")
             ]);
 
             foreach (Subvariant::VARIANT_TYPES as $header => $type) {
+
+                $mString = ($monthlyPrice) ? $monthlyPrice->getMonthlyPremiumPrice() : "N/A for " . $header;
+                $yString = ($yearlyPrice) ? $yearlyPrice->getYearlyPremiumPrice() : "N/A for " . $header;
+                $mGString = ($monthlyPrice) ? $monthlyPrice->getGwp() : "N/A for " . $header;
+                $yGString = ($yearlyPrice) ? $yearlyPrice->getGwp() : "N/A for " . $header;
+
                 $stringValues = implode(',', [
-                    sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : 'N/A for ' . $header),
-                    sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : 'N/A for ' . $header),
-                    sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getGwp() : 'N/A for ' . $header),
-                    sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getGwp() : 'N/A for ' . $header)
+                    sprintf('"%0.2f"', $mString),
+                    sprintf('"%0.2f"', $yString),
+                    sprintf('"%0.2f"', $mGString),
+                    sprintf('"%0.2f"', $yGString),
                 ]);
+
                 $lines[$count] .= $stringValues;
             }
         }
