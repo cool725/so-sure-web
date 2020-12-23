@@ -12,6 +12,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class Subvariant
 {
+    const VARIANT_TYPES = [
+      "Essential" => "essentials",
+      "Damage" => "damage"
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
