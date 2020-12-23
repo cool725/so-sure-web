@@ -266,6 +266,8 @@ class BICommand extends ContainerAwareCommand
             '"Before Warranty"',
             '"Original Retail Price"',
             '"Current Retail Price"',
+            '"Current Monthly Cost"',
+            '"Current Yearly Cost"',
             $headerTypes
         ]);
 
@@ -282,23 +284,27 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
 
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ""),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ""),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : ""),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ""),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ""),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ''),
 
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ""),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ""),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ""),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ""),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ""),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ''),
 
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice()),
-                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ""),
-                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : "")
+                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
+                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : '') . ','
             ]);
+
+            if($count > 0) {
+                $lines[$count] = trim($lines[$count],'"');
+            }
 
             foreach (Subvariant::VARIANT_TYPES as $header => $type) {
 
@@ -314,8 +320,9 @@ class BICommand extends ContainerAwareCommand
                     sprintf('"%0.2f"', $yGString),
                 ]);
 
-                $lines[$count] .= $stringValues;
+                $lines[$count] .= $stringValues . ',';
             }
+
         }
 
         $this->logger->info('Added ' . $count . ' phones to csv');
