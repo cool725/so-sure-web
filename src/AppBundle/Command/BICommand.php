@@ -266,8 +266,10 @@ class BICommand extends ContainerAwareCommand
             '"Before Warranty"',
             '"Original Retail Price"',
             '"Current Retail Price"',
-            '"Current Monthly Cost"',
-            '"Current Yearly Cost"',
+            '"MOB Monthly Cost"',
+            '"MOB Yearly Cost"',
+            '"MOB Monthly GWP"',
+            '"MOB Yearly GWP"',
             $headerTypes
         ]);
 
@@ -299,14 +301,19 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice()),
                 sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
-                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : '') . ','
+                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : ''),
+                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getGwp() : ''),
+                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getGwp() : '') . ',',
+
             ]);
 
             foreach (Subvariant::VARIANT_TYPES as $header => $type) {
-                $mString = ($monthlyPrice) ? $monthlyPrice->getMonthlyPremiumPrice() : "N/A for " . $header;
-                $yString = ($yearlyPrice) ? $yearlyPrice->getYearlyPremiumPrice() : "N/A for " . $header;
+                $submonthlyPrice = $phone->getCurrentMonthlyPhonePrice(null, $type);
+                $subyearlyPrice = $phone->getCurrentYearlyPhonePrice(null, $type);
+                $mString = ($submonthlyPrice) ? $submonthlyPrice->getMonthlyPremiumPrice() : "N/A for " . $header;
+                $yString = ($subyearlyPrice) ? $subyearlyPrice->getYearlyPremiumPrice() : "N/A for " . $header;
                 $mGString = ($monthlyPrice) ? $monthlyPrice->getGwp() : "N/A for " . $header;
-                $yGString = ($yearlyPrice) ? $yearlyPrice->getGwp() : "N/A for " . $header;
+                $yGString = ($subyearlyPrice) ? $subyearlyPrice->getGwp() : "N/A for " . $header;
 
                 $stringValues = implode(',', [
                     sprintf('"%0.2f"', $mString),
