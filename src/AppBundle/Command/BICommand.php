@@ -302,10 +302,6 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : '') . ','
             ]);
 
-            if ($count > 0) {
-                $lines[$count] = trim($lines[$count], '"');
-            }
-
             foreach (Subvariant::VARIANT_TYPES as $header => $type) {
                 $mString = ($monthlyPrice) ? $monthlyPrice->getMonthlyPremiumPrice() : "N/A for " . $header;
                 $yString = ($yearlyPrice) ? $yearlyPrice->getYearlyPremiumPrice() : "N/A for " . $header;
