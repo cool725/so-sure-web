@@ -300,7 +300,6 @@ class PurchaseController extends BaseController
             ) : null,
             'postcode' => 'comma',
             'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
-            // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
             'validation_required' => $validationRequired
         );

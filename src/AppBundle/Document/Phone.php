@@ -119,6 +119,12 @@ class Phone
     protected $retailPrices = [];
 
     /**
+     * List of competitor pricing
+     * @MongoDB\EmbedMany(targetDocument="AppBundle\Document\PhoneCompetitorPrice")
+     */
+    protected $competitorPrices = [];
+
+    /**
      * @Assert\Range(min=0,max=2000)
      * @MongoDB\Field(type="float")
      */
@@ -612,6 +618,43 @@ class Phone
     public function getPhonePrices()
     {
         return $this->phonePrices;
+    }
+
+    public function addCompetitorPrice(PhoneCompetitorPrice $competitorPrice)
+    {
+        $this->competitorPrices[] = $competitorPrice;
+    }
+
+    /**
+     * Gives you all of the competitor prices.
+     * @return array of competitor prices.
+     */
+    public function getCompetitorPrices()
+    {
+        return $this->competitorPrices;
+    }
+
+    public function removeCompetitorPrices()
+    {
+        $this->competitorPrices = [];
+    }
+
+    public function getHighestCompetitorDifference()
+    {
+        $currentPrice = $this->getCurrentMonthlyPhonePrice();
+        if (!$currentPrice) {
+            return 0;
+        }
+        $price = $currentPrice->getMonthlyPremiumPrice();
+        $delta = 0;
+        foreach ($this->getCompetitorPrices() as $competitor) {
+            $competitorPrice = $competitor->getPrice();
+            $competitorDelta = ($competitorPrice - $price) / $competitorPrice * 100;
+            if ($competitorDelta > $delta) {
+                $delta = $competitorDelta;
+            }
+        }
+        return $delta;
     }
 
     public function addPhonePrice(PhonePrice $phonePrice)

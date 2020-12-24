@@ -41,6 +41,7 @@ class Feature
     const FEATURE_APP_SHARE_GAME = 'app-share-game';
     const FEATURE_EXIT_POPUP = 'exit-popup';
     const FEATURE_BACS_PAYMENT_OPTION = 'allow-bacs-payment-method';
+    const FEATURE_COMPETITOR_PRICING = 'competitor-prices';
 
     // All Features should be here
     public static $features = [
@@ -69,6 +70,7 @@ class Feature
         self::FEATURE_APP_SHARE_GAME,
         self::FEATURE_EXIT_POPUP,
         self::FEATURE_BACS_PAYMENT_OPTION,
+        self::FEATURE_COMPETITOR_PRICING,
     ];
 
     // @codingStandardsIgnoreStart
@@ -97,7 +99,8 @@ class Feature
         self::FEATURE_REFERRAL => 'Referral Bonus',
         self::FEATURE_APP_SHARE_GAME => 'Share game in app',
         self::FEATURE_EXIT_POPUP => 'Show user exit popup lead form with promo code',
-        self::FEATURE_BACS_PAYMENT_OPTION => 'Allow user to pay via BACs in the funnel'
+        self::FEATURE_BACS_PAYMENT_OPTION => 'Allow user to pay via BACs in the funnel',
+        self::FEATURE_COMPETITOR_PRICING => 'Show competitor pricing section in funnel if available',
     ];
     // @codingStandardsIgnoreEnd
 
