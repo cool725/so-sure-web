@@ -312,7 +312,7 @@ class BICommand extends ContainerAwareCommand
                 $subyearlyPrice = $phone->getCurrentYearlyPhonePrice(null, $type);
                 $mString = ($submonthlyPrice) ? $submonthlyPrice->getMonthlyPremiumPrice() : "N/A for " . $header;
                 $yString = ($subyearlyPrice) ? $subyearlyPrice->getYearlyPremiumPrice() : "N/A for " . $header;
-                $mGString = ($monthlyPrice) ? $monthlyPrice->getGwp() : "N/A for " . $header;
+                $mGString = ($submonthlyPrice) ? $submonthlyPrice->getGwp() : "N/A for " . $header;
                 $yGString = ($subyearlyPrice) ? $subyearlyPrice->getGwp() : "N/A for " . $header;
 
                 $stringValues = implode(',', [
