@@ -1,5 +1,33 @@
 {% if phone is defined %}{% set device = phone %}{% else %}{% set device = policy.phone %}{% endif %}
 
+{% if feature_enabled('competitor-prices') %}
+    {% if phone.getCompetitorPrices|length %}
+        {% set prices_higher = false %}
+        {% for cPrice in phone.getCompetitorPrices %}
+            {% if cPrice.price > monthly %}
+                {% set prices_higher = true %}
+            {% endif %}
+        {% endfor %}
+        {% if prices_higher %}
+            <div class="policy__info mx-4 mx-lg-5 py-5">
+                <h2 class="h4 text-deep-sky-blue-d mb-4">How we look against others 💵</h2>
+                <div class="h5 text-white mb-3">SO-SURE is up to {{ phone.getHighestCompetitorDifference|number_format(0, '.', ',') }}% cheaper</div>
+                <ul class="list-unstyled icn-fa-list mb-3">
+                    {% for cPrice in phone.getCompetitorPrices %}
+                        {% if cPrice.price > monthly  %}
+                            <li class="text-white {% if not loop.last %}mb-3{% endif %}">
+                                <i class="fas fa-circle fa-xs"></i>
+                                {{ cPrice.competitor }} - &pound;{{ cPrice.price }} per month
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <p class="text-white mb-0"><small><em>Info correct as of Dec 18 2020</em></small></p>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endif %}
+
 <div class="policy__info mx-4 mx-lg-5 py-5">
     <h2 class="h4 text-deep-sky-blue-d mb-4">Easy, Fast & Great Value 🤗</h2>
     <ul class="list-unstyled icn-fa-list mb-0">
