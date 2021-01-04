@@ -135,15 +135,25 @@ class PromoCodeCommand extends ContainerAwareCommand
                 $output->writeln('Nothing to process. Ending');
                 return;
             }
+            $influencerRepo = $this->dm->getRepository(Influencer::class);
+            $organisation = null;
             /** @var Reward $reward */
             foreach ($activeScodeRewards as $idx => $reward) {
                 $rewardConnections = $reward->getConnections();
+
+                /** @var Influencer $influencer */
+                $influencer = $influencerRepo->find($reward->getId());
+                if (null !== $influencer) {
+                    $organisation = $influencer->getOrganisation();
+                }
+
                 if ($rewardConnections) {
                     /** @var Connection $connection */
                     foreach ($rewardConnections as $idx2 => $connection) {
                         if (null !== $connection->getSourcePolicy()) {
                             $policies[$idx2]['policy'] = $connection->getSourcePolicy();
                             $policies[$idx2]['reward'] = $reward;
+                            $policies[$idx2]['organisation'] = $organisation;
                         }
                     }
                 }
@@ -173,7 +183,6 @@ class PromoCodeCommand extends ContainerAwareCommand
         $activeRewardsData = [];
         /** @var Reward $reward */
         foreach ($rewards as $reward) {
-
             /** @var SCode $scode */
             $scode = $reward->getSCode();
             if ($scode) {
@@ -194,6 +203,7 @@ class PromoCodeCommand extends ContainerAwareCommand
         $policy = null;
         $reward = null;
         $scode = null;
+        $organisation = null;
         foreach ($resultSet as $type => $collection) {
             if ($type === 'policy') {
                 $policy = $collection;
@@ -201,6 +211,10 @@ class PromoCodeCommand extends ContainerAwareCommand
 
             if ($type === 'reward') {
                 $reward = $collection;
+            }
+
+            if ($type === 'organisation') {
+                $organisation = $collection;
             }
         }
         /** @var Policy $policy */
@@ -212,25 +226,15 @@ class PromoCodeCommand extends ContainerAwareCommand
             $scode = $reward->getSCode();
         }
 
-
-        $organisation = null;
-
-        $influencerRepo = $this->dm->getRepository(Influencer::class);
-        /** @var Influencer $influencer */
-        $influencer = $influencerRepo->find($reward->getId());
-        if ($influencer instanceof Influencer) {
-            $organisation = $influencer->getOrganisation();
-        }
-
-        /** @var SCode $scode */
+        /** @var Policy $policy */
         return [
-            'First name'                      => $policy->getUser()->getName(),
+            'First name'                      => $policy->getUser()->getFirstName(),
             'Last name'                       => $policy->getUser()->getLastName(),
             'Email'                           => $policy->getUser()->getEmail(),
             'Attribution'                     => $policy->getUser()->getAttribution() ?
-                                                 $policy->getUser()->getAttribution()->getCampaignName() : 'N/A',
+                $policy->getUser()->getAttribution()->getCampaignName() : 'N/A',
             'Latest attributions'             => $policy->getUser()->getLatestAttribution() ?
-                                                 $policy->getUser()->getLatestAttribution()->getReferer() : 'N/A',
+                $policy->getUser()->getLatestAttribution()->getCampaignName() : 'N/A',
             'Number of claims'                => $policy->getUser()->getTotalClaims(),
             'Policy Status'                   => $policy->getStatus(),
             'Promo Code'                      => $scode ? $scode->getCode() : '',

@@ -157,18 +157,6 @@ class PurchaseController extends BaseController
         // TEMP - As using skip add extra event
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
 
-        // A/B Test Opt In Copy
-        $optInCopyExperiment = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_OPT_IN_COPY,
-            ['copy-a', 'copy-b'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
-        // A/B Test Homepage Design
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_COPY);
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY);
-
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
@@ -273,10 +261,6 @@ class PurchaseController extends BaseController
 
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
-                    if ($user->isOptedInForMarketing()) {
-                        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OPT_IN_COPY);
-                    }
-
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
                             $this->generateUrl('purchase_step_phone_id', [
@@ -316,10 +300,8 @@ class PurchaseController extends BaseController
             ) : null,
             'postcode' => 'comma',
             'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
-            // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
-            'validation_required' => $validationRequired,
-            'opt_in_copy_experiment' => $optInCopyExperiment
+            'validation_required' => $validationRequired
         );
 
         return $this->render($template, $data);
@@ -405,7 +387,7 @@ class PurchaseController extends BaseController
                 $purchaseFormValid = $purchaseForm->isValid();
 
                 // If there's a file upload, the form submit event bind should have already run the ocr
-                // and data object has the imei/serial
+                // and data object has the imei
                 // however, we need to re-create the form so the fields will display the updated data
                 if ($filename = $purchase->getFile()) {
                     $purchaseForm = $this->get('form.factory')
@@ -918,14 +900,6 @@ class PurchaseController extends BaseController
             $this->setSessionQuotePhone($request, $phone);
         }
 
-        // A/B Test Opt In Copy
-        $optInCopyExperiment = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_OPT_IN_COPY,
-            ['copy-a', 'copy-b'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPledgeType::class, $purchase)
@@ -952,9 +926,6 @@ class PurchaseController extends BaseController
                             $user->optInMarketing();
                         } else {
                             $user->optOutMarketing();
-                        }
-                        if ($user->isOptedInForMarketing() === true) {
-                            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OPT_IN_COPY);
                         }
                         $dm->flush();
                     }
@@ -992,7 +963,6 @@ class PurchaseController extends BaseController
             'instore' => $instore,
             'validation_required' => $validationRequired,
             'aggregator' => $this->get('session')->get('aggregator'),
-            'opt_in_copy_experiment' => $optInCopyExperiment,
             'show_opt_in' => $user->isOptedInForMarketing()
         );
 

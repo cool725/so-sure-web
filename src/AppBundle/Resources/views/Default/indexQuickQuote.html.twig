@@ -57,16 +57,10 @@
 
     <section class="hero">
         <div class="container-large">
-            {% if homepage_exp is defined and homepage_exp == 'curent-new-copy' %}
-                <h1 class="text-white text-center fit">
-                    Mobile Insurance <br class="d-lg-none"><span class="sub text-deep-sky-blue-d">That’s a Win-Win 🙌</span>
-                </h1>
-                <p class="lead mb-4 text-white text-center">Great value if you need us — Money back if you don’t!</p>
-            {% else %}
-                <h1 class="mb-4 text-white text-center fit">
-                    <span class="sub text-deep-sky-blue-d">Simply Better</span><br class="d-lg-none"> Mobile Insurance
-                </h1>
-            {% endif %}
+            <h1 class="text-white text-center fit">
+                Mobile Insurance <br class="d-lg-none"><span class="sub text-deep-sky-blue-d">That’s a Win-Win 🙌</span>
+            </h1>
+            <p class="lead mb-4 text-white text-center">Great value if you need us — Money back if you don’t!</p>
             <div class="row">
                 <div class="col-md-6 d-none d-md-block">
                     <div class="hero__illustration mt-md-4">
@@ -84,14 +78,12 @@
                 <div class="col-md-6 col-lg-5 offset-lg-1">
                     {% if phone is defined and phone %}
                         {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
-                            'type': homepage_exp,
-                            'homepage_exp': homepage_exp,
+                            'type': 'homepage',
                             'id': phone.id }|merge(app.request.query.all)
                         )) }}
                     {% else %}
                         {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
-                            'type': homepage_exp,
-                            'homepage_exp': homepage_exp }|merge(app.request.query.all)
+                            'type': 'homepage' }|merge(app.request.query.all)
                         )) }}
                     {% endif %}
                 </div>

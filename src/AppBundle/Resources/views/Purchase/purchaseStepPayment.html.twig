@@ -37,27 +37,6 @@
     <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
 {% endblock %}
 
-{% block gtm_data %}
-    {% if phone %}
-        ,
-        'event': 'checkout',
-        'ecommerce': {
-            'checkout': {
-                'actionField': {'step': 4},
-                'products': [{
-                    'id': '{{ phone.id }}',
-                    'name': '{{ phone.make }} {{ phone.model }}',
-                    'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
-                    'brand': '{{ phone.make }}',
-                    'category': '{{ phone.make }}',
-                    'variant': '{{ phone.memory }}GB',
-                    'quantity': 1
-                }]
-            }
-        }
-    {% endif %}
-{% endblock %}
-
 {% block body %}
     <section class="qpw">
         <div class="d-lg-flex">

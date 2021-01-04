@@ -1,7 +1,4 @@
 {% set opt_in_copy = 'Yes please, I\'d like to receive offers or promotions' %}
-{% if opt_in_copy_experiment is defined and opt_in_copy_experiment == 'copy-b' %}
-    {% set opt_in_copy = 'I\'d like to receive offers or promotions' %}
-{% endif %}
 {{ form_start(purchase_form, {'attr': {
     'data-toggle': 'validator',
     'class': 'validate-form form-400',

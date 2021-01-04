@@ -101,20 +101,11 @@ class DefaultController extends BaseController
 
         $competitorData = new Competitors();
 
-        // A/B Test Homepage Design
-        $homepageDesign = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_COPY,
-            ['control', 'curent-new-copy'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             'competitor' => $competitorData::$competitorComparisonData,
-            'is_noindex' => $noindex,
-            'homepage_exp' => $homepageDesign
+            'is_noindex' => $noindex
         );
 
         return $this->render($template, $data);
@@ -144,22 +135,13 @@ class DefaultController extends BaseController
         // Is indexed?
         $noindex = true;
 
-        // A/B Test Homepage Design
-        $homepageDesign = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY,
-            ['control', 'curent-new-copy'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-            'page' => 'Homepage - '.$homepageDesign.' - LP']);
+            'page' => 'Homepage Marketing - LP']);
 
         $data = array(
             'referral'  => $referral,
             'competitor' => $competitorData::$competitorComparisonData,
-            'is_noindex' => $noindex,
-            'homepage_exp' => $homepageDesign
+            'is_noindex' => $noindex
         );
 
         return $this->render($template, $data);

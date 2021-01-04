@@ -36,27 +36,6 @@
     <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
 {% endblock %}
 
-{% block gtm_data %}
-    {% if phone %}
-        ,
-        'event': 'checkout',
-        'ecommerce': {
-            'checkout': {
-                'actionField': {'step': 3},
-                'products': [{
-                    'id': '{{ phone.id }}',
-                    'name': '{{ phone.make }} {{ phone.model }}',
-                    'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
-                    'brand': '{{ phone.make }}',
-                    'category': '{{ phone.make }}',
-                    'variant': '{{ phone.memory }}GB',
-                    'quantity': 1
-                }]
-            }
-        }
-    {% endif %}
-{% endblock %}
-
 {% block body %}
     <section class="qpw">
         <div class="d-lg-flex">
@@ -79,7 +58,7 @@
                 {# Sub Content #}
                 <div class="qpw__sub__container">
                     <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
-                        {% include 'AppBundle::Purchase/_formStepPledge.html.twig' with {'opt_in_copy_experiment': opt_in_copy_experiment } %}
+                        {% include 'AppBundle::Purchase/_formStepPledge.html.twig' %}
                     </div>
                 </div>
                 {# Mobile Info #}

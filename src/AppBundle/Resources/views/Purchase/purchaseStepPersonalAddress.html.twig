@@ -48,21 +48,15 @@
 {% block gtm_data %}
     {% if phone %}
         ,
-        'event': 'checkout',
-        'ecommerce': {
-            'checkout': {
-                'actionField': {'step': 1},
-                'products': [{
-                    'id': '{{ phone.id }}',
-                    'name': '{{ phone.make }} {{ phone.model }}',
-                    'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
-                    'brand': '{{ phone.make }}',
-                    'category': '{{ phone.make }}',
-                    'variant': '{{ phone.memory }}GB',
-                    'quantity': 1
-                }]
-            }
+        'event': 'quote',
+        'quote': {
+            'id': '{{ phone.id }}',
+            'name': '{{ phone.make }} {{ phone.model }}',
+            'category': '{{ phone.make }}',
+            'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
+            'quantity': 1
         }
+
     {% endif %}
 {% endblock %}
 
@@ -88,7 +82,7 @@
                 {# Sub Content #}
                 <div class="qpw__sub__container">
                     <div class="qpw__sub px-4 pb-4 pt-5 p-lg-5">
-                        {% include 'AppBundle::Purchase/_formStepPersonalAddress.html.twig' with {'opt_in_copy_experiment': opt_in_copy_experiment } %}
+                        {% include 'AppBundle::Purchase/_formStepPersonalAddress.html.twig' %}
                     </div>
                 </div>
                 {# Mobile Info #}

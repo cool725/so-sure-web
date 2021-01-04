@@ -1330,14 +1330,6 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        // A/B Manufacturers Landing Pages USPs
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
-        // A/B Test Homepage Design
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_COPY);
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MARKETING_HOMEPAGE_COPY);
-        // A/B Test Opt In Purchased - Not needed but might as well record it
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_OPT_IN_COPY);
-
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));

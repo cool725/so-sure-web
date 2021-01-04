@@ -2319,9 +2319,16 @@ datatables.net-dt@^1.10.19:
     datatables.net "1.10.19"
     jquery ">=1.7"
 
-datatables.net@1.10.19, datatables.net@^1.10.19:
+datatables.net@1.10.19:
   version "1.10.19"
   resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.10.19.tgz#97a1ed41c85e62d61040603481b59790a172dd1f"
+  dependencies:
+    jquery ">=1.7"
+
+datatables.net@^1.10.22:
+  version "1.10.22"
+  resolved "https://registry.yarnpkg.com/datatables.net/-/datatables.net-1.10.22.tgz#975d4ffb1eb40dec5fb772eaf93796ec1a948b55"
+  integrity sha512-ujn8GvkQIBYzYH54XY7OrI0Zb35TKRd9ABYfbnXgBfwTGIFT6UsmXrfHU5Yk+MSDoF0sDu2TB+31V6c+zUZ0Pw==
   dependencies:
     jquery ">=1.7"
 
@@ -4184,11 +4191,7 @@ jquery-validation@^1.17.0:
   dependencies:
     jquery "^1.7 || ^2.0 || ^3.1"
 
-jquery@>=1.11, "jquery@>=1.4.2 <4", "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
-
-jquery@>=1.7:
+jquery@>=1.11, "jquery@>=1.4.2 <4", jquery@>=1.7, "jquery@^1.7 || ^2.0 || ^3.1", jquery@^3.0, jquery@^3.3.1:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.0.tgz#8de513fa0fa4b2c7d2e48a530e26f0596936efdf"
 

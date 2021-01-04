@@ -14,6 +14,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Reward;
 use AppBundle\Document\SCode;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Subvariant;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
@@ -52,6 +53,20 @@ use AppBundle\Helpers\CsvHelper;
 class BICommand extends ContainerAwareCommand
 {
     use DateTrait;
+
+    const STREAM_MONTHLY = "monthly";
+    const STREAM_YEARLY = "yearly";
+
+    const VARIANT_STREAM_TYPE_HEADERS = [
+        "ess_monthly" => "ESS Price Monthly",
+        "ess_yearly" => "ESS Price Yearly",
+        "ess_monthly_gwp" => "ESS Monthly GWP",
+        "ess_yearly_gwp" => "ESS Yearly GWP",
+        "dmg_monthly" => "DMG Price Monthly",
+        "dmg_yearly" => "DMG Price Yearly",
+        "dmg_monthly_gwp" => "DMG Monthly GWP",
+        "dmg_yearly_gwp" => "DMG Yearly GWP",
+    ];
 
     const EXPORT_OPTIONS = [
         'policies',
@@ -227,29 +242,91 @@ class BICommand extends ContainerAwareCommand
         $repo = $this->dm->getRepository(Phone::class);
         $phones = $repo->findActive()->getQuery()->execute();
         $lines = [];
-        $lines[] = implode(',', [
+
+        $headerTypes = null;
+        foreach (self::VARIANT_STREAM_TYPE_HEADERS as $idx => $header) {
+            $headerTypes .= '"'. $header . '",';
+        }
+        $headerTypes = rtrim($headerTypes, ',');
+        $count = 0;
+
+        $lines[$count] = implode(',', [
             '"Make"',
             '"Model"',
             '"Memory"',
-            '"Current Monthly Cost"',
-            '"Current Yearly Cost"',
+            '"DMG"',
+            '"Loss"',
+            '"Theft"',
+            '"Ext Warranty"',
+            '"Warranty"',
+            '"Before DMG"',
+            '"Before Loss"',
+            '"Before Theft"',
+            '"Before Ext Warranty"',
+            '"Before Warranty"',
             '"Original Retail Price"',
-            '"Current Retail Price"'
+            '"Current Retail Price"',
+            '"MOB Monthly Cost"',
+            '"MOB Yearly Cost"',
+            '"MOB Monthly GWP"',
+            '"MOB Yearly GWP"',
+            $headerTypes
         ]);
+
         foreach ($phones as $phone) {
+            $count++;
             /** @var Phone $phone */
+            $mPhonePrice = $phone->getCurrentPhonePrice(self::STREAM_MONTHLY);
+            $originalExcess = $mPhonePrice ? $mPhonePrice->getExcess()->toPriceArray() : false;
             $monthlyPrice = $phone->getCurrentMonthlyPhonePrice();
             $yearlyPrice = $phone->getCurrentYearlyPhonePrice();
-            $lines[] = implode(',', [
+
+            $lines[$count] = implode(',', [
                 sprintf('"%s"', $phone->getMake()),
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
+
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ''),
+
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ''),
+
+                sprintf('"%0.2f"', $phone->getInitialPrice()),
+                sprintf('"%0.2f"', $phone->getCurrentRetailPrice()),
                 sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
                 sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : ''),
-                sprintf('"%0.2f"', $phone->getInitialPrice()),
-                sprintf('"%0.2f"', $phone->getCurrentRetailPrice())
+                sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getGwp() : ''),
+                sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getGwp() : '') . ',',
+
             ]);
+
+            foreach (Subvariant::VARIANT_TYPES as $header => $type) {
+                $submonthlyPrice = $phone->getCurrentMonthlyPhonePrice(null, $type);
+                $subyearlyPrice = $phone->getCurrentYearlyPhonePrice(null, $type);
+                $mString = ($submonthlyPrice) ? $submonthlyPrice->getMonthlyPremiumPrice() : "N/A for " . $header;
+                $yString = ($subyearlyPrice) ? $subyearlyPrice->getYearlyPremiumPrice() : "N/A for " . $header;
+                $mGString = ($submonthlyPrice) ? $submonthlyPrice->getGwp() : "N/A for " . $header;
+                $yGString = ($subyearlyPrice) ? $subyearlyPrice->getGwp() : "N/A for " . $header;
+
+                $stringValues = implode(',', [
+                    sprintf('"%0.2f"', $mString),
+                    sprintf('"%0.2f"', $yString),
+                    sprintf('"%0.2f"', $mGString),
+                    sprintf('"%0.2f"', $yGString),
+                ]);
+
+                $lines[$count] .= $stringValues . ',';
+            }
         }
+
+        $this->logger->info('Added ' . $count . ' phones to csv');
         if (!$skipS3) {
             $this->uploadS3(implode(PHP_EOL, $lines), 'phones.csv');
         }
