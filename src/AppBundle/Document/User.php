@@ -1457,6 +1457,28 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    /**
+     * Like get first policy but not limited to those that are active right now, it is just limited to those that have
+     * got a start date.
+     * @return Policy|null the earliest policy or null if they have no started policies.
+     */
+    public function getEarliestPolicy()
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->getStart()) {
+                $policies[] = $policy;
+            }
+        }
+        if (count($policies) == 0) {
+            return null;
+        }
+        usort($policies, function ($a, $b) {
+            return $a->getStart() > $b->getStart();
+        });
+        return $policies[0];
+    }
+
     public function getFirstPolicy()
     {
         $policies = $this->getValidPolicies(true);

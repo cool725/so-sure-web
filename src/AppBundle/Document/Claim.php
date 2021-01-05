@@ -1720,7 +1720,7 @@ class Claim
         $date = $date ?: new \DateTime();
         $picsure = $phonePolicy->isPicSureValidated();
         $age = 0;
-        $firstPolicy = $phonePolicy->getUser()->getFirstPolicy();
+        $firstPolicy = $phonePolicy->getUser()->getEarliestPolicy();
         if ($firstPolicy) {
             $delta = $date->diff($firstPolicy->getStart());
             $age = $delta->y * 12 + $delta->m;
