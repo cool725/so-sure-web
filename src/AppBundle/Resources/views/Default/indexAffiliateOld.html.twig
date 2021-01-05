@@ -61,13 +61,13 @@
                     <p class="lead text-columbia-blue-e mb-2">affiliated with</p>
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="300px" class="d-block mt-3 mb-2 mx-auto lozad">
                 {% endif %}
-                {% if affiliate_page == 'money' %}
+                {# {% if affiliate_page == 'money' %}
                     <p class="text-white">
                         <span class="h6">Xmas Offer:</span>
                         £10 Amazon Voucher 🎁 use code MONEY10 at checkout.
                         <a href="#page_terms" data-toggle="modal" data-target="#page_terms" class="text-white">Terms &amp; Conditions</a>
                     </p>
-                {% endif %}
+                {% endif %} #}
             </div>
             <div class="hero__controls mb-4">
                 <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled">Get a Quote </a>
@@ -111,7 +111,7 @@
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
 
-    <div class="modal fade"
+    {# <div class="modal fade"
         id="page_terms"
         tabindex="-1" role="dialog"
         aria-labelledby="page_terms"
@@ -137,7 +137,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> #}
 
 {% endblock %}
 
