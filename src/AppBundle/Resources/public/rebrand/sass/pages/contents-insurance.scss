@@ -1,0 +1,44 @@
+// contents-insurance.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+@import "../base/fonts";
+
+.hero {
+  position: relative;
+  padding: 5rem 0;
+  text-align: center;
+
+  // @include blue-gradient-45;
+  background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-hero-mobile.jpg') no-repeat left bottom;
+  background-size: cover;
+
+  .container-large {
+      position: relative;
+      z-index: 4;
+  }
+
+  @include media-breakpoint-up(lg) {
+      padding: 10rem 0;
+      background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-hero.jpg') no-repeat center bottom;
+      background-size: cover;
+  }
+}
+
+.lead-form {
+    max-width: 500px;
+    padding: 2rem;
+    margin: 0 auto;
+    background-color: $white;
+    box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                0 5px 15px 0 rgba(8,27,154,0.08);
+    @include border-radius($g-border-radius);
+}
+
+.form-response {
+    display: none;
+}
