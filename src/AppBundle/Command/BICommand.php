@@ -254,23 +254,25 @@ class BICommand extends ContainerAwareCommand
             '"Make"',
             '"Model"',
             '"Memory"',
-            '"DMG"',
-            '"Loss"',
-            '"Theft"',
-            '"Ext Warranty"',
-            '"Warranty"',
-            '"Before DMG"',
-            '"Before Loss"',
-            '"Before Theft"',
-            '"Before Ext Warranty"',
-            '"Before Warranty"',
             '"Original Retail Price"',
             '"Current Retail Price"',
+
             '"MOB Monthly Cost"',
             '"MOB Yearly Cost"',
             '"MOB Monthly GWP"',
             '"MOB Yearly GWP"',
-            $headerTypes
+            $headerTypes,
+
+            '"Before DMG"',
+            '"Before Warranty"',
+            '"Before Ext Warranty"',
+            '"Before Loss"',
+            '"Before Theft"',
+            '"DMG"',
+            '"Warranty"',
+            '"Ext Warranty"',
+            '"Loss"',
+            '"Theft"'
         ]);
 
         foreach ($phones as $phone) {
@@ -285,26 +287,12 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $phone->getMake()),
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
-
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ''),
-
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ''),
-                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ''),
-
                 sprintf('"%0.2f"', $phone->getInitialPrice()),
                 sprintf('"%0.2f"', $phone->getCurrentRetailPrice()),
                 sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getMonthlyPremiumPrice() : ''),
                 sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getYearlyPremiumPrice() : ''),
                 sprintf('"%0.2f"', $monthlyPrice ? $monthlyPrice->getGwp() : ''),
                 sprintf('"%0.2f"', $yearlyPrice ? $yearlyPrice->getGwp() : '') . ',',
-
             ]);
 
             foreach (Subvariant::VARIANT_TYPES as $header => $type) {
@@ -324,6 +312,21 @@ class BICommand extends ContainerAwareCommand
 
                 $lines[$count] .= $stringValues . ',';
             }
+
+            $batch3 = implode(',', [
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['damage'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['warranty'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['extendedWarranty'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['loss'] : ''),
+                sprintf('"%0.2f"', $originalExcess ? $originalExcess['theft'] : ''),
+
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getDamage() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ''),
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : '') . ','
+            ]);
+            $lines[$count] .= $batch3;
         }
 
         $this->logger->info('Added ' . $count . ' phones to csv');
