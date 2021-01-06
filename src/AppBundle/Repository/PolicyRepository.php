@@ -63,6 +63,15 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findPoliciesFromStartDate($start)
+    {
+        $qb = $this->createQueryBuilder()
+                   ->field('start')->gte($start)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findPoliciesForPendingCancellation($includeFuture, \DateTime $date = null)
     {
         if (!$date) {
