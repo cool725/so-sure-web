@@ -174,11 +174,24 @@ class CoolOffCommand extends ContainerAwareCommand
     private function formatPayload(Policy $policy) : array
     {
         /** @var Policy $policy */
+
+        $startDate = '';
+        if ($policy->getStart() instanceof \DateTime) {
+            $startDate = $policy->getStart()->format('Y-m-d H:i:s');
+        }
+        $endDate = '';
+        if ($policy->getEnd() instanceof \DateTime) {
+            $endDate = $policy->getEnd()->format('Y-m-d H:i:s');
+        }
+        $downloadDate = '';
+        if ($policy->getUser()->getFirstLoginInApp() instanceof \DateTime) {
+            $downloadDate = $policy->getUser()->getFirstLoginInApp()->format('Y-m-d H:i:s');
+        }
         return [
             'Policy Number'                   => $policy->getId(),
-            'App download date'               => $policy->getUser()->getFirstLoginInApp()->format('Y-m-d H:i:s'),
-            'Policy Start date'               => $policy->getStart()->format('Y-m-d H:i:s'),
-            'Policy cancellation date'        => ($policy->getEnd()) ? $policy->getEnd()->format('Y-m-d H:i:s') : '',
+            'App download date'               => $downloadDate,
+            'Policy Start date'               => $startDate,
+            'Policy cancellation date'        => $endDate,
         ];
     }
 
