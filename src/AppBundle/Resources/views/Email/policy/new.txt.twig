@@ -1,82 +1,55 @@
 
-Welcome to so-sure 🎉
+Welcome to SO-SURE {{ policy.user.firstName }}! Your phone is now covered.
 
-{% if policy.status == 'picsure-required' %}
-Almost there! Your policy details are below, however your policy will NOT commence until you have verified the condition of phone with our app. Click the link below to install the app and follow the instructions.
-
-{% if policy.phone.isITunes %}
-Download the app: {{ url('download_apple', {'medium': 'pic-sure-required-welcome-email'}) }}
-{% elseif policy.phone.isGooglePlay %}
-Download the app: {{ url('download_google', {'medium': 'pic-sure-required-welcome-email'}) }}
-{% endif %}
-
-{% else %}
-Nice to have you on board {{ policy.user.firstName }} 🥳
-
-Your phone is now covered and the policy details are below.
-{% if feature_enabled('referral') %}
-
-Now for the exciting bits 😀
-
-Get a month free each time one of your friends signs up with your sharing code. On top of that, you also get &pound;10 in your No Claims Reward Pot each time you connect with friends on so-sure.
-
-Download the app or log in to start earning rewards now!
+Now it’s time to download our app <br> and save money on your excess.
 
 {% if policy.phone.isITunes %}
-Download the app: {{ url('download_apple', {'medium': 'pic-sure-required-welcome-email'}) }}
+Download now: {{ url('download_apple', {'medium': 'welcome-email-hero-text-verison'}) }}
 {% elseif policy.phone.isGooglePlay %}
-Download the app: {{ url('download_google', {'medium': 'pic-sure-required-welcome-email'}) }}
+Download now: {{ url('download_google', {'medium': 'welcome-email-hero-text-verison'}) }}
 {% endif %}
 
-Or login here: {{ url('user_home', {'id': policy.id }) }}
-{% else %}
-Now for the fun bits 😀 share the love and earn up to &pound;{{ policy.maxPot|number_format(2, '.', ',') }} cashback if you don't claim.
+Save £100 on your excess 🙌
 
-Head to your dashboard to start earning rewards: {{ url('user_home', {'id': policy.id }) }}
+Your excess is currently &pound;{{ policy.premium.excess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss){% endif %} but you can easily reduce it to &pound;{{ policy.premium.picSureExcess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss){% endif %} by just downloading our app and validating your phone.
 
-Katie Booth so-sure customer 😎
-"This insurance is your peace of mind when you spend so much on technology these days it’s better to insure them"
+Validating your phone is so easy, and takes less that 3 minutes. What are you waiting for?
+
+{% if policy.phone.isITunes %}
+Reduce my excess: {{ url('download_apple', {'medium': 'welcome-email-excess-section-text-verison'}) }}
+{% elseif policy.phone.isGooglePlay %}
+Reduce my excess: {{ url('download_google', {'medium': 'welcome-email-excess-section-text-verison'}) }}
 {% endif %}
-{% endif %}
 
-Important boring bits:
+Let’s talk about rewards 🎁
+
+We’re giving you 1 month free cover every time one of your friends or family signs up to SO-SURE using your unique sharing code.
+
+On top of that, you’ll also get a further £10 in your no claims ‘Reward Pot’ for every connection you make.
+
+Learn more: {{ url('user_home', {'id': policy.id }) }}
+
+The important (but boring 😴) bits
 
 - Your policy is for a {{ policy.phone }}
-- Policy starts: {{ policy.start | date('d M Y', 'Europe/London') }}
-- Policy ends: {{ policy.end | date('d M Y H:i', 'Europe/London') }}
+- Your policy starts:: {{ policy.start | date('d M Y', 'Europe/London') }}
+- Your policy ends: {{ policy.end | date('d M Y H:i', 'Europe/London') }}
 
 {% if policy.phone.newHighDemand %}
-Note: As you have a shiny new model, we wanted to let you know your repair or replacement may take longer than usual. This is unfortunately out of our control and due to market shortages for this new model, but it’s only temporary.
+Note:
+As you have a shiny new model, we wanted to let you know your repair or replacement may take longer than usual. This is unfortunately out of our control and due to market shortages for this new model, but it’s only temporary.
 {% endif %}
 
-{% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
-Cover includes: Accidental Damage, Global Travel 😍.
-{% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
-Cover includes: Loss, Theft, Accidental Damage, Accessories, Global Travel 😍.
-{% else %}
-Cover includes: Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories, Global Travel 😍.
-{% endif %}
+Your cover includes:
 
-Attached is a copy of all your key documents, including your policy terms for reference. If you have any questions please don't hesitate to contact us.
-
-{% if policy.status == 'picsure-required' %}
-Don't forget to download the app and verify the condition of your phone to start your policy.
-{% elseif policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
-{% if policy.subvariant.name is defined and policy.subvariant.name == 'damage' %}
-Your excess is currently &pound;{{ policy.premium.excess.damage }}, you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} by validating your phone with our app.
-{% else %}
-Your excess is currently &pound;{{ policy.premium.excess.damage }} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss), you can easily reduce this amount to &pound;{{ policy.premium.picSureExcess.damage }} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss) by validating your phone with our app.
+{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %}
+- Loss
+- Theft
 {% endif %}
-{% if policy.phone.isITunes %}
-Download our iOS App, login, and complete the validation process.
-{{ url('download_apple', {'medium': 'pic-sure-welcome-email'}) }}
-{% elseif policy.phone.isGooglePlay %}
-Download our Android App</a>, login, and complete the validation process.
-{{ url('download_google', {'medium': 'pic-sure-welcome-email'}) }}
-{% else %}
-Just email a picture of your phone's screen in the mirror to support@wearesosure.com and we'll get started on that process.
-{% endif %}
-{% endif %}
+- Accidental Damage
+- Out of Warranty Breakdown
+- Accessories
+- Global Travel
 
 If your phone is already broken 👮
 On a serious note, if your phone was already damaged before you purchased this policy, you should cancel it now or risk prosecution.
@@ -90,8 +63,8 @@ If you are in any doubt, please email us at info@wearesosure.com.
 ============================================================
 ** (http://www.twitter.com/wearesosure)
 ** (https://www.facebook.com/wearesosure)
+** (https://www.instagram.com/wearesosure)
 ** (http://wearesosure.com)
-** (http://blog.wearesosure.com)
 ** (mailto:hello@wearesosure.com)
 
 Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
@@ -99,4 +72,4 @@ Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
 {% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
 
 Our mailing address is:
-so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
+{{ business_address|replace({'\n':','}) }}

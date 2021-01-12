@@ -72,7 +72,8 @@ class PurchaseStepPhoneType extends AbstractType
 
             if ($purchase->getPhone()) {
                 if ($purchase->getPhone()->isApple()) {
-                    $form->add('serialNumber', TextType::class, ['required' => $this->required]);
+                    // Un-comment to start taking serial number for iphones
+                    //$form->add('serialNumber', TextType::class, ['required' => $this->required]);
                 }
             }
         });

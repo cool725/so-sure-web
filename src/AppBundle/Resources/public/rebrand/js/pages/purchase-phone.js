@@ -42,11 +42,11 @@ sosure.purchaseStepPhone = (function() {
                 },
                 "purchase_form[amount]" : {
                     required: true
-                },
-                "purchase_form[serialNumber]" : {
-                    required: true,
-                    // alphanumeric: true
                 }
+                // "purchase_form[serialNumber]" : {
+                //     required: true,
+                //     // alphanumeric: true
+                // }
             },
             messages: {
                 "purchase_form[imei]" : {
@@ -54,11 +54,11 @@ sosure.purchaseStepPhone = (function() {
                     minlength: 'Please enter a valid IMEI Number',
                     imei: 'Please enter a valid IMEI Number'
 
-                },
-                "purchase_form[serialNumber]" : {
-                    required: 'Please enter a valid serial number',
-                    // alphanumeric: 'Please enter a valid serial number'
                 }
+                // "purchase_form[serialNumber]" : {
+                //     required: 'Please enter a valid serial number',
+                //     // alphanumeric: 'Please enter a valid serial number'
+                // }
             },
 
             errorPlacement: function(error, element) {
@@ -100,13 +100,10 @@ $(function(){
     textFit($('.fit')[0], {detectMultiLine: false});
 
     // Trim as you type
-    // TODO: Rework as it's affecting validation - possible fix for now
-    let imei  = $('.imei'),
-        phone = imei.data('make');
-
-    imei.change(function(event) {
+    let imei  = $('.imei');
+    imei.on('change', function() {
         $(this).val($(this).val().replace(/\s/g,''));
-    });
+    })
 
     sosure.purchaseStepPhone.init();
 });

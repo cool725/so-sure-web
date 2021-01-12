@@ -54,6 +54,8 @@ class PurchaseStepPledgeType extends AbstractType
             ->add('agreedAgeLocation', CheckboxType::class, ['required' => $this->required])
             ->add('agreedExcess', CheckboxType::class, ['required' => $this->required])
             ->add('agreedTerms', CheckboxType::class, ['required' => $this->required])
+            // TODO: if user opted in earlier - don't show
+            ->add('userOptIn', CheckboxType::class, ['required' => false])
             ->add('next', SubmitType::class)
         ;
 

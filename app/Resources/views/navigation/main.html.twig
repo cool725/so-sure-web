@@ -18,10 +18,12 @@
 {# Main Navbar #}
 <nav id="main_nav" class="navbar {{ navbar_classes }}">
     <div class="{{ navbar_container_classes }}">
-        <a href="{{ url('homepage') }}" class="navbar-brand">
-            <div class="navbar-brand__logo"></div>
-            <span class="sr-only">so-sure</span>
-        </a>
+        {% if login_mode is not defined %}
+            <a href="{{ url('homepage') }}" class="navbar-brand">
+                <div class="navbar-brand__logo"></div>
+                <span class="sr-only">so-sure</span>
+            </a>
+        {% endif %}
         {# Nav Types #}
         <ul class="nav navbar-nav flex-row align-items-center">
             {% if admin_mode is defined and admin_mode == true %}

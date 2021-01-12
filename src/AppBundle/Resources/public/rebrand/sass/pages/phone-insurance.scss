@@ -122,6 +122,11 @@
     }
 }
 
+.hero-money {
+    background: #85234B url('#{$cdn_url}/images/experiments/money-background.png') no-repeat center top;
+    background-size: cover;
+}
+
 .intro {
     text-align: center;
     background-color: $pattens-blue;

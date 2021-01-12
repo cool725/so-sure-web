@@ -28,6 +28,7 @@ use AppBundle\Document\PhonePolicyIteration;
 use AppBundle\Document\Subvariant;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Excess\PhoneExcess;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\Helvetia;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -117,7 +118,7 @@ class Create
     {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy = new SalvaPhonePolicy();
-        $policy->setUser($user);
+        $user->addPolicy($policy);
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $policy->setStaticEnd($policy->getEnd());
@@ -132,6 +133,8 @@ class Create
         } else {
             $premium = new PhonePremium();
             $premium->setGwp(rand(20, 100) / 8);
+            $premium->setExcess(Create::phoneExcess());
+            $premium->setPicSureExcess(Create::phoneExcess());
             $policy->setPremium($premium);
         }
         $policy->setStatus($status);
@@ -161,7 +164,7 @@ class Create
     ) {
         $startDate = is_string($start) ? new \DateTime($start) : $start;
         $policy = new HelvetiaPhonePolicy();
-        $policy->setUser($user);
+        $user->addPolicy($policy);
         $policy->setStart($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $policy->setStaticEnd($policy->getEnd());
@@ -176,6 +179,8 @@ class Create
         } else {
             $premium = new PhonePremium();
             $premium->setGwp(rand(20, 100) / 8);
+            $premium->setExcess(Create::phoneExcess());
+            $premium->setPicSureExcess(Create::phoneExcess());
             $policy->setPremium($premium);
         }
         $policy->setStatus($status);
@@ -400,19 +405,44 @@ class Create
 
     /**
      * Creates a claim.
-     * @param Policy    $policy is the policy that the claim is on.
-     * @param string    $type   is the type of claim.
-     * @param \DateTime $date   is the date the claim was created.
-     * @param string    $status is the statue of the claim.
+     * @param Policy           $policy is the policy that the claim is on.
+     * @param string           $type   is the type of claim.
+     * @param \DateTime|string $date   is the date the claim was created.
+     * @param string           $status is the statue of the claim.
      * @return Claim the claim created.
      */
     public static function claim($policy, $type, $date, $status)
     {
         $claim = new Claim();
         $claim->setType($type);
-        $claim->setCreatedDate($date);
+        $claim->setCreatedDate(is_string($date) ? new \DateTime($date) : $date);
         $claim->setStatus($status);
         $policy->addClaim($claim);
         return $claim;
+    }
+
+    /**
+     * Creates a phone excess by providing all the fields that it needs.
+     * @param number $damage           is the damage excess.
+     * @param number $warranty         is the warranty excess.
+     * @param number $extendedWarranty is the extended warranty excess.
+     * @param number $loss             is the loss excess.
+     * @param number $theft            is the theft excess.
+     * @return PhoneExcess the created excess.
+     */
+    public static function phoneExcess(
+        $damage = -1,
+        $warranty = -1,
+        $extendedWarranty = -1,
+        $loss = -1,
+        $theft = -1
+    ) {
+        $excess = new PhoneExcess();
+        $excess->setDamage($damage >= 0 ? $damage : rand(1, 200));
+        $excess->setWarranty($warranty >= 0 ? $warranty : rand(1, 200));
+        $excess->setExtendedWarranty($extendedWarranty >= 0 ? $extendedWarranty : rand(1, 200));
+        $excess->setLoss($loss >= 0 ? $loss : rand(1, 200));
+        $excess->setTheft($theft >= 0 ? $theft : rand(1, 200));
+        return $excess;
     }
 }

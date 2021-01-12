@@ -113,7 +113,7 @@
                                 </li>
                             </ul>
                         </div> #}
-                        {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
+                        {# {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
                             {% set greeting = 'Good morning' %}
                         {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
                             {% set greeting = 'Good afternoon' %}
@@ -124,7 +124,7 @@
                         {% endif %}
                         <div class="personalised mb-2 lead">
                             {{ greeting|raw }}{% if app.user is not null and app.user %} {{ app.user.firstName }}{% endif %}, here's your quote:
-                        </div>
+                        </div> #}
                         <h1 class="h1b fit">
                             <a href="#mem_sizes"
                                class=""

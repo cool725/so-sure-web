@@ -159,6 +159,8 @@ class PhoneInsuranceController extends BaseController
         $noindex = false;
         if ($request->get('_route') == 'phone_insurance_second_hand_m') {
             $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Second Hand Phone Insurance - LP']);
         }
 
         $data = [
@@ -204,6 +206,8 @@ class PhoneInsuranceController extends BaseController
         $noindex = false;
         if ($request->get('_route') == 'phone_insurance_refurbished_m') {
             $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Refurbished Phone Insurance - LP']);
         }
 
         $data = [
@@ -251,6 +255,8 @@ class PhoneInsuranceController extends BaseController
         $noindex = false;
         if ($request->get('_route') == 'phone_insurance_m') {
             $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Phone Insurance - LP']);
         }
 
         $data = [
@@ -312,6 +318,8 @@ class PhoneInsuranceController extends BaseController
         $repo = $dm->getRepository(Phone::class);
         $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
         $phone = null;
+        $noindex = false;
+        $money = false;
 
         $phones = $repo->findBy([
             'active' => true,
@@ -340,12 +348,6 @@ class PhoneInsuranceController extends BaseController
                 $make
             ));
             return new RedirectResponse($this->generateUrl('phone_insurance'));
-        }
-
-        // Add money route
-        $money = false;
-        if ($request->get('_route') == 'phone_insurance_make_money') {
-            $money = true;
         }
 
         // Track Page
@@ -379,10 +381,17 @@ class PhoneInsuranceController extends BaseController
 
         $competitorData = new Competitors();
 
-        // Is indexed?
-        $noindex = false;
-        if ($request->get('_route') == 'phone_insurance_make_m' or $money == true) {
+        if ($request->get('_route') == 'phone_insurance_make_money') {
+            $money = true;
             $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => sprintf('%s Phone Insurance - Money LP', $make)]);
+        }
+
+        if ($request->get('_route') == 'phone_insurance_make_m') {
+            $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => sprintf('%s Phone Insurance - LP', $make)]);
         }
 
         $data = [
@@ -438,6 +447,8 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $decodedModel = Phone::decodeModel($model);
         $decodedModelHyph = Phone::decodedModelHyph($model);
+        $noindex = false;
+        $money = false;
 
         $phones = $repo->findBy([
             'makeCanonical' => mb_strtolower($make),
@@ -462,22 +473,11 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('phone_insurance'));
         }
 
-        // Add money route
-        $money = false;
-        if ($request->get('_route') == 'phone_insurance_make_model_money') {
-            $money = true;
-        }
+        // Set make model for tracking
+        $makemodel = $make." ".$model;
 
         // Track Page
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_MODEL_PAGE);
-
-        // A/B Pricing Messaging Experiment
-        $manufacturerLandingUsps = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-            ['current', 'same-as-homepage'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
 
         // Model template control
         // Hyphenate Model for images/template
@@ -517,10 +517,17 @@ class PhoneInsuranceController extends BaseController
 
         $competitorData = new Competitors();
 
-        // Is indexed?
-        $noindex = false;
-        if ($request->get('_route') == 'phone_insurance_make_model_m' or $money == true) {
+        if ($request->get('_route') == 'phone_insurance_make_model_money') {
             $noindex = true;
+            $money = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => sprintf('%s Phone Insurance Money - LP', $makemodel)]);
+        }
+
+        if ($request->get('_route') == 'phone_insurance_make_model_m') {
+            $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => sprintf('%s Phone Insurance - LP', $makemodel)]);
         }
 
         $data = [
@@ -531,7 +538,6 @@ class PhoneInsuranceController extends BaseController
             'available_images' => $availableImages,
             'hide_section' => $hideSection,
             'competitor' => $competitorData::$competitorComparisonData,
-            'manufacturer_landing_usps' => $manufacturerLandingUsps,
             'money_version' => $money,
             'is_noindex' => $noindex
         ];
@@ -599,9 +605,6 @@ class PhoneInsuranceController extends BaseController
 
         // In-store
         $instore = $this->get('session')->get('store');
-
-        // A/B Manufacturers Landing Pages USPs
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
 
         $buyForm = $this->makeBuyButtonForm('buy_form', 'buy');
         $buyBannerForm = $this->makeBuyButtonForm('buy_form_banner');

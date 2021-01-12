@@ -27,7 +27,7 @@ class PurchaseStepPhone
     protected $user;
 
     protected $file;
-    
+
     /**
      * @Assert\IsTrue(message="Unable to find an IMEI number in the file")
      */
@@ -130,7 +130,9 @@ class PurchaseStepPhone
         if (!$this->getPhone()) {
             return true;
         }
-        if (!$this->getPhone()->isApple()) {
+        // To require iphones to have serial, invert the logic
+        // if (!$this->getPhone()->isApple()) {
+        if ($this->getPhone()->isApple()) {
             return false;
         }
 

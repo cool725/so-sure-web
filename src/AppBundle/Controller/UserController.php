@@ -1330,12 +1330,6 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        // A/B Manufacturers Landing Pages USPs
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_MANUFACTURER_PAGES_USPS);
-
-        // A/B Test Homepage Design
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V2);
-
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
         if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(\DateTime::createFromFormat('U', time()));

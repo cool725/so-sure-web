@@ -1,25 +1,47 @@
 
-📌 Your saved so-sure quote for your {{ phone }}
+📌 Your saved SO-SURE quote for your {{ phone }}
 
-Hi 👋
+It’s time to upgrade your phone insurance.
 
-You recently visited so-sure to get a quote for insuring your {{ phone }}. Smart move - we're up to 40% cheaper than other players in the market and quicker at sorting claims!
+Click the link below to view your {{ phone }} insurance quote:
 
+{{ quoteUrl }}
 
-so-sure covers you for loss, theft, accidental damage and out of warranty breakdown - without any sneaky add-on costs.
+You recently visited SO-SURE to get an insurance quote for your {{ phone }}. Very smart move!
 
-Once your claim is approved, we aim to replace or repair your device in 24-72 hours.
+We’re up to 40% cheaper than anyone else in the market and much quicker at sorting claims. We aim to replace or repair your device in 24-72 hours.
 
-View your quote: {{ quoteUrl }}
+Find out more: {{ quoteUrl }}
 
-Have a question or issue? contact us at support@wearesosure.com.
+Here’s what you’ll be covered for:
 
+✅ Theft and loss as standard
+
+✅ Accidental Damage: Including water damage & cracked screens
+
+✅ Out of warranty breakdown
+
+✅ Accessories up to the value of £100
+
+✅ Unauthorised network charges up to the value of £1000
+
+✅ 90 days of global travel
+
+Our hassle free claims process 😌
+
+Claim Online - Claiming online with SO-SURE is easy, fast and pain-free. Simply go online and use our online claims portal.
+
+Claim Reviewed - Our UK based claims team will review your claim and reach out with a request for any further details or documents if needed.
+
+Claim Approved ✅ - Once approved, we take your excess payment over the phone and aim to repair or replace your phone within 24-72 hours.
+
+Find out more: {{ quoteUrl }}
 
 ============================================================
 ** (http://www.twitter.com/wearesosure)
 ** (https://www.facebook.com/wearesosure)
+** (https://www.instagram.com/wearesosure)
 ** (http://wearesosure.com)
-** (http://blog.wearesosure.com)
 ** (mailto:hello@wearesosure.com)
 
 Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
@@ -27,4 +49,4 @@ Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
 {% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
 
 Our mailing address is:
-so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
+{{ business_address|replace({'\n':','}) }}

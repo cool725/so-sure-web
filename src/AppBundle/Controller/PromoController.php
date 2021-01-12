@@ -33,6 +33,9 @@ class PromoController extends BaseController
      * @Route("/share/{code}", name="share_promo")
      * @Route("/uswitch/{code}", name="uswitch_promo")
      * @Route("/offer/{code}", name="offer_promo")
+     * @Route("/hotukdeals/{code}", name="hotukdeals_promo")
+     * @Route("/student/{code}", name="student_promo")
+     * @Route("/groupon/{code}", name="groupon_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -44,7 +47,6 @@ class PromoController extends BaseController
         $scode = null;
         $custom = null;
         $amazonVoucher = null;
-        $code = mb_strtoupper($code);
 
         try {
             if ($scode = $repo->findOneBy(['code' => $code, 'active' => true, 'type' => Scode::TYPE_REWARD])) {
@@ -72,11 +74,19 @@ class PromoController extends BaseController
             $custom = 'xiaomi';
         } elseif ($request->get('_route') == 'share_promo') {
             $template = 'AppBundle:Promo:influencer.html.twig';
+        } elseif ($request->get('_route') == 'student_promo') {
+            $template = 'AppBundle:Promo:influencerStudent.html.twig';
         } elseif ($request->get('_route') == 'uswitch_promo') {
             $custom = 'uswitch';
             $amazonVoucher = 15;
         } elseif ($request->get('_route') == 'offer_promo') {
             $template = 'AppBundle:Promo:indexOffer.html.twig';
+        } elseif ($request->get('_route') == 'hotukdeals_promo') {
+            $custom = 'hotukdeals';
+            $amazonVoucher = 20;
+        } elseif ($request->get('_route') == 'groupon_promo') {
+            $custom = 'groupon';
+            $amazonVoucher = 15;
         }
 
         $lead = new Lead();
@@ -140,24 +150,6 @@ class PromoController extends BaseController
             'custom' => $custom,
             'lead_form' => $leadForm->createView(),
             'competitor' => $competitorData::$competitorComparisonData,
-            'amazon_voucher' => $amazonVoucher
-        ];
-
-        return $this->render($template, $data);
-    }
-
-    /**
-     * @Route("/hotukdeals", name="hotukdeals_promo")
-     * @Template
-     */
-    public function promoHotukdealsAction()
-    {
-        $custom = 'hotukdeals';
-        $amazonVoucher = 20;
-        $template = 'AppBundle:Promo:promo.html.twig';
-
-        $data = [
-            'custom' => $custom,
             'amazon_voucher' => $amazonVoucher
         ];
 

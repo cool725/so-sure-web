@@ -8,7 +8,6 @@
   "license": "proprietary",
   "private": true,
   "devDependencies": {
-    "@fortawesome/fontawesome-pro": "^5.12.1",
     "@symfony/webpack-encore": "git://github.com/symfony/webpack-encore.git#master",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
@@ -24,7 +23,6 @@
   },
   "dependencies": {
     "@fancyapps/fancybox": "^3.5.2",
-    "@fortawesome/fontawesome-free": "^5.12.1",
     "animate.css": "^3.7.0",
     "babel-core": "^7.0.0-bridge.0",
     "body-scroll-lock": "^2.6.1",
@@ -32,7 +30,7 @@
     "bs-custom-file-input": "^1.3.2",
     "clipboard": "^2.0.1",
     "corejs-typeahead": "^1.2.1",
-    "datatables.net": "^1.10.19",
+    "datatables.net": "^1.10.22",
     "datatables.net-dt": "^1.10.19",
     "dot": "^1.1.2",
     "flickity": "^2.2.0",

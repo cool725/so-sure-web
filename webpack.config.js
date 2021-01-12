@@ -100,12 +100,14 @@ Encore
     // Pos
     .addEntry('pos', './src/AppBundle/Resources/public/rebrand/js/pages/pos.js')
 
-    // Third Party
-    .addEntry('fontawesome', './src/AppBundle/Resources/public/rebrand/js/fontawesome.js')
+    // Signup
+    .addEntry('signup', './src/AppBundle/Resources/public/rebrand/js/pages/signup.js')
 
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
     .addEntry('rollbar-js-error', './src/AppBundle/Resources/public/rebrand/js/pages/rollbar-js-error.js')
+
+    .addEntry('contents-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()

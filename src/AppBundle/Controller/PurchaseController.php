@@ -13,6 +13,7 @@ use AppBundle\Document\Note\StandardNote;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Postcode;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Opt\MarketingOptIn;
 use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
@@ -156,9 +157,6 @@ class PurchaseController extends BaseController
         // TEMP - As using skip add extra event
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
 
-        // A/B Test Homepage Design
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V2);
-
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
@@ -208,6 +206,10 @@ class PurchaseController extends BaseController
                     if ($newUser) {
                         $dm->persist($user);
                     }
+                    if ($purchase->getUserOptIn() === true) {
+                        $user->optInMarketing();
+                    }
+
                     if (!$user->getIdentityLog()) {
                         $user->setIdentityLog($this->getIdentityLog($request));
                     }
@@ -298,9 +300,8 @@ class PurchaseController extends BaseController
             ) : null,
             'postcode' => 'comma',
             'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
-            // 'funnel_exp' => $homepageFunnelExp,
             'instore' => $instore,
-            'validation_required' => $validationRequired,
+            'validation_required' => $validationRequired
         );
 
         return $this->render($template, $data);
@@ -386,7 +387,7 @@ class PurchaseController extends BaseController
                 $purchaseFormValid = $purchaseForm->isValid();
 
                 // If there's a file upload, the form submit event bind should have already run the ocr
-                // and data object has the imei/serial
+                // and data object has the imei
                 // however, we need to re-create the form so the fields will display the updated data
                 if ($filename = $purchase->getFile()) {
                     $purchaseForm = $this->get('form.factory')
@@ -903,6 +904,12 @@ class PurchaseController extends BaseController
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPledgeType::class, $purchase)
             ->getForm();
+
+        // Check if opted in and remove field
+        if ($user->isOptedInForMarketing() === true) {
+            $purchaseForm->remove('userOptIn');
+        }
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
@@ -913,6 +920,16 @@ class PurchaseController extends BaseController
                         'OS' => $phone ? $phone->getOs() : null,
                         'Policy Id' => $policy->getId(),
                     ]);
+
+                    if ($user->isOptedInForMarketing() === null) {
+                        if ($purchase->getUserOptIn() == true) {
+                            $user->optInMarketing();
+                        } else {
+                            $user->optOutMarketing();
+                        }
+                        $dm->flush();
+                    }
+
                     return new RedirectResponse(
                         $this->generateUrl('purchase_step_payment_id', [
                             'id' => $policy->getId()
@@ -946,6 +963,7 @@ class PurchaseController extends BaseController
             'instore' => $instore,
             'validation_required' => $validationRequired,
             'aggregator' => $this->get('session')->get('aggregator'),
+            'show_opt_in' => $user->isOptedInForMarketing()
         );
 
         return $this->render($template, $data);
