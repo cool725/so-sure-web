@@ -2947,7 +2947,6 @@ class PolicyService
      */
     public function generateReportLines($policy)
     {
-        $reportLineRepo = $this->dm->getRepository(ReportLine::class);
         foreach (PolicyReport::TYPES as $reportType) {
             $report = PolicyReport::createReport($reportType, $this->dm, new \DateTimeZone('Europe/London'));
             $line = $policy->getReportLineByType($reportType);
