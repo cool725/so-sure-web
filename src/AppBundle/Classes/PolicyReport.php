@@ -18,9 +18,9 @@ abstract class PolicyReport
     const TYPE_PICSURE = 'picsure';
     const TYPE_SCODE = 'scode';
     const TYPES = [
-        TYPE_POLICY,
-        TYPE_PICSURE,
-        TYPE_SCODE
+        self::TYPE_POLICY,
+        self::TYPE_PICSURE,
+        self::TYPE_SCODE
     ];
 
     /**
