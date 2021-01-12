@@ -2,6 +2,7 @@
 
 namespace AppBundle\Classes;
 
+use AppBundle\Helpers\CsvHelper;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RenewalConnection;
@@ -57,6 +58,14 @@ class PolicyBiReport extends PolicyReport
     public function getFile()
     {
         return 'policies.csv';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getType()
+    {
+        return PolicyReport::TYPE_POLICY;
     }
 
     /**
@@ -128,8 +137,10 @@ class PolicyBiReport extends PolicyReport
      */
     public function process(Policy $policy)
     {
-        if (!($policy instanceof PhonePolicy) || $policy->getEnd() <= $policy->getStart()) {
-            return;
+        if (!($policy instanceof PhonePolicy) || !$policy->isValidPolicy() ||
+            $policy->getEnd() <= $policy->getStart()
+        ) {
+            return null;
         }
         $connections = $policy->getConnections();
         $user = $policy->getUser();
@@ -148,7 +159,7 @@ class PolicyBiReport extends PolicyReport
         $company = $policy->getCompany();
         $scodeType = $this->getFirstSCodeUsedType($connections);
         $scodeName = $this->getFirstSCodeUsedCode($connections);
-        $this->add(
+        return CsvHelper::line(
             $policy->getPolicyNumber(),
             $user->getId(),
             $user->getAge(),
