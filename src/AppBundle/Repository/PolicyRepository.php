@@ -4,6 +4,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Company;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
@@ -62,6 +63,15 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findPoliciesFromStartDate($start)
+    {
+        $qb = $this->createQueryBuilder()
+                   ->field('start')->gte($start)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findPoliciesForPendingCancellation($includeFuture, \DateTime $date = null)
     {
         if (!$date) {
@@ -93,6 +103,24 @@ class PolicyRepository extends BaseDocumentRepository
             ->field('scodes')->exists(true)
             ->getQuery()
             ->execute();
+    }
+
+    public function findScodePoliciesByStatus($status = null)
+    {
+        $defaultStatus = [
+            Policy::STATUS_ACTIVE,
+            Policy::STATUS_PENDING_RENEWAL,
+            Policy::STATUS_PENDING,
+            Policy::STATUS_RENEWAL
+        ];
+        if (null !== $status) {
+            $defaultStatus = $status;
+        }
+        return $this->createQueryBuilder()
+                    ->field('scodes')->exists(true)
+                    ->field('status')->in($defaultStatus)
+                    ->getQuery()
+                    ->execute();
     }
 
     public function findPoliciesForPendingRenewal($date = null)
@@ -395,16 +423,43 @@ class PolicyRepository extends BaseDocumentRepository
     }
 
     /**
-     * Finds all the policies that have got the given bacs reference on their bank account.
-     * @param string $reference is the bacs reference.
-     * @return Cursor over the results.
+     * This gets the latest policy with the given bacs reference. First it looks for a policy in an active status, and
+     * if it does not find one then it just returns the one that started most recently.
+     * @param string $reference is the bacs reference to seek.
+     * @return Policy|null the policy found or null if it could not find one.
      */
-    public function findPoliciesByBacsReference($reference)
+    public function getLatestPolicyByBacsReference($reference)
     {
+        $policy = $this->createQueryBuilder()
+            ->field('paymentMethod.bankAccount.reference')->equals($reference)
+            ->field('status')->in(Policy::$activeStatuses)
+            ->getQuery()
+            ->getSingleResult();
+        if ($policy) {
+            return $policy;
+        }
         return $this->createQueryBuilder()
-            ->field('paymentMethod.type')->equals('bacs')
-            ->field('paymentMethod.reference')->equals($reference)
-            ->getQuery()->execute();
+            ->field('paymentMethod.bankAccount.reference')->equals($reference)
+            ->sort('start', 'desc')
+            ->getQuery()
+            ->getSingleResult();
+    }
+
+    /**
+     * Finds all the policies for a given company that are ending within the given number of days.
+     * @param Company $company    is the company to look for.
+     * @param int     $cutoffDays is the number of days into the future within which the policy must end to be found.
+     * @return Cursor over the found companies.
+     */
+    public function findEndingPoliciesForCompany($company, $cutoffDays)
+    {
+        $cutoff = (new \DateTime())->add(new \DateInterval("P{$cutoffDays}D"));
+        return $this->createQueryBuilder()
+            ->field('company')->references($company)
+            ->field('status')->in(Policy::$activeStatuses)
+            ->field('end')->lte($cutoff)
+            ->getQuery()
+            ->execute();
     }
 
     /**

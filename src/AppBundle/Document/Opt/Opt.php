@@ -14,7 +14,12 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\Document(collection="OptOut")
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("optout_type")
- * @MongoDB\DiscriminatorMap({"email"="EmailOptOut", "sms"="SmsOptOut", "optinEmail"="EmailOptIn"})
+ * @MongoDB\DiscriminatorMap({
+ *    "email"="EmailOptOut",
+ *    "sms"="SmsOptOut",
+ *    "optinEmail"="EmailOptIn",
+ *    "MarketingOptIn"="MarketingOptIn",
+ *    "MarketingOptOut"="MarketingOptOut"})
  * @Gedmo\Loggable(logEntryClass="AppBundle\Document\LogEntry")
  */
 abstract class Opt
@@ -155,7 +160,7 @@ abstract class Opt
     {
         return in_array($category, $this->categories);
     }
-    
+
     /**
      * Removes a category if it is there, or just does nothing.
      * @param string $category is the category to remove.
@@ -168,7 +173,7 @@ abstract class Opt
             $this->setUpdated(new \DateTime());
         }
     }
-            
+
 
     public function getNotes()
     {

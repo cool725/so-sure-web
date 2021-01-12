@@ -85,6 +85,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/about/social-insurance/terms' => 'Terms & Conditions',
             '/about/social-insurance/how-to-contact-so-sure' => 'Contact Us',
             '/phone-insurance' => 'Phone Insurance',
+            '/contents-insurance' => 'Contents Insurance',
             '/download-app' => 'Get covered in seconds using our app (IOS and Android)',
             '/phone-insurance/broken-phone' => 'Broken phone',
             '/phone-insurance/cracked-screen' => 'Cracked screen',

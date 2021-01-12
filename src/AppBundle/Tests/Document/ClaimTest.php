@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Form\PicSureStatus;
@@ -12,6 +13,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Tests\UserClassTrait;
+use AppBundle\Tests\Create;
 use DateTime;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
@@ -50,25 +52,42 @@ class ClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(true);
     }
 
-    public function testNeedProofOfPurchase()
+    public function testRisk()
     {
-        $claim = new Claim();
-        $policy = new HelvetiaPhonePolicy();
-        $premium = new PhonePremium();
-        $premium->setExcess(PolicyTerms::getLowExcess());
-        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
-        $policy->setPremium($premium);
-        $policy->addClaim($claim);
-
-        $claim->setFnolRisk(Policy::RISK_LEVEL_HIGH);
-        $this->assertTrue($claim->needProofOfPurchase());
-
-        // both high risk & pic-sure validated required to not require proof of purchase
+        $user = Create::user();
+        $policy = Create::policy($user, '2020-01-01', Policy::STATUS_ACTIVE, 12);
+        $claim = Create::claim($policy, Claim::TYPE_LOSS, '2020-01-01', Claim::STATUS_FNOL);
+        // less than 6 months old no picsure -> black
+        $this->assertEquals(
+            Claim::RISK_BLACK,
+            $claim->getRisk(new \DateTime('2020-01-01'))
+        );
+        // less than 12 months old no picsure -> black
+        $this->assertEquals(
+            Claim::RISK_BLACK,
+            $claim->getRisk(new \DateTime('2020-06-02'))
+        );
+        // more than 12 months old no picsure -> green
+        $this->assertEquals(
+            Claim::RISK_GREEN,
+            $claim->getRisk(new \DateTime('2021-01-02'))
+        );
+        // less than 6 months old picsure -> red
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $this->assertFalse($claim->needProofOfPurchase());
+        $this->assertEquals(
+            Claim::RISK_RED,
+            $claim->getRisk(new DateTime('2020-01-01'))
+        );
+        // less than 12 months old picsure -> amber
+        $this->assertEquals(
+            Claim::RISK_AMBER,
+            $claim->getRisk(new DateTime('2020-07-01'))
+        );
+        // more than 12 months old picsure -> green
+        $this->assertEquals(
+            Claim::RISK_GREEN,
+            $claim->getRisk(new DateTime('2021-01-02'))
+        );
 
-        // invalid imei should always require proof of purchase
-        $policy->setInvalidImei(true);
-        $this->assertTrue($claim->needProofOfPurchase());
     }
 }

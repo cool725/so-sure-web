@@ -57,6 +57,13 @@
             </span>
         </a>
         <a class="dropdown-item dropdown-item-nav h6 mb-0"
+           href="{{ path('company_phone_insurance') }}">
+            <span>
+                Company Phone <br>
+                <small class="sub text-zaffre">Insurance</small>
+            </span>
+        </a>
+        <a class="dropdown-item dropdown-item-nav h6 mb-0"
            href="{{ path('phone_insurance_second_hand') }}">
             <span>
                 Second Hand <br>
@@ -77,6 +84,12 @@
             </span>
         </a>
     </div>
+</li>
+<li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-4">
+    <a href="{{ path('contents_insurance') }}"
+       class="nav-link {{ app.request.get('_route') == 'contents_insurance' ? 'nav-active' }}">
+        Contents Insurance
+    </a>
 </li>
 <li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-4">
     <a href="#"
@@ -130,12 +143,6 @@
             </span>
         </a>
     </div>
-</li>
-<li class="nav-item dropdown d-none {{ menu_breakpoint }} pr-xl-4">
-    <a href="{{ path('company_phone_insurance') }}"
-       class="nav-link {{ app.request.get('_route') == 'company_phone_insurance' ? 'nav-active' }}">
-        Company Phones
-    </a>
 </li>
 <li class="nav-item d-none {{ menu_breakpoint }} pr-xl-4">
     <a href="{{ path('claim') }}"

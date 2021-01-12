@@ -59,6 +59,11 @@
     }
 }
 
+.hero-money {
+    background: #85234B url('#{$cdn_url}/images/experiments/money-background.png') no-repeat center top;
+    background-size: cover;
+}
+
 .hero-starling {
     position: relative;
     padding-top: 6rem;

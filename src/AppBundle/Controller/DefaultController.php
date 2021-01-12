@@ -81,33 +81,10 @@ class DefaultController extends BaseController
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/reimagined", name="reimagined")
      * @Route("/hasslefree", name="hasslefree")
-     * @Route("/home", name="home")
      */
     public function indexAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-        ]);
-
-        $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
-
-        // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
-
+        $noindex = false;
         $referral = $request->get('referral');
         $session = $this->get('session');
 
@@ -120,35 +97,50 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // A/B Test Homepage Design
-        $homepageDesign = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_DESIGN_V2,
-            ['current', 'new-design'],
-            SixpackService::LOG_MIXPANEL_ALL
-        );
+        $template = 'AppBundle:Default:indexQuickQuote.html.twig';
 
-        if ($homepageDesign == 'new-design') {
-            $template = 'AppBundle:Default:indexHomepage.html.twig';
-        } else {
-            $template = 'AppBundle:Default:indexQuickQuote.html.twig';
-        }
+        $competitorData = new Competitors();
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+
+        $data = array(
+            'competitor' => $competitorData::$competitorComparisonData,
+            'is_noindex' => $noindex
+        );
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/home", name="home")
+     */
+    public function homeLandingAction(Request $request)
+    {
+        $referral = $request->get('referral');
+        $session = $this->get('session');
+
+        // For Referrals
+        if ($referral) {
+            $session->set('referral', $referral);
+            $this->get('logger')->debug(sprintf('Referral %s', $referral));
+        }
+
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+
+        $template = 'AppBundle:Default:indexQuickQuote.html.twig';
 
         $competitorData = new Competitors();
 
         // Is indexed?
-        $noindex = false;
-        if ($request->get('_route') == 'home') {
-            $noindex = true;
-        }
+        $noindex = true;
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+            'page' => 'Homepage Marketing - LP']);
 
         $data = array(
             'referral'  => $referral,
-            'phone'     => $this->getQuerystringPhone($request),
             'competitor' => $competitorData::$competitorComparisonData,
-            'from_price' => $fromPrice,
             'is_noindex' => $noindex
         );
 
@@ -680,6 +672,7 @@ class DefaultController extends BaseController
                 $categories = $marketingOptOutForm->getData()['categories'];
                 if (in_array(Opt::OPTOUT_CAT_MARKETING, $categories)) {
                     $optOut->addCategory(Opt::OPTOUT_CAT_MARKETING);
+                    $this->getUser()->optOutMarketing();
                 } else {
                     $optOut->removeCategory(Opt::OPTOUT_CAT_MARKETING);
                 }
@@ -823,6 +816,14 @@ class DefaultController extends BaseController
         );
 
         return new RedirectResponse($this->generateUrl('user_home'));
+    }
+
+    /**
+     * @Route("/quiz", name="quiz")
+     */
+    public function quizAction()
+    {
+        return $this->render('AppBundle:Quiz:quiz.html.twig');
     }
 
     /**

@@ -17,17 +17,17 @@ class Feature
     const FEATURE_SALVA_POLICY_UPDATE = 'salva-policy-update';
 
     // TODO: Verify if still used
-    const FEATURE_STARLING = 'starling';
     const FEATURE_JUDO_RECURRING = 'judo-recurring';
     const FEATURE_USER_PAYMENT_HISTORY = 'user-payment-history';
     const FEATURE_INVITE_PAGES_COMPETITION = 'invite-competition';
     const FEATURE_APPLY_SIGN_UP_BONUS = 'apply-sign-up-bonus';
+    const FEATURE_STARLING = 'starling';
+    const FEATURE_CARD_OPTION_WITH_BACS = 'card-option-with-bacs';
+    const FEATURE_CARD_SWAP_FROM_BACS = 'card-swap-from-bacs';
 
     // Active features
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
     const FEATURE_BACS = 'bacs';
-    const FEATURE_CARD_OPTION_WITH_BACS = 'card-option-with-bacs';
-    const FEATURE_CARD_SWAP_FROM_BACS = 'card-swap-from-bacs';
     const FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR = 'app-ios-imei-validation-colour';
     const FEATURE_APP_PICSURE_ACCELEROMETER = 'app-picsure-accelerometer';
     const FEATURE_APP_PICSURE_DOTCODE = 'app-picsure-dotcode';
@@ -40,6 +40,8 @@ class Feature
     const FEATURE_REFERRAL = 'referral';
     const FEATURE_APP_SHARE_GAME = 'app-share-game';
     const FEATURE_EXIT_POPUP = 'exit-popup';
+    const FEATURE_BACS_PAYMENT_OPTION = 'allow-bacs-payment-method';
+    const FEATURE_COMPETITOR_PRICING = 'competitor-prices';
 
     // All Features should be here
     public static $features = [
@@ -66,7 +68,9 @@ class Feature
         self::FEATURE_INVITE_PAGES_COMPETITION,
         self::FEATURE_REFERRAL,
         self::FEATURE_APP_SHARE_GAME,
-        self::FEATURE_EXIT_POPUP
+        self::FEATURE_EXIT_POPUP,
+        self::FEATURE_BACS_PAYMENT_OPTION,
+        self::FEATURE_COMPETITOR_PRICING,
     ];
 
     // @codingStandardsIgnoreStart
@@ -77,8 +81,8 @@ class Feature
         self::FEATURE_STARLING => 'Starling integration - unused?',
         self::FEATURE_SALVA_POLICY_UPDATE => 'Use salva update api call instead of cancel/create',
         self::FEATURE_BACS => 'Bacs functionality - too integrated to turn off',
-        self::FEATURE_CARD_OPTION_WITH_BACS => 'Allow users to pay via BACS',
-        self::FEATURE_CARD_SWAP_FROM_BACS => 'Allow user to swap from BACS to card',
+        self::FEATURE_CARD_OPTION_WITH_BACS => 'Allow users to pay via BACS - unused?',
+        self::FEATURE_CARD_SWAP_FROM_BACS => 'Allow user to swap from BACS to card - unused?',
         self::FEATURE_APP_IOS_IMEI_VALIDATION_COLOUR => 'Check the colour of the top left pixel in the screenshot and if it is too different from the iOS header colour it will return an error as an anti-fraud measure.',
         self::FEATURE_APP_PICSURE_ACCELEROMETER => 'If enabled it will use the accelerometer data to check any sudden movements while taking the picsure and prevent doing picsure if any are detected as an anti-fraud measure.',
         self::FEATURE_APP_PICSURE_DOTCODE => 'Display dotcode on iOS for on the background image. Allows us to validate the imei in cases of suspected hacking.',
@@ -94,7 +98,9 @@ class Feature
         self::FEATURE_INVITE_PAGES_COMPETITION => 'Invite pages competition (Amazon voucher)',
         self::FEATURE_REFERRAL => 'Referral Bonus',
         self::FEATURE_APP_SHARE_GAME => 'Share game in app',
-        self::FEATURE_EXIT_POPUP => 'Show user exit popup lead form with promo code'
+        self::FEATURE_EXIT_POPUP => 'Show user exit popup lead form with promo code',
+        self::FEATURE_BACS_PAYMENT_OPTION => 'Allow user to pay via BACs in the funnel',
+        self::FEATURE_COMPETITOR_PRICING => 'Show competitor pricing section in funnel if available',
     ];
     // @codingStandardsIgnoreEnd
 

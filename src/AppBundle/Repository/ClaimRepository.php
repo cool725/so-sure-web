@@ -37,6 +37,15 @@ class ClaimRepository extends DocumentRepository
         return $qb->getQuery()->execute();
     }
 
+    public function findPostClaims($start)
+    {
+        $qb = $this->createQueryBuilder()
+                   ->field('replacementReceivedDate')->gte($start)
+        ;
+
+        return $qb->getQuery()->execute();
+    }
+
     public function findApprovedClaims($start, $end)
     {
         $qb = $this->createQueryBuilder()

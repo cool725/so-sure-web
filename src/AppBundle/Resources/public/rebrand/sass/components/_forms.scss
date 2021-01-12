@@ -33,7 +33,11 @@ label {
 
 // Modify error styling - main styling done in _variables.scss
 .form-control {
+    font-size: 16px;
 
+    @include media-breakpoint-up(md) {
+        font-size: inherit;
+    }
     // &.is-valid-ss,
     // &.is-valid-ss:focus,
     &:focus {

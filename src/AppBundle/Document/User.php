@@ -5,6 +5,8 @@ namespace AppBundle\Document;
 
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\MarketingOptIn;
+use AppBundle\Document\Opt\MarketingOptOut;
 use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Service\PostcodeService;
@@ -321,7 +323,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $multipays;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="user")
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="user", cascade={"persist"})
      */
     protected $opts = array();
 
@@ -908,6 +910,44 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->opts;
     }
 
+    public function optInMarketing()
+    {
+        $optIn = new MarketingOptIn;
+        $optIn->setCategory(MarketingOptIn::OPTIN_CAT_MARKETING);
+        $this->addOpt($optIn);
+    }
+
+    public function optOutMarketing()
+    {
+        $optOut = new MarketingOptOut;
+        $optOut->setCategory(MarketingOptIn::OPTOUT_CAT_MARKETING);
+        $this->addOpt($optOut);
+    }
+
+    public function isOptedInForMarketing()
+    {
+        if ($this->getOpts()) {
+            $currentOpt = null;
+            foreach ($this->getOpts() as $key => $opt) {
+                if (!$key = 0) {
+                    $currentOpt = $opt;
+                } elseif ($currentOpt->getCreated() < $opt->getCreated()) {
+                    $currentOpt = $opt;
+                }
+            }
+            if ($currentOpt) {
+                if ($currentOpt instanceof MarketingOptIn) {
+                    return true;
+                } elseif ($currentOpt instanceof MarketingOptOut) {
+                    return false;
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
     public function getMultiPays()
     {
         return $this->multipays;
@@ -1201,6 +1241,24 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
+    public function getTotalClaims()
+    {
+        $claims = 0;
+
+        /** @var Policy $policy */
+        foreach ($this->getAllPolicies() as $policy) {
+            // TODO: Blend upgrades
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED &&
+                $policy->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+                continue;
+            }
+
+            $claims += count($policy->getApprovedClaims());
+        }
+
+        return $claims;
+    }
+
     public function getAvgPolicyClaims()
     {
         $claims = 0;
@@ -1331,7 +1389,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                     Claim::STATUS_SETTLED,
                     Claim::STATUS_DECLINED,
                     Claim::STATUS_PENDING_CLOSED,
-                    Claim::STATUS_WITHDRAWN
+                    Claim::STATUS_WITHDRAWN,
                 ])) {
                     $noOpenClaim = false;
                     break;
@@ -1397,6 +1455,28 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return $policies;
+    }
+
+    /**
+     * Like get first policy but not limited to those that are active right now, it is just limited to those that have
+     * got a start date.
+     * @return Policy|null the earliest policy or null if they have no started policies.
+     */
+    public function getEarliestPolicy()
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->getStart()) {
+                $policies[] = $policy;
+            }
+        }
+        if (count($policies) == 0) {
+            return null;
+        }
+        usort($policies, function ($a, $b) {
+            return $a->getStart() > $b->getStart();
+        });
+        return $policies[0];
     }
 
     public function getFirstPolicy()
@@ -2401,7 +2481,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             'payment_method' => $policy && $policy->getPaymentMethod() ?
                 $policy->getPaymentMethod()->getType() :
                 null,
-            'has_mobile_number_verified' => $this->getMobileNumberVerified()
+            'has_mobile_number_verified' => $this->getMobileNumberVerified(),
+            'is_optin' => $this->isOptedInForMarketing()
         ];
     }
 

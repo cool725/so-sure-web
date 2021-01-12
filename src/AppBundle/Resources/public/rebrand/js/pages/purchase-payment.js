@@ -102,11 +102,8 @@ $(function(){
         });
     }
 
-    const payOptionCC = $('#payment-option-credit-card'),
-          payOptionDD = $('#payment-option-direct-debit'),
-          payCtaCC    = $('#payment-cta-credit-card'),
-          payCtaDD    = $('#payment-cta-direct-debit'),
-          payOptionTl = $('#payment-option-title');
+    const payCtaCC    = $('#payment-cta-credit-card'),
+          payCtaDD    = $('#payment-cta-direct-debit');
 
     $('.payment-card-type').on('click', function(e) {
         $('.payment-card-type').removeClass('active');
@@ -114,12 +111,12 @@ $(function(){
 
         let option = $(this).data('option');
 
-        if (option == 'direct-debit') {
-            payCtaCC.addClass('hideme');
-            payCtaDD.removeClass('hideme');
-        } else {
+        if (option == 'card') {
             payCtaCC.removeClass('hideme');
             payCtaDD.addClass('hideme');
+        } else {
+            payCtaCC.addClass('hideme');
+            payCtaDD.removeClass('hideme');
         }
     });
 
@@ -132,21 +129,6 @@ $(function(){
         // Set the value for the form element
         let val   = $(this).data('value'),
             cycle = $(this).data('premium-type');
-
-        if (cycle === 'month') {
-            payOptionCC.addClass('hideme');
-            payOptionDD.find('.payment-card-type').addClass('active');
-            payCtaCC.addClass('hideme');
-            payCtaDD.removeClass('hideme');
-            payOptionTl.addClass('hideme');
-        } else {
-            payOptionCC.removeClass('hideme');
-            payOptionDD.find('.payment-card-type').removeClass('active');
-            payOptionCC.find('.payment-card-type').addClass('active');
-            payCtaCC.removeClass('hideme');
-            payCtaDD.addClass('hideme');
-            payOptionTl.removeClass('hideme');
-        }
 
         // Set the linked radio
         $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);

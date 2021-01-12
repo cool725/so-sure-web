@@ -29,6 +29,9 @@ class Lead
     const SOURCE_QUOTE_EMAIL_HOME_REQUIRED = 'quote-email-home-required';
     const SOURCE_EXIT_POPUP = 'exit-popup';
 
+    // Home Contents
+    const SOURCE_CONTENTS_BUZZ = 'home-contents-buzz';
+
     // Competition/Cold leads
     const SOURCE_COMPETITION = 'competition';
 
@@ -98,7 +101,7 @@ class Lead
      *                 "invite-not-ready", "competition",
      *                 "aggregator", "send-quote",
      *                 "quote-email-home", "quote-email-home-required",
-     *                 "exit-popup"}, strict=true)
+     *                 "exit-popup", "home-contents-buzz"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

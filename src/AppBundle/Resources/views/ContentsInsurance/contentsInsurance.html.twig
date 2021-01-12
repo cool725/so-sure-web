@@ -1,0 +1,45 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'contents-insurance' %}
+
+{% block title %}Contents Insurance | SO-SURE{% endblock %}
+{% block meta %}
+    <meta name="description" content="Add description..."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/contents-insurance.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <h1 class="text-white fit">Contents Insurance <br class="d-md-none"> <span class="sub"><span class="d-none d-md-inline">-</span> coming soon!</span></h1>
+            <p class="lead text-white mb-4">All the things you love about SO-SURE, now for all the things you love.</p>
+            <form class="lead-form validate-form"
+                  data-toggle="validator"
+                  data-client-validation="{{ form_client_validation }}"
+                  data-csrf="{{ lead_csrf }}"
+                  data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz'}) }}"
+                  autocomplete="off">
+                <h2 class="h5 mb-4 lead-feedback">Be the first to know when we launch</h2>
+                <div class="form-group">
+                    <label for="lead-email" class="sr-only">Email Address</label>
+                    <input type="email" name="lead-email" class="lead-email form-control" placeholder="Enter email address..." />
+                </div>
+                <button type="submit" class="btn btn-success lead-submit btn-block-xs">Notify Me</button>
+            </form>
+        </div>
+    </section>
+
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/contents-insurance.js') }}"></script>
+{% endblock %}

@@ -25,16 +25,20 @@
                 "@type": "Place",
                 "address": {
                   "@type": "PostalAddress",
-                  "addressLocality": "Tower Hamlets",
+                  "addressLocality": "City of London",
                   "addressRegion": "London",
-                  "postalCode": "E1 7PT",
-                  "streetAddress": "114 Whitechapel High Street"
+                  "postalCode": "EC3V 0EE",
+                  "streetAddress": "55 Gracechurch Street"
                 },
-                "name": "Relay Building"
+                "name": "6th Floor"
             },
             "logo": "{{ cdn_url }}/images/rebrand/logo/so-sure_logo_square.png",
             "description": "The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure.",
-            "sameAs": ["https://twitter.com/wearesosure", "https://www.facebook.com/wearesosure"]
+            "sameAs": [
+                "https://twitter.com/wearesosure",
+                "https://www.facebook.com/wearesosure",
+                "https://www.instagram.com/wearesosure"
+            ]
         },
         {
             "@type" : "WebSite",
@@ -53,9 +57,10 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="mb-4 text-white text-center fit">
-                <span class="sub text-deep-sky-blue-d">Simply Better</span> Mobile Insurance
+            <h1 class="text-white text-center fit">
+                Mobile Insurance <br class="d-lg-none"><span class="sub text-deep-sky-blue-d">That’s a Win-Win 🙌</span>
             </h1>
+            <p class="lead mb-4 text-white text-center">Great value if you need us — Money back if you don’t!</p>
             <div class="row">
                 <div class="col-md-6 d-none d-md-block">
                     <div class="hero__illustration mt-md-4">
@@ -72,9 +77,14 @@
                 </div>
                 <div class="col-md-6 col-lg-5 offset-lg-1">
                     {% if phone is defined and phone %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc', 'id': phone.id }|merge(app.request.query.all))) }}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
+                            'type': 'homepage',
+                            'id': phone.id }|merge(app.request.query.all)
+                        )) }}
                     {% else %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', { 'type': 'homepage-jc' }|merge(app.request.query.all))) }}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
+                            'type': 'homepage' }|merge(app.request.query.all)
+                        )) }}
                     {% endif %}
                 </div>
             </div>

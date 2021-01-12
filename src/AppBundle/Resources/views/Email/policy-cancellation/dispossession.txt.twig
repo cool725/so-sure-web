@@ -12,8 +12,8 @@ If you have any questions, please don't hesitate to contact us (support@wearesos
 ============================================================
 ** (http://www.twitter.com/wearesosure)
 ** (https://www.facebook.com/wearesosure)
+** (https://www.instagram.com/wearesosure)
 ** (http://wearesosure.com)
-** (http://blog.wearesosure.com)
 ** (mailto:hello@wearesosure.com)
 
 Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
@@ -21,4 +21,4 @@ Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
 {% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
 
 Our mailing address is:
-so-sure, Relay Builiding, 114 Whitechapel High Street, London, E1 7PT, UK
+{{ business_address|replace({'\n':','}) }}

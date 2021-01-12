@@ -35,8 +35,8 @@
 
     li {
         position: relative;
-        padding-left: 45px;
-        padding-top: 2px;
+        padding-left: 25px;
+        // padding-top: 4px;
 
         span {
             position: absolute;
@@ -55,7 +55,8 @@
 
         > .far,
         > .fal,
-        > .fab {
+        > .fab,
+        > .fas {
             position: absolute;
             left: 0; top: 5px;
         }
@@ -66,7 +67,8 @@
 
         > .far,
         > .fal,
-        > .fab {
+        > .fab,
+        > .fas {
             top: 2px;
         }
     }
@@ -76,7 +78,8 @@
 
         > .far,
         > .fal,
-        > .fab {
+        > .fab,
+        > .fas {
             top: 5px;
         }
     }

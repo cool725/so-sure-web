@@ -93,7 +93,8 @@
 .home-instore,
 .user-competition,
 .user-referral,
-.user {
+.user,
+.contents-insurance {
     .navbar-so-sure {
         background-image: none;
     }
@@ -126,6 +127,12 @@
     background-image: none;
     background-color: $crayon-blue;
     box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.05);
+}
+
+.money {
+    .navbar-scrolled:not(.devbar) {
+        background-color:  #85234B;
+    }
 }
 
 .landing-twitter {

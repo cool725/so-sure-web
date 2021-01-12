@@ -7,41 +7,33 @@
 {% set robots_noindex = true %}
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
+{% set device_is = 'so-sure_quote-device.svg' %}
 {% if phone %}
     {% set body_class = 'purchase' %}
     {% set make_desc = phone.make %}
     {% if phone.make == 'Apple' %}
         {% set make_desc = '' %}
+        {# {% set device_is = 'so-sure_quote_device.png' %} #}
     {% endif %}
+    {% set yearly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') %}
+    {% set yearlyMonthly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') / 12 %}
+    {% set monthly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') %}
+    {% set monthlyYearly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') * 12 %}
+    {% set difference = monthlyYearly - yearly %}
 {% endif %}
 
-{% block title %}Purchase | so-sure{% endblock %}
+{% block title %}
+    {% if phone %}
+        Purchase {{ phone.make }} {{ phone.model }} Insurance | SO-SURE
+    {% else %}
+        Purchase | SO-SURE
+    {% endif %}
+{% endblock %}
 
 {% block meta %}{% endblock %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
-{% endblock %}
-
-{% block gtm_data %}
-    {% if phone %}
-        ,
-        'event': 'checkout',
-        'ecommerce': {
-            'checkout': {
-                'actionField': {'step': 2},
-                'products': [{
-                    'id': '{{ phone.id }}',
-                    'name': '{{ phone.make }} {{ phone.model }}',
-                    'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
-                    'brand': '{{ phone.make }}',
-                    'category': '{{ phone.make }}',
-                    'variant': '{{ phone.memory }}GB',
-                    'quantity': 1
-                }]
-            }
-        }
-    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -50,93 +42,7 @@
             {% if phone %}
                 {# Main Content #}
                 <div class="qpw__main__container">
-                    <div class="qpw__main px-4 px-lg-5">
-                        <div class="qpw__h5 h5 text-center text-lg-left text-white mb-4">Here are your quote details, insure your:</div>
-                        <div class="d-flex justify-content-center justify-content-lg-start align-items-center justify-content-lg-start">
-                            <h1 class="qpw__h1 text-columbia-blue-e fit">
-                                <span class="sub">
-                                    {{ make_desc }} {{ phone.model }}
-                                    <small>({{ phone.memory }}GB)</small>
-                                </span>
-                            </h1>
-                            <div class="qpw__alt__phones">
-                                <a href="#mem_sizes"
-                                   class="dropdown-toggle"
-                                   id="dropdownMenuLink"
-                                   data-toggle="collapse"
-                                   role="button"
-                                   aria-expanded="false"
-                                   aria-controls="mem_sizes"
-                                   title="Not the phone you're looking for?">
-                                    <i class="far fa-chevron-down text-white fa-lg ml-3"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="collapse my-4 text-center text-lg-left" id="mem_sizes">
-                            {% if phones | length > 1 %}
-                                <ul class="list-inline">
-                                    {% for phone_mem in phones %}
-                                        {% if phone_mem.id != phone.id  %}
-                                            <li class="list-inline-item">
-                                                <a href="{{ path('quote_phone', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class="btn btn-outline-white btn-sm" href="#">{{ phone_mem.memory }}GB</a>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                            <a class="text-white get-a-quote disabled" href="#">
-                                <small>Not the phone you're looking for?</small>
-                            </a>
-                        </div>
-                        {% set yearly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') %}
-                        {% set yearlyMonthly = prices['yearly'].yearlyPremiumPrice|number_format(2, '.', ',') / 12 %}
-                        {% set monthly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') %}
-                        {% set monthlyYearly = prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') * 12 %}
-                        {% set difference = monthlyYearly - yearly %}
-                        <div class="qpw__h3 h4 text-center text-lg-left text-white mb-4 fit">                            
-                            {% if not app.user or app.user.allowedMonthly %}                  
-                                &pound;{{ yearlyMonthly }}<span class="sub">/month if you pay yearly<br> or pay</span> &pound;{{ monthly }} <span class="sub">per month</span>
-                            {% else %}
-                                <span class="sub">For only</span> &pound;{{ yearly }} <span class="sub">a year</span>
-                            {% endif %}
-                        </div>
-                        {% if validation_required is not null %}
-                            <p class="text-white text-center text-lg-left mb-lg-4">👋 You must use the so-sure app to validate your phone within 14 days or you will not be able to claim and the policy will be cancelled</p>
-                        {% endif %}
-                        <div class="qpw__h5 h5 d-block d-lg-none text-center">
-                            <a href="#qpw-info-mobile"
-                               id="qpw-info-btn"
-                               class="text-white">
-                                View my excess <i class="fas fa-caret-down ml-2"></i>
-                            </a>
-                        </div>
-                        <div class="qpw__footer d-none d-lg-block">
-                            <div class="purchase__footer__text">
-                                <h2 class="h4 text-columbia-blue-e">Easy, Fast &amp; Great Value</h2>
-                                <ul class="list-unstyled icn-fa-list">
-                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Fast replace and repair service</li>
-                                    <li class="text-white mb-2"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Up to 80% no claims cashback</li>
-                                    <li class="text-white"><i class="far fa-check text-columbia-blue-e fa-lg"></i> Low price and excess from &pound;{{ prices['monthly'].picsureexcess.damage }}</li>
-                                </ul>
-                            </div>
-                            <div class="qpw__footer__cta">
-                                <a href="#qpw-info"
-                                   class="btn btn-outline-columbia-blue-e mt-2 toggle-text"
-                                   data-toggle="collapse"
-                                   data-target="#qpw-info"
-                                   data-text-swap='Hide my excess/IPID <i class="fas fa-caret-up ml-2"></i>'
-                                   role="button"
-                                   aria-expanded="false"
-                                   aria-controls="qpw-info">View my excess
-                                   <i class="fas fa-caret-down ml-2"></i>
-                               </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="qpw-info" class="qpw__info__container mt-4 collapse">
-                        {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore, 'validation_required': validation_required } %}
-                    </div>
+                    {% include 'AppBundle::Purchase/_mainTitleAndPrice.html.twig' %}
                 </div>
                 {# Curve Desktop #}
                 <div class="qpw__curve">
@@ -157,12 +63,12 @@
                 </div>
                 {# Mobile Info #}
                 <div id="qpw-info" class="qpw__info__container__mobile d-block d-lg-none">
-                    {% include 'AppBundle::PhoneInsurance/_seeFullDetails.html.twig' with {'instore': instore, 'validation_required': validation_required } %}
+                    {% include 'AppBundle::Purchase/_seeFullDetails.html.twig' %}
                 </div>
             {% else %}
                 <div class="purchase__details__container">
                     <div class="purchase__details p-4 p-lg-5 mt-5">
-                        <h2 class="text-white h1 mb-5">Whoops, no phone selected... 😩</h2>
+                        <h2 class="text-white h1 mb-5 fit">Whoops, no phone selected... 😩</h2>
                         <a href="#"
                            class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote disabled track-data"
                            data-event="no-phone-in-session">

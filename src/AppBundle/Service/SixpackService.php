@@ -26,13 +26,7 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     // Exp 1
-    const EXPERIMENT_MANUFACTURER_PAGES_USPS = 'Manufacturers Landing Pages USPs';
-
-    // Exp 2
-    const EXPERIMENT_HOMEPAGE_DESIGN_V2 = 'Homepage Design V2';
-
-    // Exp 3
-    //
+    // const EXPERIMENT_MONEY_LANDING = 'Money Landing Page Background';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
@@ -130,16 +124,21 @@ class SixpackService
         'Landing Page Design',
         'Scode Layout Variation',
         'Purchase Payment Step',
-        'Homepage Design'
+        'Homepage Design',
+        'Homepage Design V2',
+        'Homepage Design V3',
+        'Marketing Homepage Design',
+        'Homepage Design and Copy',
+        'User Opt In copy',
+        'Money iPhone Landing Page Background',
+        'Homepage Copy',
+        'Manufacturers Landing Pages USPs',
+        'Money Landing Page Background'
     ];
 
     public static $unauthExperiments = [
         // Exp 1
-        self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-        // Exp 2
-        self::EXPERIMENT_HOMEPAGE_DESIGN_V2,
-        // Exp 3
-        //
+        // self::EXPERIMENT_MONEY_LANDING,
     ];
 
     public static $authExperiments = [
@@ -175,11 +174,7 @@ class SixpackService
      */
     public static $purchaseConversionKpi = [
         // Exp 1
-        self::EXPERIMENT_MANUFACTURER_PAGES_USPS,
-        // Exp 2
-        self::EXPERIMENT_HOMEPAGE_DESIGN_V2,
-        // Exp 3
-        //
+        // self::EXPERIMENT_MONEY_LANDING,
     ];
 
     /** @var LoggerInterface */
