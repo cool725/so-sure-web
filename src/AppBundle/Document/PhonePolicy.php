@@ -3,7 +3,6 @@
 namespace AppBundle\Document;
 
 use AppBundle\Classes\NoOp;
-use AppBundle\Classes\PolicyReport;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -236,11 +235,6 @@ abstract class PhonePolicy extends Policy
      * @Gedmo\Versioned
      */
     protected $picSureRequired;
-
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", cascade={"persist"})
-     */
-    protected $picsureReportLine = null;
 
     /**
      * @return Phone
@@ -918,29 +912,6 @@ abstract class PhonePolicy extends Policy
     public function setPicSureRequired($picSureRequired)
     {
         $this->picSureRequired = $picSureRequired;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getReportLineByType($type)
-    {
-        if ($type == PolicyReport::TYPE_PICSURE) {
-            return $this->picsureReportLine;
-        }
-        return parent::getReportLineByType($type);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setReportLineByType($type, $value)
-    {
-        if ($type == PolicyReport::TYPE_PICSURE) {
-            $this->picsureReportLine = $value;
-        } else {
-            parent::setReportLineByType($type, $value);
-        }
     }
 
     public function isSameInsurable(Policy $policy)

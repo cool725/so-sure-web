@@ -4,7 +4,6 @@ namespace AppBundle\Document;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\NoOp;
-use AppBundle\Classes\PolicyReport;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\Note;
@@ -666,16 +665,6 @@ abstract class Policy
      * @var Subvariant|null
      */
     protected $subvariant = null;
-
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", cascade={"persist"})
-     */
-    protected $policyReportLine = null;
-
-    /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\ReportLine", cascade={"persist"})
-     */
-    protected $scodeReportLine = null;
 
     public function __construct()
     {
@@ -3062,42 +3051,6 @@ abstract class Policy
     public function setSubvariant($subvariant)
     {
         $this->subvariant = $subvariant;
-    }
-
-    /**
-     * Gives you a report line for the given type of report.
-     * @param string $type is the name of the type of report that you are getting.
-     * @return ReportLine|null the reportline found.
-     */
-    public function getReportLineByType($type)
-    {
-        switch ($type) {
-            case PolicyReport::TYPE_POLICY:
-                return $this->policyReportLine;
-            case PolicyReport::TYPE_SCODE:
-                return $this->scodeReportLine;
-            default:
-                throw new \Exception(sprintf('%s is not a value type of policy report', $type));
-        }
-    }
-
-    /**
-     * Sets a reportline object on this policy based on the type that it is.
-     * @param string          $type  is the type of reportline to change.
-     * @param ReportLine|null $value is the value to set this reportline to.
-     */
-    public function setReportLineByType($type, $value)
-    {
-        switch ($type) {
-            case PolicyReport::TYPE_POLICY:
-                $this->policyReportLine = $value;
-                break;
-            case PolicyReport::TYPE_SCODE:
-                $this->scodeReportLine = $value;
-                break;
-            default:
-                throw new \Exception(sprintf('%s is not a value type of policy report', $type));
-        }
     }
 
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)

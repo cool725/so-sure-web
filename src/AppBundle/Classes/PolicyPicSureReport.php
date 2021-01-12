@@ -2,7 +2,6 @@
 
 namespace AppBundle\Classes;
 
-use AppBundle\Helpers\CsvHelper;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use DateTimeZone;
@@ -34,14 +33,6 @@ class PolicyPicSureReport extends PolicyReport
     /**
      * @inheritDoc
      */
-    public function getType()
-    {
-        return PolicyReport::TYPE_PICSURE;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getHeaders()
     {
         return ['Policy Number', 'Start', 'Make/Model/Memory', 'First Login in App', 'PicSure Status'];
@@ -52,10 +43,9 @@ class PolicyPicSureReport extends PolicyReport
      */
     public function process(Policy $policy)
     {
-        $user = $policy->getUser();
-        if ($policy instanceof PhonePolicy && $user && $policy->isValidPolicy()) {
+        if ($policy instanceof PhonePolicy) {
             $first = $policy->getUser()->getFirstLoginInApp();
-            return CsvHelper::line(
+            $this->add(
                 $policy->getPolicyNumber(),
                 $policy->getStart()->format('Ymd H:i'),
                 $policy->getPhone()->__toString(),
@@ -63,6 +53,5 @@ class PolicyPicSureReport extends PolicyReport
                 $policy->getPicSureStatus()
             );
         }
-        return null;
     }
 }

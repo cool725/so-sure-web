@@ -57,13 +57,6 @@ class DoctrineUserListener extends BaseDoctrineListener
             $event = new UserEmailEvent($user, $eventArgs->getOldValue('email'));
             $this->dispatcher->dispatch(UserEmailEvent::EVENT_CHANGED, $event);
         }
-        if ($this->hasDataChanged(
-            $eventArgs,
-            User::class,
-            ['gender', 'policyAddress', 'email', 'leadSource', 'attribution', 'latestAttribution', 'birthday']
-        )) {
-            $this->triggerEvent($user, UserEvent::EVENT_REPORT_LINE);
-        }
 
         // If both confirmationToken & passwordRequestAt are changing to null,
         // then the user has reset their password using their token.
