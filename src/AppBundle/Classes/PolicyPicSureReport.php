@@ -53,7 +53,7 @@ class PolicyPicSureReport extends PolicyReport
     public function process(Policy $policy)
     {
         $user = $policy->getUser();
-        if ($policy instanceof PhonePolicy && $user) {
+        if ($policy instanceof PhonePolicy && $user && $policy->isValidPolicy()) {
             $first = $policy->getUser()->getFirstLoginInApp();
             return CsvHelper::line(
                 $policy->getPolicyNumber(),
