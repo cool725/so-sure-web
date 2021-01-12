@@ -20,7 +20,7 @@ abstract class PolicyReport
     const TYPES = [
         TYPE_POLICY,
         TYPE_PICSURE,
-        TYPE_SCODE 
+        TYPE_SCODE
     ];
 
     /**
