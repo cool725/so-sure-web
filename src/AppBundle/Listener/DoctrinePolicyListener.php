@@ -38,13 +38,6 @@ class DoctrinePolicyListener extends BaseDoctrineListener
             if (!$policy->isValidPolicy()) {
                 return;
             }
-            if (!$this->hasDataChanged(
-                $eventArgs,
-                Policy::class,
-                ['policyReportLine', 'scodeReportLine', 'picsureReportLine']
-            )) {
-                $this->triggerEvent($policy, PolicyEvent::EVENT_REPORT_LINE);
-            }
         }
 
         if ($this->hasDataChanged(

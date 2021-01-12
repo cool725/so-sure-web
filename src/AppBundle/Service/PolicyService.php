@@ -5,8 +5,6 @@ namespace AppBundle\Service;
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\NoOp;
-use AppBundle\Classes\PolicyReport;
-use AppBundle\Document\ReportLine;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Feature;
@@ -2935,46 +2933,6 @@ class PolicyService
                 'Could not find scheduled payment to skip for policy %s referral bonus',
                 $policy->getId()
             ));
-        }
-    }
-
-    /**
-     * Takes a policy and gives it up to date report lines for each relevant policy report type. If the policy has
-     * ReportLine objects for the report types already it updates them and if it lacks them then it creates them. If
-     * the policy is not eligible for reportlines for whatever reason then they are removed if present and nothing is
-     * done otherwise.
-     * @param PhonePolicy $policy is the policy for which we are to create report lines.
-     */
-    public function generateReportLines($policy)
-    {
-        foreach (PolicyReport::TYPES as $reportType) {
-            $report = PolicyReport::createReport($reportType, $this->dm, new \DateTimeZone('Europe/London'));
-            $line = $policy->getReportLineByType($reportType);
-            if (!$line) {
-                $line = new ReportLine();
-                $line->setNumber($this->sequence->getSequenceId(SequenceService::SEQUENCE_REPORT_LINE));
-                $line->setPolicy($policy);
-                $line->setReport($reportType);
-                $policy->setReportLineByType($reportType, $line);
-                $this->dm->persist($line);
-            }
-            $line->setDate(new \DateTime());
-            $line->setContent($report->process($policy));
-        }
-    }
-
-    /**
-     * Deletes all report lines for the given policy.
-     * @param PhonePolicy $policy is the policy to get deleting for.
-     */
-    public function deleteReportLines($policy)
-    {
-        foreach (PolicyReport::TYPES as $reportType) {
-            $report = $policy->getReportLineByType($reportType);
-            if ($report) {
-                $this->dm->remove($report);
-            }
-            $policy->setReportLineByType($reportType, null);
         }
     }
 }

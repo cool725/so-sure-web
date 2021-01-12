@@ -6,9 +6,8 @@ use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Repository\ConnectionRepository;
-use AppBundle\Helpers\CsvHelper;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use DateTimeZone;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * Generates policy report showing scodes.
@@ -44,17 +43,9 @@ class PolicyScodeReport extends PolicyReport
     /**
      * @inheritDoc
      */
-    public function getType()
-    {
-        return PolicyReport::TYPE_SCODE;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getHeaders()
     {
-        return ['Scode', 'Scode Type', 'User Id', 'Policy Number', 'Date'];
+        return ["Scode", "Scode Type", "User Id", "Policy Number", "Date"];
     }
 
     /**
@@ -62,7 +53,6 @@ class PolicyScodeReport extends PolicyReport
      */
     public function process(Policy $policy)
     {
-        $content = '';
         foreach ($policy->getSCodes() as $scode) {
             $type = $scode->getType();
             $connection = null;
@@ -74,18 +64,14 @@ class PolicyScodeReport extends PolicyReport
                 $connection = $this->connectionRepo->connectedByPolicy($policy, $other);
             }
             if ($connection) {
-                $content .= CsvHelper::line(
+                $this->add(
                     $scode->getCode(),
                     $scode->getType(),
                     $policy->getUser()->getId(),
                     $policy->getPolicyNumber(),
-                    $connection->getDate()->format('Y-m-d H:i')
-                ) . '\n';
+                    $connection->getDate()->format("Y-m-d H:i")
+                );
             }
         }
-        if ($content == '') {
-            return null;
-        }
-        return $content;
     }
 }

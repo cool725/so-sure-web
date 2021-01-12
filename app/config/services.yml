@@ -1144,15 +1144,6 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: prePersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
-    app.listener.policyReport:
-      class: AppBundle\Listener\PolicyReportListener
-      arguments:
-        - "@app.policy"
-        - "@logger"
-      tags:
-        - { name: kernel.event_listener, event: event.policy.report-line, method: policyRefresh }
-        - { name: kernel.event_listener, event: event.user.report-line, method: userRefresh }
-
     app.listener.validation:
         class:   AppBundle\Listener\ValidationListener
         arguments:
