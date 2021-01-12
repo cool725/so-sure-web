@@ -137,7 +137,9 @@ class PolicyBiReport extends PolicyReport
      */
     public function process(Policy $policy)
     {
-        if (!($policy instanceof PhonePolicy) || $policy->getEnd() <= $policy->getStart()) {
+        if (!($policy instanceof PhonePolicy) || !$policy->isValidPolicy() ||
+            $policy->getEnd() <= $policy->getStart()
+        ) {
             return null;
         }
         $connections = $policy->getConnections();
