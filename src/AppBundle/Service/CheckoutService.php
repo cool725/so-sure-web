@@ -946,10 +946,8 @@ class CheckoutService
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
             $paymentMethod = new CheckoutPaymentMethod();
-                $this->logger->error('idiot');
             if ($saveBacs && $policy->getBacsPaymentMethod()) {
-                $this->logger->error('noreg');
-                $paymentMethod->setCoveringBankAccount($policy->getPaymentMethod()->getBankAccount());
+                $paymentMethod->setCoveringBankAccount($policy->getBacsPaymentMethod()->getBankAccount());
             }
             $policy->setPaymentMethod($paymentMethod);
         }

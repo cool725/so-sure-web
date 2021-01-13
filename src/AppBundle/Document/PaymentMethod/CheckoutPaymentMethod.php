@@ -4,6 +4,7 @@ namespace AppBundle\Document\PaymentMethod;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\BankAccount;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -230,7 +231,7 @@ class CheckoutPaymentMethod extends PaymentMethod
      */
     public function getCoveringBankAccount()
     {
-        return $this->coveringBankAccount();
+        return $this->coveringBankAccount;
     }
 
     /**

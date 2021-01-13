@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
@@ -172,6 +173,9 @@ class BacsService
     /** @var SftpService */
     protected $accesspaySftpService;
 
+    /** @var CheckoutService */
+    protected $checkoutService;
+
     protected $warnings;
 
     /**
@@ -191,6 +195,7 @@ class BacsService
      * @param EventDispatcherInterface $dispatcher
      * @param SftpService              $sosureSftpService
      * @param SftpService              $accesspaySftpService
+     * @param CheckoutService          $checkoutService
      */
     public function __construct(
         DocumentManager $dm,
@@ -208,7 +213,8 @@ class BacsService
         MailerService $mailer,
         EventDispatcherInterface $dispatcher,
         SftpService $sosureSftpService,
-        SftpService $accesspaySftpService
+        SftpService $accesspaySftpService,
+        CheckoutService $checkoutService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -229,6 +235,7 @@ class BacsService
         $this->dispatcher = $dispatcher;
         $this->sosureSftpService = $sosureSftpService;
         $this->accesspaySftpService = $accesspaySftpService;
+        $this->checkoutService = $checkoutService;
     }
 
     /**
