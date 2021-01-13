@@ -1013,6 +1013,18 @@ class BacsService
             /** @var BacsPayment $payment */
             try {
                 $payment->approve();
+                $paymentMethod = $payment->getPolicy()->getPaymentMethod();
+                if ($paymentMethod instanceof CheckoutPaymentMethod &&
+                    $paymentMethod->getCoveringBankAccount()
+                ) {
+                    $this->checkoutService->refund(
+                        $payment->getPolicy()->findPaymentForRefund($payment->getAmount()),
+                        $payment->getAmount()
+                    );
+                    $bacsPaymentMethod = new BacsPaymentMethod();
+                    $bacsPaymentMethod->setBankAccount($paymentMethod->getCoveringBankAccount());
+                    $payment->getPolicy()->setPaymentMethod($bacsPaymentMethod);
+                }
             } catch (\Exception $e) {
                 $this->logger->error(
                     sprintf('Skipping payment %s approval', $payment->getId()),

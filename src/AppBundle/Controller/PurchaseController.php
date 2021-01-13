@@ -1568,6 +1568,7 @@ class PurchaseController extends BaseController
             $token = $request->get("token");
             $pennies = $request->get("pennies");
             $freq = $request->get('premium');
+            $saveBacs = $request->get('save_bank') == '1';
             if ($request->get('_route') == 'purchase_checkout') {
                 $priceService = $this->get('app.price');
                 $additionalPremium = $policy->getUser()->getAdditionalPremium();
@@ -1778,11 +1779,7 @@ class PurchaseController extends BaseController
                     }
                 }
             } else {
-                $checkout->updatePaymentMethod(
-                    $policy,
-                    $token,
-                    $amount
-                );
+                $checkout->updatePaymentMethod($policy, $token, $amount, $saveBacs);
             }
 
             $this->addFlash('success', $successMessage);

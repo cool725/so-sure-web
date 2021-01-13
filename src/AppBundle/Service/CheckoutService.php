@@ -929,11 +929,13 @@ class CheckoutService
 
     /**
      * Stores new card details and starts a new chain of payments.
-     * @param Policy     $policy is the policy to whom the new details belong.
-     * @param string     $token  is the checkout token with which we can make the request to checkout.
-     * @param float|null $amount is an optional amount of money to charge in the same request.
+     * @param Policy     $policy   is the policy to whom the new details belong.
+     * @param string     $token    is the checkout token with which we can make the request to checkout.
+     * @param float|null $amount   is an optional amount of money to charge in the same request.
+     * @param boolean    $saveBacs is an optional thing to save the existing bacs payment method if it is there and put
+     *                             it on the new checkout payment method.
      */
-    public function updatePaymentMethod(Policy $policy, $token, $amount = null)
+    public function updatePaymentMethod(Policy $policy, $token, $amount = null, $saveBacs = false)
     {
         $throwLater = false;
         $thingToThrow = null;
@@ -944,6 +946,11 @@ class CheckoutService
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
             $paymentMethod = new CheckoutPaymentMethod();
+                $this->logger->error('idiot');
+            if ($saveBacs && $policy->getBacsPaymentMethod()) {
+                $this->logger->error('noreg');
+                $paymentMethod->setCoveringBankAccount($policy->getPaymentMethod()->getBankAccount());
+            }
             $policy->setPaymentMethod($paymentMethod);
         }
         try {
