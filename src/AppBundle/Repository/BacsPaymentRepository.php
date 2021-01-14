@@ -6,6 +6,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use DateInterval;
 use DateTime;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
@@ -128,5 +129,23 @@ class BacsPaymentRepository extends PaymentRepository
         } catch (MongoDBException $e) {
             return [];
         }
+    }
+
+    /**
+     * Finds bacs payments that have not been reverted which have got a covering checkout payment which are ready to be
+     * reverted.
+     * @param \DateTime $date is the date which is to be considered now for the sake of finding which bacs payments are
+     *                        ready to go.
+     * @return Cursor over the found results.
+     */
+    public function findReadyCoveredPayments(DateTime $date)
+    {
+        return $this->createQueryBuilder()
+            ->field('coveredBy')->exists(true)
+            ->field('success')->equals(true)
+            ->field('bacsReversedDate')->lt($date)
+            ->field('coveringPaymentRefunded')->equals(false)
+            ->getQuery()
+            ->execute();
     }
 }

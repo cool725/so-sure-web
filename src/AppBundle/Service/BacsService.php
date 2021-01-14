@@ -4,7 +4,6 @@ namespace AppBundle\Service;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
-use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
@@ -173,9 +172,6 @@ class BacsService
     /** @var SftpService */
     protected $accesspaySftpService;
 
-    /** @var CheckoutService */
-    protected $checkoutService;
-
     protected $warnings;
 
     /**
@@ -195,7 +191,6 @@ class BacsService
      * @param EventDispatcherInterface $dispatcher
      * @param SftpService              $sosureSftpService
      * @param SftpService              $accesspaySftpService
-     * @param CheckoutService          $checkoutService
      */
     public function __construct(
         DocumentManager $dm,
@@ -213,8 +208,7 @@ class BacsService
         MailerService $mailer,
         EventDispatcherInterface $dispatcher,
         SftpService $sosureSftpService,
-        SftpService $accesspaySftpService,
-        CheckoutService $checkoutService
+        SftpService $accesspaySftpService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -235,7 +229,6 @@ class BacsService
         $this->dispatcher = $dispatcher;
         $this->sosureSftpService = $sosureSftpService;
         $this->accesspaySftpService = $accesspaySftpService;
-        $this->checkoutService = $checkoutService;
     }
 
     /**
@@ -1021,17 +1014,6 @@ class BacsService
             try {
                 $payment->approve();
                 $paymentMethod = $payment->getPolicy()->getPaymentMethod();
-                if ($paymentMethod instanceof CheckoutPaymentMethod &&
-                    $paymentMethod->getCoveringBankAccount()
-                ) {
-                    $this->checkoutService->refund(
-                        $payment->getPolicy()->findPaymentForRefund($payment->getAmount()),
-                        $payment->getAmount()
-                    );
-                    $bacsPaymentMethod = new BacsPaymentMethod();
-                    $bacsPaymentMethod->setBankAccount($paymentMethod->getCoveringBankAccount());
-                    $payment->getPolicy()->setPaymentMethod($bacsPaymentMethod);
-                }
             } catch (\Exception $e) {
                 $this->logger->error(
                     sprintf('Skipping payment %s approval', $payment->getId()),

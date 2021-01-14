@@ -11,7 +11,9 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\CheckoutFile;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\Payment\CheckoutPayment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
+use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Exception\CommissionException;
 use AppBundle\Exception\DuplicatePaymentException;
 use AppBundle\Exception\InvalidPaymentMethodException;
@@ -929,13 +931,14 @@ class CheckoutService
 
     /**
      * Stores new card details and starts a new chain of payments.
-     * @param Policy     $policy   is the policy to whom the new details belong.
-     * @param string     $token    is the checkout token with which we can make the request to checkout.
-     * @param float|null $amount   is an optional amount of money to charge in the same request.
-     * @param boolean    $saveBacs is an optional thing to save the existing bacs payment method if it is there and put
-     *                             it on the new checkout payment method.
+     * @param Policy           $policy             is the policy to whom the new details belong.
+     * @param string           $token              is the checkout token with which we can make the request to
+     *                                             checkout.
+     * @param float|null       $amount             is an optional amount of money to charge in the same request.
+     * @param BacsPayment|null $coveredBacsPayment is an optional bacs payment to say that the created payment is
+     *                                             covering for while it pends.
      */
-    public function updatePaymentMethod(Policy $policy, $token, $amount = null, $saveBacs = false)
+    public function updatePaymentMethod(Policy $policy, $token, $amount = null, $coveredBacsPayment = null)
     {
         $throwLater = false;
         $thingToThrow = null;
@@ -946,7 +949,7 @@ class CheckoutService
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
             $paymentMethod = new CheckoutPaymentMethod();
-            if ($saveBacs && $policy->getBacsPaymentMethod()) {
+            if ($coveredBacsPayment && $policy->getBacsPaymentMethod()) {
                 $paymentMethod->setCoveringBankAccount($policy->getBacsPaymentMethod()->getBankAccount());
             }
             $policy->setPaymentMethod($paymentMethod);
@@ -996,6 +999,11 @@ class CheckoutService
                 $payment->setInfo($details->getResponseAdvancedInfo());
                 $payment->setResponseCode($details->getResponseCode());
                 $payment->setRiskScore($details->getRiskCheck());
+                if ($coveredBacsPayment) {
+                    $coveredBacsPayment->setCoveredBy($payment);
+                    $coveredBacsPayment->setCoveringPaymentRefunded(false);
+                    $payment->setCovering($coveredBacsPayment);
+                }
                 try {
                     $this->setCommission($payment, true);
                 } catch (CommissionException $e) {
