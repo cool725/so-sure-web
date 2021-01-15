@@ -166,7 +166,6 @@ class UpgradeService
                     throw new \RuntimeException('Yearly Payment Failed');
                 }
             } elseif ($paymentMethod->getType() == PaymentMethod::TYPE_BACS) {
-                $this->policyService->clearRescheduledPayments($policy);
                 $this->bacsService->scheduleBacsPayment(
                     $policy,
                     $amount,
@@ -181,6 +180,7 @@ class UpgradeService
             }
         }
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_UPGRADED);
+        $this->policyService->clearRescheduledPayments($policy);
         $this->dm->persist($policy);
         $this->dm->flush();
         // Dispatch an event.
