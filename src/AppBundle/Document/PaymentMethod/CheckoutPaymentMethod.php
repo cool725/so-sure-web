@@ -61,13 +61,6 @@ class CheckoutPaymentMethod extends PaymentMethod
      */
     protected $previousChargeId = 'none';
 
-    /**
-     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\BankAccount")
-     * @Gedmo\Versioned
-     * @var BankAccount
-     */
-    protected $coveringBankAccount;
-
     public function setCustomerId($customerId)
     {
         $this->customerId = $customerId;
@@ -223,24 +216,6 @@ class CheckoutPaymentMethod extends PaymentMethod
         $isNone = $this->getPreviousChargeId() === "none";
         $isEmpty = mb_strlen($this->getPreviousChargeId()) == 0;
         return !$isNone && !$isEmpty;
-    }
-
-    /**
-     * Gives you the bank account this is covering if any.
-     * @return BankAccount|null the bank account.
-     */
-    public function getCoveringBankAccount()
-    {
-        return $this->coveringBankAccount;
-    }
-
-    /**
-     * Sets the bank account that this checkout payment method is covering for.
-     * @param BankAccount $coveringBankAccount is the bank account.
-     */
-    public function setCoveringBankAccount($coveringBankAccount)
-    {
-        $this->coveringBankAccount = $coveringBankAccount;
     }
 
     public function __toString()

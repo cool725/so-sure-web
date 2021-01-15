@@ -74,7 +74,12 @@ class BacsCoverCommand extends ContainerAwareCommand
             if ($wet) {
                 $paymentMethod = $payment->getPolicy()->getCheckoutPaymentMethod();
                 if ($paymentMethod) {
-                    $this->checkoutService->refund($payment->getCoveredBy());
+                    $this->bacsService->scheduledBacsPayment(
+                        $payment->getPolicy(),
+                        0 - $payment->getAmount(),
+                        ScheduledPayment::TYPE_REFUND,
+                        'covering payment refund'
+                    );
                     $payment->setCoveringPaymentRefunded(true);
                     $bacsPaymentMethod = new BacsPaymentMethod();
                     $bacsPaymentMethod->setBankAccount($paymentMethod->getCoveringBankAccount());

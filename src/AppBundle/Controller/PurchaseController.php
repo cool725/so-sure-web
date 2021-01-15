@@ -1780,7 +1780,9 @@ class PurchaseController extends BaseController
                 }
             } else {
                 $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
+                $bacsPaymentMethod = $policy->getBacsPaymentMethod();
                 $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
+                $policy->setPaymentMethod($bacsPaymentMethod);
             }
 
             $this->addFlash('success', $successMessage);

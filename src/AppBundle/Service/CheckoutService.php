@@ -949,9 +949,6 @@ class CheckoutService
         $paymentMethod = $policy->getCheckoutPaymentMethod();
         if (!$paymentMethod) {
             $paymentMethod = new CheckoutPaymentMethod();
-            if ($coveredBacsPayment && $policy->getBacsPaymentMethod()) {
-                $paymentMethod->setCoveringBankAccount($policy->getBacsPaymentMethod()->getBankAccount());
-            }
             $policy->setPaymentMethod($paymentMethod);
         }
         try {
