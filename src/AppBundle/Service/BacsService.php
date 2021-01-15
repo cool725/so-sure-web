@@ -2145,9 +2145,9 @@ class BacsService
                 $metadata['debit-amount'] += $scheduledPayment->getAmount();
                 $payments[] = $payment;
             }
-            if ($update) {
-                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-            }
+        }
+        if ($update) {
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         }
         $this->notifyWarnings();
 
