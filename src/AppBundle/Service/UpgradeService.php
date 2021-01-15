@@ -166,6 +166,7 @@ class UpgradeService
                     throw new \RuntimeException('Yearly Payment Failed');
                 }
             } elseif ($paymentMethod->getType() == PaymentMethod::TYPE_BACS) {
+                $this->policyService->clearRescheduledPayments($policy);
                 $this->bacsService->scheduleBacsPayment(
                     $policy,
                     $amount,
