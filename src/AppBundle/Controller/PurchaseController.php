@@ -1779,10 +1779,18 @@ class PurchaseController extends BaseController
                     }
                 }
             } else {
-                $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
-                $bacsPaymentMethod = $policy->getBacsPaymentMethod();
+                if ($this->get('app.bacs')->sftpRunning() > 0) {
+                    $this->addFlash('warning', 'an unknown error occurred. Please try again later.');
+                    return new RedirectResponse($redirectFailure);
+                }
+                $bacsPayment = null;
+                if ($saveBacs) {
+                    $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
+                }
+                $bacsPaymentMethod = clone $policy->getBacsPaymentMethod();
                 $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
                 $policy->setPaymentMethod($bacsPaymentMethod);
+                $this->getManager()->flush();
             }
 
             $this->addFlash('success', $successMessage);

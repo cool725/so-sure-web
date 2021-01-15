@@ -67,7 +67,7 @@
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_pending' %}
 
                     {# PAYMENT PENDING #}
-                    {% set save_bank = true %}
+                    {% if !bacs_sftp %}{% set save_bank = true %}{% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
 
                     <h1 class="h2 mb-4">Payment is processing</h1>

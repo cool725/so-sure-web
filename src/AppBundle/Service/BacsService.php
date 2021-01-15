@@ -60,6 +60,7 @@ class BacsService
     const KEY_BACS_CANCEL = 'bacs:cancel';
     const KEY_BACS_QUEUE = 'bacs:queue';
     const KEY_BACS_PROCESSED = 'bacs:processed';
+    const KEY_SFTP_FLAG = 'bacs:sftp-flag';
 
     // special key to use to adjust file date instead of storing in metadata
     const SPECIAL_METADATA_FILE_DATE = 'file-date';
@@ -281,11 +282,21 @@ class BacsService
         return null;
     }
 
+    /**
+     * Returns the number of instances of the sftp function running.
+     * @return int the number of them running.
+     */
+    public function sftpRunning()
+    {
+        return $this->redis->llen(self::KEY_SFTP_FLAG);
+    }
+
     public function sftp()
     {
         $results = [];
         $errorCount = 0;
         $files = $this->sosureSftpService->listSftp();
+        $this->redis->lpush(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
         foreach ($files as $file) {
             $error = false;
             $unzippedFile = null;
@@ -310,7 +321,7 @@ class BacsService
                     ['exception' => $e]
                 );
             }
-
+            $this->redis->lpop(self::KEY_SFTP_FLAG);
             $this->sosureSftpService->moveSftp($file, !$error);
         }
 

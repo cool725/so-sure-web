@@ -1281,6 +1281,7 @@ class UserController extends BaseController
         if (!($bacsFeature || $checkoutFeature)) {
             $this->get('logger')->error('No payment providers available.');
         }
+        $bacsService = $this->get('app.bacs');
         // Send relevant information to the template. Checkout payment happens on frontend and returns to the
         // purchase controller via their server.
         return [
@@ -1288,7 +1289,8 @@ class UserController extends BaseController
             'amount' => $amount,
             'bacs_feature' => $bacsFeature,
             'unpaid_reason' => $unpaidReason,
-            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT
+            'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
+            'bacs_sftp' => ($bacsService->sftpRunning() > 0)
         ];
     }
 
