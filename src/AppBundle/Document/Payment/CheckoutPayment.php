@@ -98,7 +98,7 @@ class CheckoutPayment extends Payment
     protected $webType;
 
     /**
-     * @MongDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="covering")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="covering")
      * @Gedmo\Versioned
      * @var BacsPayment
      */
