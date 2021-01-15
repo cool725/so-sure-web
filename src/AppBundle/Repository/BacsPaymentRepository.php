@@ -2,10 +2,12 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\BacsPayment;
 use DateInterval;
 use DateTime;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use Doctrine\ODM\MongoDB\Cursor;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
