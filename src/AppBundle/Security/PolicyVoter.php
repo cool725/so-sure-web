@@ -86,7 +86,7 @@ class PolicyVoter extends Voter
             ])) {
                 return false;
             }
-            if (count($policy->getPendingBacsPayments() > 0)) {
+            if (count($policy->getPendingBacsPayments()) > 0) {
                 return false;
             }
         }

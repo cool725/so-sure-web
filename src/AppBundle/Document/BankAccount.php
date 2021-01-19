@@ -1,4 +1,4 @@
-->flush()<?php
+<?php
 // src/AppBundle/Document/User.php
 
 namespace AppBundle\Document;
