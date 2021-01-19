@@ -86,6 +86,9 @@ class PolicyVoter extends Voter
             ])) {
                 return false;
             }
+            if (count($policy->getPendingBacsPayments()) > 0) {
+                return false;
+            }
         }
 
         return $policy->getUser()->getId() == $currentUser->getId();
