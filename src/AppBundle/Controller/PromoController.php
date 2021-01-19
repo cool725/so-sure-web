@@ -36,6 +36,7 @@ class PromoController extends BaseController
      * @Route("/hotukdeals/{code}", name="hotukdeals_promo")
      * @Route("/student/{code}", name="student_promo")
      * @Route("/groupon/{code}", name="groupon_promo")
+     * @Route("/benefithub/{code}", name="benefithub_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -86,6 +87,9 @@ class PromoController extends BaseController
             $amazonVoucher = 20;
         } elseif ($request->get('_route') == 'groupon_promo') {
             $custom = 'groupon';
+            $amazonVoucher = 15;
+        } elseif ($request->get('_route') == 'benefithub_promo') {
+            $custom = 'benefithub';
             $amazonVoucher = 15;
         }
 
