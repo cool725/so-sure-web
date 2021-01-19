@@ -2073,7 +2073,7 @@ class BacsService
             $policy = $scheduledPayment->getPolicy();
 
             // Reschedule if there are already positive payments pending.
-            if ($bacsPaymentRepo->findPositivePendingBacsPayments($policy)) {
+            if (count($bacsPaymentRepo->findPositivePendingBacsPayments($policy)) > 0) {
                 $scheduledPayment->setNotes("Cancelling as BACs payment already in progress");
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate, 4);
