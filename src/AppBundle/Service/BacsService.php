@@ -2049,6 +2049,8 @@ class BacsService
         $policyType = null,
         $limit = -1
     ) {
+        /** @var BacsPaymentRepository $bacsPaymentRepo */
+        $bacsPaymentRepo = $this->dm->getRepository(BacsPayment::class);
         $payments = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
         // time for the bacs cycle
