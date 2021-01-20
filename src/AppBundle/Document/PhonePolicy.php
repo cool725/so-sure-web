@@ -348,6 +348,17 @@ abstract class PhonePolicy extends Policy
         }
     }
 
+    public function isPhoneDifferent($phone1, $phone2) : bool
+    {
+        $sArr1 = serialize($phone1);
+        $sArr2 = serialize($phone2);
+        if ($sArr1 == $sArr2) {
+            return true;
+        }
+        return false;
+    }
+
+
     public function getDetectedImei()
     {
         return $this->detectedImei;

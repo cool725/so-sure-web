@@ -13,7 +13,11 @@ $('.confirmModal').on('show.bs.modal', function (event) {
             limitDiff = 4,
             premiumDiff;
 
-        newPremium.text(newPremiumPrice);
+        if($('#imei_form_phone option:selected').text() === $('#current_phone').text()) {
+            newPremium.text(oldPremiumPrice);
+        } else {
+            newPremium.text(newPremiumPrice);
+        }
 
         // Set value on valid - default for normal imei update
         validUpgrade.text('✅');
@@ -23,8 +27,15 @@ $('.confirmModal').on('show.bs.modal', function (event) {
         phones.on('change', function(e) {
             // Set price
             newPremiumPriceUpdate = $('#imei_form_phone option:selected').data('premium');
-            newPremium.text(newPremiumPriceUpdate);
-            premiumDiff = Math.abs(newPremiumPriceUpdate - oldPremiumPrice);
+
+            if($('#imei_form_phone option:selected').text() === $('#current_phone').text()) {
+                newPremium.text(oldPremiumPrice);
+                premiumDiff = 0;
+            } else {
+                newPremium.text(newPremiumPriceUpdate);
+                premiumDiff = Math.abs(newPremiumPriceUpdate - oldPremiumPrice);
+            }
+
 
             if (premiumDiff <= limitDiff) {
                 validUpgrade.text('✅');
