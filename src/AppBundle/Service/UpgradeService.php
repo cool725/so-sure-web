@@ -180,6 +180,7 @@ class UpgradeService
             }
         }
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_UPGRADED);
+        $this->policyService->clearRescheduledPayments($policy);
         $this->dm->persist($policy);
         $this->dm->flush();
         // Dispatch an event.

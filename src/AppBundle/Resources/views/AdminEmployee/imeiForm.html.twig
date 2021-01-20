@@ -41,7 +41,7 @@
             <div class="col-xs-6">
                 <div class="form-group">
                     <label>Current Phone</label>
-                    <p>{{ policy.phone }}</p>
+                    <p id="current_phone">{{ policy.phone }}</p>
                     <p>Current premium: <strong>
                         {% set phonePrice = policy.phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
                         {% if policy.isPolicy %}

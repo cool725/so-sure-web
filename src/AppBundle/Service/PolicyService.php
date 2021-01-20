@@ -2935,4 +2935,21 @@ class PolicyService
             ));
         }
     }
+
+    /**
+     * Removes all rescheduled payments for the given policy.
+     * @param Policy $policy is the policy for whom there shall be no rescheduled payments.
+     */
+    public function clearRescheduledPayments($policy)
+    {
+        $scheduledPayments = $policy->getScheduledPayments();
+        foreach ($scheduledPayments as $scheduled) {
+            if ($scheduled->getType() == ScheduledPayment::TYPE_RESCHEDULED &&
+                $scheduled->getStatus() == ScheduledPayment::STATUS_SCHEDULED
+            ) {
+                $scheduled->cancel('clearing rescheduled payments');
+            }
+        }
+        $this->dm->flush();
+    }
 }

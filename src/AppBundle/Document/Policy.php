@@ -270,7 +270,7 @@ abstract class Policy
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "expired-wait-claim",
      *                  "unpaid", "multipay-requested", "multipay-rejected", "renewal",
-     *                  "pending-renewal", "declined-renewal", "unrenewed", "picsure-required"}, strict=true)
+     *                  "pending-renewal", "declined-renewal", "unrenewed", "picsure-required", null}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      * @DataChange(categories="hubspot")
