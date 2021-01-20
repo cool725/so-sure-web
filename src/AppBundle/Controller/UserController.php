@@ -2334,22 +2334,32 @@ class UserController extends BaseController
         }
 
         $oldPhone = $policy->getPhone();
+        $oldPhoneDetails = $oldPhone->getMakeModelMemory();
 
+        $newPhoneDetails = '';
+        if ($newPhone instanceof Phone) {
+            $newPhoneDetails = $newPhone->getMakeModelMemory();
+        }
+
+        $samePhone = $policy->isPhoneDifferent($oldPhoneDetails, $newPhoneDetails);
 
         $now = new \DateTime();
         $priceService = $this->get("app.price");
 
         $stream = PhonePrice::installmentsStream($policy->getPremiumInstallments());
         $futurePayments = $policy->countFutureInvoiceSchedule();
-        if ($futurePayments <= 1) {
-            $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
-            $upgradePremium = $policy->getPremiumUpgradeCostYearly($newPhonePremium, $now);
+        $oldPhonePremium = $policy->getPremium();
+
+        if ($samePhone) {
+            $newPhonePremium = $oldPhonePremium;
         } else {
             $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+        }
+        if ($futurePayments <= 1) {
+            $upgradePremium = $policy->getPremiumUpgradeCostYearly($newPhonePremium, $now);
+        } else {
             $upgradePremium = $policy->getPremiumUpgradeCostMonthly($newPhonePremium, $now);
         }
-
-        $oldPhonePremium = $priceService->getPhonePolicyPremium($policy, $stream, null, $now);
 
         $session->set('upgrade-premium', $upgradePremium);
         $session->set('upgrade-stream', $stream);
@@ -2606,6 +2616,7 @@ class UserController extends BaseController
         /** @var Phone $newPhone */
         $newPhone = $phoneRepo->find($session->get('upgrade-phone'));
         $premium = $session->get('new-phone-premium');
+
         $stream = $session->get('upgrade-stream');
         $imei = $session->get('upgrade-imei');
         $serial  = $session->get('upgrade-serialNumber');
