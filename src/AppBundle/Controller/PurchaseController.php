@@ -1789,7 +1789,9 @@ class PurchaseController extends BaseController
                 }
                 $bacsPaymentMethod = clone $policy->getBacsPaymentMethod();
                 $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
-                $policy->setPaymentMethod($bacsPaymentMethod);
+                if ($saveBacs && $bacsPaymentMethod) {
+                    $policy->setPaymentMethod($bacsPaymentMethod);
+                }
                 $this->getManager()->flush();
             }
 

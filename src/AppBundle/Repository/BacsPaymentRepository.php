@@ -144,7 +144,8 @@ class BacsPaymentRepository extends PaymentRepository
             ->field('coveredBy')->exists(true)
             ->field('success')->equals(true)
             ->field('bacsReversedDate')->lt($date)
-            ->field('coveringPaymentRefunded')->equals(false)
+            ->field('reversedBy')->exists(false)
+            ->field('coveringPaymentRefunded')->notEqual(true)
             ->getQuery()
             ->execute();
     }

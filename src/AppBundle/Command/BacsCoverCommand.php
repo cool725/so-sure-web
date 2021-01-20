@@ -9,7 +9,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\UserRepository;
-use AppBundle\Service\BacsService;
+use AppBundle\Service\CheckoutService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,19 +29,19 @@ class BacsCoverCommand extends ContainerAwareCommand
     /** @var DocumentManager */
     protected $dm;
 
-    /** @var BacsService */
-    protected $bacsService;
+    /** @var CheckoutService */
+    protected $checkoutService;
 
     /**
      * Creates the command object and injects the dependencies.
-     * @param DocumentManager $dm          is used to query the database and stuff.
-     * @param BacsService     $bacsService is used to do checkout stuff.
+     * @param DocumentManager $dm              is used to query the database and stuff.
+     * @param CheckoutService $checkoutService is used to do checkout stuff.
      */
-    public function __construct(DocumentManager $dm, BacsService $bacsService)
+    public function __construct(DocumentManager $dm, CheckoutService $checkoutService)
     {
         parent::__construct();
         $this->dm = $dm;
-        $this->bacsService = $bacsService;
+        $this->checkoutService = $checkoutService;
     }
 
     /**
@@ -50,7 +50,7 @@ class BacsCoverCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('sosure:bacs:cover')
-            ->setDescription('Finds successful bacs payments that were covered by checkout payments')
+            ->setDescription('Finds successful bacs payments that were covered by checkout payments and refunds')
             ->addOption('wet', null, InputOption::VALUE_NONE, 'actually persist changes');
     }
 
@@ -69,16 +69,11 @@ class BacsCoverCommand extends ContainerAwareCommand
                 'policy %s payment %s date %s amount %f',
                 $payment->getPolicy()->getId(),
                 $payment->getId(),
-                $payment->getDate(),
+                $payment->getDate()->format('Y-m-d H:i'),
                 $payment->getAmount()
             ));
             if ($wet) {
-                $this->bacsService->scheduleBacsPayment(
-                    $payment->getPolicy(),
-                    0 - $payment->getAmount(),
-                    ScheduledPayment::TYPE_REFUND,
-                    'covering payment refund'
-                );
+                $this->checkoutService->refund($payment->getCoveredBy());
                 $payment->setCoveringPaymentRefunded(true);
                 $this->dm->flush();
             }
