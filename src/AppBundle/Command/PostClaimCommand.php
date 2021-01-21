@@ -30,7 +30,7 @@ class PostClaimCommand extends ContainerAwareCommand
 {
 
     const COMMAND_REPORT_NAME = 'Post Claim Report';
-    const DEFAULT_EMAIL_ADDRESS = 'kyle@so-sure.com';
+    const DEFAULT_EMAIL_ADDRESS = 'tech+ops@so-sure.com';
     const DEFAULT_REPORT_PERIOD_DAYS = '-8';
     const FILE_NAME = 'postclaims';
     const BUCKET_FOLDER = 'reports';

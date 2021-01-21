@@ -1568,6 +1568,7 @@ class PurchaseController extends BaseController
             $token = $request->get("token");
             $pennies = $request->get("pennies");
             $freq = $request->get('premium');
+            $saveBacs = $request->get('save_bank') == '1';
             if ($request->get('_route') == 'purchase_checkout') {
                 $priceService = $this->get('app.price');
                 $additionalPremium = $policy->getUser()->getAdditionalPremium();
@@ -1778,11 +1779,20 @@ class PurchaseController extends BaseController
                     }
                 }
             } else {
-                $checkout->updatePaymentMethod(
-                    $policy,
-                    $token,
-                    $amount
-                );
+                if ($this->get('app.bacs')->sftpRunning() > 0) {
+                    $this->addFlash('warning', 'an unknown error occurred. Please try again later.');
+                    return new RedirectResponse($redirectFailure);
+                }
+                $bacsPayment = null;
+                if ($saveBacs) {
+                    $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
+                }
+                $bacsPaymentMethod = clone $policy->getBacsPaymentMethod();
+                $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
+                if ($saveBacs && $bacsPaymentMethod) {
+                    $policy->setPaymentMethod($bacsPaymentMethod);
+                }
+                $this->getManager()->flush();
             }
 
             $this->addFlash('success', $successMessage);

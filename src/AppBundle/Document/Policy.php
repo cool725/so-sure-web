@@ -2125,6 +2125,19 @@ abstract class Policy
         return $claims;
     }
 
+    public function findPendingBacsPaymentWithAmount($date, $amount)
+    {
+        foreach ($this->getPayments() as $payment) {
+            if ($payment instanceof BacsPayment &&
+                $this->areEqualToTwoDp($payment->getAmount(), $amount) &&
+                $payment->getBacsReversedDate() >= $date
+            ) {
+                return $payment;
+            }
+        }
+        return null;
+    }
+
     public function getPotValue()
     {
         return $this->toTwoDp($this->potValue);

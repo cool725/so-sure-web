@@ -6,6 +6,7 @@
 {% set user_mode = true %}
 {% set small_footer = true %}
 {% set show_card = true %}
+{% set save_bank = false %}
 {% set show_bacs_setup = false %}
 {% set show_bacs_retry = false %}
 {% set judo_btn_text = 'Update my card details' %}
@@ -66,11 +67,18 @@
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_pending' %}
 
                     {# PAYMENT PENDING #}
-                    {% set show_card = false %}
+                    {% if not bacs_sftp %}
+                        {% set save_bank = true %}
+                    {% else %}
+                        {% set show_card = false %}
+                    {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
 
                     <h1 class="h2 mb-4">Payment is processing</h1>
-                    <p>We are currently processing your Direct Debit payment.</p>
+                    <p>
+                        We have been unable to process your direct debit payment.
+                        {% if save_bank %}Please pay by card in the meantime, and if your direct debit payment is recieved we will immediately refund it.{% endif %}
+                    </p>
                     {# END - PAYMENT PENDING #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_mandate_invalid' %}
@@ -226,7 +234,7 @@
                               data-public-key="{{ checkoutApiKey(policy) }}"
                               data-customer-email="{{ app.user.email }}"
                               data-value="{{ convert_to_pennies(amount) }}"
-                              data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
+                              data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id, 'pennies': convert_to_pennies(amount), 'save_bank': save_bank }) }}"
                               data-csrf="{{ csrf_token('checkout') }}"
                               data-currency="GBP"
                               data-payment-mode="cards"

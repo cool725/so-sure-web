@@ -153,4 +153,23 @@ class BacsPaymentRepository extends PaymentRepository
             ->getQuery()
             ->execute();
     }
+          
+    /*
+     * Finds bacs payments that have not been reverted which have got a covering checkout payment which are ready to be
+     * reverted.
+     * @param \DateTime $date is the date which is to be considered now for the sake of finding which bacs payments are
+     *                        ready to go.
+     * @return Cursor over the found results.
+     */
+    public function findReadyCoveredPayments(DateTime $date)
+    {
+        return $this->createQueryBuilder()
+            ->field('coveredBy')->exists(true)
+            ->field('success')->equals(true)
+            ->field('bacsReversedDate')->lt($date)
+            ->field('reversedBy')->exists(false)
+            ->field('coveringPaymentRefunded')->notEqual(true)
+            ->getQuery()
+            ->execute();
+    }
 }

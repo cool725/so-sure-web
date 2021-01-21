@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Connection\RewardConnection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -389,12 +390,25 @@ class Reward
         if (!$this->isOpen($date)) {
             return false;
         }
-        // make sure they are not trying to get it multiple times.
+
         foreach ($policy->getConnections() as $connection) {
+            /** @var Connection $connection */
+            // make sure they are not trying to get it multiple times.
             if ($connection->getLinkedUser()->getId() == $this->getUser()->getId()) {
                 return false;
             }
+
+            // we need to check that this new code cannot be applied if another code has already been applied
+            // unless it is a gamification code
+            if ($connection instanceof RewardConnection) {
+                if ($this->getType() !== 'Gamification') {
+                    if ($connection->getSourceUser()->getId() == $policy->getUser()->getId()) {
+                        return false;
+                    }
+                }
+            }
         }
+
         // other conditions
         $min = $this->getPolicyAgeMin();
         $max = $this->getPolicyAgeMax();
