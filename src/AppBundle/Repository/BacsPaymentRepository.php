@@ -154,7 +154,7 @@ class BacsPaymentRepository extends PaymentRepository
             ->execute();
     }
           
-    /*
+    /**
      * Finds bacs payments that have not been reverted which have got a covering checkout payment which are ready to be
      * reverted.
      * @param \DateTime $date is the date which is to be considered now for the sake of finding which bacs payments are
