@@ -313,6 +313,7 @@ services:
             - "@event_dispatcher"
             - "@app.sftp.sosure"
             - "@app.sftp.accesspay"
+            - "@app.checkout"
 
     app.push:
         alias: AppBundle\Service\PushService

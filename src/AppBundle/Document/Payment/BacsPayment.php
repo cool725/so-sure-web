@@ -114,6 +114,21 @@ class BacsPayment extends Payment
      */
     protected $reverses;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\CheckoutPayment", inversedBy="covering")
+     * @Gedmo\Versioned
+     * @var CheckoutPayment
+     */
+    protected $coveredBy;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     * @var boolean
+     */
+    protected $coveringPaymentRefunded;
+
     public function isManual()
     {
         return $this->manual;
@@ -212,6 +227,42 @@ class BacsPayment extends Payment
     {
         $this->setReversedBy($reverse);
         $reverse->setReverses($this);
+    }
+
+    /**
+     * Gives the checkout payment covering this payment while it pends.
+     * @return CheckoutPayment|null the covering payment if any.
+     */
+    public function getCoveredBy()
+    {
+        return $this->coveredBy;
+    }
+
+    /**
+     * Sets the checkout payment that this payment is covered by while it pends.
+     * @param CheckoutPayment $coveredBy is the coverer.
+     */
+    public function setCoveredBy($coveredBy)
+    {
+        $this->coveredBy = $coveredBy;
+    }
+
+    /**
+     * Tells you if this payment's covering checkout payment has been refunded.
+     * @return bool true if it has been refunded.
+     */
+    public function getCoveringPaymentRefunded()
+    {
+        return $this->coveringPaymentRefunded;
+    }
+
+    /**
+     * Sets whether this payment's covering checkout payment has been refundede.
+     * @param bool $coveringPaymentRefunded whether or not it has been refunded.
+     */
+    public function setCoveringPaymentRefunded($coveringPaymentRefunded)
+    {
+        $this->coveringPaymentRefunded = $coveringPaymentRefunded;
     }
 
     public function submit(\DateTime $date = null)

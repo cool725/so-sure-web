@@ -97,6 +97,13 @@ class CheckoutPayment extends Payment
      */
     protected $webType;
 
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\BacsPayment", inversedBy="covering")
+     * @Gedmo\Versioned
+     * @var BacsPayment
+     */
+    protected $covering;
+
     public function getResult()
     {
         return $this->result;
@@ -187,6 +194,24 @@ class CheckoutPayment extends Payment
     public function setWebType($webType)
     {
         $this->webType = $webType;
+    }
+
+    /**
+     * Gives you the bacs payment that this payment is covering for while it pends if any.
+     * @return BacsPayment|null payment it covers.
+     */
+    public function getCovering()
+    {
+        return $this->covering;
+    }
+
+    /**
+     * Sets the bacs payment that this payment is covering while it pends.
+     * @param BacsPayment $covering is the payment to cover.
+     */
+    public function setCovering($covering)
+    {
+        $this->covering = $covering;
     }
 
     public function isSuccess($includeAuthorized = false)
