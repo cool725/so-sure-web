@@ -1103,7 +1103,8 @@ class InvitationService
         $rewardRepo = $this->dm->getRepository(Reward::class);
         $sharerPolicy = ($sharer->getId() == $inviterPolicy->getUser()->getId()) ? $inviterPolicy : $inviteePolicy;
         $connectionBonus = $rewardRepo->getConnectionBonus($date);
-        if ($connectionBonus && !$sharerPolicy->getCompany() && $connectionBonus->canApply($sharerPolicy, $date)) {
+        if ($connectionBonus && !$sharerPolicy->getCompany()
+            && $connectionBonus->canApply($sharerPolicy, $date)) {
             try {
                 $this->addReward($sharerPolicy, $connectionBonus);
             } catch (\Exception $e) {

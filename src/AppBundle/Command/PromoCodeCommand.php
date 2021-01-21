@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Influencer;
 use AppBundle\Document\Reward;
@@ -9,6 +10,7 @@ use AppBundle\Document\Reward;
 use AppBundle\Repository\RewardRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\RouterService;
+use Aws\S3\S3Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -25,11 +27,16 @@ class PromoCodeCommand extends ContainerAwareCommand
 
     const COMMAND_REPORT_NAME = 'Promo Code Report';
     const PROMO_EMAIL_ADDRESS = 'tech+ops@so-sure.com';
+    const FILE_NAME = 'promocodes';
+    const BUCKET_FOLDER = 'reports';
 
     use DateTrait;
 
     /** @var DocumentManager  */
     protected $dm;
+
+    /** @var S3Client */
+    protected $s3;
 
     /** @var MailerService */
     protected $mailerService;
@@ -47,10 +54,14 @@ class PromoCodeCommand extends ContainerAwareCommand
     /** @var string */
     protected $environment;
 
+    /** @var bool */
+    protected $skipS3;
+
     protected $emailAccounts;
 
     public function __construct(
         DocumentManager $dm,
+        S3Client $s3,
         MailerService $mailerService,
         Client $redis,
         $environment,
@@ -58,6 +69,7 @@ class PromoCodeCommand extends ContainerAwareCommand
     ) {
         parent::__construct();
         $this->dm = $dm;
+        $this->s3 = $s3;
         $this->redis = $redis;
         $this->mailerService = $mailerService;
         $this->environment = $environment;
@@ -154,6 +166,7 @@ class PromoCodeCommand extends ContainerAwareCommand
                             $policies[$idx2]['policy'] = $connection->getSourcePolicy();
                             $policies[$idx2]['reward'] = $reward;
                             $policies[$idx2]['organisation'] = $organisation;
+                            $policies[$idx2]['conn_date'] = $connection->getDate();
                         }
                     }
                 }
@@ -203,6 +216,7 @@ class PromoCodeCommand extends ContainerAwareCommand
         $policy = null;
         $reward = null;
         $scode = null;
+        $connDate = null;
         $organisation = null;
         foreach ($resultSet as $type => $collection) {
             if ($type === 'policy') {
@@ -216,6 +230,10 @@ class PromoCodeCommand extends ContainerAwareCommand
             if ($type === 'organisation') {
                 $organisation = $collection;
             }
+
+            if ($type === 'conn_date') {
+                $connDate = $collection;
+            }
         }
         /** @var Policy $policy */
         if (null === $reward || null === $policy) {
@@ -223,6 +241,7 @@ class PromoCodeCommand extends ContainerAwareCommand
         }
         /** @var Reward $reward */
         if ($reward) {
+            /** @var SCode $scode */
             $scode = $reward->getSCode();
         }
 
@@ -237,9 +256,9 @@ class PromoCodeCommand extends ContainerAwareCommand
                 $policy->getUser()->getLatestAttribution()->getCampaignName() : 'N/A',
             'Number of claims'                => $policy->getUser()->getTotalClaims(),
             'Policy Status'                   => $policy->getStatus(),
-            'Promo Code'                      => $scode ? $scode->getCode() : '',
+            'Promo Code'                      => ($scode) ? $scode->getCode() : '',
             'Organisation'                    => $organisation,
-            'Reward code redeemed date'       => $policy->getCreated()->format('Y-m-d H:i:s'),
+            'Reward code redeemed date'       => ($connDate) ? $connDate->format('Y-m-d H:i:s') : '',
             'Link to policy on Admin'         => $this->route->generateUrl('admin_policy', ['id' => $policy->getId()])
         ];
     }
@@ -249,7 +268,7 @@ class PromoCodeCommand extends ContainerAwareCommand
     {
 
         /** create the csv tmp file */
-        $fileName = "promocode-".time().".csv";
+        $fileName = self::FILE_NAME.'-'.time().".csv";
         $file = "/tmp/" . $fileName;
         $cspReport = fopen($file, "w");
         if (isset($filteredItems['0'])) {
@@ -260,6 +279,11 @@ class PromoCodeCommand extends ContainerAwareCommand
         }
         fclose($cspReport);
         $output->writeln('Completed CSV..sending mail.');
+
+        if (!$this->skipS3) {
+            $s3Key = sprintf('%s/'. self::BUCKET_FOLDER.'/%s', $this->environment, $fileName);
+            $this->uploadS3($file, $s3Key);
+        }
 
         $this->mailerService->send(
             self::COMMAND_REPORT_NAME,
@@ -273,5 +297,15 @@ class PromoCodeCommand extends ContainerAwareCommand
         );
         unset($file);
         $output->writeln('Mail sent!');
+    }
+
+    private function uploadS3($tmpFile, $s3Key)
+    {
+        $this->s3->putObject([
+            'Bucket' => SoSure::S3_BUCKET_ADMIN,
+            'Key' => $s3Key,
+            'SourceFile' => $tmpFile,
+        ]);
+        return $s3Key;
     }
 }

@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Reward;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Payment\BacsPayment;
@@ -16,6 +17,7 @@ use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Exception\CannotApplyRewardException;
+use AppBundle\Repository\RewardRepository;
 use AppBundle\Security\UserVoter;
 use AppBundle\Security\ClaimVoter;
 use AppBundle\Service\BacsService;
@@ -147,6 +149,7 @@ class UserController extends BaseController
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $scodeRepo = $dm->getRepository(SCode::class);
+        /** @var User $user */
         $user = $this->getUser();
         if ($user->hasPolicyCancelledAndPaymentOwed()) {
             foreach ($user->getAllPolicies() as $policy) {
@@ -273,8 +276,12 @@ class UserController extends BaseController
                         }
                     }
                 }
+
                 if ($scode->isReward() && $scode->isActive()) {
+                    /** @var Reward $reward */
                     $reward = $scode->getReward();
+
+                    /** Need to check if user already has a promo code , ignore if Gamification code */
                     if (!$reward || !$reward->canApply($policy, new \DateTime())) {
                         $this->addFlash('warning', sprintf('Sorry, promo code %s cannot be applied', $code));
                         return new RedirectResponse(
