@@ -58,10 +58,17 @@
                 {% elseif unpaid_reason == 'unpaid_bacs_mandate_pending' %}
 
                     {# MANDATE PENDING #}
-                    {% set show_card = false %}
+                    {% if not bacs_sftp %}
+                        {% set save_bank = true %}
+                    {% else %}
+                        {% set show_card = false %}
+                    {% endif %}
                     <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure" width="180px">
                     <h1 class="h2 mb-4">Direct Debit setup pending</h1>
-                    <p>We're currently setting up your direct debit. Please come back in a few days.</p>
+                    <p>
+                        We're currently setting up your direct debit. Please come back in a few days.
+                        {% if save_bank %}Please pay by card in the meantime, and if your direct debit payment is recieved we will immediately refund it.{% endif %}
+                    </p>
                     {# END - MANDATE PENDING #}
 
                 {% elseif unpaid_reason == 'unpaid_bacs_payment_pending' %}
