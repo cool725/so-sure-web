@@ -45,7 +45,6 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Feature;
 
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 use AppBundle\Service\IntercomService;
 
 use AppBundle\Classes\GoCompare;

@@ -15,7 +15,6 @@ use AppBundle\Document\Reward;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 use AppBundle\Form\Type\LeadEmailType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;

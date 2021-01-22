@@ -754,7 +754,6 @@ services:
             - "@app.intercom"
             - "@app.sms"
             - "@app.scode"
-            - "@app.sixpack"
             - "@app.feature"
             - "@app.price"
             - "@app.postcode"
@@ -966,18 +965,6 @@ services:
             - "%mixpanel_apisecret%"
             - "@app.stats"
             - "@census.search"
-
-    app.sixpack:
-        alias: AppBundle\Service\SixpackService
-        public: true
-
-    AppBundle\Service\SixpackService:
-        arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@logger"
-            - "%sixpack_url%"
-            - "@app.request"
-            - "@app.mixpanel"
 
     app.feature:
         alias: AppBundle\Service\FeatureService
@@ -1297,14 +1284,6 @@ services:
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBacsUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.payment-method.changed, method: onPolicyPaymentMethodChangedEvent }
             -  { name: kernel.event_listener, event: event.policy.upgraded, method: onPolicyUpgradedEvent }
-
-    app.listener.sixpack:
-        class:   AppBundle\Listener\SixpackListener
-        arguments:
-            - "@app.sixpack"
-            - "@logger"
-        tags:
-            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
     app.listener.push:
         class:   AppBundle\Listener\PushListener

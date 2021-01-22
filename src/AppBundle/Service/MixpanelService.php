@@ -103,7 +103,6 @@ class MixpanelService
     const EVENT_RENEW = 'Renew Policy';
     const EVENT_CASHBACK = 'Cashback';
     const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
-    const EVENT_SIXPACK = 'Sixpack Experiment';
     const EVENT_ONBOARDING = 'Track Onboarding Interaction';
     const EVENT_POLICY_STATUS = 'Policy Status Change';
     const EVENT_PAYMENT_METHOD_CHANGED = 'Payment Method Changed';
@@ -188,7 +187,6 @@ class MixpanelService
         self::EVENT_RENEW,
         self::EVENT_CASHBACK,
         self::EVENT_DECLINE_RENEW,
-        self::EVENT_SIXPACK,
         self::EVENT_ONBOARDING,
         self::EVENT_POLICY_STATUS,
         self::EVENT_PAYMENT_METHOD_CHANGED,
@@ -511,7 +509,6 @@ class MixpanelService
         $count += $this->deleteNoValueUsers(14);
         //$count += $this->deleteOldUsersByNoEvents();
         $count += $this->deleteFacebookPreview();
-        $count += $this->deleteSixpack();
         $count += $this->deleteHappyApp();
         $count += $this->deleteLittleValueUsers(30);
 
@@ -595,12 +592,6 @@ class MixpanelService
                 ]]
             ], [
                 "window" => "90d",
-                "name" => "behavior_11113",
-                "event_selectors" => [[
-                    "event" => "Sixpack Experiment",
-                ]]
-            ], [
-                "window" => "90d",
                 "name" => "behavior_11114",
                 "event_selectors" => [[
                     "event" => "Click on the Buy Now Button"
@@ -637,12 +628,6 @@ class MixpanelService
                 ]]
             ], [
                 "window" => "90d",
-                "name" => "behavior_11113",
-                "event_selectors" => [[
-                    "event" => "Sixpack Experiment",
-                ]]
-            ], [
-                "window" => "90d",
                 "name" => "behavior_11114",
                 "event_selectors" => [[
                     "event" => "Click on the Buy Now Button"
@@ -665,12 +650,6 @@ class MixpanelService
                 $now->format('U')
             ),
             'behaviors' => [[
-                "window" => "90d",
-                "name" => "behavior_11114",
-                "event_selectors" => [[
-                    "event" => "Sixpack Experiment",
-                ]]
-            ], [
                 "window" => "90d",
                 "name" => "behavior_11115",
                 "event_selectors" => [[
@@ -710,9 +689,7 @@ class MixpanelService
 
     private function deleteFacebookPreview()
     {
-        // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
-        // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
-        // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
+        // Delete any users over 1 day old with a facebook brower
         $now = \DateTime::createFromFormat('U', time());
         // @codingStandardsIgnoreStart
         $query = [
@@ -721,13 +698,6 @@ class MixpanelService
                 $now->format('U')
             ),
             'behaviors' => [[
-                "window" => "90d",
-                "name" => "behavior_11111",
-                "event_selectors" => [[
-                    "event" => "Sixpack Experiment",
-                    "selector" => "((\"Facebook\" in event[\"\$browser\"]) and (defined (event[\"\$browser\"])))"
-                ]]
-            ], [
                 "window" => "90d",
                 "name" => "behavior_11112",
                 "event_selectors" => [[
@@ -742,47 +712,6 @@ class MixpanelService
             ]
             ]];
         // @codingStandardsIgnoreEnd
-
-        return $this->runDelete($query);
-    }
-
-    private function deleteSixpack()
-    {
-        $now = \DateTime::createFromFormat('U', time());
-        // @codingStandardsIgnoreStart
-        $query = [
-            'selector' => sprintf(
-                '(behaviors["behavior_11114"] == 1 and datetime(%s - 86400) > user["$last_seen"] and not defined(user["$last_name"]) and behaviors["behavior_11115"] == 0 and behaviors["behavior_11116"] == 0 and behaviors["behavior_11117"] == 0)',
-                $now->format('U')
-            ),
-            'behaviors' => [[
-                "window" => "90d",
-                "name" => "behavior_11114",
-                "event_selectors" => [[
-                    "event" => "Sixpack Experiment",
-                ]]
-            ], [
-                "window" => "90d",
-                "name" => "behavior_11115",
-                "event_selectors" => [[
-                    "event" => "Home Page"
-                ]]
-            ], [
-                "window" => "90d",
-                "name" => "behavior_11116",
-                "event_selectors" => [[
-                    "event" => "Quote Page"
-                ]]
-            ], [
-                "window" => "90d",
-                "name" => "behavior_11117",
-                "event_selectors" => [[
-                    "event" => "CPC Manufacturer Page"
-                ]]
-            ]
-            ]];
-        // @codingStandardsIgnoreEnd
-        //print_r($query);
 
         return $this->runDelete($query);
     }
