@@ -296,7 +296,10 @@ class BacsService
         $results = [];
         $errorCount = 0;
         $files = $this->sosureSftpService->listSftp();
-        $this->redis->lpush(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
+        $significant = count($files) > 0;
+        if ($significant) {
+            $this->redis->lpush(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
+        }
         foreach ($files as $file) {
             $error = false;
             $unzippedFile = null;
@@ -321,8 +324,10 @@ class BacsService
                     ['exception' => $e]
                 );
             }
-            $this->redis->lpop(self::KEY_SFTP_FLAG);
             $this->sosureSftpService->moveSftp($file, !$error);
+        }
+        if ($significant) {
+            $this->redis->lpop(self::KEY_SFTP_FLAG);
         }
 
         // if files were present and no errors, the we should approve mandates and payments
