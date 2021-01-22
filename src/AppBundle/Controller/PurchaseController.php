@@ -97,7 +97,6 @@ use AppBundle\Form\Type\PurchaseStepPhoneType;
 use AppBundle\Form\Type\UserCancelType;
 
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 use AppBundle\Service\JudopayService;
 
 use AppBundle\Security\UserVoter;

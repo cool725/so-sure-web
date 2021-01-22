@@ -25,7 +25,6 @@ use Symfony\Component\Form\FormEvent;
 
 class PurchaseStepPaymentType extends AbstractType
 {
-    use SixpackFormTrait;
 
     /**
      * @var boolean
@@ -80,7 +79,6 @@ class PurchaseStepPaymentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('next', SubmitType::class);
-        $this->setFormAction($builder, $this->requestStack);
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $purchase = $event->getData();
             $form = $event->getForm();

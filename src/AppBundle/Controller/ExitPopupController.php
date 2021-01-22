@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Document\Lead;
 
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 
 class ExitPopupController extends BaseController
 {

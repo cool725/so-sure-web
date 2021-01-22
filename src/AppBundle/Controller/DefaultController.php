@@ -66,7 +66,6 @@ use AppBundle\Document\Charge;
 use AppBundle\Document\Feature;
 
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 
 use AppBundle\Validator\Constraints\UkMobileValidator;
 
