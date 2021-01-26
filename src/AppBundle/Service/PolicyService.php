@@ -2408,7 +2408,7 @@ class PolicyService
         if ($policy->getCompany()) {
             $this->priceService->setPhonePolicyPremium(
                 $newPolicy,
-                PhonePrice::installmentsStream($newPolicy->getInstallments()),
+                PhonePrice::installmentsStream($newPolicy->getPremiumInstallments()),
                 $policy->getUser()->getAdditionalPremium(),
                 $date
             );
