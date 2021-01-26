@@ -93,8 +93,6 @@ parameters:
     redis_session_dsn: redis://localhost/1
     redis_mailer_dsn: redis://localhost/2
 
-    sixpack_url: 'http://localhost:5000'
-
     aws_key: ''
     aws_secret: ''
     aws_cognito_identitypoolid: ''

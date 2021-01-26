@@ -97,7 +97,6 @@ use AppBundle\Form\Type\PurchaseStepPhoneType;
 use AppBundle\Form\Type\UserCancelType;
 
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 use AppBundle\Service\JudopayService;
 
 use AppBundle\Security\UserVoter;
@@ -1787,7 +1786,7 @@ class PurchaseController extends BaseController
                 if ($saveBacs) {
                     $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
                 }
-                $bacsPaymentMethod = clone $policy->getBacsPaymentMethod();
+                $bacsPaymentMethod = $policy->getBacsPaymentMethod();
                 $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
                 if ($saveBacs && $bacsPaymentMethod) {
                     $policy->setPaymentMethod($bacsPaymentMethod);

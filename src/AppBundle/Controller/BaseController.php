@@ -63,7 +63,6 @@ use Psr\Log\LoggerInterface;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use AppBundle\Validator\Constraints\AgeValidator;
-use AppBundle\Service\SixpackService;
 
 abstract class BaseController extends Controller
 {
@@ -811,31 +810,6 @@ abstract class BaseController extends Controller
         }
     }
 
-    protected function getSessionSixpackTest(Request $request, $name, $options)
-    {
-        $exp = null;
-        $sessionName = sprintf('sixpack:%s', $name);
-
-        $session = $request->getSession();
-        if ($session) {
-            $exp = $session->get($sessionName);
-        }
-
-        if (!$exp) {
-            $exp = $this->sixpack($request, $name, $options);
-            if ($session) {
-                $session->set($sessionName, $exp);
-            }
-        }
-
-        $override = $request->get('force');
-        if ($override && in_array($override, $options)) {
-            $exp = $override;
-        }
-
-        return $exp;
-    }
-
     protected function searchPolicies(Request $request, $includeInvalidPolicies = null)
     {
         /** @var DocumentManager $dm */
@@ -1012,46 +986,6 @@ abstract class BaseController extends Controller
     protected function isProduction()
     {
         return $this->getParameter('kernel.environment') == 'prod';
-    }
-
-    protected function sixpack(
-        $request,
-        $name,
-        $options,
-        $logMixpanel = SixpackService::LOG_MIXPANEL_CONVERSION,
-        $clientId = null,
-        $trafficFraction = 1,
-        $force = null
-    ) {
-        $exp = $this->get('app.sixpack')->participate(
-            $name,
-            $options,
-            $logMixpanel,
-            $trafficFraction,
-            $clientId,
-            $force
-        );
-        $override = $request->get('force');
-        if ($override && in_array($override, $options)) {
-            $exp = $override;
-        }
-
-        return $exp;
-    }
-
-    protected function sixpackSimple($name, Request $request = null)
-    {
-        $sixpack = $this->get('app.sixpack');
-        $exp = $sixpack->runningSixpackExperiment($name);
-
-        if ($request) {
-            $override = $request->get('force');
-            if ($override && in_array($override, $sixpack->getOptionsAvailable($name))) {
-                return $override;
-            }
-        }
-
-        return $exp;
     }
 
     protected function isRealUSAIp(Request $request)

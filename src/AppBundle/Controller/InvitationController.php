@@ -13,7 +13,6 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Feature;
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 use AppBundle\Service\MailerService;
 use AppBundle\Form\Type\LeadEmailType;
 use Symfony\Component\HttpFoundation\Session\Session;

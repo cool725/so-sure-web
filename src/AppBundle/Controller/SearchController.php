@@ -23,7 +23,6 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\PhonePrice;
 
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 
 class SearchController extends BaseController
 {

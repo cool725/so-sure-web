@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use AppBundle\Service\MixpanelService;
-use AppBundle\Service\SixpackService;
 
 class MarketingController extends BaseController
 {

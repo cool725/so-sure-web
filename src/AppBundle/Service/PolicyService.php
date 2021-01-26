@@ -157,9 +157,6 @@ class PolicyService
     /** @var SCodeService */
     protected $scodeService;
 
-    /** @var SixpackService */
-    protected $sixpackService;
-
     /** @var FeatureService */
     protected $featureService;
 
@@ -228,7 +225,6 @@ class PolicyService
      * @param IntercomService          $intercom
      * @param SmsService               $sms
      * @param SCodeService             $scodeService
-     * @param SixpackService           $sixpackService
      * @param FeatureService           $featureService
      * @param PriceService             $priceService
      * @param PostcodeService          $postcodeService
@@ -255,7 +251,6 @@ class PolicyService
         IntercomService $intercom,
         SmsService $sms,
         SCodeService $scodeService,
-        SixpackService $sixpackService,
         FeatureService $featureService,
         PriceService $priceService,
         PostcodeService $postcodeService
@@ -281,7 +276,6 @@ class PolicyService
         $this->intercom = $intercom;
         $this->sms = $sms;
         $this->scodeService = $scodeService;
-        $this->sixpackService = $sixpackService;
         $this->featureService = $featureService;
         $this->priceService = $priceService;
         $this->postcodeService = $postcodeService;
@@ -2414,7 +2408,7 @@ class PolicyService
         if ($policy->getCompany()) {
             $this->priceService->setPhonePolicyPremium(
                 $newPolicy,
-                PhonePrice::installmentsStream($newPolicy->getInstallments()),
+                PhonePrice::installmentsStream($newPolicy->getPremiumInstallments()),
                 $policy->getUser()->getAdditionalPremium(),
                 $date
             );

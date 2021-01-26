@@ -10,7 +10,6 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\Policy;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
-use AppBundle\Service\SixpackService;
 
 /**
  * @group functional-net
@@ -32,8 +31,6 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         // @codingStandardsIgnoreEnd
     }
 
-    // ab
-
     /**
      *
      */
@@ -43,32 +40,6 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         $url = sprintf('/api/v1/partial/ab/%s?_method=GET', 'unknown');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
-    }
-
-    public function testABShareMessageWithRequiredUserNoUser()
-    {
-        $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
-        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
-    }
-
-    public function testABShareMethod()
-    {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('testABShareMethod', $this),
-            'foo'
-        );
-        $cognitoIdentityId = $this->getAuthUser($user);
-        $phone = self::getRandomPhone(self::$dm);
-        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
-        $policy->setStatus(Policy::STATUS_ACTIVE);
-        self::$dm->flush();
-
-        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
-        $data = $this->verifyResponse(200);
     }
 
     public function testABAllNone()
