@@ -450,7 +450,7 @@
 
         // Modify - use .justify-content-between on element
         .nav-item {
-            width: 22%;
+            width: 18%;
             margin-bottom: -1px;
         }
 
@@ -460,10 +460,11 @@
             justify-content: start;
             position: relative;
             z-index: 3;
-            padding: 1rem 2rem 1rem 1rem;
+            padding: 1rem;
 
             line-height: 1.46;
             font-family: $g-bold;
+            font-size: 13px;
             color: $white;
             background-color: rgba(255, 255, 255, 0.1);
             // border: 1px solid rgba(37, 147, 243, 0.2);
