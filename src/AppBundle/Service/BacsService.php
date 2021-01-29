@@ -2069,6 +2069,7 @@ class BacsService
         /** @var BacsPaymentRepository $bacsPaymentRepo */
         $bacsPaymentRepo = $this->dm->getRepository(BacsPayment::class);
         $payments = [];
+        $policyIds = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
         // time for the bacs cycle
         $advanceDate = clone $date;
@@ -2086,6 +2087,12 @@ class BacsService
             /** @var ScheduledPayment $scheduledPayment */
             if ($scheduledPayment->getAmount() < 0) {
                 continue;
+            }
+            $policyId = $policy->getId();
+            if (array_key_exists($policyId, $policies)) {
+                continue;
+            } else {
+                $policyIds[$policyId] = true;
             }
 
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
