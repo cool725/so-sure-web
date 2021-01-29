@@ -1089,6 +1089,32 @@ class PurchaseController extends BaseController
                         $yearlyPrice = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY);
                         $useMonthly = $purchase->getAmount() != $yearlyPrice->getYearlyPremiumPrice();
                         if ($paymentProvider == SoSure::PAYMENT_PROVIDER_BACS) {
+                            $code = $purchaseForm->get('promoCode')->getData();
+                            if ($code != $this->get('session')->get('scode')) {
+                                try {
+                                    /** @var SCode $scode */
+                                    $scode = $scodeRepo->findOneBy(['code' => $code]);
+                                    if ($scode) {
+                                        if (in_array($scode->getType(), [SCode::TYPE_STANDARD, SCode::TYPE_MULTIPAY])) {
+                                            if (!$scode->getPolicy() || !$scode->getPolicy()->getUser()) {
+                                                throw new \Exception('Unknown scode');
+                                            }
+                                        } elseif (in_array($scode->getType(), [SCode::TYPE_REWARD])) {
+                                            if (!$scode->getReward() || !$scode->getReward()->getUser()) {
+                                                throw new \Exception('Unknown scode');
+                                            }
+                                        }
+                                    } else {
+                                        $code = false;
+                                    }
+                                } catch (\Exception $e) {
+                                    $code = false;
+                                }
+
+                                if ($code != false) {
+                                    $this->get('session')->set('scode', $code);
+                                }
+                            }
                             return new RedirectResponse(
                                 $this->generateUrl('purchase_step_payment_bacs_id', [
                                     'id' => $policy->getId(),
