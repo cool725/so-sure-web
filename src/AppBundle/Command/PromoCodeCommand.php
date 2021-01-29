@@ -163,10 +163,12 @@ class PromoCodeCommand extends ContainerAwareCommand
                     /** @var Connection $connection */
                     foreach ($rewardConnections as $idx2 => $connection) {
                         if (null !== $connection->getSourcePolicy()) {
-                            $policies[$idx2]['policy'] = $connection->getSourcePolicy();
-                            $policies[$idx2]['reward'] = $reward;
-                            $policies[$idx2]['organisation'] = $organisation;
-                            $policies[$idx2]['conn_date'] = $connection->getDate();
+                            $policies[] = [
+                                'policy' => $connection->getSourcePolicy(),
+                                'reward' => $reward,
+                                'organisation' => $organisation,
+                                'conn_date' => $connection->getDate()
+                            ];
                         }
                     }
                 }

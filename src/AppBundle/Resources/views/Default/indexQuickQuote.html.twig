@@ -95,10 +95,12 @@
                         <div class="hero__badge animated tada">
                             <div class="hero__badge-inner">{{ free_months|capitalize }}<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
                         </div>
-                        {# Toasts #}
-                        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left' } %}
                     </div>
                 </div>
+            </div>
+            <div class="d-md-none">
+                {# Toasts #}
+                {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left' } %}
             </div>
         </div>
     </section>
@@ -136,7 +138,7 @@
     {% include 'AppBundle::PhoneInsurance/CommonSections/_topManufacturers.html.twig' %}
 
     {# Claims Process #}
-    {% include 'AppBundle::Default/CommonSections/_claimsProcessB.html.twig' %}
+    {# {% include 'AppBundle::Default/CommonSections/_claimsProcessB.html.twig' %} #}
 
     {# Top Models #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %}

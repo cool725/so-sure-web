@@ -11,13 +11,18 @@
 .hero {
     position: relative;
     padding-top: 4.8rem;
-    padding-bottom: 4rem;
+    padding-bottom: 2rem;
 
     @include blue-gradient-45;
 
     .container-large {
         position: relative;
         z-index: 4;
+        padding-bottom: 10rem;
+
+        @include media-breakpoint-up(lg) {
+            padding-bottom: 0rem;
+        }
     }
 
     &__intro {

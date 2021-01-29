@@ -758,7 +758,7 @@ class ReportingService
         for ($i = 0; $i < 10; $i++) {
             $weighted += $i * $data['policyConnections'][$i]['total'];
         }
-        if ($data['policyConnections']['total'] != 0) {
+        if ($data['policyConnections']['total']['total'] != 0) {
             $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total']['total'];
         } else {
             $data['totalWeightedAvgConnections'] = null;

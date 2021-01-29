@@ -183,7 +183,7 @@
             </div>
         </div>
     </div>
-    <div class="expanding-cardbox expanding-cardbox-white">
+    <div class="expanding-cardbox expanding-cardbox-white mb-3">
         <div class="expanding-cardbox__body">
             <h2 class="h5 expanding-cardbox__title d-flex align-items-center mb-0 track-data"
                 data-event="reduce-excess-tab-mb"
@@ -246,6 +246,58 @@
                 <p class="mb-5">Excess is the amount you pay if you have to claim. It’s a way of you taking on a small portion of the risk. Every phone insurance company requires you to pay excess as it helps prevent fraud...</p>
                 <h4 class="h5 text-primary">How can your excess be so low? 🤩</h4>
                 <p class="mb-4">We are the only mobile phone insurer with clever anti-fraud tech that helps weed out fraud. We don’t have to pay out on dodgy claims, so you can get a much lower excess. Win-win for the win...</p>
+            </div>
+        </div>
+    </div>
+    <div class="expanding-cardbox expanding-cardbox-white">
+        <div class="expanding-cardbox__body">
+            <h2 class="h5 expanding-cardbox__title d-flex align-items-center mb-0 track-data"
+                data-event="claims-tab-mb"
+                data-event-location="{{ app.request.uri }}"
+                data-event-once="">
+                <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_device_tab.svg"
+                     alt="Damaged Phone"
+                     width="55px"
+                     class="lozad mr-3">
+                <span class="">Our hassle-free <br class="d-md-none">claims process</span> <i class="fas fa-arrow-circle-down fa-lg"></i>
+            </h2>
+            <div class="expanding-cardbox__expand">
+                <h3 class="mb-4 text-center">Need to claim, here's what happens</h3>
+                <div class="card box-shadow mr-5 mb-5 w-100">
+                    <div class="card-number"><span class="h4 mb-0">1</span></div>
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_one.jpg"
+                         class="lozad card-img-top"
+                         alt="Polaroid of friends">
+                    <div class="card-body py-4 text-center">
+                        <h4 class="h5 text-primary card-title">Launch your claim online</h4>
+                        <p class="card-text">Is your phone lost, stolen or broken? Claiming with so-sure is easy, fast and pain-free. Get started using our online claims portal below.</p>
+                    </div>
+                </div>
+                <div class="card box-shadow mr-5 mb-5 w-100">
+                    <div class="card-number"><span class="h4 mb-0">2</span></div>
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_two.jpg"
+                         class="lozad card-img-top"
+                         alt="Phone connection app">
+                    <div class="card-body py-4 text-center">
+                        <h4 class="h5 text-primary card-title">Review Claim</h4>
+                        <p class="card-text">Our UK based claims team will review your claim and reach out with a request for any further details or documents.</p>
+                    </div>
+                </div>
+                <div class="card box-shadow mb-5 w-100">
+                    <div class="card-number"><span class="h4 mb-0">3</span></div>
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_three.jpg"
+                         class="lozad card-img-top"
+                         alt="Woman taking selfie">
+                    <div class="card-body py-4 text-center">
+                        <h4 class="h5 text-primary card-title">Approve Claim</h5>
+                        <p class="card-text">Once approved, we take your excess payment over the phone and aim to repair or replace your phone within 24-72 hours.</p>
+                    </div>
+                </div>
+                <a href="{{ path('claim') }}" class="btn btn-success btn-block-xs mt-3">Find out more</a>
             </div>
         </div>
     </div>
@@ -316,10 +368,9 @@
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_pound_tab.svg"
                          alt="Pound coin"
-                         width="38px"
+                         width="32px"
                          class="lozad d-none d-xl-inline mr-2">
                    Get up to 80% of <br>your money back
-                   <i class="fas fa-arrow-circle-up tab-indicator fa-lg"></i>
                </a>
             </li>
             <li class="nav-item">
@@ -336,10 +387,9 @@
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_clip_tab.svg"
                          alt="Clipboard"
-                         width="38px"
+                         width="32px"
                          class="lozad d-none d-xl-inline mr-2">
                     What is and <br>isn't covered
-                    <i class="fas fa-arrow-circle-down tab-indicator fa-lg"></i>
                 </a>
             </li>
             <li class="nav-item">
@@ -356,10 +406,9 @@
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_device_tab.svg"
                          alt="Mobile phone"
-                         width="38px"
+                         width="32px"
                          class="lozad d-none d-xl-inline mr-2">
                     Why insure <br>with SO-SURE
-                   <i class="fas fa-arrow-circle-down tab-indicator fa-lg"></i>
                </a>
             </li>
             <li class="nav-item">
@@ -376,10 +425,28 @@
                     <img src="{{ cdn_url }}/images/onexone.png"
                          data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_reduce_excess_tab.svg"
                          alt="Phone excess"
-                         width="38px"
+                         width="32px"
                          class="lozad d-none d-xl-inline mr-2">
                    Reduce your <br>excess in seconds
-                   <i class="fas fa-arrow-circle-down tab-indicator fa-lg"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link tab-link track-data"
+                   id="claims_tab"
+                   data-toggle="tab"
+                   href="#claims"
+                   role="tab"
+                   aria-controls="claims"
+                   aria-selected="false"
+                   data-event="claims-tab-dt"
+                   data-event-location="{{ app.request.uri }}"
+                   data-event-once="">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_device_tab.svg"
+                         alt="Damaged Phone"
+                         width="32px"
+                         class="lozad d-none d-xl-inline mr-2">
+                   Our hassle-free <br>claims process
                 </a>
             </li>
         </ul>
@@ -630,6 +697,48 @@
                         <p class="mb-4">We are the only mobile phone insurer with clever anti-fraud tech that helps weed out fraud. We don’t have to pay out on dodgy claims, so you can get a much lower excess. Win-win for the win...</p>
                     </div>
                 </div>
+            </div>
+            <div class="tab-pane fade"
+               id="claims"
+               role="tabpanel"
+               aria-labelledby="claims_tab">
+                <h3 class="h2 pt-5 text-center">Need to claim, here's what happens</h3>
+                <div class="d-flex justify-content-between p-5">
+                    <div class="card box-shadow mr-5 mb-4 w-100">
+                        <div class="card-number"><span class="h4 mb-0">1</span></div>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_one.jpg"
+                             class="lozad card-img-top"
+                             alt="Polaroid of friends">
+                        <div class="card-body py-4 text-center">
+                            <h4 class="h5 text-primary card-title">Launch your claim online</h4>
+                            <p class="card-text">Is your phone lost, stolen or broken? Claiming with so-sure is easy, fast and pain-free. Get started using our online claims portal below.</p>
+                        </div>
+                    </div>
+                    <div class="card box-shadow mr-5 mb-4 w-100">
+                        <div class="card-number"><span class="h4 mb-0">2</span></div>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_two.jpg"
+                             class="lozad card-img-top"
+                             alt="Phone connection app">
+                        <div class="card-body py-4 text-center">
+                            <h4 class="h5 text-primary card-title">Review Claim</h4>
+                            <p class="card-text">Our UK based claims team will review your claim and reach out with a request for any further details or documents.</p>
+                        </div>
+                    </div>
+                    <div class="card box-shadow mb-4 w-100">
+                        <div class="card-number"><span class="h4 mb-0">3</span></div>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_claims_three.jpg"
+                             class="lozad card-img-top"
+                             alt="Woman taking selfie">
+                        <div class="card-body py-4 text-center">
+                            <h4 class="h5 text-primary card-title">Approve Claim</h5>
+                            <p class="card-text">Once approved, we take your excess payment over the phone and aim to repair or replace your phone within 24-72 hours.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center"><a href="{{ path('claim') }}" class="btn btn-success btn-block-xs mt-3">Find out more</a></div>
             </div>
         </div>
     </div>
