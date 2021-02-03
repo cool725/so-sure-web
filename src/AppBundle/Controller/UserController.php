@@ -1263,6 +1263,12 @@ class UserController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         $policyService = $this->get('app.policy');
         $amount = $policyService->checkOwedPremium($policy, new \DateTime());
+        if ($unpaidReason == Policy::UNPAID_BACS_PAYMENT_PENDING) {
+            $pendingBacs = $policy->getPendingBacsPayments(true);
+            if (count($pendingBacs) > 0) {
+                $amount = end($pendingBacs)->getAmount();
+            }
+        }
         if ($amount == 0) {
             return new RedirectResponse($this->generateUrl('user_home'));
         }
