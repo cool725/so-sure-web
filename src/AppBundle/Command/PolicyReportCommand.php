@@ -24,6 +24,8 @@ use AppBundle\Classes\SoSure;
  */
 class PolicyReportCommand extends ContainerAwareCommand
 {
+    const INTERVAL = 'P5D';
+
     /** @var S3Client */
     protected $s3;
 
@@ -63,29 +65,9 @@ class PolicyReportCommand extends ContainerAwareCommand
     {
         $this ->setName('sosure:policy:report')
             ->setDescription('Generates reports using common policy data.')
-            ->addArgument(
-                'reports',
-                InputArgument::IS_ARRAY,
-                'names of reports to generate'
-            )
-            ->addOption(
-                'debug',
-                null,
-                InputOption::VALUE_NONE,
-                'show debug output'
-            )
-            ->addOption(
-                'timezone',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Choose a timezone to use for policies report'
-            )
-            ->addOption(
-                'n',
-                0,
-                InputOption::VALUE_REQUIRED,
-                'Choose a certain maximum number of policies to process. 0 means all of them.'
-            );
+            ->addArgument('reports', InputArgument::IS_ARRAY, 'names of reports to generate')
+            ->addOption('debug', null, InputOption::VALUE_NONE, 'show debug output')
+            ->addOption('timezone', null, InputOption::VALUE_REQUIRED, 'Choose a timezone to use for policies report');
     }
 
     /**
@@ -97,7 +79,6 @@ class PolicyReportCommand extends ContainerAwareCommand
         // Set up reports to run.
         $reports = $input->getArgument('reports');
         $debug = $input->getOption('debug') == true;
-        $n = $input->getOption('n');
         $timezone = new DateTimeZone($input->getOption('timezone') ?: 'UTC');
         $executingReports = [];
         foreach ($reports as $report) {
@@ -108,20 +89,34 @@ class PolicyReportCommand extends ContainerAwareCommand
             }
             $executingReports[] = $createdReport;
         }
-        // Load policies.
+        // Iterating over the policies.
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $phonePolicyRepo->findAllStartedPoliciesBatched(new DateTime(SoSure::POLICY_START), null, $n);
-        // Now run the reports.
-        foreach ($policies as $policy) {
-            foreach ($executingReports as $report) {
-                try {
-                    $report->process($policy);
-                } catch (RuntimeException $e) {
-                    $output->writeln("<error>{$e->getMessage()}</error>");
+        $now = new \DateTime();
+        $begin = (clone $now)->sub(new \DateInterval('P15M'));
+        while ($begin < $now) {
+            $batchStart = time();
+            $top = ($begin < $now) ? (clone $begin)->add(new \DateInterval(self::INTERVAL)) : null;
+            $policies = $phonePolicyRepo->findAllStartedPolicies($begin, $top);
+            $output->writeln(sprintf(
+                '%s - %s: %d',
+                $begin->format('Y-m-d'),
+                $top ? $top->format('Y-m-d') : '',
+                count($policies)
+            ));
+            foreach ($policies as $policy) {
+                foreach ($executingReports as $report) {
+                    try {
+                        $report->process($policy);
+                    } catch (RuntimeException $e) {
+                        $output->writeln("<error>{$e->getMessage()}</error>");
+                    }
                 }
             }
+            $begin->add(new \DateInterval(self::INTERVAL));
+            $output->writeln(sprintf('%f -- %f / row', time() - $batchStart, (time() - $batchStart) / count($policies)));
         }
+        // Now run the reports.
         // Output and upload.
         foreach ($executingReports as $report) {
             if ($debug) {
