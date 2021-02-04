@@ -107,7 +107,7 @@
                                     <div class="h4 text-white">Get an extra &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} cash back with the code <span class="promo-code">{{ scode.code }}</span></div>
                                 </div>
                             {% elseif custom == 'hotukdeals' or custom == 'groupon' or custom == 'benefithub' or custom == 'lifeworks' or custom == 'idealworld' %}
-                                <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} Amazon voucher 💰</span></h1>
+                                <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} {% if custom == 'idealworld' %}Ideal World{% else %}Amazon{% endif %} voucher 💰</span></h1>
                                 <ul class="list-unstyled icn-fa-list mb-5 hero-usps">
                                     <li class="mb-4 text-white">
                                         <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
