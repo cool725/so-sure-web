@@ -166,4 +166,12 @@ class PromoController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/idealworld", name="idealworld_forward")
+     */
+    public function forwardIdealWorld()
+    {
+        return $this->redirectToRoute('idealworld_promo', ['code'=>'IDEALW10'], 301);
+    }
 }
