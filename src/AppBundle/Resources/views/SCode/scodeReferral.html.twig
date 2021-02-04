@@ -7,13 +7,13 @@
 {% set include_get_a_quote = true %}
 
 {# Set Meta #}
-{% block title %}1 Month FREE Phone Insurance thanks to {{ scode.policy.user.firstname }} | so-sure{% endblock %}
+{% block title %}1 Month FREE Phone Insurance thanks to {{ scode.policy.user.firstname }} | SO-SURE{% endblock %}
 {% block meta %}
-    <meta name="description" content="Check out so-sure to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!"/>
+    <meta name="description" content="Check out SO-SURE to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!"/>
 {% endblock %}
 
 {% set og_title = '1 Month FREE Phone Insurance thanks to ' ~ scode.policy.user.firstname %}
-{% set og_description = 'Check out so-sure to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!' %}
+{% set og_description = 'Check out SO-SURE to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-referral.jpg' %}
 
 {% block cssPage %}
@@ -32,7 +32,7 @@
                 </div>
                 <div class="col-lg-6">
                     {% if scode is defined and scode and scode.policy %}
-                        <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Get so-sure perks with</span> {{ scode.policy.user.firstname }}!</h1>
+                        <h1 class="text-white fit mb-4"><span class="sub text-deep-sky-blue-d">Get SO-SURE perks with</span> {{ scode.policy.user.firstname }}!</h1>
                         <ul class="list-unstyled icn-fa-list mb-4">
                             <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>One month FREE thanks to {{ scode.policy.user.firstname }}, <br> just click "Get a quote" below!</li>
                             <li class="mb-3 text-white lead"> <i class="far fa-plus fa-lg fa-fw text-deep-sky-blue-d"></i>&pound;10 in your no claims reward pot</li>
@@ -46,7 +46,7 @@
                         data-event="scode-hero-quote-btn{% if scode is defined and scode and scode.policy %}-{{ user_code }}{% elseif share_code is defined and share_code %}{{ share_code }}{% endif %}">
                         Get a Quote</a>
                     </div>
-                    <p class="text-white">Is your phone already covered with so-sure? <a href="{{ path('fos_user_security_login') }}" class="text-white"><u>Login</u></a> to connect with {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}others{% endif %} and claim your connection bonus.</p>
+                    <p class="text-white">Is your phone already covered with SO-SURE? <a href="{{ path('fos_user_security_login') }}" class="text-white"><u>Login</u></a> to connect with {% if scode is defined and scode and scode.policy %}{{ scode.policy.user.firstname }}{% else %}others{% endif %} and claim your connection bonus.</p>
                 </div>
             </div>
             <div class="hero__illustration d-block d-lg-none mt-4">
