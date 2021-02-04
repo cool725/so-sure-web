@@ -67,7 +67,13 @@ class PolicyReportCommand extends ContainerAwareCommand
             ->setDescription('Generates reports using common policy data.')
             ->addArgument('reports', InputArgument::IS_ARRAY, 'names of reports to generate')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'show debug output')
-            ->addOption('timezone', null, InputOption::VALUE_REQUIRED, 'Choose a timezone to use for policies report');
+            ->addOption('timezone', null, InputOption::VALUE_REQUIRED, 'Choose a timezone to use for policies report')
+            ->addOption(
+                'timer',
+                0,
+                InputOption::VALUE_REQUIRED,
+                'times how long columns take in the bi report to generate n times'
+            );
     }
 
     /**
@@ -75,6 +81,11 @@ class PolicyReportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $timer = intval($input->getOption('timer'));
+        if ($timer) {
+            $this->timeColumns($output, $timer);
+            return;
+        }
         $start = time();
         // Set up reports to run.
         $reports = $input->getArgument('reports');
@@ -132,6 +143,30 @@ class PolicyReportCommand extends ContainerAwareCommand
         }
         $time = time() - $start;
         $output->writeln("Execution completed in {$time} seconds.");
+    }
+
+    /**
+     * Hard coded test of how long each column in the policy bi report takes. Kind of ugly messy code but it needs to
+     * be done and I can't think of a PHP way to do it more neatly without changing the performance of the report
+     * itself.
+     * @param OutputInterface $output     is used to say what is going on.
+     * @param int             $iterations is the number of times to generate each column.
+     */
+    private function timeColumns($output, $iterations) {
+        /** @var PhonePolicyRepository $phonePolicyRepo */
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $phonePolicyRepo->findAllStartedPolicies(
+            new \DateTime(SoSure::POLICY_START),
+            (new \DateTime(SoSure::POLICY_START))->add(new \DateInterval('P10D'))
+        );
+        foreach ($policies as $policy) {
+            $start = time();
+            for ($i = 0; $i < $iterations; $i++) {
+
+            }
+
+            return;
+        }
     }
 
     /**
