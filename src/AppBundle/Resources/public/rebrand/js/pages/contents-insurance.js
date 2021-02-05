@@ -17,57 +17,59 @@ $(function() {
       isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
 
   const addValidation = () => {
-    validateForm.validate({
-      debug: true,
-      // When to validate
-      validClass: 'is-valid-ss',
-      errorClass: 'is-invalid',
-      onfocusout: false,
-      onkeyup: false,
-      rules: {
-        "lead-email" : {
-          required: {
-            depends:function(){
-                $(this).val($.trim($(this).val()));
-                return true;
-            }
+    validateForm.each(function() {
+      $(this).validate({
+        debug: true,
+        // When to validate
+        validClass: 'is-valid-ss',
+        errorClass: 'is-invalid',
+        onfocusout: false,
+        onkeyup: false,
+        rules: {
+          "lead-email" : {
+            required: {
+              depends:function(){
+                  $(this).val($.trim($(this).val()));
+                  return true;
+              }
+            },
+            email: true,
+            emaildomain: true
           },
-          email: true,
-          emaildomain: true
         },
-      },
-      messages: {
-        "lead-email" : {
-          required: 'Please enter a valid email address.'
+        messages: {
+          "lead-email" : {
+            required: 'Please enter a valid email address.'
+          },
         },
-      },
 
-      submitHandler: function() {
-        $('.lead-submit').prop('disabled', 'disabled');
-        $('.lead-feedback').animate({opacity: 0});
-        let data = {
-          email: $('.lead-email').val(),
-          csrf: validateForm.data('csrf')
+        submitHandler: function(form) {
+          $(form).find('.lead-submit').prop('disabled', 'disabled');
+          $(form).find('.lead-feedback').animate({opacity: 0});
+          let data = {
+            email: $(form).find('.lead-email').val(),
+            csrf: $(form).data('csrf')
+          }
+          $.ajax({
+            url: $(form).data('lead'),
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+          })
+          .done(function(data) {
+            $(form).find('.lead-feedback').text('Thanks! We’ll keep you posted about the launch');
+            $(form).find('.lead-email').prop('disabled', 'disabled');
+          })
+          .fail(function(data) {
+            $(form).find('.lead-feedback').text('Something went wrong, please try again');
+            $(form).find('.lead-email, .lead-submit').prop('disabled', '');
+          })
+          .always(function(){
+            $(form).find('.lead-feedback').animate({opacity: 1});
+          });
         }
-        $.ajax({
-          url: validateForm.data('lead'),
-          type: 'POST',
-          data: JSON.stringify(data),
-          contentType: "application/json; charset=utf-8",
-          dataType: "json",
-        })
-        .done(function(data) {
-          $('.lead-feedback').text('Thanks! We’ll keep you posted about the launch');
-          $('.lead-email').prop('disabled', 'disabled');
-        })
-        .fail(function(data) {
-          $('.lead-feedback').text('Something went wrong, please try again');
-          $('.lead-email, .lead-submit').prop('disabled', '');
-        })
-        .always(function(){
-          $('.lead-feedback').animate({opacity: 1});
-        });
-      }
+      });
     });
   }
 

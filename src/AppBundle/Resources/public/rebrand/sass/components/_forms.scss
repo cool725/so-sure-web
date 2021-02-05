@@ -286,7 +286,25 @@ label {
         top: 8px; right: 8px;
         padding: 0.60rem;
         box-shadow: none;
+    }
+}
 
+.custom-input-with-btn-responsive {
+
+    .form-control {
+        margin-bottom: 15px;
+
+        @include media-breakpoint-up(md) {
+            margin-bottom: 0;
+        }
+    }
+
+    .btn {
+        position: static;
+
+        @include media-breakpoint-up(md) {
+            position: absolute;
+        }
     }
 }
 

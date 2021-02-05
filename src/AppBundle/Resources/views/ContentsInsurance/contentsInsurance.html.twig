@@ -17,26 +17,231 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="text-white fit">Contents Insurance <br class="d-md-none"> <span class="sub"><span class="d-none d-md-inline">-</span> coming soon!</span></h1>
-            <p class="lead text-white mb-4">All the things you love about SO-SURE, now for all the things you love.</p>
-            <form class="lead-form validate-form"
-                  data-toggle="validator"
-                  data-client-validation="{{ form_client_validation }}"
-                  data-csrf="{{ lead_csrf }}"
-                  data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz'}) }}"
-                  autocomplete="off">
-                <h2 class="h5 mb-4 lead-feedback">Be the first to know when we launch</h2>
-                <div class="form-group">
-                    <label for="lead-email" class="sr-only">Email Address</label>
-                    <input type="email" name="lead-email" class="lead-email form-control" placeholder="Enter email address..." />
+            <h1 class="text-white fit">Introducing <br class="d-md-none"> <span class="text-deep-sky-blue-d">Smarter Contents <br class="d-md-none"> Insurance</span></h1>
+            <p class="lead text-white"><strong>All the things you love about SO-SURE, for all the things you love.</strong></p>
+            <div class="row">
+                <div class="col-lg-6 offset-lg-5">
+                    <p class="d-none d-md-block hero-p mt-lg-5">We're making contents insurance for renters fast, fair and fuss-free. With the SO-SURE app, simply scan the items you want covered, agree on the value upfront and have claims approved in minutes.</p>
+                    <form id="hero-form" class="lead-form validate-form"
+                        data-toggle="validator"
+                        data-client-validation="{{ form_client_validation }}"
+                        data-csrf="{{ lead_csrf }}"
+                        data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz'}) }}"
+                        autocomplete="off">
+                        <h2 class="h5 lead-feedback text-primary">Contents Insurance by SO-SURE: Coming soon</h2>
+                        <p>Get on the launch list + receive special offers 👇</p>
+                        <div class="form-group mb-4">
+                            <label for="lead-email" class="sr-only">Email Address</label>
+                            <input type="email" name="lead-email" class="lead-email form-control" placeholder="Enter email address..." />
+                        </div>
+                        <button type="submit" class="btn btn-success lead-submit btn-block">Send Me Launch Offers</button>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-success lead-submit btn-block-xs">Notify Me</button>
-            </form>
+            </div>
         </div>
     </section>
 
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="vid-sure py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Point. Scan. Covered.</h2>
+            <p class="mb-0">Goodbye, boring forms. Using cutting-edge image recognition and AI technology,<br class="d-none d-md-inline"> our app identifies the items you need to cover from theft, fire, or flood damage.</p>
+        </div>
+    </section>
+
+    <section class="vid-sure-cont py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-white mb-4">See Our App In Action</h2>
+            <p class="text-white mb-4">Effortlessly build your contents inventory with just a few taps.<br class="d-none d-md-inline"> Capture everything, from your fancy new laptop to the food in your freezer.</p>
+            <div class="row">
+                <div class="col-lg-4 d-none d-lg-block">
+                    <ul class="list-unstyled text-right vid-sure-cont-list">
+                        <li class="right">
+                            <h3 class="h5 text-white">Ski equipment and gear</h3>
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_ski-icon.svg" alt="Ski equipment and gear icon" width="50px" class="ml-3 lozad">
+                        </li>
+                        <li class="right">
+                            <h3 class="h5 text-white">Laptops, tablets, desktops</h3>
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_desktop-icon.svg" alt="Laptops, tablets, desktops icon" width="50px" class="ml-3 lozad">
+                        </li>
+                        <li class="right">
+                            <h3 class="h5 text-white">Your bicycle</h3>
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_bicycle-icon.svg" alt="Bicycle icon" width="50px" class="ml-3 lozad">
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="vid-sure-video-tour">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_video-tour-frame.png"
+                             class="vid-sure-video-tour-frame lozad">
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_video-tour-framed.gif"
+                             class="vid-sure-video-tour-video lozad">
+                    </div>
+                </div>
+                <div class="col-lg-4 d-none d-lg-block">
+                    <ul class="list-unstyled text-left vid-sure-cont-list">
+                        <li class="left">
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_bag-icon.svg" alt="Handbags icon" width="50px" class="mr-3 lozad">
+                            <h3 class="h5 text-white">Your collection of handbags</h3>
+                        </li>
+                        </li>
+                        <li class="left">
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_food-icon.svg" alt="Food icon" width="50px" class="mr-3 lozad">
+                            <h3 class="h5 text-white">The food inside your fridge</h3>
+                        </li>
+                        <li class="left">
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_china-icon.svg" alt="China icon" width="50px" class="mr-3 lozad">
+                            <h3 class="h5 text-white">Nan's china set</h3>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-contents py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Win-Win Contents Insurance</h2>
+            <p class="mb-4">Quick and easy if you need us — money back if you don’t.</p>
+            <div class="d-md-flex justify-content-between p-lg-5">
+                <div class="card mr-5 mb-4 w-100">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_contents_one.jpg"
+                         class="lozad card-img-top"
+                         alt="Upfront agreed">
+                    <div class="card-body py-4 text-center">
+                        <h3 class="h5 text-primary card-title">Worth Agreed Upfront</h3>
+                        <p class="card-text">Build your inventory and confirm how much you’ll get in case you need to make a claim.</p>
+                    </div>
+                </div>
+                <div class="card mr-5 mb-4 w-100">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_contents_three.jpg"
+                         class="lozad card-img-top"
+                         alt="Reward Pot">
+                    <div class="card-body py-4 text-center">
+                        <h3 class="h5 text-primary card-title">Super Fast Claims </h3>
+                        <p class="card-text">No more waiting around. The majority of claims will be sorted within 72 hours.</p>
+                    </div>
+                </div>
+                <div class="card mb-4 w-100">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_contents_two.jpg"
+                         class="lozad card-img-top"
+                         alt="Money Back">
+                    <div class="card-body py-4 text-center">
+                        <h3 class="h5 text-primary card-title">Up to 40% Money Back</h3>
+                        <p class="card-text">Connect with friends and get rewarded every year when you and your connections don't claim.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cardbox no-box-shadow cardbox-100">
+                <div class="cardbox__body p-lg-5">
+                    <h3 class="text-primary mb-4">Who Is This For?</h3>
+                    <p class="mb-4">SO-SURE’s contents insurance has been designed for renters, but it’s ideal for homeowners, too.</p>
+                    <div class="row who-list">
+                        <div class="col-md-4">
+                            <div class="who-list-item">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_sole-occupant.jpg" class="lozad" alt="Sole Occupants" width="150px">
+                                <h4 class="h5 text-primary">Sole Occupants</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="who-list-item">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_house-sharers-adj.jpg" class="lozad" alt="House Sharers" width="150px">
+                                <h4 class="h5 text-primary">House Sharers</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="who-list-item">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_families.jpg" class="lozad" alt="Families" width="150px">
+                                <h4 class="h5 text-primary">Families</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-5">
+                    <div class="row text-left">
+                        <div class="col-lg-6">
+                            <h4 class="h3 mb-4">What's covered 👍</h4>
+                            <ul class="list-unstyled icn-fa-list">
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Almost everything</strong> in your home, apart from a few specifics (check “What’s not covered”)
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Accidental Damage:</strong>  Drops, spills, scrapes and more; if it was an accident, we can cover it
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Out of home:</strong> For extra peace of mind, your stuff can be covered for when you’re out and about, too
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Business:</strong> WFH? Travelling to the office? We can protect the things you use for your business
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Outdoors:</strong> The contents of your garden or outdoor space (and the space itself) can also be covered
+                                </li>
+                                <li>
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Pet Damage:</strong> Got a clumsy four-legged friend or a suspiciously unruly fish? We can protect against damage caused by pets
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4 class="h3 mb-4">What's not covered 👎</h4>
+                            <ul class="list-unstyled icn-fa-list">
+                                <li class="mb-3">
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Mobile phones (<a href="{{ path('phone_insurance') }}">get covered here instead</a>)
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Money
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Powered vehicles
+                                </li>
+                                <li>
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Pets (coming soon!)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sign-up-bottom py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-white">Contents Insurance by SO-SURE: Coming soon</h2>
+            <p class="lead text-white mb-4"><strong>Get on the launch list + receive special offers </strong>👇</p>
+            <form id="footer-form" class="validate-form"
+                  data-toggle="validator"
+                  data-client-validation="{{ form_client_validation }}"
+                  data-csrf="{{ lead_csrf }}"
+                  data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz-footer'}) }}"
+                  autocomplete="off">
+                <div class="custom-input-with-btn custom-input-with-btn-responsive">
+                    <input type="email" name="lead-email" class="lead-email form-control form-control-white" placeholder="Enter email address..." />
+                    <button type="submit" class="btn btn-success lead-submit btn-block-xs btn-sm">Send Me Launch Offers</button>
+                </div>
+                <p class="lead-feedback text-white"></p>
+            </form>
+        </div>
+    </section>
 
 {% endblock %}
 

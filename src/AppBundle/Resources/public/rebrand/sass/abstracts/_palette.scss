@@ -176,6 +176,10 @@ $dark:          $haiti;
     @include linear-gradient(0deg, #0A3BD6, #0262DD);
 }
 
+@mixin vid-sure-background {
+    @include linear-gradient(90deg, #134ED9, #2871E1);
+}
+
 // Box shadow
 .box-shadow {
     box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),

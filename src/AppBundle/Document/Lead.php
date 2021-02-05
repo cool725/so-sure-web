@@ -31,6 +31,7 @@ class Lead
 
     // Home Contents
     const SOURCE_CONTENTS_BUZZ = 'home-contents-buzz';
+    const SOURCE_CONTENTS_BUZZ_FOOTER = 'home-contents-buzz-footer';
 
     // Competition/Cold leads
     const SOURCE_COMPETITION = 'competition';
@@ -101,7 +102,7 @@ class Lead
      *                 "invite-not-ready", "competition",
      *                 "aggregator", "send-quote",
      *                 "quote-email-home", "quote-email-home-required",
-     *                 "exit-popup", "home-contents-buzz"}, strict=true)
+     *                 "exit-popup", "home-contents-buzz", "home-contents-buzz-footer"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
