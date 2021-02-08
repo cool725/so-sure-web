@@ -1147,6 +1147,11 @@ services:
             - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
+            -  { name: kernel.event_listener, event: event.policy.updated-premium, method: onPolicyLegalDataChange }
+            -  { name: kernel.event_listener, event: event.policy.upgraded, method: onPolicyLegalDataChange }
+            -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserLegalDataChange }
+            -  { name: kernel.event_listener, event: event.user.birthday.updated, method: onUserLegalDataChange }
+            -  { name: kernel.event_listener, event: event.user.email.updated, method: onUserLegalDataChange }
 
     app.listener.sms:
         class:   AppBundle\Listener\SmsListener
