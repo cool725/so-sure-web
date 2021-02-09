@@ -19,14 +19,14 @@ $(function() {
   const addValidation = () => {
     validateForm.each(function() {
       $(this).validate({
-        debug: true,
+        debug: false,
         // When to validate
         validClass: 'is-valid-ss',
         errorClass: 'is-invalid',
         onfocusout: false,
         onkeyup: false,
         rules: {
-          "lead-email" : {
+          "hc-lead-email" : {
             required: {
               depends:function(){
                   $(this).val($.trim($(this).val()));
@@ -38,16 +38,16 @@ $(function() {
           },
         },
         messages: {
-          "lead-email" : {
+          "hc-lead-email" : {
             required: 'Please enter a valid email address.'
           },
         },
 
         submitHandler: function(form) {
-          $(form).find('.lead-submit').prop('disabled', 'disabled');
-          $(form).find('.lead-feedback').animate({opacity: 0});
+          $(form).find('.hc-lead-submit').prop('disabled', 'disabled');
+          $(form).find('.hc-lead-feedback').animate({opacity: 0});
           let data = {
-            email: $(form).find('.lead-email').val(),
+            email: $(form).find('.hc-lead-email').val(),
             csrf: $(form).data('csrf')
           }
           $.ajax({
@@ -58,15 +58,15 @@ $(function() {
             dataType: "json",
           })
           .done(function(data) {
-            $(form).find('.lead-feedback').text('Thanks! We’ll keep you posted about the launch');
-            $(form).find('.lead-email').prop('disabled', 'disabled');
+            $(form).find('.hc-lead-feedback').text('Thanks! We’ll keep you posted about the launch');
+            $(form).find('.hc-lead-email').prop('disabled', 'disabled');
           })
           .fail(function(data) {
-            $(form).find('.lead-feedback').text('Something went wrong, please try again');
-            $(form).find('.lead-email, .lead-submit').prop('disabled', '');
+            $(form).find('.hc-lead-feedback').text('Something went wrong, please try again');
+            $(form).find('.hc-lead-email, .hc-lead-submit').prop('disabled', '');
           })
           .always(function(){
-            $(form).find('.lead-feedback').animate({opacity: 1});
+            $(form).find('.hc-lead-feedback').animate({opacity: 1});
           });
         }
       });

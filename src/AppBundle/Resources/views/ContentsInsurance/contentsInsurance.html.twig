@@ -22,19 +22,19 @@
             <div class="row">
                 <div class="col-lg-6 offset-lg-5">
                     <p class="d-none d-md-block hero-p mt-lg-5">We're making contents insurance for renters fast, fair and fuss-free. With the SO-SURE app, simply scan the items you want covered, agree on the value upfront and have claims approved in minutes.</p>
-                    <form id="hero-form" class="lead-form validate-form"
+                    <form id="hero-form" class="hc-lead-form validate-form"
                         data-toggle="validator"
                         data-client-validation="{{ form_client_validation }}"
                         data-csrf="{{ lead_csrf }}"
                         data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz'}) }}"
                         autocomplete="off">
-                        <h2 class="h5 lead-feedback text-primary">Contents Insurance by SO-SURE: Coming soon</h2>
+                        <h2 class="h5 hc-lead-feedback text-primary">Contents Insurance by SO-SURE: Coming soon</h2>
                         <p>Get on the launch list + receive special offers 👇</p>
                         <div class="form-group mb-4">
-                            <label for="lead-email" class="sr-only">Email Address</label>
-                            <input type="email" name="lead-email" class="lead-email form-control" placeholder="Enter email address..." />
+                            <label for="hc-lead-email" class="sr-only">Email Address</label>
+                            <input type="email" name="hc-lead-email" class="hc-lead-email form-control" placeholder="Enter email address..." />
                         </div>
-                        <button type="submit" class="btn btn-success lead-submit btn-block">Send Me Launch Offers</button>
+                        <button type="submit" class="btn btn-success hc-lead-submit btn-block">Send Me Launch Offers</button>
                     </form>
                 </div>
             </div>
@@ -235,10 +235,10 @@
                   data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz-footer'}) }}"
                   autocomplete="off">
                 <div class="custom-input-with-btn custom-input-with-btn-responsive">
-                    <input type="email" name="lead-email" class="lead-email form-control form-control-white" placeholder="Enter email address..." />
-                    <button type="submit" class="btn btn-success lead-submit btn-block-xs btn-sm">Send Me Launch Offers</button>
+                    <input type="email" name="hc-lead-email" class="hc-lead-email form-control form-control-white" placeholder="Enter email address..." />
+                    <button type="submit" class="btn btn-success hc-lead-submit btn-block-xs btn-sm">Send Me Launch Offers</button>
                 </div>
-                <p class="lead-feedback text-white"></p>
+                <p class="hc-lead-feedback text-white"></p>
             </form>
         </div>
     </section>
