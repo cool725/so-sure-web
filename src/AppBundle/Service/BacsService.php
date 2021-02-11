@@ -2088,16 +2088,14 @@ class BacsService
             if ($scheduledPayment->getAmount() < 0) {
                 continue;
             }
+            $policy = $scheduledPayment->getPolicy();
             $policyId = $policy->getId();
-            if (array_key_exists($policyId, $policies)) {
+            if (array_key_exists($policyId, $policyIds)) {
                 continue;
             } else {
                 $policyIds[$policyId] = true;
             }
-
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
-            $policy = $scheduledPayment->getPolicy();
-
             // Reschedule if there are already positive payments pending.
             if (count($bacsPaymentRepo->findPositivePendingBacsPayments($policy)) > 0) {
                 $scheduledPayment->setNotes("Cancelling as BACs payment already in progress");
