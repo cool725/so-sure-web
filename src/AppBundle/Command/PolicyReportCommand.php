@@ -65,15 +65,9 @@ class PolicyReportCommand extends ContainerAwareCommand
     {
         $this ->setName('sosure:policy:report')
             ->setDescription('Generates reports using common policy data.')
-            ->addArgument('reports', InputArgument::IS_ARRAY, 'names of reports to generate')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'show debug output')
             ->addOption('timezone', null, InputOption::VALUE_REQUIRED, 'Choose a timezone to use for policies report')
-            ->addOption(
-                'timer',
-                0,
-                InputOption::VALUE_REQUIRED,
-                'times how long columns take in the bi report to generate n times'
-            );
+            ->addOption('report', null, InputOption::VALUE_REQUIRED, 'Choose a report to generate', 'policy');
     }
 
     /**
@@ -88,17 +82,13 @@ class PolicyReportCommand extends ContainerAwareCommand
         }
         $start = time();
         // Set up reports to run.
-        $reports = $input->getArgument('reports');
+        $reportName = $input->getOption('report');
         $debug = $input->getOption('debug') == true;
         $timezone = new DateTimeZone($input->getOption('timezone') ?: 'UTC');
-        $executingReports = [];
-        foreach ($reports as $report) {
-            $createdReport = PolicyReport::createReport($report, $this->dm, $timezone);
-            if (!$createdReport) {
-                $output->writeln("<error>{$report} is not a valid report type</error>");
-                return;
-            }
-            $executingReports[] = $createdReport;
+        $report = PolicyReport::createReport($reportName, $this->dm, $timezone);
+        if (!$report) {
+            $output->writeln("<error>{$reportName} is not a valid report type</error>");
+            return;
         }
         // Iterating over the policies.
         /** @var PhonePolicyRepository $phonePolicyRepo */
@@ -116,57 +106,37 @@ class PolicyReportCommand extends ContainerAwareCommand
                 count($policies)
             ));
             foreach ($policies as $policy) {
-                foreach ($executingReports as $report) {
-                    try {
-                        $report->process($policy);
-                    } catch (RuntimeException $e) {
-                        $output->writeln("<error>{$e->getMessage()}</error>");
-                    }
+                try {
+                    $report->process($policy);
+                } catch (RuntimeException $e) {
+                    $output->writeln("<error>{$e->getMessage()}</error>");
                 }
             }
             $begin->add(new \DateInterval(self::INTERVAL));
-            $output->writeln(sprintf('%f -- %f / row', time() - $batchStart, (time() - $batchStart) / count($policies)));
+            if (count($policies) > 0) {
+                $output->writeln(sprintf(
+                    '%f -- %f / row',
+                    time() - $batchStart,
+                    (time() - $batchStart) / count($policies)
+                ));
+            } else {
+                $output->writeln(sprintf('%f', time() - $batchStart));
+            }
         }
         // Now run the reports.
         // Output and upload.
-        foreach ($executingReports as $report) {
-            if ($debug) {
-                $output->writeln("<info>{$report->getFile()}</info>");
-                $output->writeln($report->getLines());
-            }
-            try {
-                $this->uploadS3($report->getLines(), $report->getFile());
-                $output->writeln("<info>Uploaded {$report->getFile()}");
-            } catch (IOException $e) {
-                $output->writeln("<error>{$e->getMessage()}</error>");
-            }
+        if ($debug) {
+            $output->writeln("<info>{$report->getFile()}</info>");
+            $output->writeln($report->getLines());
+        }
+        try {
+            $this->uploadS3($report->getLines(), $report->getFile());
+            $output->writeln("<info>Uploaded {$report->getFile()}");
+        } catch (IOException $e) {
+            $output->writeln("<error>{$e->getMessage()}</error>");
         }
         $time = time() - $start;
         $output->writeln("Execution completed in {$time} seconds.");
-    }
-
-    /**
-     * Hard coded test of how long each column in the policy bi report takes. Kind of ugly messy code but it needs to
-     * be done and I can't think of a PHP way to do it more neatly without changing the performance of the report
-     * itself.
-     * @param OutputInterface $output     is used to say what is going on.
-     * @param int             $iterations is the number of times to generate each column.
-     */
-    private function timeColumns($output, $iterations) {
-        /** @var PhonePolicyRepository $phonePolicyRepo */
-        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $phonePolicyRepo->findAllStartedPolicies(
-            new \DateTime(SoSure::POLICY_START),
-            (new \DateTime(SoSure::POLICY_START))->add(new \DateInterval('P10D'))
-        );
-        foreach ($policies as $policy) {
-            $start = time();
-            for ($i = 0; $i < $iterations; $i++) {
-
-            }
-
-            return;
-        }
     }
 
     /**
