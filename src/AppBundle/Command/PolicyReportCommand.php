@@ -24,7 +24,7 @@ use AppBundle\Classes\SoSure;
  */
 class PolicyReportCommand extends ContainerAwareCommand
 {
-    const INTERVAL = 'P5D';
+    const INTERVAL = 'P13D';
 
     /** @var S3Client */
     protected $s3;
@@ -75,11 +75,6 @@ class PolicyReportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $timer = intval($input->getOption('timer'));
-        if ($timer) {
-            $this->timeColumns($output, $timer);
-            return;
-        }
         $start = time();
         // Set up reports to run.
         $reportName = $input->getOption('report');
@@ -119,8 +114,6 @@ class PolicyReportCommand extends ContainerAwareCommand
                     time() - $batchStart,
                     (time() - $batchStart) / count($policies)
                 ));
-            } else {
-                $output->writeln(sprintf('%f', time() - $batchStart));
             }
         }
         // Now run the reports.
