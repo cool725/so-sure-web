@@ -1,3 +1,4 @@
+n
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
@@ -28,6 +29,7 @@
                 <div class="col-lg-8 offset-lg-2">
                     <div class="cp__content">
                         <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
                             <header class="mb-5">
                                 <hgroup>
                                     <div class="breadcrumbs">
@@ -69,18 +71,20 @@
                                                 <meta property="position" content="3">
                                             </li>
                                         </ul>
-                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
                                     </div>
                                     <h1 class="text-primary mb-4">What to do if you break your phone screen</h1>
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item">
-                                            <div rel="author">Susan</div>
-                                        </li>
-                                        <li class="list-inline-item">|</li>
-                                        <li class="list-inline-item">
-                                            <time>Jan 16, 2019</time>
-                                        </li>
-                                    </ul>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Susan</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Jan 16, 2019</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                    </div>
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

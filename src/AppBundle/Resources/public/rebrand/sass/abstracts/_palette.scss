@@ -60,6 +60,8 @@ $starling:      #7420FF;
 $starling-dark: #1d2346;
 $twitter:       #00aced;
 $whatsapp:      #25d366;
+$linkedin:      #0051E9;
+$instagram:     #ff7b31;
 
 // Extend Theme colours and overide primary BS colour
 $theme-colors: (
@@ -108,7 +110,9 @@ $theme-colors: (
     "tan-hide":             $tan-hide,
     "azureeradiance":       $azureeradiance,
     "cadet-blue":           $cadet-blue,
-    "mako":                 $mako
+    "mako":                 $mako,
+    "linkedin":             $linkedin,
+    "instagram":            $instagram,
 );
 
 // Bootstrap overides

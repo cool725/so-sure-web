@@ -1,19 +1,61 @@
 <div class="blog-footer-cta">
-    <div class="h5 mb-4">Get a quote for mobile phone insurance in seconds with so-sure</div>
-    <div class="row mb-5">
-        <div class="col-lg-4">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="so-sure - Simple Terms &amp; Conditions" width="100px" class="lozad">
-            <div class="h6 text-primary">24-72 hour replace or repair</div>
-        </div>
-        <div class="col-lg-4">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_wallet-cashback.png" alt="so-sure - Up to 40% cheaper" width="100px" class="lozad">
-            <div class="h6 text-primary">Up to 80% money back</div>
-        </div>
-        <div class="col-lg-4">
-            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="100px" class="lozad">
-            <div class="h6 text-primary">Low excess from just {{ lowest_excess }}</div>
-        </div>
+    <div class="share-links-mobile mb-4">
+        <span class="h6">Share this article: </span>
+        <a href="#"
+        data-sharer="facebook"
+        data-title="{{ og_title}}"
+        data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
+        data-hashtags="so-sure, phoneinsurance">
+            <span class="fa-stack fa-lg">
+                <i class="fas fa-circle text-facebook fa-stack-2x"></i>
+                <i class="fab fa-facebook-square text-white fa-stack-1x fa-inverse"></i>
+            </span><span class="sr-only">Facebook</span></a>
+        <a href="#"
+        data-sharer="linkedin"
+        data-web
+        data-title="{{ og_title}}"
+        data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}">
+            <span class="fa-stack fa-lg">
+                <i class="fas fa-circle text-linkedin fa-stack-2x"></i>
+                <i class="fab fa-linkedin text-white fa-stack-1x fa-inverse"></i>
+            </span><span class="sr-only">Linkedin</span></a>
+        <a href="#"
+        data-sharer="twitter"
+        data-title="{{ og_title}}"
+        data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
+        data-via="wearesosure"
+        data-hashtags="so-sure, phoneinsurance">
+            <span class="fa-stack fa-lg">
+                <i class="fas fa-circle text-twitter fa-stack-2x"></i>
+                <i class="fab fa-twitter text-white fa-stack-1x fa-inverse"></i>
+            </span><span class="sr-only">Tweet</span></a>
     </div>
-    <a href="#" class="btn btn-success get-a-quote">Get a quote now!</a>
+    <div class="blog-footer-cta-banner">
+        {% if type is defined and type == 'home' %}
+            <div class="blog-footer-cta-banner-left">
+                <div class="h5 text-white mb-4">Learn how you can protect what you love with contents insurance.</div>
+                <a href="{{ path('contents_insurance') }}" class="btn btn-success btn-block-xs">Learn more</a>
+            </div>
+            <div class="blog-footer-cta-banner-right">
+                <img src="{{ cdn_url }}/images/onexone.png"
+                    data-src="{{ cdn_url }}/images/rebrand/blog/footer/so-sure_blog-footer-house-x2.png" alt="S0-SURE home contents insurance"
+                    title=""
+                    width="140px"
+                    class="lozad">
+            </div>
+        {% else %}
+            <div class="blog-footer-cta-banner-left">
+                <div class="h5 text-white mb-4">Get a fast quote for your mobile insurance today.</div>
+                <a href="#" class="btn btn-success btn-block-xs get-a-quote">Get a quote</a>
+            </div>
+            <div class="blog-footer-cta-banner-right">
+                <img src="{{ cdn_url }}/images/onexone.png"
+                    data-src="{{ cdn_url }}/images/rebrand/blog/footer/so-sure_blog-footer-hand-phone.png" alt="S0-SURE home contents insurance"
+                    title=""
+                    width="150px"
+                    class="lozad">
+            </div>
+        {% endif %}
+    </div>
 </div>
 

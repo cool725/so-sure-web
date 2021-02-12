@@ -742,4 +742,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/what-is-contents-insurance",
+     * name="what_is_contents_insurance", options={"sitemap" = true})
+     * @Template
+     */
+    public function whatIsContentsInsuranceAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/what-is-contents-insurance.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

@@ -1,4 +1,23 @@
-<div class="d-flex align-items-center justify-content-start">
+<div class="share-links-desktop">
+    <span class="h6">Share this article: </span>
+    <a href="#"
+       data-sharer="facebook"
+       data-title="{{ og_title}}"
+       data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
+       data-hashtags="so-sure, phoneinsurance">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-facebook fa-stack-2x"></i>
+            <i class="fab fa-facebook-square text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Facebook</span></a>
+    <a href="#"
+       data-sharer="linkedin"
+       data-web
+       data-title="{{ og_title}}"
+       data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-linkedin fa-stack-2x"></i>
+            <i class="fab fa-linkedin text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Linkedin</span></a>
     <a href="#"
        data-sharer="twitter"
        data-title="{{ og_title}}"
@@ -6,25 +25,61 @@
        data-via="wearesosure"
        data-hashtags="so-sure, phoneinsurance">
         <span class="fa-stack fa-lg">
-            <i class="fas fa-square text-athens-gray fa-stack-2x"></i>
-            <i class="fab fa-twitter text-twitter fa-stack-1x fa-inverse"></i>
+            <i class="fas fa-circle text-twitter fa-stack-2x"></i>
+            <i class="fab fa-twitter text-white fa-stack-1x fa-inverse"></i>
         </span><span class="sr-only">Tweet</span></a>
-    <a href="#"
-       data-sharer="facebook"
-       data-title="{{ og_title}}"
-       data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
-       data-hashtags="so-sure, phoneinsurance">
+</div>
+<div class="follow-links-moblie">
+    <span class="h6">Follow us: </span>
+    <a href="https://www.facebook.com/wearesosure" rel="noopener noreferrer" target="_blank" target="_blank">
         <span class="fa-stack fa-lg">
-            <i class="fas fa-square text-athens-gray fa-stack-2x"></i>
-            <i class="fab fa-facebook text-facebook fa-stack-1x fa-inverse"></i>
-        </span><span class="sr-only">Facebook</span></a>
-    <a href="#"
-       data-sharer="whatsapp"
-       data-web
-       data-title="{{ og_title}}"
-       data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}">
+            <i class="fas fa-circle text-facebook fa-stack-2x"></i>
+            <i class="fab fa-facebook-square text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Facebook</span>
+    </a>
+    <a href="https://www.instagram.com/wearesosure" rel="noopener noreferrer" target="_blank" target="_blank">
         <span class="fa-stack fa-lg">
-            <i class="fas fa-square text-athens-gray fa-stack-2x"></i>
-            <i class="fab fa-whatsapp text-whatsapp fa-stack-1x fa-inverse"></i>
-        </span><span class="sr-only">Whatsapp</span></a>
+            <i class="fas fa-circle text-instagram fa-stack-2x"></i>
+            <i class="fab fa-instagram text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Instagram</span>
+    </a>
+    <a href="https://www.linkedin.com/company/so-sure/" rel="noopener noreferrer" target="_blank" target="_blank">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-linkedin fa-stack-2x"></i>
+            <i class="fab fa-linkedin text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Linkedin</span></a>
+    </a>
+    <a href="https://twitter.com/wearesosure" rel="noopener noreferrer" target="_blank">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-twitter fa-stack-2x"></i>
+            <i class="fab fa-twitter text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Twitter</span></a>
+    </a>
+</div>
+<div class="follow-links-desktop">
+    <span>Follow us: </span>
+    <a href="https://www.facebook.com/wearesosure" rel="noopener noreferrer" target="_blank" target="_blank">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-facebook fa-stack-2x"></i>
+            <i class="fab fa-facebook-square text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Facebook</span>
+    </a>
+    <a href="https://www.instagram.com/wearesosure" rel="noopener noreferrer" target="_blank" target="_blank">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-instagram fa-stack-2x"></i>
+            <i class="fab fa-instagram text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Instagram</span>
+    </a>
+    <a href="https://www.linkedin.com/company/so-sure/" rel="noopener noreferrer" target="_blank" target="_blank">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-linkedin fa-stack-2x"></i>
+            <i class="fab fa-linkedin text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Linkedin</span></a>
+    </a>
+    <a href="https://twitter.com/wearesosure" rel="noopener noreferrer" target="_blank">
+        <span class="fa-stack fa-lg">
+            <i class="fas fa-circle text-twitter fa-stack-2x"></i>
+            <i class="fab fa-twitter text-white fa-stack-1x fa-inverse"></i>
+        </span><span class="sr-only">Twitter</span></a>
+    </a>
 </div>
