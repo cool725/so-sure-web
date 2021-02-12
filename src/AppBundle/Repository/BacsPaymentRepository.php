@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\BacsPayment;
 use DateInterval;
 use DateTime;
@@ -131,6 +132,28 @@ class BacsPaymentRepository extends PaymentRepository
         }
     }
 
+    /**
+     * Finds all the pending bacs payments for the given policy. Basically does the exact same functionality as
+     * Policy::getPendingBacsPayments, except only for positive payments, and it does it with a query so it doesn't
+     * have to load them all in and then filter them in code.
+     * @param Policy $policy         is the policy to find the pending payments for.
+     * @param bool   $includePending is whether pending counts as a pending status, the default being no.
+     * @return Cursor to the found results.
+     */
+    public function findPositivePendingBacsPayments($policy, $includePending = false)
+    {
+        $statuses = [BacsPayment::STATUS_SUBMITTED, BacsPayment::STATUS_GENERATED];
+        if ($includePending) {
+            $statuses[] = BacsPayment::STATUS_PENDING;
+        }
+        return $this->createQueryBuilder()
+            ->field('policy')->references($policy)
+            ->field('status')->in($statuses)
+            ->field('amount')->gt(0)
+            ->getQuery()
+            ->execute();
+    }
+          
     /**
      * Finds bacs payments that have not been reverted which have got a covering checkout payment which are ready to be
      * reverted.

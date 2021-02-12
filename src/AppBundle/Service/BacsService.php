@@ -2066,7 +2066,10 @@ class BacsService
         $policyType = null,
         $limit = -1
     ) {
+        /** @var BacsPaymentRepository $bacsPaymentRepo */
+        $bacsPaymentRepo = $this->dm->getRepository(BacsPayment::class);
         $payments = [];
+        $policyIds = [];
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
         // time for the bacs cycle
         $advanceDate = clone $date;
@@ -2085,38 +2088,24 @@ class BacsService
             if ($scheduledPayment->getAmount() < 0) {
                 continue;
             }
-
-            $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
             $policy = $scheduledPayment->getPolicy();
-
-            /**
-             * If the policy already has a submitted or generated payment then we
-             * don't want to add this one, but we might not want to lose the payment,
-             * so we will reschedule it for 4 days time, then it will be tried again tomorrow.
-             */
-            $pending = $policy->getPendingBacsPayments();
-            if (count($pending) > 0) {
-                $shouldReschedule = false;
-                /** @var Payment $payment */
-                foreach ($pending as $payment) {
-                    if ($payment->getAmount() > 0) {
-                        $shouldReschedule = true;
-                    }
-                }
-                if ($shouldReschedule) {
-                    $scheduledPayment->setNotes("Cancelling as BACs payment already in progress");
-                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
-                    $rescheduled = $scheduledPayment->reschedule($scheduledDate, 4);
-                    $rescheduled->setNotes(sprintf(
-                        "Rescheduled from cancelled payment %s",
-                        $scheduledPayment->getId()
-                    ));
-                    $policy->addScheduledPayment($rescheduled);
-                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-                    continue;
-                }
+            $policyId = $policy->getId();
+            if (array_key_exists($policyId, $policyIds)) {
+                continue;
+            } else {
+                $policyIds[$policyId] = true;
             }
-
+            $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
+            // Reschedule if there are already positive payments pending.
+            if (count($bacsPaymentRepo->findPositivePendingBacsPayments($policy)) > 0) {
+                $scheduledPayment->setNotes("Cancelling as BACs payment already in progress");
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+                $rescheduled = $scheduledPayment->reschedule($scheduledDate, 4);
+                $rescheduled->setNotes(sprintf('Rescheduled from cancelled payment %s', $scheduledPayment->getId()));
+                $policy->addScheduledPayment($rescheduled);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                continue;
+            }
             // If admin has rescheduled, then allow payment to go through, but should be manually approved
             $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN ||
                 $policy->getDontCancelIfUnpaid() ||
@@ -2162,9 +2151,9 @@ class BacsService
                 $metadata['debit-amount'] += $scheduledPayment->getAmount();
                 $payments[] = $payment;
             }
-            if ($update) {
-                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-            }
+        }
+        if ($update) {
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         }
         $this->notifyWarnings();
 
