@@ -58,7 +58,7 @@
             </td>
         </tr>
         <tr>
-            <td class="td-30 bb1" colspan="2" align="center"><strong>Damage: time to repair once received</strong></td>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Damage: time to repair <u>once received</u></strong></td>
         </tr>
         <tr>
             <td class="b2a">{{ competitor['SS']['timeToRepair']|raw }}</td>
@@ -71,7 +71,7 @@
             </td>
         </tr>
         <tr>
-            <td class="td-30 bb1" colspan="2" align="center"><strong>Theft/Loss: time to replace after approval</strong></td>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Theft/Loss: time to replace <u>after approval</u></strong></td>
         </tr>
         <tr>
             <td class="b2a">{{ competitor['SS']['timeToReplace']|raw }}</td>
@@ -97,7 +97,7 @@
             </td>
         </tr>
         <tr>
-            <td class="td-30 bb1" colspan="2" align="center"><strong>Insure used phones</strong></td>
+            <td class="td-30 bb1" colspan="2" align="center"><strong>Insure second hand phones</strong></td>
         </tr>
         <tr>
             <td class="b2a">{{ competitor['SS']['oldPhones']|raw }}</td>
@@ -122,7 +122,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        {# <tr>
             <td class="td-30 bb1" colspan="2" align="center"><strong>Loss included as standard</strong></td>
         </tr>
         <tr>
@@ -143,7 +143,7 @@
                     <span class="td-swap">{{ competitor['LCANI']['lossAsStandard']|raw }}</span>
                 </div>
             </td>
-        </tr>
+        </tr> #}
     </tbody>
 </table>
 <table class="table-comparison light-table d-none d-md-block mx-auto mt-lg-5">
@@ -180,14 +180,14 @@
             <td class="wh">{{ competitor['LCANI']['excessFrom']|raw }}</td>
         </tr>
         <tr>
-            <td class="bb1 text-left"><strong>Damage: time to repair once received</strong></td>
+            <td class="bb1 text-left"><strong>Damage: time to repair <u>once received</u></strong></td>
             <td class="b2">{{ competitor['SS']['timeToRepair']|raw }}</td>
             <td class="bb1 bs-l">{{ competitor['PYB']['timeToRepair']|raw }}</td>
             <td class="bb1">{{ competitor['LICI']['timeToRepair']|raw }}</td>
             <td class="bb1">{{ competitor['LCANI']['timeToRepair']|raw }}</td>
         </tr>
         <tr>
-            <td class="wh text-left"><strong>Theft/Loss: time to replace after approval</strong></td>
+            <td class="wh text-left"><strong>Theft/Loss: time to replace <u>after approval</u></strong></td>
             <td class="b2a">{{ competitor['SS']['timeToReplace']|raw }}</td>
             <td class="wh bs-l">{{ competitor['PYB']['timeToReplace']|raw }}</td>
             <td class="wh">{{ competitor['LICI']['timeToReplace']|raw }}</td>
@@ -201,7 +201,7 @@
             <td class="bb1">{{ competitor['LCANI']['repairVia']|raw }}</td>
         </tr>
         <tr>
-            <td class="wh text-left"><strong>Insure used phones</strong></td>
+            <td class="wh text-left"><strong>Insure second hand phones</strong></td>
             <td class="b2a">{{ competitor['SS']['oldPhones']|raw }}</td>
             <td class="wh bs-l">{{ competitor['PYB']['oldPhones']|raw }}</td>
             <td class="wh">{{ competitor['LICI']['oldPhones']|raw }}</td>
@@ -214,7 +214,7 @@
             <td class="bb1">{{ competitor['LICI']['phoneage']|raw }}</td>
             <td class="bb1">{{ competitor['LCANI']['phoneage']|raw }}</td>
         </tr>
-        <tr>
+        {# <tr>
             <td class="wh text-left">
                 <strong>Loss included as standard</strong>
             </td>
@@ -231,8 +231,8 @@
             <td class="wh bs-l">{{ competitor['PYB']['lossAsStandard']|raw }}</td>
             <td class="wh">{{ competitor['LICI']['lossAsStandard']|raw }}</td>
             <td class="wh">{{ competitor['LCANI']['lossAsStandard']|raw }}</td>
-        </tr>
+        </tr> #}
     </tbody>
 </table>
-<p class="updated-text text-center mt-2"><small><em>Info correct as of Oct 21 2020 - data taken on a first phone covered basis
+<p class="updated-text text-center mt-2"><small><em>Info correct as of Jan 29 2021 - data taken on a first phone covered basis
 </em></small></em>

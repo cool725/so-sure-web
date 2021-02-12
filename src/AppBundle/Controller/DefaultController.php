@@ -177,6 +177,7 @@ class DefaultController extends BaseController
      * @Route("/vendi-app", name="vendi_app")
      * @Route("/so-sure-compared", name="so_sure_compared")
      * @Route("/moneyback", name="moneyback")
+     * @Route("/quotezone", name="quotezone")
      */
     public function affiliateLanding(Request $request)
     {
@@ -227,6 +228,13 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'money',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo_light.svg',
+            ];
+        } elseif ($request->get('_route') == 'quotezone') {
+            $data = [
+                'competitor' => $competitorData::$competitorComparisonData,
+                'affiliate_page' => 'quotezone',
+                'affiliate_company' => 'quotezone',
+                'affiliate_company_logo' => 'so-sure_quotezone_logo-spaced.svg',
             ];
         } elseif ($request->get('_route') == 'money_free_phone_case') {
             $data = [

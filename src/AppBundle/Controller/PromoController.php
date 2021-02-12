@@ -36,6 +36,8 @@ class PromoController extends BaseController
      * @Route("/student/{code}", name="student_promo")
      * @Route("/groupon/{code}", name="groupon_promo")
      * @Route("/benefithub/{code}", name="benefithub_promo")
+     * @Route("/lifeworks/{code}", name="lifeworks_promo")
+     * @Route("/idealworld/{code}", name="idealworld_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -90,6 +92,12 @@ class PromoController extends BaseController
         } elseif ($request->get('_route') == 'benefithub_promo') {
             $custom = 'benefithub';
             $amazonVoucher = 15;
+        } elseif ($request->get('_route') == 'lifeworks_promo') {
+            $custom = 'lifeworks';
+            $amazonVoucher = 15;
+        } elseif ($request->get('_route') == 'idealworld_promo') {
+            $custom = 'idealworld';
+            $amazonVoucher = 10;
         }
 
         $lead = new Lead();
@@ -157,5 +165,13 @@ class PromoController extends BaseController
         ];
 
         return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/idealworld", name="idealworld_forward")
+     */
+    public function forwardIdealWorld()
+    {
+        return $this->redirectToRoute('idealworld_promo', ['code'=>'IDEALW10'], 301);
     }
 }

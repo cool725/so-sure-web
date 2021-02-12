@@ -56,6 +56,17 @@ class DoctrineUserListener extends BaseDoctrineListener
         )) {
             $event = new UserEmailEvent($user, $eventArgs->getOldValue('email'));
             $this->dispatcher->dispatch(UserEmailEvent::EVENT_CHANGED, $event);
+            $this->triggerEvent($user, UserEvent::EVENT_EMAIL_UPDATED);
+        }
+
+        if ($this->hasDataChanged(
+            $eventArgs,
+            User::class,
+            ['birthday'],
+            DataChange::COMPARE_EQUAL,
+            true
+        )) {
+            $this->triggerEvent($user, UserEvent::EVENT_BIRTHDAY_UPDATED);
         }
 
         // If both confirmationToken & passwordRequestAt are changing to null,

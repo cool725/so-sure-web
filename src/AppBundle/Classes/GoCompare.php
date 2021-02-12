@@ -124,6 +124,13 @@ class GoCompare
         1935 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 5G', 'memory' => 256],
         1936 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 256],
         1937 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 512],
+        2070 => ['make' => 'Samsung', 'model' => 'Galaxy S21 5G', 'memory' => 128],
+        2071 => ['make' => 'Samsung', 'model' => 'Galaxy S21 5G', 'memory' => 256],
+        2072 => ['make' => 'Samsung', 'model' => 'Galaxy S21+ 5G', 'memory' => 128],
+        2073 => ['make' => 'Samsung', 'model' => 'Galaxy S21+ 5G', 'memory' => 256],
+        2074 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 128],
+        2075 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 256],
+        2076 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 512],
 
         1412 => ['make' => 'Huawei', 'model' => 'P20', 'memory' => 128],
         1413 => ['make' => 'Huawei', 'model' => 'P20 Lite', 'memory' => 64],
@@ -184,6 +191,7 @@ class GoCompare
         1748 => ['make' => 'Google', 'model' => 'Pixel 4', 'memory' => 128128],
         1749 => ['make' => 'Google', 'model' => 'Pixel 4 XL', 'memory' => 64],
         1750 => ['make' => 'Google', 'model' => 'Pixel 4 XL', 'memory' => 128],
+        2069 => ['make' => 'Google', 'model' => 'Pixel 5', 'memory' => 128],
 
         1477 => ['make' => 'Nokia', 'model' => '7.1', 'memory' => 32],
 
@@ -203,6 +211,9 @@ class GoCompare
         1746 => ['make' => 'OnePlus', 'model' => '7T', 'memory' => 256],
         2052 => ['make' => 'OnePlus', 'model' => '8T', 'memory' => 128],
         2053 => ['make' => 'OnePlus', 'model' => '8T', 'memory' => 256],
+        2077 => ['make' => 'OnePlus', 'model' => 'Nord', 'memory' => 128],
+        2079 => ['make' => 'OnePlus', 'model' => 'Nord N10 5G', 'memory' => 128],
+        2080 => ['make' => 'OnePlus', 'model' => 'Nord N100', 'memory' => 64],
 
         1733 => ['make' => 'Oppo', 'model' => 'Reno', 'memory' => 256],
         1734 => ['make' => 'Oppo', 'model' => 'Reno 10x Zoom', 'memory' => 256],
@@ -219,6 +230,9 @@ class GoCompare
 
         1872 => ['make' => 'Realme', 'model' => '6', 'memory' => 64],
         1873 => ['make' => 'Realme', 'model' => '6', 'memory' => 128],
+        2054 => ['make' => 'Realme', 'model' => '7 Pro', 'memory' => 128],
+        2055 => ['make' => 'Realme', 'model' => '7', 'memory' => 64],
+        2056 => ['make' => 'Realme', 'model' => '7', 'memory' => 64],
 
         1741 => ['make' => 'Xiaomi', 'model' => 'Redmi Note 7', 'memory' => 64],
         1742 => ['make' => 'Xiaomi', 'model' => 'Mi 9T', 'memory' => 64],

@@ -14,6 +14,8 @@ class UserEvent extends Event
     const EVENT_NAME_UPDATED = 'event.user.name.updated';
     const EVENT_PASSWORD_CHANGED = 'event.user.password.changed';
     const EVENT_PAYMENT_METHOD_CHANGED = 'event.user.payment-method.changed';
+    const EVENT_BIRTHDAY_UPDATED = 'event.user.birthday.updated';
+    const EVENT_EMAIL_UPDATED = 'event.user.email.updated';
 
     /** @var User */
     protected $user;

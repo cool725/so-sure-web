@@ -6,6 +6,9 @@
 {% set robots_noindex = true %}
 {% set user_mode = true %}
 {% set small_footer = true %}
+{% set matchNetworks = ['Virgin Mobile', 'Sky Mobile', 'Plusnet Mobile', 'BT Mobile'] %}
+{% set showPOF = true %}
+{% set formLabel = 'Proof of usage' %}
 
 {% block title %}Submitted Claim | Claims | so-sure{% endblock %}
 
@@ -63,10 +66,21 @@
                                 'data-client-validation': form_client_validation
                             }}) }}
                                 {% if claim_form.proofOfUsage is defined %}
-                                    <p>You should request a proof of usage document from your Network Provider that has your IMEI number and the first and last time that IMEI was used on their network.</p>
-                                    <div class="form-row">
+                                    {% if claim.network in matchNetworks %}
+                                        {% set formLabel = 'Latest Bill' %}
+                                        <p>Contact your network to request your 'Latest Bill'. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).</p>
+                                    {% elseif claim.network == 'giffgaff' %}
+                                        {% set showPOF = false %}
+                                        <div class="form-group">
+                                            <label>Proof of Usage</label>
+                                            <p>Contact your network to request a 'Proof of Usage' document to send directly to our claims team at the following email address <a href="matilto:ggpou@so-sure.com">ggpou@so-sure.com</a>. This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                                        </div>
+                                    {% else %}
+                                        <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                                    {% endif %}
+                                    <div class="form-row {% if not showPOF %}d-none{% endif %}">
                                         <div class="col-md form-group">
-                                            {{ form_label(claim_form.proofOfUsage, 'Proof of usage') }}
+                                            {{ form_label(claim_form.proofOfUsage, formLabel) }}
                                             {{ form_widget(claim_form.proofOfUsage) }}
                                             <small class="form-text">
                                                 <a href="#"
