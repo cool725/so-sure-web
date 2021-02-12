@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\AffiliateCompany;
+use AppBundle\Document\Company;
 use AppBundle\Document\Subvariant;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\InvalidImei;
@@ -1942,6 +1943,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         /** @var array $phoneUpgrade */
         $phoneUpgrade = $policy->getPreviousIteration();
 
+        /** @var Company $company */
+        $company = $policy->getCompany();
+        $companyName = ($company) ? $company->getName() : '';
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
@@ -1949,6 +1953,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'note_form' => $noteForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
             'upgrade_data' => $phoneUpgrade,
+            'company_name' => $companyName,
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
             'bacs_form' => $bacsForm->createView(),
