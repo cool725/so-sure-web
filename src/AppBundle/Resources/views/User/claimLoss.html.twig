@@ -6,6 +6,9 @@
 {% set robots_noindex = true %}
 {% set user_mode = true %}
 {% set small_footer = true %}
+{% set matchNetworks = ['Virgin Mobile', 'Sky Mobile', 'Plusnet Mobile', 'BT Mobile'] %}
+{% set showPOF = true %}
+{% set formLabel = 'Proof of usage' %}
 
 {% block title %}Loss Claim | Claims | so-sure{% endblock %}
 
@@ -58,7 +61,11 @@
                                     <li class="mb-2">Request that they block your phone and IMEI</li>
                                     <li class="mb-2">Request a <u>Proof of Blacklisting</u> document from them.</li>
                                     {% if claim_form.proofOfUsage is defined %}
-                                        <li>Request a <strong>Proof of Usage</strong> document from them.  This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</li>
+                                        {% if claim.network in matchNetworks %}
+                                            <li>Request your <strong>Latest Bill</strong> from them.  This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).</li>
+                                        {% else %}
+                                            <li>Request a <strong>Proof of Usage</strong> document from them.  This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</li>
+                                        {% endif %}
                                     {% endif %}
                                 </ol>
                                 <div class="form-row">
@@ -93,10 +100,21 @@
                                     </div>
                                 </div>
                                 {% if claim_form.proofOfUsage is defined %}
-                                    <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
-                                    <div class="form-row">
+                                    {% if claim.network in matchNetworks %}
+                                        {% set formLabel = 'Latest Bill' %}
+                                        <p>Contact your network to request your 'Latest Bill'. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).</p>
+                                    {% elseif claim.network == 'giffgaff' %}
+                                        {% set showPOF = false %}
+                                        <div class="form-group">
+                                            <label>Proof of Usage</label>
+                                            <p>Contact your network to request a 'Proof of Usage' document to send directly to our claims team at the following email address <a href="matilto:ggpou@so-sure.com">ggpou@so-sure.com</a>. This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                                        </div>
+                                    {% else %}
+                                        <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                                    {% endif %}
+                                    <div class="form-row {% if not showPOF %}d-none{% endif %}">
                                         <div class="col-md form-group">
-                                            {{ form_label(claim_form.proofOfUsage, 'Proof of usage') }}
+                                            {{ form_label(claim_form.proofOfUsage, formLabel) }}
                                             {{ form_widget(claim_form.proofOfUsage) }}
                                             <small class="form-text">
                                                 <a href="#"

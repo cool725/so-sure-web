@@ -138,17 +138,17 @@ class ClaimFnolDamage
         return $this->claim;
     }
 
-    /**
-     * @Assert\IsTrue(message="You must upload your Proof of Usage document")
-     */
-    public function hasProofOfUsage()
-    {
-        if ($this->getClaim()->needProofOfUsage()) {
-            return $this->getProofOfUsage() || count($this->getClaim()->getProofOfUsageFiles()) > 0;
-        } else {
-            return true;
-        }
-    }
+    // /**
+    //  * @Assert\IsTrue(message="You must upload your Proof of Usage document")
+    //  */
+    // public function hasProofOfUsage()
+    // {
+    //     if ($this->getClaim()->needProofOfUsage()) {
+    //         return $this->getProofOfUsage() || count($this->getClaim()->getProofOfUsageFiles()) > 0;
+    //     } else {
+    //         return true;
+    //     }
+    // }
 
     /**
      * @Assert\IsTrue(message="You must upload your Proof of Damage document")

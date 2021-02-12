@@ -6,6 +6,7 @@ use AppBundle\Service\PolicyService;
 use Psr\Log\LoggerInterface;
 use AppBundle\Event\ConnectionEvent;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Event\UserEvent;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Charge;
 
@@ -54,5 +55,36 @@ class PolicyListener
         }
 
         $this->policyService->connectionReduced($connection);
+    }
+
+    /**
+     * When some policy legal information is modified such as user name, email,
+     * premium, phone or Imei then we want to regenerate the policy schedule
+     *
+     * @param PolicyEvent $event
+     */
+    public function onPolicyLegalDataChange(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        if ($policy->isActive()) {
+            $this->policyService->generatePolicySchedule($policy);
+        }
+    }
+
+    /**
+     * When some policy legal information is modified such as user name, email,
+     * premium, phone or Imei then we want to regenerate the policy schedule
+     *
+     * @param UserEvent $event
+     */
+    public function onUserLegalDataChange(UserEvent $event)
+    {
+        $user = $event->getUser();
+        $policies = $user->getValidPolicies(true);
+        foreach ($policies as $policy) {
+            if ($policy->isActive()) {
+                $this->policyService->generatePolicySchedule($policy);
+            }
+        }
     }
 }

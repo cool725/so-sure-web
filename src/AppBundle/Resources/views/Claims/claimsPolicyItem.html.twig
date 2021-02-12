@@ -96,7 +96,10 @@
                                         {% else %} No previous upgrade done {% endif %}
                                     </td>
                                 </tr>
-
+                                <tr>
+                                    <td>Company </td>
+                                    <td>{{ company_name }}</td>
+                                </tr>
                                 <tr>
                                     <td>Phone Warranty Status</td>
                                     <td class="{% if policy.phone.underWarranty == 'likely'%}success{% elseif policy.phone.underWarranty == 'maybe'%}warning{% else %}danger{% endif %}">

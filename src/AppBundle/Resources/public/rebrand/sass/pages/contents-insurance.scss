@@ -11,26 +11,44 @@
 .hero {
   position: relative;
   padding: 5rem 0;
-  text-align: center;
 
+  background-color: $crayon-blue;
   // @include blue-gradient-45;
-  background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-hero-mobile.jpg') no-repeat left bottom;
+  background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-hero-girl-sitting-mobile.jpg') no-repeat center bottom;
   background-size: cover;
 
   .container-large {
-      position: relative;
-      z-index: 4;
+    position: relative;
+    z-index: 4;
+    padding-bottom: 20rem;
+    text-align: left;
+
+    @include media-breakpoint-up(sm) {
+      padding-bottom: 500px;
+    }
+
+    @include media-breakpoint-up(lg) {
+      padding-bottom: 3rem;
+      text-align: center;
+    }
+  }
+
+  .hero-p {
+    text-align: left;
+    font-size: 114%;
+    color: $white;
+    text-shadow: 0 0 $ultramarine;
   }
 
   @include media-breakpoint-up(lg) {
-      padding: 10rem 0;
-      background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-hero.jpg') no-repeat center bottom;
-      background-size: cover;
+    background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-hero-girl-sitting-desktop-high.jpg') no-repeat center bottom;
+    background-size: cover;
   }
 }
 
-.lead-form {
-    max-width: 500px;
+.hc-lead-form {
+    // max-width: 500px;
+    text-align: left;
     padding: 2rem;
     margin: 0 auto;
     background-color: $white;
@@ -39,6 +57,104 @@
     @include border-radius($g-border-radius);
 }
 
+.validate-form .form-group {
+  position: relative;
+}
+
+.validate-form label.is-invalid {
+  position: absolute;
+  left: 0; top: 110%;
+}
+
 .form-response {
     display: none;
+}
+
+.vid-sure {
+  background-color: $athens-gray;
+
+  @include media-breakpoint-up(lg) {
+    text-align: center;
+  }
+}
+
+.vid-sure-cont {
+  @include vid-sure-background;
+  @include media-breakpoint-up(lg) {
+    text-align: center;
+  }
+
+  &-list {
+    margin-top: 7rem;
+
+    li {
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+
+      &.right {
+        justify-content: flex-end;
+      }
+
+      &.left {
+        justify-content: flex-start;
+      }
+    }
+  }
+}
+
+.vid-sure-video-tour {
+  width: 300px; height: 600px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+
+  &-frame {
+    width: 300px;
+    top: 0; left: 0;
+    position: absolute;
+    z-index: 4;
+  }
+  &-video {
+    width: 298px;
+    top: 1px; left: 1px;
+    position: absolute;
+    z-index: 1;
+  }
+}
+
+.home-contents {
+  background-color: $athens-gray;
+
+  @include media-breakpoint-up(lg) {
+    text-align: center;
+  }
+}
+
+.who-list {
+  &-item {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    @include media-breakpoint-up(md) {
+      display: block;
+    }
+  }
+}
+
+.sign-up-bottom {
+  background-color: $crayon-blue;
+  // @include blue-gradient-45;
+  background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-sign-up-footer-background.jpg') no-repeat center bottom;
+  background-size: cover;
+
+  form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  @include media-breakpoint-up(lg) {
+    text-align: center;
+  }
 }
