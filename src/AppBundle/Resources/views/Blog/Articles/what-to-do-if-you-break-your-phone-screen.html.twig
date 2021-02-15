@@ -1,12 +1,10 @@
-n
 {% extends 'base_rebrand.html.twig' %}
 
 {# Set vars #}
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}What to do if you break your phone screen - Blog | so-sure
-{% endblock %}
+{% block title %}What to do if you break your phone screen - Blog | so-sure{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Nearly all breakages occur due to accidental damage, which means you’ll only be covered for repair or replacement if you have phone insurance. So, it’s worth digging into that pesky small print to check where you stand with regards to accidental damage."/>
@@ -29,7 +27,7 @@ n
                 <div class="col-lg-8 offset-lg-2">
                     <div class="cp__content">
                         <article>
-                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
                             <header class="mb-5">
                                 <hgroup>
                                     <div class="breadcrumbs">

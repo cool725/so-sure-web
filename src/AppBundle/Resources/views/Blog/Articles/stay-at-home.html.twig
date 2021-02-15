@@ -4,15 +4,15 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Title - Blog | SO-SURE{% endblock %}
+{% block title %}It Pays To ‘Stay At Home’ - Blog | so-sure{% endblock %}
 
 {% block meta %}
-    <meta name="description" content=""/>
+    <meta name="description" content="So, we’re announcing our ‘Stay at Home Insurance’, which is just a nifty way of saying we’re launching a competition for you lovely lot. Share a photo yourself staying safely in the UK or at home for a chance to win a £250 Amazon voucher. Want in on the action? Here’s how to enter"/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Title - Blog | SO-SURE' %}
-{% set og_description = "" %}
-{% set og_image = cdn_url ~ '/images/rebrand/blog/' %}
+{% set og_title = 'It Pays To ‘Stay At Home’ - Blog | so-sure' %}
+{% set og_description = "So, we’re announcing our ‘Stay at Home Insurance’, which is just a nifty way of saying we’re launching a competition for you lovely lot. Share a photo yourself staying safely in the UK or at home for a chance to win a £250 Amazon voucher. Want in on the action? Here’s how to enter" %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/stay-at-home-1.jpg' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
@@ -27,7 +27,7 @@
                 <div class="col-lg-8 offset-lg-2">
                     <div class="cp__content blog__contents">
                         <article>
-                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
                             <header class="mb-5">
                                 <hgroup>
                                     <div class="breadcrumbs">
@@ -65,20 +65,20 @@
                                             <li class="list-inline-item"
                                                 property="itemListElement"
                                                 typeof="ListItem">
-                                                <span property="name">XXXX</span>
+                                                <span property="name">It Pays To ‘Stay At Home’</span>
                                                 <meta property="position" content="3">
                                             </li>
                                         </ul>
                                     </div>
-                                    <h1 class="text-primary mb-4">Blog title</h1>
+                                    <h1 class="text-primary mb-4">It Pays To ‘Stay At Home’</h1>
                                     <div class="blog__info_share">
                                         <ul class="list-inline">
                                             <li class="list-inline-item">
-                                                <div rel="author">so-sure</div>
+                                                <div rel="author">Rachel</div>
                                             </li>
                                             <li class="list-inline-item">|</li>
                                             <li class="list-inline-item">
-                                                <time>Blog date</time>
+                                                <time>Feb 15, 2021</time>
                                             </li>
                                         </ul>
                                         {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
@@ -87,14 +87,29 @@
                             </header>
                             <div class="blog__contents">
                                 <img src="{{ cdn_url }}/images/onexone.png"
-                                     data-src=""
-                                     alt=""
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/stay-at-home-1.jpg"
+                                     alt="SO-SURE Stay Home Competition"
                                      class="img-fluid lozad mb-5">
-                                <p></p>
+                                <p>Are you sick and tired of people ignoring travel bans and flaunting their holidays on social media? 🙄 So are we!</p>
+                                <p>Influencers and celebs are like “Pandemic? I don’t know her?”, while we sit at home dreaming about taking in the sun on a gorgeous beach in Dubai. Sure, we’re a little salty about it, but now, we’re gonna stick it to them by rewarding our customers who are actually staying at home for their commitment to the rules.</p>
+                                <p>So, we’re announcing our <strong>‘Stay at Home Insurance’</strong>, which is just a nifty way of saying we’re launching a competition for you lovely lot. Share a photo yourself staying safely in the UK or at home for a chance to win a £250 Amazon voucher. Want in on the action? Here’s how to enter:</p>
+                                <h2>Competition Rules</h2>
+                                <ol>
+                                  <li>Like and follow us on <a href="https://www.instagram.com/wearesosure" rel="noopener noreferrer" target="_blank">Instagram</a>.</li>
+                                  <li>Snap a photo of you that proves you’re at home - and <u>not</u> the Maldives!</li>
+                                  <li>Upload your best photo and tag <a href="https://www.instagram.com/wearesosure" rel="noopener noreferrer" target="_blank">@wearesosure</a> and #StayAtHomeInsurance (make sure your profile is not set to private).</li>
+                                  <li>Be fun and creative. Multiple entries accepted!</li>
+                                </ol>
+                                <p>Enter today for your chance to win the grand prize of a £250 Amazon voucher and stick it to the rule breakers. Just think of the lovely things you can get with our prize! From accessories for your phone to things for when we’re ready to go outside - oh, the possibilities! 🤑</p>
+                                <h2>Terms & Conditions</h2>
+                                <p>To enter the competition, all you need to do is like and follow us on <a href="https://www.instagram.com/wearesosure" rel="noopener noreferrer" target="_blank">Instagram</a> and share a photo of yourself at home with us with #StayAtHomeInsurance. Participants must be 18 or older and UK residents. By tagging us in your photo and using the competition hashtag, users accept the listed terms and conditions.</p>
+                                <p>Entries will be accepted from 15/02/2021 until 11.59pm on 07/03/2021. Multiple entries are permitted. One lucky winner will receive a £250 Amazon voucher. The winner will be contacted on March 8th, 2021 via private message on Instagram.</p>
+                                <h2>Insurance that’s 👉 fast 👉 easy👉 fair</h2>
+                                <p>Did you know that 70% of Brits don’t currently have their mobile phone insured and over a quarter couldn’t afford to replace it outright if they lost or broke their device. <a href="{{ path('homepage') }}">SO-SURE</a> offers full cover at a competitive price and with more perks. Connect with careful friends and family and you can all get cashback rewards - up to 80% of your annual premium back - all through our SO-SURE app.</p>
                             </div>
                             <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
                             <footer class="my-4">
-                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home' } %}
                             </footer>
                         </article>
                     </div>

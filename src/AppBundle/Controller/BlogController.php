@@ -756,4 +756,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/stay-at-home",
+     * name="stay_at_home", options={"sitemap" = true})
+     * @Template
+     */
+    public function stayAtHomeAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/stay-at-home.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
