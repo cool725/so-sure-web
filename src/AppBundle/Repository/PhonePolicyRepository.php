@@ -234,37 +234,6 @@ class PhonePolicyRepository extends PolicyRepository
         return $qb->getQuery()->execute();
     }
 
-    /**
-     * Finds all started policies but does so making a number of small queries and returns the results one by one.
-     * @param \DateTime|null $startDate is the minimum date.
-     * @param \DateTime|null $endDate   is the maximum date.
-     * @param int            $limit     is the maximum number of policies to return with any value < 1 meaning not to
-     *                                  limit.
-     * @param int            $batchSize is the number of policies to query at once.
-     * @return \Generator which produces all policies.
-     */
-    public function findAllStartedPoliciesBatched(
-        \DateTime $startDate = null,
-        \DateTime $endDate = null,
-        $limit = 0,
-        $batchSize = 666
-    ) {
-        $n = 0;
-        $limit = ($limit > 0) ? $limit : PHP_INT_MAX;
-        while ($n < $limit) {
-            $yieldSize = ($batchSize > $limit - $n) ? ($limit - $n) : $batchSize;
-            $policies = $this->findAllStartedPolicies($startDate, $endDate, $yieldSize, $n)->toArray();
-            $count = count($policies);
-            foreach ($policies as $policy) {
-                yield $policy;
-            }
-            $n += $yieldSize;
-            if ($count < $batchSize) {
-                break;
-            }
-        }
-    }
-
     public function countAllStartedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
     {
         return count($this->findAllStartedPolicies($startDate, $endDate));

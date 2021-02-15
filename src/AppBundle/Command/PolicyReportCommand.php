@@ -24,6 +24,8 @@ use AppBundle\Classes\SoSure;
  */
 class PolicyReportCommand extends ContainerAwareCommand
 {
+    const INTERVAL = 'P13D';
+
     /** @var S3Client */
     protected $s3;
 
@@ -63,29 +65,9 @@ class PolicyReportCommand extends ContainerAwareCommand
     {
         $this ->setName('sosure:policy:report')
             ->setDescription('Generates reports using common policy data.')
-            ->addArgument(
-                'reports',
-                InputArgument::IS_ARRAY,
-                'names of reports to generate'
-            )
-            ->addOption(
-                'debug',
-                null,
-                InputOption::VALUE_NONE,
-                'show debug output'
-            )
-            ->addOption(
-                'timezone',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Choose a timezone to use for policies report'
-            )
-            ->addOption(
-                'n',
-                0,
-                InputOption::VALUE_REQUIRED,
-                'Choose a certain maximum number of policies to process. 0 means all of them.'
-            );
+            ->addOption('debug', null, InputOption::VALUE_NONE, 'show debug output')
+            ->addOption('timezone', null, InputOption::VALUE_REQUIRED, 'Choose a timezone to use for policies report')
+            ->addOption('report', null, InputOption::VALUE_REQUIRED, 'Choose a report to generate', 'policy');
     }
 
     /**
@@ -95,45 +77,56 @@ class PolicyReportCommand extends ContainerAwareCommand
     {
         $start = time();
         // Set up reports to run.
-        $reports = $input->getArgument('reports');
+        $reportName = $input->getOption('report');
         $debug = $input->getOption('debug') == true;
-        $n = $input->getOption('n');
         $timezone = new DateTimeZone($input->getOption('timezone') ?: 'UTC');
-        $executingReports = [];
-        foreach ($reports as $report) {
-            $createdReport = PolicyReport::createReport($report, $this->dm, $timezone);
-            if (!$createdReport) {
-                $output->writeln("<error>{$report} is not a valid report type</error>");
-                return;
-            }
-            $executingReports[] = $createdReport;
+        $report = PolicyReport::createReport($reportName, $this->dm, $timezone);
+        if (!$report) {
+            $output->writeln("<error>{$reportName} is not a valid report type</error>");
+            return;
         }
-        // Load policies.
+        // Iterating over the policies.
         /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $phonePolicyRepo->findAllStartedPoliciesBatched(new DateTime(SoSure::POLICY_START), null, $n);
-        // Now run the reports.
-        foreach ($policies as $policy) {
-            foreach ($executingReports as $report) {
+        $now = new \DateTime();
+        $begin = (clone $now)->sub(new \DateInterval('P15M'));
+        while ($begin < $now) {
+            $batchStart = time();
+            $top = ($begin < $now) ? (clone $begin)->add(new \DateInterval(self::INTERVAL)) : null;
+            $policies = $phonePolicyRepo->findAllStartedPolicies($begin, $top);
+            $output->writeln(sprintf(
+                '%s - %s: %d',
+                $begin->format('Y-m-d'),
+                $top ? $top->format('Y-m-d') : '',
+                count($policies)
+            ));
+            foreach ($policies as $policy) {
                 try {
                     $report->process($policy);
                 } catch (RuntimeException $e) {
                     $output->writeln("<error>{$e->getMessage()}</error>");
                 }
             }
+            $begin->add(new \DateInterval(self::INTERVAL));
+            if (count($policies) > 0) {
+                $output->writeln(sprintf(
+                    '%f -- %f / row',
+                    time() - $batchStart,
+                    (time() - $batchStart) / count($policies)
+                ));
+            }
         }
+        // Now run the reports.
         // Output and upload.
-        foreach ($executingReports as $report) {
-            if ($debug) {
-                $output->writeln("<info>{$report->getFile()}</info>");
-                $output->writeln($report->getLines());
-            }
-            try {
-                $this->uploadS3($report->getLines(), $report->getFile());
-                $output->writeln("<info>Uploaded {$report->getFile()}");
-            } catch (IOException $e) {
-                $output->writeln("<error>{$e->getMessage()}</error>");
-            }
+        if ($debug) {
+            $output->writeln("<info>{$report->getFile()}</info>");
+            $output->writeln($report->getLines());
+        }
+        try {
+            $this->uploadS3($report->getLines(), $report->getFile());
+            $output->writeln("<info>Uploaded {$report->getFile()}");
+        } catch (IOException $e) {
+            $output->writeln("<error>{$e->getMessage()}</error>");
         }
         $time = time() - $start;
         $output->writeln("Execution completed in {$time} seconds.");
