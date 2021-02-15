@@ -742,4 +742,32 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/what-is-contents-insurance",
+     * name="what_is_contents_insurance", options={"sitemap" = true})
+     * @Template
+     */
+    public function whatIsContentsInsuranceAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/what-is-contents-insurance.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/stay-at-home",
+     * name="stay_at_home", options={"sitemap" = true})
+     * @Template
+     */
+    public function stayAtHomeAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/stay-at-home.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

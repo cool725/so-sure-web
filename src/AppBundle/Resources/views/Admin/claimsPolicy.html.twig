@@ -59,6 +59,15 @@
             </div>
 {% endif %}
         </div>
+    {% if policy.isPolicy() %}
+      {% if policy.company %}
+          <div class="row">
+              <div style="background: #0A3BD6; margin: 10px; width:98%" class="col-md-12 text-center ">
+                  <h3 style="color: #FFFFFF;">Company Policy Scheme</h3>
+              </div>
+          </div>
+      {% endif %}
+    {% endif %}
     <div class="bg-danger text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
         {% if policy.isPolicy() %}
         <div class="row">

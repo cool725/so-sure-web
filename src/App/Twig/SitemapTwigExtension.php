@@ -79,6 +79,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/how-long-do-mobile-phones-last' => 'How Long Do Mobile Phones Last?',
             '/blog/halloween-horror-stories' => 'Halloween Horror Stories',
             '/blog/excessive-phone-use-can-lead-to-stress-and-anxiety' => 'Excessive Phone Use Can Lead To Stress And Anxiety.',
+            '/blog/what-is-contents-insurance' => 'What is Contents Insurance',
+            '/blog/stay-at-home' => 'It Pays To Stay At Home',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

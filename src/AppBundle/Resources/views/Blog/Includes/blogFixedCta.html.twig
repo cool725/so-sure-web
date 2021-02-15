@@ -1,0 +1,13 @@
+<div class="blog-fixed-cta {% if feature_enabled('sticky-cta-blog') %}blog-fixed-cta-sticky{% endif %}">
+    {% if type is defined and type == 'home' %}
+        <div class="h5 text-white">Learn how you can protect what you love with contents insurance.</div>
+        <a href="{{ path('contents_insurance') }}" class="btn btn-success d-xl-none">
+            <i class="fal fa-arrow-right fa-lg"></i>
+        </a>
+        <a href="{{ path('contents_insurance') }}" class="btn btn-success btn-block d-none d-xl-block">Learn more</a>
+    {% else %}
+        <div class="h5 text-white">Get a quote for your mobile in minutes</div>
+        <a href="#" class="btn btn-success get-a-quote d-xl-none"><i class="fal fa-arrow-right fa-lg"></i></a>
+        <a href="#" class="btn btn-success btn-block get-a-quote d-none d-xl-block">Get a quote</a>
+    {% endif %}
+</div>

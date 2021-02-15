@@ -42,6 +42,7 @@ class Feature
     const FEATURE_EXIT_POPUP = 'exit-popup';
     const FEATURE_BACS_PAYMENT_OPTION = 'allow-bacs-payment-method';
     const FEATURE_COMPETITOR_PRICING = 'competitor-prices';
+    const FEATURE_BLOG_MOBILE_STICK = 'sticky-cta-blog';
 
     // All Features should be here
     public static $features = [
@@ -71,6 +72,7 @@ class Feature
         self::FEATURE_EXIT_POPUP,
         self::FEATURE_BACS_PAYMENT_OPTION,
         self::FEATURE_COMPETITOR_PRICING,
+        self::FEATURE_BLOG_MOBILE_STICK,
     ];
 
     // @codingStandardsIgnoreStart
@@ -101,6 +103,7 @@ class Feature
         self::FEATURE_EXIT_POPUP => 'Show user exit popup lead form with promo code',
         self::FEATURE_BACS_PAYMENT_OPTION => 'Allow user to pay via BACs in the funnel',
         self::FEATURE_COMPETITOR_PRICING => 'Show competitor pricing section in funnel if available',
+        self::FEATURE_BLOG_MOBILE_STICK => 'Make sticky cta on blog stuck or not',
     ];
     // @codingStandardsIgnoreEnd
 

@@ -27,6 +27,7 @@
                 <div class="col-lg-8 offset-lg-2">
                     <div class="cp__content blog__contents">
                         <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
                             <header class="mb-5">
                                 <hgroup>
                                     <div class="breadcrumbs">
@@ -70,16 +71,18 @@
                                         </ul>
                                     </div>
                                     <h1 class="text-primary mb-4">UK Phone Statistics</h1>
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item">
-                                            <div rel="author">Susan</div>
-                                        </li>
-                                        <li class="list-inline-item">|</li>
-                                        <li class="list-inline-item">
-                                            <time>Apr 21, 2020</time>
-                                        </li>
-                                    </ul>
-                                    {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Susan</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Apr 21, 2020</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                    </div>
                                 </hgroup>
                             </header>
                             <div class="blog__contents">

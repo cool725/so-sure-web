@@ -1,0 +1,175 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}What is Contents Insurance? - Blog | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Home contents insurance covers the cost of replacing your belongings if they're damaged, destroyed, or stolen. Learn more about contents insurance here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'What is Contents Insurance? | SO-SURE' %}
+{% set og_description = "Home contents insurance covers the cost of replacing your belongings if they're damaged, destroyed, or stolen. Learn more about contents insurance here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/what-is-contents-insurance.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">What is Contents Insurance?</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">What is Contents Insurance?</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Feb 11, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/what-is-contents-insurance.jpg"
+                                     alt="Home Contents Insurance - SO-SURE"
+                                     class="img-fluid lozad mb-5">
+                                <p>Home contents insurance covers the cost of replacing your belongings in your home if they are damaged, destroyed, or stolen. Generally, your ‘contents’ are the items that you would take with if you moved home, such as:</p>
+                                <ul>
+                                  <li>Furniture: beds, sofas, wardrobes, dining tables, and chairs</li>
+                                  <li>Kitchenware: cutlery, cookware, microwaves, and kettles</li>
+                                  <li>Entertainment: toys, books, musical instruments, DVDs, and CDs</li>
+                                  <li>Soft furnishings: cushions, curtains, and bedding</li>
+                                  <li>Electricals: TVs, laptops, and game consoles</li>
+                                  <li>Clothes and jewellery</li>
+                                  <li>Ornaments and antiques.</li>
+                                </ul>
+                                <p>You can buy contents insurance as a standalone policy or combined with buildings insurance for a complete home insurance package.</p>
+                                <h2>How does contents insurance work?</h2>
+                                <p>If you make a home insurance claim, your insurance provider will settle this on either a ‘new-for-old’ or ‘indemnity’ basis. We’ve explained each policy type below.</p>
+                                <h3>New-for-old cover</h3>
+                                <p>With new-for-old cover, your home insurer will pay for a brand-new product of equivalent value if your insured item is damaged or stolen.</p>
+                                <h3>Indemnity cover</h3>
+                                <p>Indemnity cover considers wear and tear on the items you claim for, reducing your overall reimbursement. For example, your TV may have cost £500, but once wear and tear has been factored in, you may only receive a fraction of the original cost – £100, for instance. Also bear in mind that as pay-outs on new-for-old policies are higher, they’re usually more expensive.</p>
+                                <h2>What are the different types of contents insurance?</h2>
+                                <p>There are three types of contents insurance: bedroom rated, sum insured, and unlimited sum insured.</p>
+                                <h3>Bedroom rated</h3>
+                                <p>Bedroom rated contents insurance calculates your contents cover based on the number of bedrooms in your home. Therefore, you don’t have to manually calculate the sum of your contents.</p>
+                                <h3>Sum insured</h3>
+                                <p>Sum insured contents insurance requires you to calculate the contents cover you need, so you’ll need to be meticulous when valuing your possessions.</p>
+                                <h3>Unlimited sum insured</h3>
+                                <p>Unlimited sum insurance covers all of your contents without any limit, eliminating issues such as over and underinsuring your contents</p>
+                                <h2>Tips for buying contents insurance</h2>
+                                <p>Having covered the different types of contents insurance, let’s take a look at two quickfire tips that’ll help you purchase the right contents insurance policy for you.</p>
+                                <h3>Choose the level of cover that suits you</h3>
+                                <p>Try to value your contents as accurately as possible. Under or over-insuring your belongings could cause issues if you have to make a claim.</p>
+                                <h3>Read the terms of your policy carefully</h3>
+                                <p>Once you’ve selected a policy, read the terms and conditions to reduce the likelihood of being short-changed when you make a claim.</p>
+                                <h2>Does contents insurance cover accidental damage?</h2>
+                                <p>Accidental damage occurs when there’s an unintentional incident that damages your contents – spilling paint on your carpet, for example. Generally, home insurers provide limited cover for accidental damage, so it’s typically bought as a policy add-on.</p>
+                                <h2>What is personal possessions cover?</h2>
+                                <p>Sometimes called an ‘all-risks extension’, personal possessions cover protects your portable items when you’re outside of your home or on holiday. Items covered by personal possessions cover include:</p>
+                                <ul>
+                                  <li>Mobile phones</li>
+                                  <li>Tablets and laptops</li>
+                                  <li>Jewellery</li>
+                                  <li>Handbags/rucksacks.</li>
+                                </ul>
+                                <p>Be aware that insurers differ in their personal possessions coverage, so it’s best to check with your insurer and choose a policy suited to your needs. If you frequently travel, for instance, a complete personal possessions policy will be beneficial.</p>
+                                <h2>Common exclusions for contents insurance</h2>
+                                <p>Your contents insurance policy will likely exclude certain items. These include but are not limited to:</p>
+                                <h3>High-value items</h3>
+                                <p>Expensive items such as jewellery and top-end tech usually have a limit for each item (e.g., £1500 per item). If you have several high-value items, check your policy to make sure they’re covered.</p>
+                                <h3>Working from home</h3>
+                                <p>Many of us work from home these days, but the amount of cover available to remote workers varies between providers. Some insurers will cover the contents you need for work, like laptops and smartphones, but others may not offer any cover for these items. Always check the policy beforehand to ensure it provides extensive coverage for your work contents.</p>
+                                <h3>Running a business from your home</h3>
+                                <p>Similarly, if you run your own business from home, it’s vital to check that your business-related contents are covered to avoid any threats to your livelihood.</p>
+                                <h3>General wear and tear</h3>
+                                <p>Any items damaged through general ageing or wear and tear won’t be covered, so it could be worth insuring your most prized possessions separately.</p>
+                                <h3>No sign of forced entry</h3>
+                                <p>If there is no sign of forced entry (e.g., burglars enter the property through unlocked doors or windows) you won’t be able to claim.</p>
+                                <h3>Unoccupied property</h3>
+                                <p>If you left your property empty for longer than a specified period without unoccupied property cover in place, your policy would likely be void.</p>
+                                <h3>Subletting your home</h3>
+                                <p>You may not be covered for loss or theft when subletting your home unless there are signs of forced entry. Again, be sure to check your policy.</p>
+                                <h3>Pairs and sets</h3>
+                                <p>You are unlikely to receive reimbursement for an entire item set, only the damaged parts’ cost. For example, if one chair from a five-piece suite is damaged, you will receive reimbursement for the damaged chair.</p>
+                                <h2>Will contents insurance cover me if my home is unoccupied?</h2>
+                                <p>Many insurers will cover your home providing that it’s not left unattended for more than 30 consecutive days. If you leave your home unoccupied for a prolonged period (e.g., work overseas, an extended holiday), let your insurer know as you may be able to increase your cover for no extra cost temporarily.</p>
+                                <h2>Should tenants get contents insurance?</h2>
+                                <p>Depending on your living situation, it’s possible to get contents insurance for the entire home or just your room.</p>
+                                <h3>Contents insurance that’s dummy proof</h3>
+                                <p>Now that you know what contents insurance is, why not consider protecting the things you love with SO-SURE?  SO-SURE offers cover that saves the day when you need it and rewards you when you don’t. Our cover protects your home contents from damage and theft- that’s beside the low premiums, excess and more perks. Get an insurance quote for all the things you love here.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
