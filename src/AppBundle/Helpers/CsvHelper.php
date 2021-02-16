@@ -19,4 +19,21 @@ class CsvHelper
         NoOp::ignore($item);
         return '"'.implode('","', func_get_args()).'"';
     }
+
+    /**
+     * Creates an array out of all arguments that are not null.
+     * @param mixed ...$item are all of the items to put in the array (other than the null ones).
+     * @return array with no nulls.
+     */
+    public static function ignoreBlank(...$item)
+    {
+        NoOp::ignore($item);
+        $items = [];
+        foreach (func_get_args() as $arg) {
+            if ($arg !== null) {
+                $items[] = $arg;
+            }
+        }
+        return $items;
+    }
 }
