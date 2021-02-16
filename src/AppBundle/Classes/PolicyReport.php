@@ -89,6 +89,8 @@ abstract class PolicyReport
     ) {
         switch ($name) {
             case 'policy':
+                return new PolicyBiReport($dm, $tz, true);
+            case 'policy-full':
                 return new PolicyBiReport($dm, $tz);
             case 'picsure':
                 return new PolicyPicSureReport($dm, $tz);
@@ -111,9 +113,11 @@ abstract class PolicyReport
         $args = func_get_args();
         if (count($args) != $this->columns) {
             throw new RuntimeException(sprintf(
-                'Invalid line \'%s\' given for report \'%s\'',
+                'Invalid line \'%s\' given for report \'%s\'. %d lines instead of %d',
                 CsvHelper::line(...$args),
-                $this->getFile()
+                $this->getFile(),
+                count($args),
+                $this->columns
             ));
         }
         $this->lines[] = CsvHelper::line(...$args);
