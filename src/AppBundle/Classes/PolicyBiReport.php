@@ -175,7 +175,7 @@ class PolicyBiReport extends PolicyReport
             $policy->getGeneration(),
             $policy->getStatus(),
             $this->reduced ? null : (
-                $policy->getStatus() == Policy::STATUS_UNPAID ? 
+                $policy->getStatus() == Policy::STATUS_UNPAID ?
                     DateTrait::timezoneFormat($policy->getPolicyExpirationDate(), $this->tz, 'Y-m-d') : ''
             ),
             $policy->getStatus() == Policy::STATUS_CANCELLED ? $policy->getCancelledReason() : '',
