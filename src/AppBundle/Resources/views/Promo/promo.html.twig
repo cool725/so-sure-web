@@ -232,7 +232,7 @@
                 </div>
             </div>
             <div class="hero__illustration-mobile d-block d-lg-none text-center">
-                {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' or custom == 'ipse' %}
+                {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% elseif custom == 'pizzaexpress' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
@@ -240,19 +240,21 @@
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-reward-pot-mobile-xiaomi.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% elseif custom == 'groupon' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_groupon-amazon-voucher.png" alt="so-sure - social insurance" class="img-fluid lozad">
+                {% elseif custom == 'ipse' %}
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_groupon-amazon-voucher.png" alt="so-sure - social insurance" class="img-fluid lozad">
                 {% else %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% endif %}
             </div>
         </div>
-        <div class="hero__illustration-desktop {% if custom == 'groupon' %}hero__illustration-desktop-groupon{% endif %} d-none d-lg-block">
-            {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' or custom == 'ipse' %}
+        <div class="hero__illustration-desktop {% if custom == 'groupon' or custom == 'ipse' %}hero__illustration-desktop-groupon{% endif %} d-none d-lg-block">
+            {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% elseif custom == 'pizzaexpress' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% elseif custom == 'xiaomi' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-reward-pot-desktop-xiaomi.png" alt="so-sure - social insurance" class="img-fluid lozad">
-            {% elseif custom == 'groupon' %}
+            {% elseif custom == 'groupon' or custom == 'ipse' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_groupon-amazon-voucher.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% else %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/rewardpot/so-sure_hero-illustration-reward-pot-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
