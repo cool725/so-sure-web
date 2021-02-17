@@ -106,7 +106,7 @@
                                     <span><div class="hero__number d-flex justify-content-center align-items-center h4 text-primary mr-3">3</div></span>
                                     <div class="h4 text-white">Get an extra &pound;{{ scode.reward.defaultValue|number_format(0, '.', ',') }} cash back with the code <span class="promo-code">{{ scode.code }}</span></div>
                                 </div>
-                            {% elseif custom == 'hotukdeals' or custom == 'groupon' or custom == 'benefithub' or custom == 'lifeworks' or custom == 'idealworld' %}
+                            {% elseif custom == 'hotukdeals' or custom == 'groupon' or custom == 'benefithub' or custom == 'lifeworks' or custom == 'idealworld' or custom == 'ipse' %}
                                 <h1 class="mb-4 h2 text-white">Protect your phone <br><span class="sub text-columbia-blue-e">and get a &pound;{{ amazon_voucher }} {% if custom == 'idealworld' %}Ideal World{% else %}Amazon{% endif %} voucher 💰</span></h1>
                                 <ul class="list-unstyled icn-fa-list mb-5 hero-usps">
                                     <li class="mb-4 text-white">
@@ -148,7 +148,7 @@
                         </div>
                         <div class="hero__controls">
                             <div class="mb-4"><a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Quote me</a></div>
-                            {% if custom == 'uswitch' or custom == 'hotukdeals' or custom == 'groupon' or custom == 'benefithub' or custom == 'lifeworks' or custom == 'idealworld' %}
+                            {% if custom == 'uswitch' or custom == 'hotukdeals' or custom == 'groupon' or custom == 'benefithub' or custom == 'lifeworks' or custom == 'idealworld' or custom == 'ipse' %}
                                 <div class="partner-logo text-center d-md-flex align-items-md-center mb-4">
                                     <div class="text-white mb-2 mb-md-0 mr-md-2">In partnership with:</div>
                                     {% if custom == 'uswitch' %}
@@ -185,6 +185,12 @@
                                             <img src="{{ cdn_url }}/images/onexone.png"
                                                     data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_idealworld-logo.svg" alt="Idealworld"
                                                     title="so-sure in partnership with idealworld"
+                                                    width="113px"
+                                                    class="lozad">
+                                    {% elseif custom == 'ipse' %}
+                                            <img src="{{ cdn_url }}/images/onexone.png"
+                                                    data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_ipse-logo.svg" alt="ipse"
+                                                    title="so-sure in partnership with ipse"
                                                     width="113px"
                                                     class="lozad">
                                     {% endif %}
@@ -226,7 +232,7 @@
                 </div>
             </div>
             <div class="hero__illustration-mobile d-block d-lg-none text-center">
-                {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' %}
+                {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' or custom == 'ipse' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
                 {% elseif custom == 'pizzaexpress' %}
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-mobile.png" alt="so-sure - social insurance" class="img-fluid lozad opacity-75">
@@ -240,7 +246,7 @@
             </div>
         </div>
         <div class="hero__illustration-desktop {% if custom == 'groupon' %}hero__illustration-desktop-groupon{% endif %} d-none d-lg-block">
-            {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' %}
+            {% if custom == 'amazon' or custom == 'uswitch' or custom == 'hotukdeals' or custom == 'ipse' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-amazon-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">
             {% elseif custom == 'pizzaexpress' %}
                 <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/promo/so-sure_hero-illustration-pizzaexpress-promo-desktop.png" alt="so-sure - social insurance" class="img-fluid lozad">

@@ -38,6 +38,7 @@ class PromoController extends BaseController
      * @Route("/benefithub/{code}", name="benefithub_promo")
      * @Route("/lifeworks/{code}", name="lifeworks_promo")
      * @Route("/idealworld/{code}", name="idealworld_promo")
+     * @Route("/ipse/{code}", name="ipse_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -98,6 +99,9 @@ class PromoController extends BaseController
         } elseif ($request->get('_route') == 'idealworld_promo') {
             $custom = 'idealworld';
             $amazonVoucher = 10;
+        } elseif ($request->get('_route') == 'ipse_promo') {
+            $custom = 'ipse';
+            $amazonVoucher = 15;
         }
 
         $lead = new Lead();
