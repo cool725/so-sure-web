@@ -70,6 +70,22 @@
         }
     }
 
+    &__illustration-desktop-groupon {
+        right: 0; bottom: -40px;
+
+        @include media-breakpoint-up(xl) {
+            right: 160px;
+        }
+
+        @include media-breakpoint-up(fl) {
+            right: 100px;
+        }
+
+        @include media-breakpoint-up(fk) {
+            right: 400px;
+        }
+    }
+
     &-usps {
         font-family: $g-bold;
 
