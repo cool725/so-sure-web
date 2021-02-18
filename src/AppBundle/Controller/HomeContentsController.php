@@ -18,6 +18,8 @@ use AppBundle\Document\User;
 
 use AppBundle\Exception\InvalidEmailException;
 
+use AppBundle\Service\MixpanelService;
+
 class HomeContentsController extends BaseController
 {
     /**
@@ -60,6 +62,10 @@ class HomeContentsController extends BaseController
         $leadRepo = $dm->getRepository(Lead::class);
         $existingLead = $leadRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+
+        // Add tracking - always catpure lead as we need to verify if exisiting users signed up
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_LEAD_CAPTURE, [
+            'email' => $email]);
 
         if (!$existingLead && !$existingUser) {
             $lead = new Lead();

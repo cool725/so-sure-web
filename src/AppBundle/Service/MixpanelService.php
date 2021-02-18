@@ -75,6 +75,9 @@ class MixpanelService
     const EVENT_COMPANY_PHONES = 'Company Phones Page';
     const EVENT_COMPANY_LEAD_CAPTURE = 'Company Lead Capture';
 
+    // Home Contents
+    const EVENT_CONTENTS_LEAD_CAPTURE = 'Contents Lead';
+
     // Deprecated - use EVENT_CPC_QUOTE_PAGE
     const EVENT_LANDING_PAGE = 'Landing Page';
 
@@ -195,7 +198,8 @@ class MixpanelService
         self::EVENT_PROMO_PAGE,
         self::EVENT_UPGRADE_POLICY,
         self::EVENT_COMPANY_PHONES,
-        self::EVENT_COMPANY_LEAD_CAPTURE
+        self::EVENT_COMPANY_LEAD_CAPTURE,
+        self::EVENT_CONTENTS_LEAD_CAPTURE
     ];
 
     public static function getCampaignSources($event)
