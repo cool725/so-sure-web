@@ -64,7 +64,7 @@ class HomeContentsController extends BaseController
         $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         // Add tracking - always catpure lead as we need to verify if exisiting users signed up
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_LEAD_CAPTURE, [
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CONTENTS_LEAD_CAPTURE, [
             'email' => $email]);
 
         if (!$existingLead && !$existingUser) {
