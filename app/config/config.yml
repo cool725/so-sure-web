@@ -547,6 +547,7 @@ nelmio_security:
                 - http://hits-i.iubenda.com
                 - https://bat.bing.com
                 - https://frstre.com
+                - https://tapi.tapfiliate.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
