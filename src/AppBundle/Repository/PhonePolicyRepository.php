@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use Doctrine\MongoDB\Query\Query;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Doctrine\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Cursor;
@@ -196,7 +197,6 @@ class PhonePolicyRepository extends PolicyRepository
      * @param \DateTime|null $endDate   date from which to start excluding policies, with null meaning no maximum.
      * @param int            $limit     maximum number of policies to return, with anything below 1 meaning no maximum.
      * @param int            $skip      number of initial results to skip.
-     * @return Cursor over the query results.
      */
     public function findAllStartedPolicies(
         \DateTime $startDate = null,
@@ -222,16 +222,70 @@ class PhonePolicyRepository extends PolicyRepository
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
+
         if ($this->excludedPolicyIds) {
             $this->addExcludedPolicyQuery($qb, 'id');
         }
+
         if ($limit > 0) {
             $qb->limit($limit);
         }
-        if ($skip >0) {
+
+        if ($skip > 0) {
             $qb->skip($skip);
         }
+
         return $qb->getQuery()->execute();
+    }
+
+    /**
+     * All policies that are active (excluding so-sure test ones).
+     * @param \DateTime|null $startDate date from which to start including policies, with null meaning no minimum.
+     * @param \DateTime|null $endDate   date from which to start excluding policies, with null meaning no maximum.
+     * @param int            $limit     maximum number of policies to return, with anything below 1 meaning no maximum.
+     * @param int            $skip      number of initial results to skip.
+     */
+    public function findPoliciesQueryByDate(
+        \DateTime $startDate = null,
+        \DateTime $endDate = null,
+        $limit = 0,
+        $skip = 0,
+        $count = false
+    ) {
+        if (!$endDate) {
+            $endDate = \DateTime::createFromFormat('U', time());
+        }
+        $qb = $this->createQueryBuilder()->field('status')->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_PICSURE_REQUIRED,
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
+            ])->field('policyNumber')->equals(new \MongoRegex(self::VALID_REGEX));
+        $qb->field('start')->lt($endDate);
+        if ($startDate) {
+            $qb->field('start')->gte($startDate);
+        }
+
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'id');
+        }
+
+        if ($limit > 0) {
+            $qb->limit($limit);
+        }
+
+        if ($skip > 0) {
+            $qb->skip($skip);
+        }
+
+        if ($count) {
+            return $qb->getQuery()->count();
+        }
+
+        return $qb->getQuery();
     }
 
     public function countAllStartedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
