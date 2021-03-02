@@ -178,6 +178,7 @@ class DefaultController extends BaseController
      * @Route("/so-sure-compared", name="so_sure_compared")
      * @Route("/moneyback", name="moneyback")
      * @Route("/quotezone", name="quotezone")
+     * @Route("/getmyslice", name="getmyslice")
      */
     public function affiliateLanding(Request $request)
     {
@@ -277,6 +278,13 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'vendi-app',
                 'affiliate_company' => 'Vendi',
                 'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
+            ];
+        } elseif ($request->get('_route') == 'getmyslice') {
+            $data = [
+                'competitor' => $competitorData::$competitorComparisonData,
+                'affiliate_page' => 'getmyslice',
+                'affiliate_company' => 'Get My Slice',
+                'affiliate_company_logo' => 'so-sure_getmyslice_logo.svg',
             ];
         } elseif ($request->get('_route') == 'so_sure_compared') {
             $data = [
