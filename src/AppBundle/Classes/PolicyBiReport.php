@@ -101,6 +101,7 @@ class PolicyBiReport extends PolicyReport
             'Policy Start Date',
             'Policy End Date',
             'Premium Installments',
+            ($full) ? 'First Time Policy' : null,
             ($full) ? 'Policy Number Prior Renewal' : null,
             ($full) ? 'Policy Number Renewal' : null,
             ($full) ? 'Policy Result of Upgrade' : null,
@@ -134,7 +135,7 @@ class PolicyBiReport extends PolicyReport
             ($full) ? 'Bacs Mandate Status' : null,
             ($full) ? 'Bacs Mandate Cancelled Reason' : null,
             ($full) ? 'Successful Payment' : null,
-            //($full) ? 'Latest Payment Failed Without Reschedule' : null,
+            ($full) ? 'Latest Payment Failed Without Reschedule' : null,
             'Yearly Premium',
             ($full) ? 'Premium Paid' : null,
             ($full) ? 'Premium Outstanding' : null,
@@ -213,12 +214,18 @@ class PolicyBiReport extends PolicyReport
             $bankAccount = $policy->getPolicyOrUserBacsBankAccount() ?: '';
             $reschedule = null;
             $lastReverted = null;
-//                if (!$this->reduced) {
-//                    $lastReverted = $policy->getLastRevertedScheduledPayment() ?: '';
-//                    if ($lastReverted) {
-//                        $reschedule = $this->scheduledPaymentRepo->getRescheduledBy($lastReverted);
-//                    }
-//                }
+            $lastPaymentFail = '';
+            if (!$this->reduced) {
+                $lastReverted = $policy->getLastRevertedScheduledPayment();
+                if ($lastReverted) {
+                    $reschedule = $this->scheduledPaymentRepo->getRescheduledBy($lastReverted);
+                    if ($lastReverted && !$reschedule) {
+                        $lastPaymentFail = 'yes';
+                    } else {
+                        $lastPaymentFail = 'no';
+                    }
+                }
+            }
             $connections = $policy->getConnections();
             $scodeType = '';
             $scodeName = '';
@@ -238,6 +245,45 @@ class PolicyBiReport extends PolicyReport
                 }
             }
 
+            $expDate = '';
+            if ($policy->getStatus() == Policy::STATUS_UNPAID) {
+                if ($policy->getPolicyExpirationDate()) {
+                    $expDate = DateTrait::timezoneFormat($policy->getPolicyExpirationDate(), $this->tz, 'Y-m-d');
+                }
+            }
+
+            $startDate = '';
+            $purchaseTime = '';
+            if ($policy->getStart()) {
+                $startDate = DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'Y-m-d');
+                $purchaseTime = DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'H:i');
+            }
+            $endDate = '';
+            if ($policy->getEnd()) {
+                $endDate = DateTrait::timezoneFormat($policy->getEnd(), $this->tz, 'Y-m-d');
+            }
+
+            $phoneMake = '';
+            $phoneMakeModel = '';
+            if ($phone) {
+                $phoneMakeModel = $phone->getMakeModelMemory();
+                $phoneMake = sprintf('%s %s', $phone->getMake(), $phone->getModel());
+            }
+
+            $numInstallments = '';
+            if ($policy->getPremiumInstallments()) {
+                $numInstallments = $policy->getPremiumInstallments();
+            }
+
+            $policyXRenewal = '';
+            if ($policy->getGeneration()) {
+                $policyXRenewal = $policy->getGeneration();
+            }
+            $policyUpgraded = '';
+            if ($policy->getPolicyUpgraded()) {
+                $policyUpgraded = ($policy->getPolicyUpgraded() ? 'Yes' : 'No');
+            }
+
             $items = CsvHelper::ignoreBlank(
                 $policy->getPolicyNumber() ?: '',
                 $user->getId() ?: '',
@@ -245,20 +291,18 @@ class PolicyBiReport extends PolicyReport
                 ($user->getBillingAddress()) ? $user->getBillingAddress()->getPostcode() : '',
                 $user->getGender() ?: '',
                 $phone->getMake() ?: '',
-                $this->reduced ? null : sprintf('%s %s', $phone->getMake(), $phone->getModel()),
-                ($phone) ? $phone->getMakeModelMemory() : '',
-                DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'Y-m-d'),
-                DateTrait::timezoneFormat($policy->getEnd(), $this->tz, 'Y-m-d'),
-                $policy->getPremiumInstallments() ?: '',
+                $this->reduced ? null : $phoneMake,
+                $phoneMakeModel,
+                $startDate,
+                $endDate,
+                $numInstallments,
                 $this->reduced ? null : $userAttribution,
                 $this->reduced ? null : $previous,
                 $this->reduced ? null : $next,
-                ($policy->getPolicyUpgraded()) ? 'Yes' : 'No',
+                $this->reduced ? null : $policyUpgraded,
+                $policyXRenewal,
                 $policy->getStatus() ?: '',
-                $this->reduced ? null : (
-                $policy->getStatus() == Policy::STATUS_UNPAID ?
-                    DateTrait::timezoneFormat($policy->getPolicyExpirationDate(), $this->tz, 'Y-m-d') : ''
-                ),
+                $this->reduced ? null : $expDate,
                 $cancelledReason,
                 $this->reduced ? null : ($policy->hasRequestedCancellation() ? 'yes' : 'no'),
                 $this->reduced ? null : ($policy->getRequestedCancellationReason() ?: ''),
@@ -269,7 +313,7 @@ class PolicyBiReport extends PolicyReport
                 count($policy->getClaims()),
                 $this->reduced ? null : count($policy->getApprovedClaims()),
                 $this->reduced ? null : count($policy->getWithdrawnDeclinedClaims()),
-                DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'H:i'),
+                $purchaseTime,
                 $policy->getLeadSource() ?: '',
                 $scodeType ?: '',
                 $scodeName ?: '',
@@ -289,7 +333,7 @@ class PolicyBiReport extends PolicyReport
                     $bankAccount->getMandateStatus() == BankAccount::MANDATE_CANCELLED) ?
                     $bankAccount->getMandateCancelledExplanation() : ''),
                 $this->reduced ? null : (count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no'),
-                //$this->reduced ? null : (($lastReverted && !$reschedule) ? 'yes' : 'no'),
+                $this->reduced ? null : $lastPaymentFail,
                 ($policy->getPremium()) ? $policy->getPremium()->getYearlyPremiumPrice() : '',
                 $this->reduced ? null : $policy->getPremiumPaid(),
                 $this->reduced ? null : ($policy->getUnderwritingOutstandingPremium() ?: ''),

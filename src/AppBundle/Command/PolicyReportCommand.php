@@ -25,7 +25,7 @@ use AppBundle\Classes\SoSure;
  */
 class PolicyReportCommand extends ContainerAwareCommand
 {
-    const INTERVAL = 'P11D';
+    const INTERVAL = 'P13D';
     const START_INTERVAL = 'P15M';
 
     /** @var S3Client */
