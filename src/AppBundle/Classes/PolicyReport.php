@@ -4,9 +4,11 @@ namespace AppBundle\Classes;
 
 use AppBundle\Document\Policy;
 use AppBundle\Helpers\CsvHelper;
+use Doctrine\MongoDB\Query\Query;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use DateTimeZone;
 use Exception;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 /**
@@ -35,17 +37,27 @@ abstract class PolicyReport
     private $columns;
 
     /**
+     * @var boolean
+     */
+    protected $reduced;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /**
      * Injects some dependencies.
      * @param DocumentManager $dm is used to get repositories.
      * @param DateTimeZone    $tz the timezone to put dates in.
      */
-    public function __construct(DocumentManager $dm, DateTimeZone $tz)
+    public function __construct(DocumentManager $dm, DateTimeZone $tz, LoggerInterface $logger, $reduced = false)
     {
         $header = $this->getHeaders();
         $this->lines = [CsvHelper::line(...$header)];
         $this->columns = count($header);
         $this->dm = $dm;
         $this->tz = $tz;
+        $this->logger = $logger;
+        $this->reduced = $reduced;
     }
 
     /**
@@ -62,6 +74,12 @@ abstract class PolicyReport
      * @param Policy $policy is the policy to process.
      */
     abstract public function process(Policy $policy);
+
+    /**
+     * Takes a policy and adds lines to the report with it.
+     * @param array $policy is the policy to process.
+     */
+    abstract public function processBatch(array $policy);
 
     /**
      * Gives you a string of the headers the report should have.
@@ -85,17 +103,18 @@ abstract class PolicyReport
     public static function createReport(
         $name,
         DocumentManager $dm,
-        DateTimeZone $tz
+        DateTimeZone $tz,
+        LoggerInterface $logger
     ) {
         switch ($name) {
             case 'policy':
-                return new PolicyBiReport($dm, $tz, true);
+                return new PolicyBiReport($dm, $tz, $logger, true);
             case 'policy-full':
-                return new PolicyBiReport($dm, $tz);
+                return new PolicyBiReport($dm, $tz, $logger);
             case 'picsure':
-                return new PolicyPicSureReport($dm, $tz);
+                return new PolicyPicSureReport($dm, $tz, $logger);
             case 'scode':
-                return new PolicyScodeReport($dm, $tz);
+                return new PolicyScodeReport($dm, $tz, $logger);
             default:
                 return null;
         }
@@ -112,13 +131,7 @@ abstract class PolicyReport
         NoOp::ignore($column);
         $args = func_get_args();
         if (count($args) != $this->columns) {
-            throw new RuntimeException(sprintf(
-                'Invalid line \'%s\' given for report \'%s\'. %d lines instead of %d',
-                CsvHelper::line(...$args),
-                $this->getFile(),
-                count($args),
-                $this->columns
-            ));
+            return null;
         }
         $this->lines[] = CsvHelper::line(...$args);
     }

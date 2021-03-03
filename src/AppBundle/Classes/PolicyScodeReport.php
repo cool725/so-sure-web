@@ -7,7 +7,9 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Repository\ConnectionRepository;
 use DateTimeZone;
+use Doctrine\MongoDB\Query\Query;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Psr\Log\LoggerInterface;
 
 /**
  * Generates policy report showing scodes.
@@ -19,14 +21,17 @@ class PolicyScodeReport extends PolicyReport
      */
     private $connectionRepo;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * Creates the policy picsure report.
      * @param DocumentManager $dm to get repositories.
      * @param DateTimeZone    $tz the timezone for the report to be in.
      */
-    public function __construct(DocumentManager $dm, DateTimeZone $tz)
+    public function __construct(DocumentManager $dm, DateTimeZone $tz, LoggerInterface $logger)
     {
-        parent::__construct($dm, $tz);
+        parent::__construct($dm, $tz, $logger);
         /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $dm->getRepository(Connection::class);
         $this->connectionRepo = $connectionRepo;
@@ -73,5 +78,10 @@ class PolicyScodeReport extends PolicyReport
                 );
             }
         }
+    }
+
+    public function processBatch(array $policy)
+    {
+        // TODO: Implement processBatch() method.
     }
 }

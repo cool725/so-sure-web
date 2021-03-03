@@ -568,6 +568,14 @@ abstract class Policy
     protected $policyDiscountPresent;
 
     /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     * @var boolean
+     */
+    protected $policyUpgraded;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -801,6 +809,16 @@ abstract class Policy
     public function setPolicyDiscountPresent($policyDiscountPresent)
     {
         $this->policyDiscountPresent = $policyDiscountPresent;
+    }
+
+    public function setPolicyUpgraded($policyUpgraded)
+    {
+        $this->policyUpgraded = $policyUpgraded;
+    }
+
+    public function getPolicyUpgraded()
+    {
+        return $this->policyUpgraded;
     }
 
     public function getPaymentsByType($type)
@@ -1063,8 +1081,18 @@ abstract class Policy
      */
     public function getUsedPaymentType()
     {
-        $payment = $this->getLastSuccessfulUserPaymentCredit();
+
         $method = $this->getPolicyOrUserPaymentMethod();
+        if ($method instanceof BacsPaymentMethod) {
+            return PaymentMethod::TYPE_BACS;
+        }
+        if ($method instanceof CheckoutPaymentMethod) {
+            if ($method->hasPreviousChargeId()) {
+                return PaymentMethod::TYPE_CHECKOUT;
+            }
+        }
+
+        $payment = $this->getLastSuccessfulUserPaymentCredit();
         return $payment ? $payment->getType() : ($method ? $method->getType() : null);
     }
 
@@ -1284,41 +1312,7 @@ abstract class Policy
             return $this->getIdentityLog()->getSdk();
         }
 
-        $source = $this->getFirstSuccessfulUserPaymentCredit();
-        if ($source) {
-            switch ($source) {
-                case Payment::SOURCE_WEB:
-                case Payment::SOURCE_WEB_API:
-                    return IdentityLog::SDK_WEB;
-                case Payment::SOURCE_TOKEN:
-                case Payment::SOURCE_SYSTEM:
-                case Payment::SOURCE_BACS:
-                    // historically, bacs was only implemented on the web, so anything related to bacs payments
-                    // should be web (new sdk identity log should resolve future requests better)
-                    // as bacs was usually associated with token payments, system & token should be assumed to be bacs
-                    return IdentityLog::SDK_WEB;
-                case Payment::SOURCE_MOBILE:
-                    if ($this instanceof PhonePolicy) {
-                        /** @var Phone $phone */
-                        $phone = $this->getPhone();
-                        if ($phone->isApple()) {
-                            return IdentityLog::SDK_IOS;
-                        } else {
-                            return IdentityLog::SDK_ANDROID;
-                        }
-                    }
-
-                    return IdentityLog::SDK_UNKNOWN;
-                case Payment::SOURCE_APPLE_PAY:
-                    return IdentityLog::SDK_IOS;
-                case Payment::SOURCE_ANDROID_PAY:
-                    return IdentityLog::SDK_ANDROID;
-                default:
-                    return IdentityLog::SDK_UNKNOWN;
-            }
-        }
-
-        return IdentityLog::SDK_UNKNOWN;
+        return null;
     }
 
     /**
