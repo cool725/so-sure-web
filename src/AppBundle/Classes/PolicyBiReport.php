@@ -104,7 +104,7 @@ class PolicyBiReport extends PolicyReport
             ($full) ? 'First Time Policy' : null,
             ($full) ? 'Policy Number Prior Renewal' : null,
             ($full) ? 'Policy Number Renewal' : null,
-            ($full) ? 'Policy Result of Upgrade' : null,
+            'Policy Result of Upgrade',
             'This Policy is the X renewal',
             'Policy Status',
             ($full) ? 'Expected Unpaid Cancellation Date' : null,
@@ -167,7 +167,7 @@ class PolicyBiReport extends PolicyReport
                 return;
             }
             /** @var Phone $phone */
-            $phone = $policy->getPhone() ?: '';
+            $phone = $policy->getPhone();
             $user = $policy->getUser();
 
             $previousPolicy = $policy->getPreviousPolicy();
@@ -265,9 +265,11 @@ class PolicyBiReport extends PolicyReport
 
             $phoneMake = '';
             $phoneMakeModel = '';
+            $phoneMakeModelMemory = '';
             if ($phone) {
-                $phoneMakeModel = $phone->getMakeModelMemory();
-                $phoneMake = sprintf('%s %s', $phone->getMake(), $phone->getModel());
+                $phoneMake = $phone->getMake();
+                $phoneMakeModelMemory = $phone->getMakeModelMemory();
+                $phoneMakeModel = sprintf('%s %s', $phone->getMake(), $phone->getModel());
             }
 
             $numInstallments = '';
@@ -279,7 +281,7 @@ class PolicyBiReport extends PolicyReport
             if ($policy->getGeneration()) {
                 $policyXRenewal = $policy->getGeneration();
             }
-            $policyUpgraded = '';
+            $policyUpgraded = 'No';
             if ($policy->getPolicyUpgraded()) {
                 $policyUpgraded = ($policy->getPolicyUpgraded() ? 'Yes' : 'No');
             }
@@ -290,16 +292,16 @@ class PolicyBiReport extends PolicyReport
                 $user->getAge() ?: '',
                 ($user->getBillingAddress()) ? $user->getBillingAddress()->getPostcode() : '',
                 $user->getGender() ?: '',
-                $phone->getMake() ?: '',
-                $this->reduced ? null : $phoneMake,
-                $phoneMakeModel,
+                $phoneMake,
+                $this->reduced ? null : $phoneMakeModel,
+                $phoneMakeModelMemory,
                 $startDate,
                 $endDate,
                 $numInstallments,
                 $this->reduced ? null : $userAttribution,
                 $this->reduced ? null : $previous,
                 $this->reduced ? null : $next,
-                $this->reduced ? null : $policyUpgraded,
+                $policyUpgraded,
                 $policyXRenewal,
                 $policy->getStatus() ?: '',
                 $this->reduced ? null : $expDate,
