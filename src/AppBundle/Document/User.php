@@ -879,10 +879,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getAllPolicyPolicies()
     {
         $policies = [];
-        foreach ($this->getAllPolicies() as $policy) {
-            /** @var Policy $policy */
-            if ($policy->isValidPolicy()) {
-                $policies[] = $policy;
+        if (null !== $this->getAllPolicies()) {
+            foreach ($this->getAllPolicies() as $policy) {
+                /** @var Policy $policy */
+                if ($policy->isValidPolicy()) {
+                    $policies[] = $policy;
+                }
             }
         }
         return $policies;
@@ -2417,14 +2419,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getAttributionPolicy()
     {
         $policies = $this->getAllPolicyPolicies();
-        if (count($policies) == 0) {
-            return null;
+        if ($policies) {
+            if (count($policies) == 0) {
+                return null;
+            }
+            // sort older to recent
+            usort($policies, function ($a, $b) {
+                return $a->getStart() > $b->getStart();
+            });
+            return $policies[0];
         }
-        // sort older to recent
-        usort($policies, function ($a, $b) {
-            return $a->getStart() > $b->getStart();
-        });
-        return $policies[0];
+        return null;
     }
 
     /**

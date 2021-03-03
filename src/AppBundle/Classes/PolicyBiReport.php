@@ -7,6 +7,7 @@ use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\DateTrait;
@@ -18,7 +19,10 @@ use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use DateTime;
 use DateTimeZone;
+use Doctrine\MongoDB\Query\Query;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use http\Exception\RuntimeException;
+use Psr\Log\LoggerInterface;
 use stdClass;
 
 /**
@@ -41,22 +45,30 @@ class PolicyBiReport extends PolicyReport
      */
     protected $scheduledPaymentRepo;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /** @var int */
+    protected $headerItems;
+
     /**
      * Creates the policy picsure report.
      * @param DocumentManager $dm      for the report to use.
      * @param DateTimeZone    $tz      is the time zone to report in.
+     * @param LoggerInterface $logger  is used for logging.
      * @param boolean         $reduced is whether to remove some columns to save time.
      */
-    public function __construct(DocumentManager $dm, DateTimeZone $tz, $reduced = false)
+    public function __construct(DocumentManager $dm, DateTimeZone $tz, LoggerInterface $logger, $reduced = false)
     {
-        parent::__construct($dm, $tz);
         $this->reduced = $reduced;
+        parent::__construct($dm, $tz, $logger, $reduced);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
         $this->rewardRepo = $rewardRepo;
         $this->scheduledPaymentRepo = $scheduledPaymentRepo;
+        $this->logger = $logger;
     }
 
     /**
@@ -72,35 +84,40 @@ class PolicyBiReport extends PolicyReport
      */
     public function getHeaders()
     {
-        return CsvHelper::ignoreBlank(
+        $full = true;
+        if ($this->reduced) {
+            $full = false;
+        }
+
+        $hItems = CsvHelper::ignoreBlank(
             'Policy Number',
             'Policy Holder Id',
             'Age of Policy Holder',
             'Postcode of Policy Holder',
             'Gender',
             'Make',
-            $this->reduced ? 'Make/Model' : null,
+            ($full) ? 'Make/Model' : null,
             'Make/Model/Memory',
             'Policy Start Date',
             'Policy End Date',
             'Premium Installments',
-            $this->reduced ? 'First Time Policy' : null,
-            $this->reduced ? 'Policy Number Prior Renewal' : null,
-            $this->reduced ? 'Policy Number Renewal' : null,
+            ($full) ? 'First Time Policy' : null,
+            ($full) ? 'Policy Number Prior Renewal' : null,
+            ($full) ? 'Policy Number Renewal' : null,
             'Policy Result of Upgrade',
             'This Policy is the X renewal',
             'Policy Status',
-            $this->reduced ? 'Expected Unpaid Cancellation Date' : null,
+            ($full) ? 'Expected Unpaid Cancellation Date' : null,
             'Policy Cancellation Reason',
-            $this->reduced ? 'Requested Cancellation (Phone Damaged Prior to Policy)' : null,
-            $this->reduced ? 'Requested Cancellation Reason (Phone Damaged Prior to Policy)' : null,
+            ($full) ? 'Requested Cancellation (Phone Damaged Prior to Policy)' : null,
+            ($full) ? 'Requested Cancellation Reason (Phone Damaged Prior to Policy)' : null,
             'Invitations',
             'Connections',
             'Reward Pot',
             'Pic-Sure Status',
             'Total Number of Claims',
-            $this->reduced ? 'Number of Approved/Settled Claims' : null,
-            $this->reduced ? 'Number of Withdrawn/Declined Claims' : null,
+            ($full) ? 'Number of Approved/Settled Claims' : null,
+            ($full) ? 'Number of Withdrawn/Declined Claims' : null,
             'Policy Purchase Time',
             'Lead Source',
             'First Scode Type',
@@ -115,20 +132,28 @@ class PolicyBiReport extends PolicyReport
             'First referer (user)',
             'Purchase SDK',
             'Payment Method',
-            $this->reduced ? 'Bacs Mandate Status' : null,
-            $this->reduced ? 'Bacs Mandate Cancelled Reason' : null,
-            $this->reduced ? 'Successful Payment' : null,
-            $this->reduced ? 'Latest Payment Failed Without Reschedule' : null,
+            ($full) ? 'Bacs Mandate Status' : null,
+            ($full) ? 'Bacs Mandate Cancelled Reason' : null,
+            ($full) ? 'Successful Payment' : null,
+            ($full) ? 'Latest Payment Failed Without Reschedule' : null,
             'Yearly Premium',
-            $this->reduced ? 'Premium Paid' : null,
-            $this->reduced ? 'Premium Outstanding' : null,
-            $this->reduced ? 'Past Due Amount (Bad Debt Only)' : null,
-            $this->reduced ? 'Referrals made' : null,
-            $this->reduced ? 'Referrals made amount' : null,
-            $this->reduced ? 'Referrals received' : null,
-            $this->reduced ? 'Referrals received amount' : null,
+            ($full) ? 'Premium Paid' : null,
+            ($full) ? 'Premium Outstanding' : null,
+            ($full) ? 'Past Due Amount (Bad Debt Only)' : null,
+            ($full) ? 'Referrals made' : null,
+            ($full) ? 'Referrals made amount' : null,
+            ($full) ? 'Referrals received' : null,
+            ($full) ? 'Referrals received amount' : null,
             'Company of Policy'
         );
+
+        $this->headerItems = count($hItems);
+        return $hItems;
+    }
+
+    public function processBatch(array $policy)
+    {
+        // TODO: Implement process() method.
     }
 
     /**
@@ -136,88 +161,206 @@ class PolicyBiReport extends PolicyReport
      */
     public function process(Policy $policy)
     {
-        if (!($policy instanceof PhonePolicy) || $policy->getEnd() <= $policy->getStart()) {
-            return;
-        }
-        $connections = $policy->getConnections();
-        $user = $policy->getUser();
-        $previous = $policy->getPreviousPolicy();
-        $next = $policy->getNextPolicy();
-        $phone = $policy->getPhone();
-        $billing = $user->getBillingAddress();
-        $attribution = $user->getAttribution();
-        $latestAttribution = $user->getLatestAttribution();
-        $bankAccount = $policy->getPolicyOrUserBacsBankAccount();
-        $reschedule = null;
-        $lastReverted = $policy->getLastRevertedScheduledPayment();
-        if ($lastReverted) {
-            $reschedule = $this->scheduledPaymentRepo->getRescheduledBy($lastReverted);
-        }
-        $company = $policy->getCompany();
-        $scodeType = $this->getFirstSCodeUsedType($connections);
-        $scodeName = $this->getFirstSCodeUsedCode($connections);
-        $this->add(...CsvHelper::ignoreBlank(
-            $policy->getPolicyNumber(),
-            $user->getId(),
-            $user->getAge(),
-            $user->getBillingAddress()->getPostcode(),
-            $user->getGender() ?: '',
-            $phone->getMake(),
-            $this->reduced ? null : sprintf('%s %s', $phone->getMake(), $phone->getModel()),
-            $phone,
-            DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'Y-m-d'),
-            DateTrait::timezoneFormat($policy->getEnd(), $this->tz, 'Y-m-d'),
-            $policy->getPremiumInstallments(),
-            $this->reduced ? null : ($policy->useForAttribution() ? 'yes' : 'no'),
-            $this->reduced ? null : ($previous ? $previous->getPolicyNumber() : ''),
-            $this->reduced ? null : ($next ? $next->getPolicyNumber() : ''),
-            $this->getPreviousPolicyIsUpgrade($policy),
-            $policy->getGeneration(),
-            $policy->getStatus(),
-            $this->reduced ? null : (
-                $policy->getStatus() == Policy::STATUS_UNPAID ?
-                    DateTrait::timezoneFormat($policy->getPolicyExpirationDate(), $this->tz, 'Y-m-d') : ''
-            ),
-            $policy->getStatus() == Policy::STATUS_CANCELLED ? $policy->getCancelledReason() : '',
-            $this->reduced ? null : ($policy->hasRequestedCancellation() ? 'yes' : 'no'),
-            $this->reduced ? null : ($policy->getRequestedCancellationReason() ?: ''),
-            count($policy->getInvitations()),
-            count($policy->getStandardConnections()),
-            $policy->getPotValue(),
-            $policy->getPicSureStatus() ?: 'unstarted',
-            count($policy->getClaims()),
-            $this->reduced ? null : count($policy->getApprovedClaims()),
-            $this->reduced ? null : count($policy->getWithdrawnDeclinedClaims()),
-            DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'H:i'),
-            $policy->getLeadSource() ?: '',
-            $scodeType ?: '',
-            $scodeName ?: '',
-            $this->getPromoCodesUsed($this->rewardRepo, $connections) ?: '',
-            $this->policyHasSignUpBonus($this->rewardRepo, $connections) ? 'yes' : 'no',
-            $latestAttribution ? $latestAttribution->getCampaignSource() : '',
-            $latestAttribution ? $latestAttribution->getCampaignName() : '',
-            $latestAttribution ? $latestAttribution->getReferer() : '',
-            $attribution ? $attribution->getCampaignSource() : '',
-            $attribution ? $attribution->getCampaignName() : '',
-            $attribution ? $attribution->getReferer() : '',
-            $policy->getPurchaseSdk() ?: '',
-            $policy->getUsedPaymentType() ?: '',
-            $this->reduced ? null :(($bankAccount && $policy->isActive()) ? $bankAccount->getMandateStatus() : ''),
-            $this->reduced ? null :(($bankAccount && $policy->isActive() &&
-                $bankAccount->getMandateStatus() == BankAccount::MANDATE_CANCELLED) ?
+        try {
+            /** @var Policy $policy */
+            if (!($policy instanceof PhonePolicy) || $policy->getEnd() <= $policy->getStart()) {
+                return;
+            }
+            /** @var Phone $phone */
+            $phone = $policy->getPhone();
+            $user = $policy->getUser();
+
+            $previousPolicy = $policy->getPreviousPolicy();
+            $previous = '';
+            if ($previousPolicy) {
+                $previous = $previousPolicy->getPolicyNumber() ?: '';
+            }
+            $nextPolicy = $policy->getNextPolicy();
+            $next = '';
+            if ($nextPolicy) {
+                $next = $nextPolicy->getPolicyNumber() ?: '';
+            }
+
+            $company = $policy->getCompany();
+            $companyName = '';
+            if ($company) {
+                $companyName = $company->getName() ?: '';
+            }
+
+            $attribution = $user->getAttribution();
+            $aCampaignSrc = '';
+            $aCampaignName = '';
+            $aCampaignReferer = '';
+            if ($attribution) {
+                $aCampaignSrc = $attribution->getCampaignSource() ?: '';
+                $aCampaignName = $attribution->getCampaignName() ?: '';
+                $aCampaignReferer = $attribution->getReferer() ?: '';
+            }
+            $latestAttribution = $user->getLatestAttribution();
+            $laCampaignSrc = '';
+            $laCampaignName = '';
+            $laCampaignReferer = '';
+            if ($latestAttribution) {
+                $laCampaignSrc = $latestAttribution->getCampaignSource() ?: '';
+                $laCampaignName = $latestAttribution->getCampaignName() ?: '';
+                $laCampaignReferer = $latestAttribution->getReferer() ?: '';
+            }
+            $userAtt = $policy->useForAttribution();
+            $userAttribution = '';
+            if ($userAtt) {
+                $userAttribution = ($userAtt ? 'yes' : 'no');
+            }
+
+            $bankAccount = $policy->getPolicyOrUserBacsBankAccount() ?: '';
+            $reschedule = null;
+            $lastReverted = null;
+            $lastPaymentFail = '';
+            if (!$this->reduced) {
+                $lastReverted = $policy->getLastRevertedScheduledPayment();
+                if ($lastReverted) {
+                    $reschedule = $this->scheduledPaymentRepo->getRescheduledBy($lastReverted);
+                    if ($lastReverted && !$reschedule) {
+                        $lastPaymentFail = 'yes';
+                    } else {
+                        $lastPaymentFail = 'no';
+                    }
+                }
+            }
+            $connections = $policy->getConnections();
+            $scodeType = '';
+            $scodeName = '';
+            $promoCodeUsed = '';
+            $policySignup = '';
+            if ($connections) {
+                $scodeType = $this->getFirstSCodeUsedType($connections);
+                $scodeName = $this->getFirstSCodeUsedCode($connections);
+                $promoCodeUsed = ($this->getPromoCodesUsed($this->rewardRepo, $connections) ?: '');
+                $policySignup = ($this->policyHasSignUpBonus($this->rewardRepo, $connections) ? 'yes' : 'no');
+            }
+
+            $cancelledReason = '';
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED) {
+                if ($policy->getCancelledReason()) {
+                    $cancelledReason = $policy->getCancelledReason();
+                }
+            }
+
+            $expDate = '';
+            if ($policy->getStatus() == Policy::STATUS_UNPAID) {
+                if ($policy->getPolicyExpirationDate()) {
+                    $expDate = DateTrait::timezoneFormat($policy->getPolicyExpirationDate(), $this->tz, 'Y-m-d');
+                }
+            }
+
+            $startDate = '';
+            $purchaseTime = '';
+            if ($policy->getStart()) {
+                $startDate = DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'Y-m-d');
+                $purchaseTime = DateTrait::timezoneFormat($policy->getStart(), $this->tz, 'H:i');
+            }
+            $endDate = '';
+            if ($policy->getEnd()) {
+                $endDate = DateTrait::timezoneFormat($policy->getEnd(), $this->tz, 'Y-m-d');
+            }
+
+            $phoneMake = '';
+            $phoneMakeModel = '';
+            $phoneMakeModelMemory = '';
+            if ($phone) {
+                $phoneMake = $phone->getMake();
+                $phoneMakeModelMemory = $phone->getMakeModelMemory();
+                $phoneMakeModel = sprintf('%s %s', $phone->getMake(), $phone->getModel());
+            }
+
+            $numInstallments = '';
+            if ($policy->getPremiumInstallments()) {
+                $numInstallments = $policy->getPremiumInstallments();
+            }
+
+            $policyXRenewal = '';
+            if ($policy->getGeneration()) {
+                $policyXRenewal = $policy->getGeneration();
+            }
+            $policyUpgraded = 'No';
+            if ($policy->getPolicyUpgraded()) {
+                $policyUpgraded = ($policy->getPolicyUpgraded() ? 'Yes' : 'No');
+            }
+
+            $items = CsvHelper::ignoreBlank(
+                $policy->getPolicyNumber() ?: '',
+                $user->getId() ?: '',
+                $user->getAge() ?: '',
+                ($user->getBillingAddress()) ? $user->getBillingAddress()->getPostcode() : '',
+                $user->getGender() ?: '',
+                $phoneMake,
+                $this->reduced ? null : $phoneMakeModel,
+                $phoneMakeModelMemory,
+                $startDate,
+                $endDate,
+                $numInstallments,
+                $this->reduced ? null : $userAttribution,
+                $this->reduced ? null : $previous,
+                $this->reduced ? null : $next,
+                $policyUpgraded,
+                $policyXRenewal,
+                $policy->getStatus() ?: '',
+                $this->reduced ? null : $expDate,
+                $cancelledReason,
+                $this->reduced ? null : ($policy->hasRequestedCancellation() ? 'yes' : 'no'),
+                $this->reduced ? null : ($policy->getRequestedCancellationReason() ?: ''),
+                count($policy->getInvitations()),
+                count($policy->getStandardConnections()),
+                $policy->getPotValue() ?: '',
+                $policy->getPicSureStatus() ?: 'unstarted',
+                count($policy->getClaims()),
+                $this->reduced ? null : count($policy->getApprovedClaims()),
+                $this->reduced ? null : count($policy->getWithdrawnDeclinedClaims()),
+                $purchaseTime,
+                $policy->getLeadSource() ?: '',
+                $scodeType ?: '',
+                $scodeName ?: '',
+                $promoCodeUsed,
+                $policySignup,
+                $laCampaignSrc,
+                $laCampaignName,
+                $laCampaignReferer,
+                $aCampaignSrc,
+                $aCampaignName,
+                $aCampaignReferer,
+                $policy->getPurchaseSdk() ?: '',
+                $policy->getUsedPaymentType() ?: '',
+                $this->reduced ? null : (($bankAccount && $policy->isActive())
+                    ? $bankAccount->getMandateStatus() : ''),
+                $this->reduced ? null : (($bankAccount && $policy->isActive() &&
+                    $bankAccount->getMandateStatus() == BankAccount::MANDATE_CANCELLED) ?
                     $bankAccount->getMandateCancelledExplanation() : ''),
-            $this->reduced ? null : (count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no'),
-            $this->reduced ? null : (($lastReverted && !$reschedule) ? 'yes' : 'no'),
-            $policy->getPremium()->getYearlyPremiumPrice(),
-            $this->reduced ? null : $policy->getPremiumPaid(),
-            $this->reduced ? null : $policy->getUnderwritingOutstandingPremium(),
-            $this->reduced ? null : $policy->getBadDebtAmount(),
-            $this->reduced ? null : count($policy->getInviterReferralBonuses()),
-            $this->reduced ? null : $policy->getPaidInviterReferralBonusAmount(),
-            $this->reduced ? null : count($policy->getInviteeReferralBonuses()),
-            $this->reduced ? null : $policy->getPaidInviteeReferralBonusAmount(),
-            $company ? $company->getName() : ''
-        ));
+                $this->reduced ? null : (count($policy->getSuccessfulUserPaymentCredits()) > 0 ? 'yes' : 'no'),
+                $this->reduced ? null : $lastPaymentFail,
+                ($policy->getPremium()) ? $policy->getPremium()->getYearlyPremiumPrice() : '',
+                $this->reduced ? null : $policy->getPremiumPaid(),
+                $this->reduced ? null : ($policy->getUnderwritingOutstandingPremium() ?: ''),
+                $this->reduced ? null : ($policy->getBadDebtAmount() ?: ''),
+                $this->reduced ? null : count($policy->getInviterReferralBonuses()),
+                $this->reduced ? null : $policy->getPaidInviterReferralBonusAmount(),
+                $this->reduced ? null : count($policy->getInviteeReferralBonuses()),
+                $this->reduced ? null : $policy->getPaidInviteeReferralBonusAmount(),
+                $companyName
+            );
+            // if header count does not match columns dont get to add section
+            // exception may break batch
+            if (count($items) !== $this->headerItems) {
+                $this->logger->error('Policy missing data: ' . json_encode($items));
+            }
+            $this->add(...$items);
+            // Clear for each row once its done
+        } catch (\RuntimeException $e) {
+            // Log any records not matching and continue to next record
+            $this->logger->error('Error with processing policy: ' . $e->getTraceAsString());
+            throw new \RuntimeException('Error with processing policy:' . $e->getMessage());
+        } catch (\Exception $ee) {
+            $this->logger->error($ee->getTraceAsString());
+            throw new \Exception('Error with policy:' . $ee->getMessage());
+        }
     }
 
     /**

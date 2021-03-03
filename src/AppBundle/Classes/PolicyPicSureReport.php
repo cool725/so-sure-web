@@ -5,7 +5,9 @@ namespace AppBundle\Classes;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use DateTimeZone;
+use Doctrine\MongoDB\Query\Query;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Psr\Log\LoggerInterface;
 
 /**
  * Generates policy report showing picsure stuff.
@@ -17,9 +19,12 @@ class PolicyPicSureReport extends PolicyReport
      * @param DocumentManager $dm to get repositories.
      * @param DateTimeZone    $tz the timezone for the report to be in.
      */
-    public function __construct(DocumentManager $dm, DateTimeZone $tz)
+    /** @var LoggerInterface */
+    protected $logger;
+
+    public function __construct(DocumentManager $dm, DateTimeZone $tz, LoggerInterface $logger)
     {
-        parent::__construct($dm, $tz);
+        parent::__construct($dm, $tz, $logger);
     }
 
     /**
@@ -53,5 +58,10 @@ class PolicyPicSureReport extends PolicyReport
                 $policy->getPicSureStatus()
             );
         }
+    }
+
+    public function processBatch(array $policy)
+    {
+        // TODO: Implement processBatch() method.
     }
 }
