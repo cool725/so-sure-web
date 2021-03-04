@@ -135,6 +135,7 @@ use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Form\Type\ChargebacksType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
+use AppBundle\Form\Type\InstallmentsType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
 use AppBundle\Form\Type\AdminSmsOptOutType;
@@ -1213,6 +1214,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $pendingCancelForm = $this->get('form.factory')
             ->createNamedBuilder('pending_cancel_form', PendingPolicyCancellationType::class, $policy)
             ->getForm();
+        $installmentsForm = $this->get('form.factory')
+            ->createNamedBuilder('installments_form', InstallmentsType::class)
+            ->getForm();
         $noteForm = $this->get('form.factory')
             ->createNamedBuilder('note_form', NoteType::class)
             ->getForm();
@@ -1424,6 +1428,16 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('installments_form')) {
+                $installmentsForm->handleRequest($request);
+                if ($installmentsForm->isValid()) {
+                    $policy->addNoteDetails(
+                        $this->conformAlphanumericSpaceDot($installmentsForm->getData()['notes'], 2500),
+                        $this->getUser()
+                    );
+                    // TODO: make sure that this is a number and it is a correct number.
+                    $this->get('app.policy')->changeInstallments($policy, $installmentsForm->getData()['installments']);
                 }
             } elseif ($request->request->has('note_form')) {
                 $noteForm->handleRequest($request);
@@ -1950,6 +1964,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
             'pending_cancel_form' => $pendingCancelForm->createView(),
+            'installments_form' => $installmentsForm->createView(),
             'note_form' => $noteForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
             'upgrade_data' => $phoneUpgrade,

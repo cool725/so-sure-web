@@ -2946,4 +2946,20 @@ class PolicyService
         }
         $this->dm->flush();
     }
+
+    /**
+     * Changes a policy's premium installments to the given number (1 or 12 not something weird), and regenerates
+     * the schedule.
+     * @param Policy $policy       is the policy to do the changing to.
+     * @param int    $installments is the number of installments to give it.
+     */
+    public function changeInstallments($policy, $installments)
+    {
+        if ($policy->getPremiumInstallments() == $installments) {
+            return;
+        }
+        $policy->setPremiumInstallments($installments);
+        $this->regenerateScheduledPayments($policy);
+        $this->dm->flush();
+    }
 }
