@@ -14,6 +14,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Reward;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
+use AppBundle\Document\User;
 use AppBundle\Helpers\CsvHelper;
 use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
@@ -162,13 +163,18 @@ class PolicyBiReport extends PolicyReport
     public function process(Policy $policy)
     {
         try {
+
             /** @var Policy $policy */
             if (!($policy instanceof PhonePolicy) || $policy->getEnd() <= $policy->getStart()) {
                 return;
             }
+            $user = $policy->getUser();
+            if (!$user instanceof User) {
+                return;
+            }
+
             /** @var Phone $phone */
             $phone = $policy->getPhone();
-            $user = $policy->getUser();
 
             $previousPolicy = $policy->getPreviousPolicy();
             $previous = '';
@@ -185,6 +191,20 @@ class PolicyBiReport extends PolicyReport
             $companyName = '';
             if ($company) {
                 $companyName = $company->getName() ?: '';
+            }
+
+            $userId = '';
+            $userAge = '';
+            $userGender = '';
+            $postalCode = '';
+
+            if ($user->getId()) {
+                $userId = $user->getId();
+                $userAge = ($user->getAge() ?: '');
+                $userGender = ($user->getGender() ?: '');
+                if ($user->getBillingAddress()) {
+                    $postalCode = ($user->getBillingAddress()->getPostcode() ?: '');
+                }
             }
 
             $attribution = $user->getAttribution();
@@ -267,9 +287,10 @@ class PolicyBiReport extends PolicyReport
             $phoneMakeModel = '';
             $phoneMakeModelMemory = '';
             if ($phone) {
-                $phoneMake = $phone->getMake();
-                $phoneMakeModelMemory = $phone->getMakeModelMemory();
-                $phoneMakeModel = sprintf('%s %s', $phone->getMake(), $phone->getModel());
+                $phoneMake = ($phone->getMake() ?: '');
+                $phoneModel = ($phone->getModel() ?: '');
+                $phoneMakeModelMemory = ($phone->getMakeModelMemory() ?: '');
+                $phoneMakeModel = sprintf('%s %s', $phoneMake, $phoneModel);
             }
 
             $numInstallments = '';
@@ -288,10 +309,10 @@ class PolicyBiReport extends PolicyReport
 
             $items = CsvHelper::ignoreBlank(
                 $policy->getPolicyNumber() ?: '',
-                $user->getId() ?: '',
-                $user->getAge() ?: '',
-                ($user->getBillingAddress()) ? $user->getBillingAddress()->getPostcode() : '',
-                $user->getGender() ?: '',
+                $userId,
+                $userAge,
+                $postalCode,
+                $userGender,
                 $phoneMake,
                 $this->reduced ? null : $phoneMakeModel,
                 $phoneMakeModelMemory,
@@ -346,12 +367,15 @@ class PolicyBiReport extends PolicyReport
                 $this->reduced ? null : $policy->getPaidInviteeReferralBonusAmount(),
                 $companyName
             );
+
+
             // if header count does not match columns dont get to add section
             // exception may break batch
             if (count($items) !== $this->headerItems) {
                 $this->logger->error('Policy missing data: ' . json_encode($items));
             }
             $this->add(...$items);
+
             // Clear for each row once its done
         } catch (\RuntimeException $e) {
             // Log any records not matching and continue to next record

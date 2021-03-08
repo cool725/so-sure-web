@@ -25,7 +25,7 @@ use AppBundle\Classes\SoSure;
  */
 class PolicyReportCommand extends ContainerAwareCommand
 {
-    const INTERVAL = 'P13D';
+    const INTERVAL = 'P7D';
     const START_INTERVAL = 'P15M';
 
     /** @var S3Client */
@@ -76,6 +76,13 @@ class PolicyReportCommand extends ContainerAwareCommand
                 'Europe/London'
             )
             ->addOption('limit', null, InputOption::VALUE_OPTIONAL, 'How many policies to process in batches', 1000)
+            ->addOption(
+                'bclear',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Option to flush out the batch from each memory',
+                true
+            )
             ->addOption('report', null, InputOption::VALUE_REQUIRED, 'Choose a report to generate', 'policy');
     }
 
@@ -92,6 +99,7 @@ class PolicyReportCommand extends ContainerAwareCommand
         // Set up reports to run.
         $reportName = $input->getOption('report');
         $limit = $input->getOption('limit');
+        $bclear = $input->getOption('bclear');
         $debug = $input->getOption('debug') == true;
         $timezone = new DateTimeZone($input->getOption('timezone'));
 
@@ -118,111 +126,54 @@ class PolicyReportCommand extends ContainerAwareCommand
             $top = ($begin < $now) ? (clone $begin)->add(new \DateInterval(self::INTERVAL)) : null;
             $policyCount = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top, 0, 0, true);
             $policyCounter += $policyCount;
-            $offsetCounter = 0;
-            // if we need to handle many policies, lets handle in batches
-            if ($policyCount > 2000) {
-                $policies = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top);
-                $policyArr = iterator_to_array($policies->getIterator(), true);
-                for ($v = 0; $v <= $policyCount; $v += $limit) {
-                    $starttime = time();
-
-                    if (!$policies instanceof \Doctrine\MongoDB\Query\Query) {
-                        throw new MongoDBException('Invalid return type for query');
-                    }
-
-                    $policyBatch = array_slice($policyArr, $offsetCounter, $limit, true);
-
-                    $output->writeln(sprintf(
-                        'Time Range: %s - %s. Offset count %d. Policies processing: %d',
-                        $begin->format('Y-m-d'),
-                        $top ? $top->format('Y-m-d') : '',
-                        $offsetCounter,
-                        count($policyBatch)
-                    ));
-
-                    try {
-                        if ($policyBatch) {
-                            foreach ($policyBatch as $policy) {
-                                $report->process($policy);
-                            }
-                            sleep(1);
-                            // Clear for each batch
-                            $this->dm->clear();
-                        }
-                    } catch (\Exception $e) {
-                        $output->writeln(sprintf(
-                            'Error found: %s',
-                            $e->getMessage()
-                        ));
-                    }
-
-                    $endtime = time();
-                    $duration = ($endtime - $starttime) - 1;
-                    $output->writeln(sprintf(
-                        'Time Range: %s - %s. Time taken: %s: Offset count %d.',
-                        $begin->format('Y-m-d'),
-                        $top ? $top->format('Y-m-d') : '',
-                        $duration,
-                        $offsetCounter
-                    ));
-                    $offsetCounter += $limit;
-                }
-                $policyTotalCount -= $policyCount;
-                $output->writeln(sprintf(
-                    'Time Range: %s - %s. Complete. Policies remaining: %d',
-                    $begin->format('Y-m-d'),
-                    $top ? $top->format('Y-m-d') : '',
-                    $policyTotalCount
-                ));
-
+            $starttime = time();
+            $output->writeln(sprintf(
+                'SB: Policy count %d.',
+                $policyCount
+            ));
+            if ($policyCount == 0) {
                 $begin->add(new \DateInterval(self::INTERVAL));
-            } else {
-                $starttime = time();
-                $output->writeln(sprintf(
-                    'SB: Policy count %d.',
-                    $policyCount
-                ));
-                if ($policyCount == 0) {
-                    $begin->add(new \DateInterval(self::INTERVAL));
-                    continue;
-                }
-                $policies = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top);
-                if (!$policies instanceof \Doctrine\MongoDB\Query\Query) {
-                    throw new MongoDBException('Invalid return type for query');
-                }
-                // process entire batch as its small enough
-                $policyBatch = iterator_to_array($policies->getIterator(), true);
-                try {
-                    if ($policyBatch) {
-                        foreach ($policyBatch as $policy) {
-                            $report->process($policy);
-                        }
-                        sleep(1);
+                continue;
+            }
+            $policies = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top);
+            if (!$policies instanceof \Doctrine\MongoDB\Query\Query) {
+                throw new MongoDBException('Invalid return type for query');
+            }
+            // process entire batch as its small enough
+            $policyBatch = iterator_to_array($policies->getIterator(), true);
+            try {
+                if ($policyBatch) {
+                    foreach ($policyBatch as $policy) {
+                        $report->process($policy);
+                    }
+                    sleep(1);
+                    if ($bclear) {
                         // Clear for each batch
                         $this->dm->clear();
                     }
-                } catch (\Exception $e) {
-                    $output->writeln(sprintf(
-                        'Error found: %s',
-                        $e->getMessage()
-                    ));
-                    $begin->add(new \DateInterval(self::INTERVAL));
-                    continue;
                 }
-
-                $endtime = time();
-                $duration = ($endtime - $starttime) - 1;
-                $policyTotalCount -= $policyCount;
+            } catch (\Exception $e) {
                 $output->writeln(sprintf(
-                    'SB: Time Range: %s - %s. Time taken: %s. Policies remaining: %d',
-                    $begin->format('Y-m-d'),
-                    $top ? $top->format('Y-m-d') : '',
-                    $duration,
-                    $policyTotalCount
+                    'Error found: %s',
+                    $e->getMessage()
                 ));
                 $begin->add(new \DateInterval(self::INTERVAL));
+                continue;
             }
+
+            $endtime = time();
+            $duration = ($endtime - $starttime) - 1;
+            $policyTotalCount -= $policyCount;
+            $output->writeln(sprintf(
+                'SB: Time Range: %s - %s. Time taken: %s. Policies remaining: %d',
+                $begin->format('Y-m-d'),
+                $top ? $top->format('Y-m-d') : '',
+                $duration,
+                $policyTotalCount
+            ));
+            $begin->add(new \DateInterval(self::INTERVAL));
         }
+
         if ($policyCounter > 0) {
             $output->writeln(sprintf(
                 '%f -- %f / row',
