@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\NoOp;
+use AppBundle\Document\Form\UpdatePremium;
 use AppBundle\Document\Invitation\AppNativeShareInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Note\Note;
@@ -113,7 +114,7 @@ abstract class Policy
         self::CANCELLED_DISPOSSESSION,
         self::CANCELLED_WRECKAGE,
         self::CANCELLED_UPGRADE,
-        self::CANCELLED_PICSURE_REQUIRED_EXPIRED
+        self::CANCELLED_PICSURE_REQUIRED_EXPIRED,
     ];
 
     const PLAN_MONTHLY = 'monthly';
@@ -200,13 +201,13 @@ abstract class Policy
     public static $activeStatuses = [
         Policy::STATUS_ACTIVE,
         Policy::STATUS_UNPAID,
-        Policy::STATUS_PICSURE_REQUIRED
+        Policy::STATUS_PICSURE_REQUIRED,
     ];
 
     public static $expirationStatuses = [
         Policy::STATUS_EXPIRED,
         Policy::STATUS_EXPIRED_CLAIMABLE,
-        Policy::STATUS_EXPIRED_WAIT_CLAIM
+        Policy::STATUS_EXPIRED_WAIT_CLAIM,
     ];
 
     /**
@@ -736,7 +737,7 @@ abstract class Policy
             $pendingBacs = $payment->getType() == 'bacs' && in_array($payment->getStatus(), [
                 BacsPayment::STATUS_PENDING,
                 BacsPayment::STATUS_SUBMITTED,
-                BacsPayment::STATUS_GENERATED
+                BacsPayment::STATUS_GENERATED,
             ]);
             if ($payment->isSuccess() || $pendingBacs) {
                 $amount = $payment->getAmount();
@@ -912,6 +913,28 @@ abstract class Policy
             /** @var Payment $payment */
             return $payment->isSuccess();
         });
+    }
+
+    /**
+     * @return int
+     */
+    public function countSuccessfulSchedulePayments()
+    {
+        $payments = $this->getPayments();
+        if (!is_array($payments)) {
+            $payments = $payments->toArray();
+        }
+        return array_reduce($payments, function ($total, $payment) {
+            if ($payment->isSuccess()) {
+                $amount = $payment->getAmount();
+                if ($amount > 0) {
+                    $total++;
+                } elseif ($amount < 0) {
+                    $total--;
+                }
+            }
+            return $total;
+        }, 0);
     }
 
     /**
@@ -1166,7 +1189,7 @@ abstract class Policy
         $pastPayments = array_filter($scheduledPayments, function ($scheduledPayment) {
             return !in_array($scheduledPayment->getStatus(), [
                 ScheduledPayment::STATUS_SCHEDULED,
-                ScheduledPayment::STATUS_PENDING
+                ScheduledPayment::STATUS_PENDING,
             ]);
         });
         if (count($pastPayments) == 0) {
@@ -2270,6 +2293,18 @@ abstract class Policy
         return $active;
     }
 
+    public function getRemainingScheduledPayments()
+    {
+        $payments = $this->getScheduledPayments();
+        $active = [];
+        foreach ($payments as $payment) {
+            if ($payment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $active[] = $payment;
+            }
+        }
+        return $active;
+    }
+
     /**
      * Gets all scheduled refunds in the future.
      * @return array containing all of these refunds.
@@ -2300,6 +2335,118 @@ abstract class Policy
             }
         }
         return $total;
+    }
+
+    public function processPolicyPremium(UpdatePremium $updatePremium)
+    {
+        if (!$updatePremium->getPolicy() instanceof Policy) {
+            throw new \Exception('Update premium does not contain Policy info');
+        }
+        $date = new \DateTime();
+        /** @var Policy $policy **/
+        $policy = $updatePremium->getPolicy();
+        $amount = $updatePremium->getAmount();
+        $paytype = $updatePremium->getPaytype();
+        $updatePremium->calcGwp($amount);
+        $updatePremium->calcIpt();
+
+        $premium = $updatePremium->getPremium();
+        $premium->setGwp($updatePremium->getGwp());
+        $premium->setIpt($updatePremium->getIpt());
+        $this->setPremium($premium);
+
+        // If the policy is after start date or after end, we need to
+        // issue refunds and adjust scheduled payments
+        $newPremium = $this->getPremium();
+
+        if ($policy->getStart() < $date || $policy->getEnd() > $date) {
+            switch ($paytype) {
+                /**
+                 * Do monthly calculations
+                 */
+                case self::PLAN_MONTHLY:
+                    $monthlyPremium = $newPremium->getMonthlyPremiumPrice();
+                    $countRemainingPayments = $this->countRemainingScheduledPayments();
+                    $totalPaidSoFar = $this->getTotalSuccessfulUserPayments();
+                    // If the user has already paid an amount
+                    // we need to either issue refund or update monthly
+                    if ($totalPaidSoFar > 0) {
+                        if ($countRemainingPayments > 0) {
+                            // This will give us the new total based on
+                            // the new premium amount * remaining scheduled payments
+                            $countDonePayments = $this->countSuccessfulSchedulePayments();
+                            $totalNewAmount = $amount * $countDonePayments;
+                            $newMonthly = $monthlyPremium;
+
+                            // if new total is less than
+                            if ($totalNewAmount < $totalPaidSoFar) {
+                                // new amount is less than before, we need to issue a refund
+                                $refundAmnt = $totalNewAmount - $totalPaidSoFar;
+                                $scheduledPayment = new ScheduledPayment();
+                                $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                                $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
+                                $scheduledPayment->setAmount($refundAmnt);
+                                $scheduledPayment->setScheduled($date);
+                                $this->addScheduledPayment($scheduledPayment);
+                            } else {
+                                // new amount is greater, adjust monthly to pay more
+                                $excessAmnt = $totalNewAmount - $totalPaidSoFar;
+                                $newMonthly = ($excessAmnt / $countRemainingPayments) + $monthlyPremium;
+                            }
+                            return $newMonthly;
+                        }
+                    } else {
+                        // if no payment was made, we just need to set
+                        // the amount to what was adjusted if there are
+                        // remaining scheduled payments
+                        if ($countRemainingPayments > 0) {
+                            return $monthlyPremium;
+                        }
+                        return 0;
+                    }
+                    break;
+                /**
+                 * Do yearly calculations
+                 */
+                case self::PLAN_YEARLY:
+                    $yearlyPremium = $newPremium->getYearlyPremiumPrice();
+                    $totalPaidSoFar = $this->getTotalSuccessfulUserPayments();
+                    if ($totalPaidSoFar > 0) {
+                        if ($yearlyPremium > $totalPaidSoFar) {
+                            // new amount is less than before, we need to issue a refund
+                            $excessAmnt = $yearlyPremium - $totalPaidSoFar;
+                            $scheduledPayment = new ScheduledPayment();
+                            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                            $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+                            $scheduledPayment->setAmount($excessAmnt);
+                            $scheduledPayment->setScheduled($date);
+                            $this->addScheduledPayment($scheduledPayment);
+                            return $excessAmnt;
+                        } else {
+                            $refundAmnt = $yearlyPremium - $totalPaidSoFar;
+                            $scheduledPayment = new ScheduledPayment();
+                            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+                            $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
+                            $scheduledPayment->setAmount($refundAmnt);
+                            $scheduledPayment->setScheduled($date);
+                            $this->addScheduledPayment($scheduledPayment);
+                            return $refundAmnt;
+                        }
+                    } else {
+                        // While this is yearly, there can be
+                        // a single scheduled payment not paid
+                        // We need to check and update if so
+                        if ($this->countRemainingScheduledPayments() > 0) {
+                            return $yearlyPremium;
+                        }
+                        return 0;
+                    }
+                    break;
+                default:
+                    throw new \Exception('No paytype has been found!');
+            }
+        }
+        return null;
     }
 
     public function addScheduledPayment(ScheduledPayment $scheduledPayment)
@@ -2500,7 +2647,7 @@ abstract class Policy
         return in_array($this->getStatus(), [
             self::STATUS_PICSURE_REQUIRED,
             self::STATUS_ACTIVE,
-            self::STATUS_UNPAID
+            self::STATUS_UNPAID,
         ]);
     }
 
@@ -3792,6 +3939,26 @@ abstract class Policy
         }, 0);
     }
 
+    /**
+     * Tells you how many scheduled payments there are.
+     * @return int the number of them.
+     */
+    public function countRemainingScheduledPayments()
+    {
+        $scheduledPayments = $this->getScheduledPayments();
+        if (!is_array($scheduledPayments)) {
+            $scheduledPayments = $scheduledPayments->toArray();
+        }
+        return array_reduce($scheduledPayments, function ($total, $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED &&
+                $scheduledPayment->getType() != ScheduledPayment::TYPE_REFUND) {
+                return $total + 1;
+            } else {
+                return $total;
+            }
+        }, 0);
+    }
+
     public function getPendingBacsPayments($includePending = false)
     {
         $pendingPayments = [];
@@ -4255,7 +4422,7 @@ abstract class Policy
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
-            self::STATUS_EXPIRED_WAIT_CLAIM
+            self::STATUS_EXPIRED_WAIT_CLAIM,
         ])) {
             return false;
         }
@@ -4749,6 +4916,17 @@ abstract class Policy
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
             if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
                 $scheduledPayment->cancel('Cancelled as all scheduled payments cancelled');
+            }
+        }
+    }
+
+    public function updateScheduledPaymentsMonthly($amount)
+    {
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED &&
+                $scheduledPayment->getType() != ScheduledPayment::TYPE_REFUND) {
+                $scheduledPayment->setAmount(number_format($amount, 2));
             }
         }
     }
@@ -5333,7 +5511,7 @@ abstract class Policy
 
         return [
             'is_upgraded' => $isUpgraded,
-            'previous_iteration' => $previousIteration
+            'previous_iteration' => $previousIteration,
         ];
     }
 
@@ -5818,7 +5996,7 @@ abstract class Policy
             self::STATUS_ACTIVE,
             self::STATUS_UNPAID,
             self::STATUS_PENDING,
-            self::STATUS_PICSURE_REQUIRED
+            self::STATUS_PICSURE_REQUIRED,
         ])) {
             return null;
         }
@@ -6165,7 +6343,7 @@ abstract class Policy
         if (in_array($this->getStatus(), [
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
-            self::STATUS_EXPIRED_WAIT_CLAIM
+            self::STATUS_EXPIRED_WAIT_CLAIM,
         ])) {
             $warnings[] = sprintf('Policy is %s - DO NOT ALLOW CLAIM', $this->getStatus());
         }
@@ -6613,7 +6791,7 @@ abstract class Policy
             self::STATUS_PENDING_RENEWAL,
             self::STATUS_RENEWAL,
             self::STATUS_UNPAID,
-            self::STATUS_PICSURE_REQUIRED
+            self::STATUS_PICSURE_REQUIRED,
         ])) {
             return false;
         }
@@ -6854,7 +7032,7 @@ abstract class Policy
             'card_details' => $cardDetails,
             'premium_owed' => $this->getStatus() == self::STATUS_UNPAID ?
                 $this->getOutstandingPremiumToDateWithReschedules(new \DateTime()) : 0,
-            'bacs_in_progress' => $this->hasBacsPaymentInProgress()
+            'bacs_in_progress' => $this->hasBacsPaymentInProgress(),
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

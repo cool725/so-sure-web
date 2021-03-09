@@ -1370,6 +1370,15 @@
                             </button>
                         </td>
                     </tr>
+                    <tr>
+                        <td><i class="fa fa-lock" title="Admin only"></i> Premium Adjustment</td>
+                        <td>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#updatePremiumForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update Premium
+                            </button>
+                        </td>
+                    </tr>
                 {% endif %}
             </table>
 
@@ -2073,6 +2082,7 @@
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
         {% endif %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:createScheduledPaymentForm', 'policy': policy, 'id': 'createScheduledPaymentForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:updatePremiumForm', 'policy': policy, 'id': 'updatePremiumForm'} %}
         {% if policy.isPolicy %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
