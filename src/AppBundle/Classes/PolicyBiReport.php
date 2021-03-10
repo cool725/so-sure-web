@@ -226,23 +226,23 @@ class PolicyBiReport extends PolicyReport
                 $laCampaignReferer = $latestAttribution->getReferer() ?: '';
             }
             $userAtt = $policy->useForAttribution();
-            $userAttribution = '';
+            $userAttribution = 'No';
             if ($userAtt) {
-                $userAttribution = ($userAtt ? 'yes' : 'no');
+                $userAttribution = ($userAtt ? 'Yes' : 'No');
             }
 
             $bankAccount = $policy->getPolicyOrUserBacsBankAccount() ?: '';
             $reschedule = null;
             $lastReverted = null;
-            $lastPaymentFail = '';
+            $lastPaymentFail = 'No';
             if (!$this->reduced) {
                 $lastReverted = $policy->getLastRevertedScheduledPayment();
                 if ($lastReverted) {
                     $reschedule = $this->scheduledPaymentRepo->getRescheduledBy($lastReverted);
                     if ($lastReverted && !$reschedule) {
-                        $lastPaymentFail = 'yes';
+                        $lastPaymentFail = 'Yes';
                     } else {
-                        $lastPaymentFail = 'no';
+                        $lastPaymentFail = 'No';
                     }
                 }
             }
@@ -359,8 +359,8 @@ class PolicyBiReport extends PolicyReport
                 $this->reduced ? null : $lastPaymentFail,
                 ($policy->getPremium()) ? $policy->getPremium()->getYearlyPremiumPrice() : '',
                 $this->reduced ? null : $policy->getPremiumPaid(),
-                $this->reduced ? null : ($policy->getUnderwritingOutstandingPremium() ?: ''),
-                $this->reduced ? null : ($policy->getBadDebtAmount() ?: ''),
+                $this->reduced ? null : ($policy->getUnderwritingOutstandingPremium() ?: 0),
+                $this->reduced ? null : ($policy->getBadDebtAmount() ?: 0),
                 $this->reduced ? null : count($policy->getInviterReferralBonuses()),
                 $this->reduced ? null : $policy->getPaidInviterReferralBonusAmount(),
                 $this->reduced ? null : count($policy->getInviteeReferralBonuses()),
