@@ -2949,7 +2949,9 @@ class PolicyService
 
     /**
      * Changes a policy's premium installments to the given number (1 or 12 not something weird), and regenerates
-     * the schedule.
+     * the schedule. When a policy goes from monthly to yearly this just involves cancelling all scheduled payments and
+     * adding one big one with everything they owe. When this is going from yearly to monthly we schedule a refund of
+     * the value of all upcoming monthly scheduled payments then create those.
      * @param Policy $policy       is the policy to do the changing to.
      * @param int    $installments is the number of installments to give it.
      */
@@ -2959,7 +2961,49 @@ class PolicyService
             return;
         }
         $policy->setPremiumInstallments($installments);
-        $this->regenerateScheduledPayments($policy);
+        foreach ($policy->getScheduledPayments() as $scheduled) {
+            if ($scheduled->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $scheduled->cancel('Updating Premium Installments');
+            }
+        }
         $this->dm->flush();
+        if ($installments == 1) {
+            $outstanding = $policy->getOutstandingPremium();
+            if ($outstanding != 0) {
+                $this->schedulePayment($policy, $policy->getOutstandingPremium());
+            }
+        } else {
+            $upcomingPayments = $policy->getInvoiceSchedule(new \DateTime());
+            $this->schedulePayment(
+                $policy,
+                count($upcomingPayments) * $policy->getStandardUpgradedMonthlyPremiumPrice()
+            );
+            foreach ($upcomingPayments as $upcoming) {
+                $this->schedulePayment($policy, $policy->getStandardUpgradedMonthlyPremiumPrice(), $upcoming);
+            }
+        }
+        $this->dm->flush();
+    }
+
+    /**
+     * Creates a scheduled payment. If the amount is negative it automatically sets the type as a refund.
+     * @param Policy $policy is the policy that the scheduled payment is for.
+     * @param number $amount is the amount the scheduled payment is for.
+     * @param \DateTime|null $date is the date that the scheduled payment is for which defaults to right now.
+     * @return ScheduledPayment the scheduled payment so you can do things to it.
+     */
+    public function schedulePayment($policy, $amount, $date = null)
+    {
+        $date = $date ?: new \DateTime();
+        $scheduled = new ScheduledPayment();
+        $scheduled->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduled->setScheduled($date);
+        $scheduled->setAmount($amount);
+        if ($amount < 0) {
+            $scheduled->setType(ScheduledPayment::TYPE_REFUND);
+        }
+        $policy->addScheduledPayment($scheduled);
+        $this->dm->persist($scheduled);
+        return $scheduled;
     }
 }

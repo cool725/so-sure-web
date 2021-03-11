@@ -1436,7 +1436,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $this->conformAlphanumericSpaceDot($installmentsForm->getData()['notes'], 2500),
                         $this->getUser()
                     );
-                    // TODO: make sure that this is a number and it is a correct number.
                     $this->get('app.policy')->changeInstallments($policy, $installmentsForm->getData()['installments']);
                 }
             } elseif ($request->request->has('note_form')) {
