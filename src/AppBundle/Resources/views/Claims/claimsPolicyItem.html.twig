@@ -10,7 +10,7 @@
 
 <div id="claimPolicyItem">
     <div class="text-center" style="{% if policy.active %}background-color: {{ policy.riskColour }}; color: white;{% endif %} font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
-      Risk: {{ policy.riskReason }} ({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
+      Risk:({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#user">User</a></li>
@@ -730,7 +730,7 @@
                             {% endif %}
                         </td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
-                        <td style="width: 10%;">{% if claim.fnolRisk %}{{ claim.fnolRisk }}{% else %}??{% endif %} / {% if claim.fnolRiskReason %}{{ claim.fnolRiskReason }}{% else %}??{% endif %}</td>
+                        <td style="width: 10%;">{% if claim.risk %}{{ claim.risk }}{% else %}??{% endif %}</td>
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>

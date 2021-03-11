@@ -46,7 +46,7 @@
                     </div>
                     <div class="d-none d-lg-block text-right">
                         <div class="h5 mb-3"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }}</div>
-                        {% if (policy.hasOpenClaim or policy.hasMonetaryClaimed(true)) or policy.getUnderwriterName == 'Salva' %}
+                        {% if policy.getUnderwriterName == 'Salva' %}
                             <a href="#"
                                class="btn btn-outline-primary btn-sm track-data"
                                data-toggle="modal"

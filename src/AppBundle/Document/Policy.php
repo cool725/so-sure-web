@@ -1965,6 +1965,8 @@ abstract class Policy
             Claim::STATUS_INREVIEW));
     }
 
+
+
     private function getLatestClaimByStatus($status)
     {
         $claims = $this->getClaims();
@@ -1984,6 +1986,38 @@ abstract class Policy
             return $claims[0];
         }
         return null;
+    }
+
+    public function isAnyLinkedClaimByReviewStatus() : bool
+    {
+        return $this->isClaimLinkedByStatus(array(
+            Claim::STATUS_FNOL,
+            Claim::STATUS_SUBMITTED,
+            Claim::STATUS_INREVIEW));
+    }
+
+    public function isAnyLinkedClaimByApprovedStatus() : bool
+    {
+        return $this->isClaimLinkedByStatus(array(
+            Claim::STATUS_APPROVED,
+            Claim::STATUS_SETTLED,
+            Claim::STATUS_PENDING_CLOSED));
+    }
+
+    private function isClaimLinkedByStatus(array $status) : bool
+    {
+        $exists = false;
+        $claims = $this->getClaims();
+        if (!is_array($claims)) {
+            $claims = $claims->getValues();
+        }
+        if (count($claims) == 0) {
+            return $exists;
+        }
+        if (in_array($claims[0]->getStatus(), $status)) {
+            $exists = true;
+        }
+        return $exists;
     }
 
     public function addLinkedClaim(Claim $claim)
