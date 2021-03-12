@@ -897,6 +897,7 @@ nelmio_security:
                 - http://track.omguk.com/
                 - https://dcc4iyjchzom0.cloudfront.net
                 - https://script.tapfiliate.com
+                - https://www.clickcease.com/monitor/stat.js
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
