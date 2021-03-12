@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
+use CensusBundle\Service\SearchService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -40,24 +41,30 @@ class PolicyReportCommand extends ContainerAwareCommand
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var SearchService */
+    protected $searchService;
+
     /**
      * inserts the required dependencies into the command.
-     * @param S3Client        $s3          is the amazon s3 client for uploading generated reports.
-     * @param DocumentManager $dm          is the document manager for loading data.
-     * @param string          $environment is the environment name used to upload to the right location in amazon s3.
-     * @param LoggerInterface $logger      is used for logging.
+     * @param S3Client        $s3            is the amazon s3 client for uploading generated reports.
+     * @param DocumentManager $dm            is the document manager for loading data.
+     * @param string          $environment   is the environment name used to upload to the right location in amazon s3.
+     * @param LoggerInterface $logger        is used for logging.
+     * @param SearchService   $searchService provides information about users.
      */
     public function __construct(
         S3Client $s3,
         DocumentManager $dm,
         $environment,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SearchService $searchService
     ) {
         parent::__construct();
         $this->s3 = $s3;
         $this->dm = $dm;
         $this->environment = $environment;
         $this->logger = $logger;
+        $this->searchService = $searchService;
     }
 
     /**
@@ -103,7 +110,7 @@ class PolicyReportCommand extends ContainerAwareCommand
         $debug = $input->getOption('debug') == true;
         $timezone = new DateTimeZone($input->getOption('timezone'));
 
-        $report = PolicyReport::createReport($reportName, $this->dm, $timezone, $this->logger);
+        $report = PolicyReport::createReport($reportName, $this->searchService, $this->dm, $timezone, $this->logger);
         if (!$report) {
             $output->writeln("<error>{$reportName} is not a valid report type</error>");
             return;

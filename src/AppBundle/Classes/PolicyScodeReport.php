@@ -5,6 +5,7 @@ namespace AppBundle\Classes;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
+use CensusBundle\Service\SearchService;
 use AppBundle\Repository\ConnectionRepository;
 use DateTimeZone;
 use Doctrine\MongoDB\Query\Query;
@@ -26,12 +27,17 @@ class PolicyScodeReport extends PolicyReport
 
     /**
      * Creates the policy picsure report.
-     * @param DocumentManager $dm to get repositories.
-     * @param DateTimeZone    $tz the timezone for the report to be in.
+     * @param SearchService   $searchService provides geographical information about users.
+     * @param DocumentManager $dm            for the report to use.
+     * @param DateTimeZone    $tz            is the time zone to report in.
      */
-    public function __construct(DocumentManager $dm, DateTimeZone $tz, LoggerInterface $logger)
-    {
-        parent::__construct($dm, $tz, $logger);
+    public function __construct(
+        SearchService $searchService,
+        DocumentManager $dm,
+        DateTimeZone $tz,
+        LoggerInterface $logger
+    ) {
+        parent::__construct($searchService, $dm, $tz, $logger);
         /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $dm->getRepository(Connection::class);
         $this->connectionRepo = $connectionRepo;
