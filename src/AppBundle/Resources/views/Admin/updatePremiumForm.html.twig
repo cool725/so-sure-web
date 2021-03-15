@@ -1,0 +1,43 @@
+{% block body %}
+
+    {{ form_start(update_premium_form) }}
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-xs-12 form-group">
+                <label>New Premium Amount</label>
+                <div class="input-group">
+                    <div class="input-group-addon">£</div>
+                    {{ form_widget(update_premium_form.amount, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                <p><strong>NB: Enter positive figure</strong></p>
+                <p><strong>NB: Only use monthly figures for yearly or monthly pay types.</strong></p>
+                <p class="help-block">Current Premium: <strong>£{{ policy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / month or £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} / year </strong></p>
+                <p class="help-block">Previous Premium:
+                    <strong>{% if policy.previousPolicy %}£{{ policy.previousPolicy.premium.monthlyPremiumPrice| number_format(2, '.', ',') }} / month or £{{ policy.previousPolicy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }} / year </strong>
+                    {% else %} N/A{% endif %}</p>
+                <div class="input-group">
+                    Payment Type: {{ form_widget(update_premium_form.paytype, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="col-xs-12 form-group">
+                <label>Send email to customer?</label>
+                <div class="input-group">
+                    {{ form_widget(update_premium_form.emailPreference, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label>Additional Note:</label>
+                {{ form_widget(update_premium_form.notes, {'attr': {'class': 'form_note form-control'}}) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        {{ form_widget(update_premium_form.add, {'label': 'Update', 'attr': {'class': 'btn btn-danger'}}) }}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    {{ form_end(update_premium_form) }}
+
+{% endblock %}

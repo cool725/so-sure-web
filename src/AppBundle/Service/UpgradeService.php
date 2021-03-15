@@ -105,12 +105,6 @@ class UpgradeService
      */
     public function upgrade(HelvetiaPhonePolicy $policy, $phone, $imei, $serial, $date, $premium, $phoneData = null)
     {
-        if ($policy->hasMonetaryClaimed(true) || $policy->hasOpenClaim()) {
-            throw new \InvalidArgumentException(sprintf(
-                'Policy %s cannot self upgrade due to monetary claim',
-                $policy->getId()
-            ));
-        }
         if (!$this->imeiValidator->isImei($imei)) {
             throw new InvalidImeiException();
         }

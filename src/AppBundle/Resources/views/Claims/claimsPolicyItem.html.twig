@@ -10,7 +10,7 @@
 
 <div id="claimPolicyItem">
     <div class="text-center" style="{% if policy.active %}background-color: {{ policy.riskColour }}; color: white;{% endif %} font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
-      Risk: {{ policy.riskReason }} ({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
+      Risk:({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#user">User</a></li>
@@ -730,7 +730,7 @@
                             {% endif %}
                         </td>
                         <td style="width: 10%;">£{{ claim.totalChargesWithVat|number_format(2, '.', ',') }}</td>
-                        <td style="width: 10%;">{% if claim.fnolRisk %}{{ claim.fnolRisk }}{% else %}??{% endif %} / {% if claim.fnolRiskReason %}{{ claim.fnolRiskReason }}{% else %}??{% endif %}</td>
+                        <td style="width: 10%;">{% if claim.risk %}{{ claim.risk }}{% else %}??{% endif %}</td>
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
@@ -1367,6 +1367,15 @@
                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#createScheduledPaymentForm">
                                 <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                                 Create Scheduled Payment
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa fa-lock" title="Admin only"></i> Premium Adjustment</td>
+                        <td>
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#updatePremiumForm">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                                Update Premium
                             </button>
                         </td>
                     </tr>
@@ -2073,6 +2082,7 @@
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
         {% endif %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:createScheduledPaymentForm', 'policy': policy, 'id': 'createScheduledPaymentForm'} %}
+        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:updatePremiumForm', 'policy': policy, 'id': 'updatePremiumForm'} %}
         {% if policy.isPolicy %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}

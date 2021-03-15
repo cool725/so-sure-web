@@ -14,9 +14,12 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\Reward;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
+use AppBundle\Document\User;
 use AppBundle\Helpers\CsvHelper;
 use AppBundle\Repository\RewardRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use CensusBundle\Document\Census;
+use CensusBundle\Service\SearchService;
 use DateTime;
 use DateTimeZone;
 use Doctrine\MongoDB\Query\Query;
@@ -53,15 +56,21 @@ class PolicyBiReport extends PolicyReport
 
     /**
      * Creates the policy picsure report.
-     * @param DocumentManager $dm      for the report to use.
-     * @param DateTimeZone    $tz      is the time zone to report in.
-     * @param LoggerInterface $logger  is used for logging.
-     * @param boolean         $reduced is whether to remove some columns to save time.
+     * @param SearchService   $searchService provides geographical information about users.
+     * @param DocumentManager $dm            for the report to use.
+     * @param DateTimeZone    $tz            is the time zone to report in.
+     * @param LoggerInterface $logger        is used for logging.
+     * @param boolean         $reduced       is whether to remove some columns to save time.
      */
-    public function __construct(DocumentManager $dm, DateTimeZone $tz, LoggerInterface $logger, $reduced = false)
-    {
+    public function __construct(
+        SearchService $searchService,
+        DocumentManager $dm,
+        DateTimeZone $tz,
+        LoggerInterface $logger,
+        $reduced = false
+    ) {
         $this->reduced = $reduced;
-        parent::__construct($dm, $tz, $logger, $reduced);
+        parent::__construct($searchService, $dm, $tz, $logger, $reduced);
         /** @var RewardRepository $rewardRepo */
         $rewardRepo = $this->dm->getRepository(Reward::class);
         /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
@@ -94,7 +103,9 @@ class PolicyBiReport extends PolicyReport
             'Policy Holder Id',
             'Age of Policy Holder',
             'Postcode of Policy Holder',
+            ($full) ? 'Pen Portrait' : null,
             'Gender',
+            ($full) ? 'Total Weekly Income' : null,
             'Make',
             ($full) ? 'Make/Model' : null,
             'Make/Model/Memory',
@@ -122,6 +133,7 @@ class PolicyBiReport extends PolicyReport
             'Lead Source',
             'First Scode Type',
             'First Scode Name',
+            ($full) ? 'All SCodes Used' : null,
             'Promo Codes',
             'Has Sign-up Bonus?',
             'Latest Campaign Source (user)',
@@ -140,11 +152,11 @@ class PolicyBiReport extends PolicyReport
             ($full) ? 'Premium Paid' : null,
             ($full) ? 'Premium Outstanding' : null,
             ($full) ? 'Past Due Amount (Bad Debt Only)' : null,
+            'Company of Policy',
             ($full) ? 'Referrals made' : null,
             ($full) ? 'Referrals made amount' : null,
             ($full) ? 'Referrals received' : null,
-            ($full) ? 'Referrals received amount' : null,
-            'Company of Policy'
+            ($full) ? 'Referrals received amount' : null
         );
 
         $this->headerItems = count($hItems);
@@ -162,13 +174,18 @@ class PolicyBiReport extends PolicyReport
     public function process(Policy $policy)
     {
         try {
+
             /** @var Policy $policy */
             if (!($policy instanceof PhonePolicy) || $policy->getEnd() <= $policy->getStart()) {
                 return;
             }
+            $user = $policy->getUser();
+            if (!$user instanceof User) {
+                return;
+            }
+
             /** @var Phone $phone */
             $phone = $policy->getPhone();
-            $user = $policy->getUser();
 
             $previousPolicy = $policy->getPreviousPolicy();
             $previous = '';
@@ -185,6 +202,24 @@ class PolicyBiReport extends PolicyReport
             $companyName = '';
             if ($company) {
                 $companyName = $company->getName() ?: '';
+            }
+
+            $userId = '';
+            $userAge = '';
+            $userGender = '';
+            $postalCode = '';
+            $census = null;
+            $income = null;
+
+            if ($user->getId()) {
+                $userId = $user->getId();
+                $userAge = ($user->getAge() ?: '');
+                $userGender = ($user->getGender() ?: '');
+                if ($user->getBillingAddress()) {
+                    $postalCode = ($user->getBillingAddress()->getPostcode() ?: '');
+                    $census = $this->searchService->findNearest($postalCode);
+                    $income = $this->searchService->findIncome($postalCode);
+                }
             }
 
             $attribution = $user->getAttribution();
@@ -206,23 +241,23 @@ class PolicyBiReport extends PolicyReport
                 $laCampaignReferer = $latestAttribution->getReferer() ?: '';
             }
             $userAtt = $policy->useForAttribution();
-            $userAttribution = '';
+            $userAttribution = 'No';
             if ($userAtt) {
-                $userAttribution = ($userAtt ? 'yes' : 'no');
+                $userAttribution = ($userAtt ? 'Yes' : 'No');
             }
 
             $bankAccount = $policy->getPolicyOrUserBacsBankAccount() ?: '';
             $reschedule = null;
             $lastReverted = null;
-            $lastPaymentFail = '';
+            $lastPaymentFail = 'No';
             if (!$this->reduced) {
                 $lastReverted = $policy->getLastRevertedScheduledPayment();
                 if ($lastReverted) {
                     $reschedule = $this->scheduledPaymentRepo->getRescheduledBy($lastReverted);
                     if ($lastReverted && !$reschedule) {
-                        $lastPaymentFail = 'yes';
+                        $lastPaymentFail = 'Yes';
                     } else {
-                        $lastPaymentFail = 'no';
+                        $lastPaymentFail = 'No';
                     }
                 }
             }
@@ -230,11 +265,13 @@ class PolicyBiReport extends PolicyReport
             $scodeType = '';
             $scodeName = '';
             $promoCodeUsed = '';
+            $allPromoCodes = '';
             $policySignup = '';
             if ($connections) {
                 $scodeType = $this->getFirstSCodeUsedType($connections);
                 $scodeName = $this->getFirstSCodeUsedCode($connections);
                 $promoCodeUsed = ($this->getPromoCodesUsed($this->rewardRepo, $connections) ?: '');
+                $allPromoCodes = ($this->getSCodesUsed($connections) ?: '');
                 $policySignup = ($this->policyHasSignUpBonus($this->rewardRepo, $connections) ? 'yes' : 'no');
             }
 
@@ -267,9 +304,10 @@ class PolicyBiReport extends PolicyReport
             $phoneMakeModel = '';
             $phoneMakeModelMemory = '';
             if ($phone) {
-                $phoneMake = $phone->getMake();
-                $phoneMakeModelMemory = $phone->getMakeModelMemory();
-                $phoneMakeModel = sprintf('%s %s', $phone->getMake(), $phone->getModel());
+                $phoneMake = ($phone->getMake() ?: '');
+                $phoneModel = ($phone->getModel() ?: '');
+                $phoneMakeModelMemory = ($phone->getMakeModelMemory() ?: '');
+                $phoneMakeModel = sprintf('%s %s', $phoneMake, $phoneModel);
             }
 
             $numInstallments = '';
@@ -286,12 +324,26 @@ class PolicyBiReport extends PolicyReport
                 $policyUpgraded = ($policy->getPolicyUpgraded() ? 'Yes' : 'No');
             }
 
+            $penPortrait = '';
+            /** @var Census $census */
+            if ($census) {
+                $penPortrait = ($census->getSubgrp() ?: '');
+            }
+
+            $weeklyIncome = '';
+            if ($income) {
+                $weeklyIncome = sprintf('%0.0f', $income->getTotal()->getIncome());
+            }
+
+
             $items = CsvHelper::ignoreBlank(
                 $policy->getPolicyNumber() ?: '',
-                $user->getId() ?: '',
-                $user->getAge() ?: '',
-                ($user->getBillingAddress()) ? $user->getBillingAddress()->getPostcode() : '',
-                $user->getGender() ?: '',
+                $userId,
+                $userAge,
+                $postalCode,
+                $this->reduced ? null : $penPortrait,
+                $userGender,
+                $this->reduced ? null : $weeklyIncome,
                 $phoneMake,
                 $this->reduced ? null : $phoneMakeModel,
                 $phoneMakeModelMemory,
@@ -319,6 +371,7 @@ class PolicyBiReport extends PolicyReport
                 $policy->getLeadSource() ?: '',
                 $scodeType ?: '',
                 $scodeName ?: '',
+                $this->reduced ? null : $allPromoCodes,
                 $promoCodeUsed,
                 $policySignup,
                 $laCampaignSrc,
@@ -338,20 +391,23 @@ class PolicyBiReport extends PolicyReport
                 $this->reduced ? null : $lastPaymentFail,
                 ($policy->getPremium()) ? $policy->getPremium()->getYearlyPremiumPrice() : '',
                 $this->reduced ? null : $policy->getPremiumPaid(),
-                $this->reduced ? null : ($policy->getUnderwritingOutstandingPremium() ?: ''),
-                $this->reduced ? null : ($policy->getBadDebtAmount() ?: ''),
+                $this->reduced ? null : ($policy->getUnderwritingOutstandingPremium() ?: 0),
+                $this->reduced ? null : ($policy->getBadDebtAmount() ?: 0),
+                $companyName,
                 $this->reduced ? null : count($policy->getInviterReferralBonuses()),
                 $this->reduced ? null : $policy->getPaidInviterReferralBonusAmount(),
                 $this->reduced ? null : count($policy->getInviteeReferralBonuses()),
-                $this->reduced ? null : $policy->getPaidInviteeReferralBonusAmount(),
-                $companyName
+                $this->reduced ? null : $policy->getPaidInviteeReferralBonusAmount()
             );
+
+
             // if header count does not match columns dont get to add section
             // exception may break batch
             if (count($items) !== $this->headerItems) {
                 $this->logger->error('Policy missing data: ' . json_encode($items));
             }
             $this->add(...$items);
+
             // Clear for each row once its done
         } catch (\RuntimeException $e) {
             // Log any records not matching and continue to next record

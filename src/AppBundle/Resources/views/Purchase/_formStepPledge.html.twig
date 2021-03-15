@@ -18,7 +18,7 @@
         </div>
         <div class="form-group">
             {{ form_widget(purchase_form.agreedAgeLocation, {
-                'label': 'I am a resident of the United Kingdom & over the age of 18',
+                'label': 'I am a resident of the United Kingdom & over the age of 18, if I am not the primary user of the phone, the primary user of the phone is over 16 years of age',
                 'attr': {'class':'custom-control-input'}}
             ) }}
             <div class="with-errors">{{ form_errors(purchase_form.agreedAgeLocation) }}</div>

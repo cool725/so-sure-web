@@ -18,6 +18,7 @@ use AppBundle\Document\File\SalvaPaymentFile;
 use AppBundle\Document\File\HelvetiaPaymentFile;
 use AppBundle\Document\Form\CardRefund;
 use AppBundle\Document\Form\CreateScheduledPayment;
+use AppBundle\Document\Form\UpdatePremium;
 use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\CheckoutPayment;
 use AppBundle\Document\Sequence;
@@ -25,6 +26,7 @@ use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\PolicyPhonePriceException;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Form\Type\CashflowsFileType;
+use AppBundle\Form\Type\ChangePremiumType;
 use AppBundle\Form\Type\ChargeReportType;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\CardRefundType;
@@ -488,6 +490,158 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/update-premium/{id}", name="update_premium_form")
+     * @Template
+     */
+    public function updatePremiumFormAction(Request $request, $id = null)
+    {
+        /** @var DocumentManager $dm */
+        $dm = $this->getManager();
+        /** @var PolicyRepository $repo */
+        $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+        $date = new \DateTime();
+        $clientEmailed = 'No';
+        $previousPolicy = $policy->getPreviousPolicy();
+        if (!$policy) {
+            throw $this->createNotFoundException(sprintf('Policy %s not found', $id));
+        }
+
+        $currentPremiumAmount = $policy->getPremium()->getMonthlyPremiumPrice();
+        $paytype = ($policy->getPremiumPlan() ? $policy->getPremiumPlan() : Policy::PLAN_MONTHLY);
+        $updatePremium = new UpdatePremium();
+        $updatePremium->setAmount(round($currentPremiumAmount, 2));
+        $updatePremium->setPaytype($paytype);
+        $updatePremium->setDate($date);
+        $updatePremium->setPremium($policy->getPremium());
+
+        if ($previousPolicy) {
+            $updatePremium->setPreviousGwp($previousPolicy->getPremium()->getGwp());
+            $updatePremium->setPreviousIPT($previousPolicy->getPremium()->getIpt());
+        }
+
+        $updatePremiumForm = $this->get('form.factory')
+           ->createNamedBuilder(
+               'update_premium_form',
+               ChangePremiumType::class,
+               $updatePremium
+           )
+           ->setAction($this->generateUrl('update_premium_form', ['id' => $policy->getId()]))
+           ->getForm();
+        // process the form
+        if ($request->getMethod() === 'POST') {
+            if (!$policy->getStatus() && !empty($policy->getPolicyNumber())) {
+                $this->addFlash(
+                    'error',
+                    "Cannot update premium for a partial policy"
+                );
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
+            }
+
+            if ($request->request->has('update_premium_form')) {
+                $updatePremiumForm->handleRequest($request);
+
+                if ($updatePremiumForm->isValid()) {
+                    if ($currentPremiumAmount == $updatePremium->getAmount()) {
+                        $this->addFlash(
+                            'error',
+                            sprintf(
+                                'Please do not set the same Premium'
+                            )
+                        );
+                    } else {
+                        $updatesPremium = new UpdatePremium();
+                        $updatesPremium->setNotes($updatePremium->getNotes());
+                        $updatesPremium->setAmount($updatePremium->getAmount());
+                        $updatesPremium->setPolicy($policy);
+                        $updatesPremium->setPaytype($paytype);
+                        $updatesPremium->setPremium($policy->getPremium());
+
+                        $addPolicyNote = true;
+                        $policyService = $this->get('app.policy');
+
+                        try {
+                            /**
+                             * Update the policy premium and any scheduled payments
+                             */
+                            $newMonthly = $policy->processPolicyPremium($updatesPremium);
+                            $dm->flush();
+
+                            // We want to check if no errors occurs and ignore
+                            // if the user has not paid yet
+                            if (null !== $newMonthly && $newMonthly !== 0) {
+                                $policy->updateScheduledPaymentsMonthly($newMonthly);
+                                $dm->persist($policy);
+                                $dm->flush();
+                                $this->addFlash('success', "Scheduled Payments updated successfully.");
+                            } else {
+                                $this->addFlash(
+                                    'error',
+                                    sprintf("Could not update Scheduled Payments %s", $newMonthly)
+                                );
+                            }
+                            /**
+                             * Regenerate docs for user once premium has been updated
+                             */
+                            $policyTerms = $policyService->generatePolicyTerms($policy);
+                            $policySchedule = $policyService->generatePolicySchedule($policy);
+
+                            if ($updatePremium->getEmailPreference() == 1) {
+                                // Send user email with docs
+                                $policyService->upgradedPolicyEmail(
+                                    $policy,
+                                    [$policySchedule, $policyTerms],
+                                    'bcc@so-sure.com'
+                                );
+                                $clientEmailed = 'Yes';
+                            }
+                            $this->addFlash('success', "Premium has been updated successfully.");
+                        } catch (\Exception $e) {
+                            $this->addFlash(
+                                'error',
+                                sprintf("Could not update Premium: %s", $e->getMessage())
+                            );
+                            $addPolicyNote = false;
+                        }
+                        /**
+                         * We also want to add the notes to the policy notes if the
+                         * Premium was updated successfully.
+                         */
+                        if ($addPolicyNote) {
+                            $policy->addNoteDetails(
+                                sprintf(
+                                    "Manually updated premium to %s. Client Emailed: %s. Justification: %s",
+                                    $updatePremium->getAmount(),
+                                    $clientEmailed,
+                                    $updatePremium->getNotes()
+                                ),
+                                $this->getUser()
+                            );
+                        }
+                    }
+
+                    $dm->flush();
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            'Something wrong with form data'
+                        )
+                    );
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            }
+        }
+
+        return [
+            'update_premium_form' => $updatePremiumForm->createView(),
+            'policy' => $policy,
+        ];
+    }
+
+    /**
      * @Route("/phone", name="admin_phone_add")
      * @Method({"POST"})
      */
@@ -536,7 +690,7 @@ class AdminController extends BaseController
             $from = new \DateTime($request->get('from'), SoSure::getSoSureTimezone());
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
             $stream = $this->getRequestString($request, 'stream');
-            $subvariant = $this->getRequestString($request, 'subvariant');
+            $paytype = $this->getRequestString($request, 'paytype');
             try {
                 $policyTerms = $this->getLatestPolicyTerms();
                 $excess = $policyTerms->getDefaultExcess();
@@ -571,7 +725,7 @@ class AdminController extends BaseController
                 if ($request->get('picsure-theft-excess')) {
                     $picsureExcess->setTheft($request->get('picsure-theft-excess'));
                 }
-                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes, $stream, null, $subvariant);
+                $phone->changePrice($gwp, $from, $excess, $picsureExcess, $notes, $stream, null, $paytype);
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
                 return new RedirectResponse($this->generateUrl('admin_phones'));
