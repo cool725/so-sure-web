@@ -48,10 +48,7 @@ class PaymentRepository extends DocumentRepository
         if ($underwriter) {
             $qb->field('policy.policy_type')->equals($underwriter);
         }
-        return $qb
-            ->sort('date')
-            ->sort('id')
-            ->getQuery()->execute();
+        return $qb->getQuery()->execute();
     }
 
     public function getAllPaymentsForReport(\DateTime $date, $judoOnly = false, $checkoutOnly = false)
