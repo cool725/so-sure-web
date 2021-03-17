@@ -71,7 +71,8 @@ class ApiUnauthController extends BaseController
             $cognitoIdentity = $this->get('app.cognito.identity');
             list($identityId, $token) = $cognitoIdentity->getCognitoIdToken(
                 $user,
-                $this->getDataString($data, 'cognito_id')
+                $this->getDataString($data, 'cognito_id'),
+                $this->getDataString($data, 'userpool_token')
             );
 
             // Record mobile access

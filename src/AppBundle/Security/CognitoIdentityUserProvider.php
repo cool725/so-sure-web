@@ -20,7 +20,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
     protected $userManager;
 
     protected $cognito;
-    
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -109,7 +109,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
                 /** @var User $user */
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);
             }
-    
+
             return $user;
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error in loadUserByCognitoIdentityId Ex: %s', $e->getMessage()));
@@ -133,7 +133,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
             $repo = $this->dm->getRepository(User::class);
             /** @var User $user */
             $user = $repo->findOneBy(['token' => $userToken]);
-    
+
             return $user;
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error in loadUserByUserToken Ex: %s', $e->getMessage()));

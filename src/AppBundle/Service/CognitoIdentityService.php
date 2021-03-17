@@ -56,7 +56,7 @@ class CognitoIdentityService
      * @param User   $user
      * @param string $cognitoIdentityId
      */
-    public function getCognitoIdToken(User $user, $cognitoIdentityId = null)
+    public function getCognitoIdToken(User $user, $cognitoIdentityId = null, $userpoolToken = null)
     {
         $devIdentity = array(
             'IdentityPoolId' => $this->identityPoolId,
@@ -65,9 +65,19 @@ class CognitoIdentityService
             ),
             'TokenDuration' => 300,
         );
+
+        if ($userpoolToken) {
+            if ($this->environment == 'prod') {
+                $devIdentity['Logins']['cognito-idp.eu-west-2.amazonaws.com/eu-west-2_jMu8AHCWA'] = $userpoolToken;
+            } else {
+                $devIdentity['Logins']['cognito-idp.eu-west-2.amazonaws.com/eu-west-2_EuSVRGZ7v'] = $userpoolToken;
+            }
+        }
+
         if ($cognitoIdentityId) {
             $devIdentity['IdentityId'] = $cognitoIdentityId;
         }
+        
         if ($this->environment != "test") {
             $result = $this->cognito->getOpenIdTokenForDeveloperIdentity($devIdentity);
             $identityId = $result->get('IdentityId');
