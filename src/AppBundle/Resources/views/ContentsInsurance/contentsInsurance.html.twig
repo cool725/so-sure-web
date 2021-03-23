@@ -28,13 +28,19 @@
                         data-csrf="{{ lead_csrf }}"
                         data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz'}) }}"
                         autocomplete="off">
-                        <h2 class="h5 hc-lead-feedback text-primary">Contents Insurance by SO-SURE: Coming soon</h2>
-                        <p>Get on the launch list + receive special offers 👇</p>
-                        <div class="form-group mb-4">
-                            <label for="hc-lead-email" class="sr-only">Email Address</label>
-                            <input type="email" name="hc-lead-email" class="hc-lead-email form-control" placeholder="Enter email address..." />
-                        </div>
-                        <button type="submit" class="btn btn-success hc-lead-submit btn-block">Send Me Launch Offers</button>
+                        {% if beta %}
+                            <h2 class="h5 hc-lead-feedback text-primary">Contents Insurance by SO-SURE: Beta access</h2>
+                            <p>Get started below 👇</p>
+                            <a href="{{ home_contents_funnel }}" class="btn btn-success btn-block">Get a Quote</a>
+                        {% else %}
+                            <h2 class="h5 hc-lead-feedback text-primary">Contents Insurance by SO-SURE: Coming soon</h2>
+                            <p>Get on the launch list + receive special offers 👇</p>
+                            <div class="form-group mb-4">
+                                <label for="hc-lead-email" class="sr-only">Email Address</label>
+                                <input type="email" name="hc-lead-email" class="hc-lead-email form-control" placeholder="Enter email address..." />
+                            </div>
+                            <button type="submit" class="btn btn-success hc-lead-submit btn-block">Send Me Launch Offers</button>
+                        {% endif %}
                     </form>
                 </div>
             </div>
@@ -226,20 +232,26 @@
 
     <section class="sign-up-bottom py-lg-5">
         <div class="container-large py-5">
-            <h2 class="h3 text-white">Contents Insurance by SO-SURE: Coming soon</h2>
-            <p class="lead text-white mb-4"><strong>Get on the launch list + receive special offers </strong>👇</p>
-            <form id="footer-form" class="validate-form"
-                  data-toggle="validator"
-                  data-client-validation="{{ form_client_validation }}"
-                  data-csrf="{{ lead_csrf }}"
-                  data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz-footer'}) }}"
-                  autocomplete="off">
-                <div class="custom-input-with-btn custom-input-with-btn-responsive">
-                    <input type="email" name="hc-lead-email" class="hc-lead-email form-control form-control-white" placeholder="Enter email address..." />
-                    <button type="submit" class="btn btn-success hc-lead-submit btn-block-xs btn-sm">Send Me Launch Offers</button>
-                </div>
-                <p class="hc-lead-feedback text-white"></p>
-            </form>
+            {% if beta %}
+                <h2 class="h3 text-white">Contents Insurance by SO-SURE: Beta access</h2>
+                <p class="lead text-white mb-4"><strong>Get started below 👇</p>
+                <a href="{{ home_contents_funnel }}" class="btn btn-success">Get a Quote</a>
+            {% else %}
+                <h2 class="h3 text-white">Contents Insurance by SO-SURE: Coming soon</h2>
+                <p class="lead text-white mb-4"><strong>Get on the launch list + receive special offers </strong>👇</p>
+                <form id="footer-form" class="validate-form"
+                    data-toggle="validator"
+                    data-client-validation="{{ form_client_validation }}"
+                    data-csrf="{{ lead_csrf }}"
+                    data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz-footer'}) }}"
+                    autocomplete="off">
+                    <div class="custom-input-with-btn custom-input-with-btn-responsive">
+                        <input type="email" name="hc-lead-email" class="hc-lead-email form-control form-control-white" placeholder="Enter email address..." />
+                        <button type="submit" class="btn btn-success hc-lead-submit btn-block-xs btn-sm">Send Me Launch Offers</button>
+                    </div>
+                    <p class="hc-lead-feedback text-white"></p>
+                </form>
+            {% endif %}
         </div>
     </section>
 
