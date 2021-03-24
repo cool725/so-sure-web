@@ -24,15 +24,21 @@ class HomeContentsController extends BaseController
 {
     /**
      * @Route("/contents-insurance", name="contents_insurance")
+     * @Route("/contents-insurance-beta", name="contents_insurance_beta")
      */
-    public function contentsInsuranceAction()
+    public function contentsInsuranceAction(Request $request)
     {
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
+        $beta = false;
+        if ($request->get('_route') == 'contents_insurance_beta') {
+            $beta = true;
+        }
         $data = [
             'lead_csrf' => $csrf->refreshToken('lead'),
+            'beta' => $beta,
         ];
 
         return $this->render($template, $data);

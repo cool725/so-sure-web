@@ -687,7 +687,16 @@ class DefaultController extends BaseController
                 $categories = $marketingOptOutForm->getData()['categories'];
                 if (in_array(Opt::OPTOUT_CAT_MARKETING, $categories)) {
                     $optOut->addCategory(Opt::OPTOUT_CAT_MARKETING);
-                    $this->getUser()->optOutMarketing();
+                    $user = $this->getUser();
+                    /** @var User $user */
+                    if ($user) {
+                        if ($user->getEmail() !== $email) {
+                            throw new \Exception("Cannot opt out for different email");
+                        }
+                        $this->getUser()->optOutMarketing();
+                    } else {
+                        throw new \Exception("Please login to proceed with opt out");
+                    }
                 } else {
                     $optOut->removeCategory(Opt::OPTOUT_CAT_MARKETING);
                 }

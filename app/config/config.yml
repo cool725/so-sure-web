@@ -106,6 +106,7 @@ twig:
         free_months: "one month"
         lowest_excess: "£25"
         trustpilot_rating: 4.5
+        home_contents_funnel: https://home.wearesosure.com
 
 doctrine_mongodb:
     connections:
