@@ -99,7 +99,7 @@ class DefaultController extends BaseController
         $competitorData = new Competitors();
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
-        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PAGE_LOAD, [
             'Page' => 'landing_page',
             'Step' => 'homepage'
         ]);
@@ -132,7 +132,7 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $template = 'AppBundle:Default:indexQuickQuote.html.twig';
+        $template = 'AppBundle:Default:indexHomepage.html.twig';
 
         $competitorData = new Competitors();
 
