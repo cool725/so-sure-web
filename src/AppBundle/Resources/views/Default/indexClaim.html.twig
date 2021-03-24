@@ -1,0 +1,77 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'make-a-claim' %}
+
+{% block title %}Make a Claim | SO-SURE{% endblock %}
+{% block meta %}
+    <meta name="description" content="Start your claim online with SO-SURE for a fast and pain-free claims process. Learn more about each step here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/make-a-claim.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="breadcrumbs text-center">
+                <ul class="list-inline"
+                    vocab="https://schema.org/"
+                    typeof="BreadcrumbList">
+                    <li class="list-inline-item"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <a href="{{ path('homepage') }}"
+                            class="text-columbia-blue-e"
+                            property="item"
+                            typeof="WebPage">
+                            <span property="name">Home</span>
+                        </a>
+                        <meta property="position" content="1">
+                    </li>
+                    <li class="list-inline-item text-white">
+                        <i class="fal fa-angle-right text-white"></i>
+                    </li>
+                    <li class="list-inline-item text-white"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <span property="name">Make a claim</span>
+                        <meta property="position" content="2">
+                    </li>
+                </ul>
+            </div>
+            <h1 class="text-center">Make a claim</h1>
+            <p class="text-center mb-4">Don’t worry accidents happen, we’re here to help!<br class="d-none d-md-inline" /> What do you want to make a claim on?</p>
+        </div>
+        <div id="claims_cards" class="hero-claims">
+                <div class="cardbox">
+                    <div class="cardbox__body">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_broken-phone.png" alt="SO-SURE Phone Insurance" width="160px" class="lozad mr-lg-2">
+                        <div>
+                            <h5 class="cardbox__title text-dodger-blue">Phone Insurance</h5>
+                            <div class="cardbox__text mb-4">To make a claim on your mobile phone insurance start here.</div>
+                            <a href="{{ path('claim_phone_insurance') }}" class="btn btn-success btn-block btn-shadow">Make a claim</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="cardbox">
+                    <div class="cardbox__body">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_home_contents.png" alt="SO-SURE Home Contents Insurance" width="160px" class="lozad mr-lg-2">
+                        <div>
+                            <h5 class="cardbox__title text-dodger-blue">Contents Insurance</h5>
+                            <div class="cardbox__text mb-4">To make a claim on your contents insurance start here.</div>
+                            <a href="{{ path('claim_contents_insurance') }}" class="btn btn-success btn-block btn-shadow">Make a claim</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/make-a-claim.js') }}"></script>
+{% endblock %}

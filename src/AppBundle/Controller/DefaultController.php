@@ -96,18 +96,23 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $template = 'AppBundle:Default:indexQuickQuote.html.twig';
-
         $competitorData = new Competitors();
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'landing_page',
+            'Step' => 'homepage'
+        ]);
+
+        $fromPrice = $this->getLowestPremium();
 
         $data = array(
             'competitor' => $competitorData::$competitorComparisonData,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
+            'from_price' => $fromPrice
         );
 
-        return $this->render($template, $data);
+        return $this->render('AppBundle:Default:indexHomepage.html.twig', $data);
     }
 
     /**
@@ -464,55 +469,47 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim", options={"sitemap" = true})
-     * @Route("/claim/login", name="claim_login")
      */
-    public function claimAction(Request $request)
+    public function claimAction()
     {
-        /** @var User $user */
-        $user = $this->getUser();
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'landing_page',
+            'Step' => 'make_a_claim'
+        ]);
 
-        // causes admin's (or claims) too much confusion to be redirected to a 404
-        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()
-            && ($user->hasActivePolicy() || $user->hasUnpaidPolicy())) {
-            return $this->redirectToRoute('user_claim');
-        }
+        $data = [];
 
-        $claimFnolEmail = new ClaimFnolEmail();
+        return $this->render('AppBundle:Default:indexClaim.html.twig', $data);
+    }
 
-        $claimEmailForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_email_form', ClaimFnolEmailType::class, $claimFnolEmail)
-            ->getForm();
+    /**
+     * @Route("/claim/phone-insurance", name="claim_phone_insurance", options={"sitemap" = true})
+     */
+    public function claimPhoneAction()
+    {
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'landing_page',
+            'Step' => 'mobile_claim'
+        ]);
 
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('claim_email_form')) {
-                $claimEmailForm->handleRequest($request);
-                if ($claimEmailForm->isValid()) {
-                    $repo = $this->getManager()->getRepository(User::class);
-                    $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($claimFnolEmail->getEmail())]);
+        $data = [];
 
-                    if ($user) {
-                        /** @var ClaimsService $claimsService */
-                        $claimsService = $this->get('app.claims');
-                        $claimsService->sendUniqueLoginLink($user, $request->get('_route') == 'claim_login');
-                    }
+        return $this->render('AppBundle:Default:claimPhoneInsurance.html.twig', $data);
+    }
 
-                    // @codingStandardsIgnoreStart
-                    $message = $request->get('_route') == 'claim_login' ? "Thank you. For our policy holders, an email with further instructions on how to proceed with updating your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy." : "Thank you. For our policy holders, an email with further instructions on how to proceed with your claim has been sent to you. If you do not receive the email shortly, please check your spam folders and also verify that the email address matches your policy.";
+    /**
+     * @Route("/claim/contents-insurance", name="claim_contents_insurance", options={"sitemap" = true})
+     */
+    public function claimContentsAction()
+    {
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'landing_page',
+            'Step' => 'content_claim'
+        ]);
 
-                    $this->addFlash('success', $message);
-                    // @codingStandardsIgnoreEnd
-                }
-            }
-        }
+        $data = [];
 
-        $data = [
-            'claim_email_form' => $claimEmailForm->createView(),
-        ];
-
-        if ($request->get('_route') == 'claim_login') {
-            return $this->redirectToRoute('claim', [], 301);
-        }
-        return $this->render('AppBundle:Default:claim.html.twig', $data);
+        return $this->render('AppBundle:Default:claimContentsInsurance.html.twig', $data);
     }
 
     /**

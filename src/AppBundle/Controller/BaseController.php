@@ -56,6 +56,7 @@ use AppBundle\Exception\RedirectException;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PolicySearchType;
 use AppBundle\Validator\Constraints\FullName;
+use AppBundle\Document\PhonePrice;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
@@ -1167,5 +1168,33 @@ abstract class BaseController extends Controller
         }
 
         return new RedirectResponse($this->generateUrl($redirectRoute, ['id' => $claim->getPolicy()->getId()]));
+    }
+
+    protected function getLowestPremium()
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+
+        // To display lowest monthly premium
+        $fromPhones = $repo->findBy([
+            'active' => true,
+        ]);
+
+        $fromPhones = array_filter($fromPhones, function ($phone) {
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        });
+
+        // Sort by cheapest
+        usort($fromPhones, function ($a, $b) {
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        });
+
+        // Select the lowest
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+
+        return $fromPrice;
     }
 }

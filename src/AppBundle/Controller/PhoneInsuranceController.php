@@ -131,29 +131,8 @@ class PhoneInsuranceController extends BaseController
      */
     public function secondHandPhoneInsuranceAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-        ]);
-
-        $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
-
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
-
+        $fromPrice = $this->getLowestPremium();
         // Is indexed?
         $noindex = false;
         if ($request->get('_route') == 'phone_insurance_second_hand_m') {
@@ -164,7 +143,6 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'from_price' => $fromPrice,
-            'from_phones' => $fromPhones,
             'is_noindex' => $noindex
         ];
 
@@ -178,28 +156,8 @@ class PhoneInsuranceController extends BaseController
      */
     public function refurbishedPhoneInsuranceAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-        ]);
-
-        $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
-
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $this->getLowestPremium();
 
         // Is indexed?
         $noindex = false;
@@ -211,7 +169,6 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'from_price' => $fromPrice,
-            'from_phones' => $fromPhones,
             'is_noindex' => $noindex
         ];
 
@@ -225,28 +182,8 @@ class PhoneInsuranceController extends BaseController
      */
     public function phoneInsuranceAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-        $phone = null;
-
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-        ]);
-
-        $fromPhones = array_filter($fromPhones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
-
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $this->getLowestPremium();
 
         $competitorData = new Competitors();
 
@@ -256,16 +193,22 @@ class PhoneInsuranceController extends BaseController
             $noindex = true;
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Phone Insurance - LP']);
+        } else {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PHONE_INSURANCE_HOME_PAGE);
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+                'Page' => 'landing_page',
+                'Step' => 'mobile_insurance'
+            ]);
         }
 
         $data = [
             'from_price' => $fromPrice,
-            'from_phones' => $fromPhones,
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex
         ];
 
-        return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig', $data);
+        // return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig', $data);
+        return $this->render('AppBundle:PhoneInsurance:phoneInsuranceHomepage.html.twig', $data);
     }
 
     /**
@@ -359,24 +302,8 @@ class PhoneInsuranceController extends BaseController
             'makeCanonical' => mb_strtolower($make)
         ]);
 
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-            'makeCanonical' => mb_strtolower($make)
-        ]);
-
-        $fromPhones = array_filter($phones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
-
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
-
         // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        $fromPrice = $this->getLowestPremium();
 
         $competitorData = new Competitors();
 

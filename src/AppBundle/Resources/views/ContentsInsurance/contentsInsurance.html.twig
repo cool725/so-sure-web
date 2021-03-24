@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set body_class = 'contents-insurance' %}
+{% set robots_noindex = is_noindex %}
 
 {% block title %}Contents Insurance | SO-SURE{% endblock %}
 {% block meta %}
@@ -17,31 +18,62 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="text-white fit">Introducing <br class="d-md-none"> <span class="text-deep-sky-blue-d">Smarter Contents <br class="d-md-none"> Insurance</span></h1>
-            <p class="lead text-white"><strong>All the things you love about SO-SURE, for all the things you love.</strong></p>
+            <div class="breadcrumbs">
+                <ul class="list-inline"
+                    vocab="https://schema.org/"
+                    typeof="BreadcrumbList">
+                    <li class="list-inline-item"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <a href="{{ path('homepage') }}"
+                           class="text-columbia-blue-e"
+                           property="item"
+                           typeof="WebPage">
+                           <span property="name">Home</span>
+                        </a>
+                        <meta property="position" content="1">
+                    </li>
+                    <li class="list-inline-item text-white">
+                        <i class="fal fa-angle-right text-white"></i>
+                    </li>
+                    <li class="list-inline-item text-white"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <span property="name">Contents Insurance</span>
+                        <meta property="position" content="2">
+                    </li>
+                </ul>
+            </div>
+            <h1 class="text-deep-sky-blue-d text-sm-center">
+                Win-Win<br class="d-md-none">
+                <span class="text-white">Contents Insurance</span>
+            </h1>
+            <p class="lead text-white text-sm-center">
+                <strong>Amazing cover if you need us <br class="d-md-none">— Money back if you don’t!</strong>
+            </p>
             <div class="row">
-                <div class="col-lg-6 offset-lg-5">
-                    <p class="d-none d-md-block hero-p mt-lg-5">We're making contents insurance for renters fast, fair and fuss-free. With the SO-SURE app, simply scan the items you want covered, agree on the value upfront and have claims approved in minutes.</p>
-                    <form id="hero-form" class="hc-lead-form validate-form"
-                        data-toggle="validator"
-                        data-client-validation="{{ form_client_validation }}"
-                        data-csrf="{{ lead_csrf }}"
-                        data-lead="{{ path('contents_lead', {'source': 'home-contents-buzz'}) }}"
-                        autocomplete="off">
-                        {% if beta %}
-                            <h2 class="h5 hc-lead-feedback text-primary">Contents Insurance by SO-SURE: Beta access</h2>
-                            <p>Get started below 👇</p>
-                            <a href="{{ home_contents_funnel }}" class="btn btn-success btn-block">Get a Quote</a>
-                        {% else %}
-                            <h2 class="h5 hc-lead-feedback text-primary">Contents Insurance by SO-SURE: Coming soon</h2>
-                            <p>Get on the launch list + receive special offers 👇</p>
-                            <div class="form-group mb-4">
-                                <label for="hc-lead-email" class="sr-only">Email Address</label>
-                                <input type="email" name="hc-lead-email" class="hc-lead-email form-control" placeholder="Enter email address..." />
-                            </div>
-                            <button type="submit" class="btn btn-success hc-lead-submit btn-block">Send Me Launch Offers</button>
-                        {% endif %}
-                    </form>
+                <div class="col-md-8 offset-md-2 col-lg-5 offset-lg-5">
+                    <p class="d-none d-md-block lead hero-p">Protect the stuff you love in your home. You can include accidental or pet damage, out of home cover and even work equipment.</p>
+                    <div class="cardbox cardbox-100 mt-4">
+                        <div class="cardbox__body">
+                            <h2 class="h4 mb-3 text-primary text-nowrap fit">Fair, Fast, and Rewarding 🇬🇧</h2>
+                            <ul class="list-unstyled icn-fa-list mb-4">
+                                <li class="mb-2">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    Cover from £2.80/month and excess from £50
+                                </li>
+                                <li class="mb-2">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    Most claims resolved within 72hrs
+                                </li>
+                                <li>
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    Up to 40% no claims cashback
+                                </li>
+                            </ul>
+                            <a href="{{ home_contents_funnel }}" class="btn btn-success btn-block-xs">Get a quote</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,8 +105,8 @@
                             <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_desktop-icon.svg" alt="Laptops, tablets, desktops icon" width="50px" class="ml-3 lozad">
                         </li>
                         <li class="right">
-                            <h3 class="h5 text-white">Your bicycle</h3>
-                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_bicycle-icon.svg" alt="Bicycle icon" width="50px" class="ml-3 lozad">
+                            <h3 class="h5 text-white">Your sofa and armchairs</h3>
+                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_sofa-icon.svg" alt="Sofa icon" width="50px" class="ml-3 lozad">
                         </li>
                     </ul>
                 </div>
@@ -120,8 +152,8 @@
                          class="lozad card-img-top"
                          alt="Upfront agreed">
                     <div class="card-body py-4 text-center">
-                        <h3 class="h5 text-primary card-title">Worth Agreed Upfront</h3>
-                        <p class="card-text">Build your inventory and confirm how much you’ll get in case you need to make a claim.</p>
+                        <h3 class="h5 text-primary card-title">Smart Savings</h3>
+                        <p class="card-text">Peace of mind that won't break the bank. Enjoy a low monthly price and excess from only £50.</p>
                     </div>
                 </div>
                 <div class="card mr-5 mb-4 w-100">
@@ -130,7 +162,7 @@
                          class="lozad card-img-top"
                          alt="Reward Pot">
                     <div class="card-body py-4 text-center">
-                        <h3 class="h5 text-primary card-title">Super Fast Claims </h3>
+                        <h3 class="h5 text-primary card-title">Super Fast Claims</h3>
                         <p class="card-text">No more waiting around. The majority of claims will be sorted within 72 hours.</p>
                     </div>
                 </div>
@@ -230,7 +262,7 @@
         </div>
     </section>
 
-    <section class="sign-up-bottom py-lg-5">
+    {# <section class="sign-up-bottom py-lg-5">
         <div class="container-large py-5">
             {% if beta %}
                 <h2 class="h3 text-white">Contents Insurance by SO-SURE: Beta access</h2>
@@ -253,7 +285,7 @@
                 </form>
             {% endif %}
         </div>
-    </section>
+    </section> #}
 
 {% endblock %}
 

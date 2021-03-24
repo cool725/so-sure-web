@@ -123,6 +123,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/second-hand' => 'Second Hand',
             '/phone-insurance/refurbished' => 'Refurbished',
             '/claim' => 'Make a claim',
+            '/claim/phone-insurance' => 'Make a Phone Insurance claim',
+            '/claim/contents-insurance' => 'Make a Contents Insurance claim',
             '/faq' => 'FAQ'
         ];
         // @codingStandardsIgnoreEnd
