@@ -469,9 +469,23 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim", options={"sitemap" = true})
+     * @Route("/claim/login", name="claim_login")
      */
-    public function claimAction()
+    public function claimAction(Request $request)
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        // causes admin's (or claims) too much confusion to be redirected to a 404
+        if ($user && !$user->hasEmployeeRole() && !$user->hasClaimsRole()
+            && ($user->hasActivePolicy() || $user->hasUnpaidPolicy())) {
+            return $this->redirectToRoute('user_claim');
+        }
+
+        if ($request->get('_route') == 'claim_login') {
+            return $this->redirectToRoute('claim', [], 301);
+        }
+
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PAGE_LOAD, [
             'Page' => 'landing_page',
             'Step' => 'make_a_claim'
