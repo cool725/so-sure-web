@@ -284,6 +284,14 @@ class BacsService
     }
 
     /**
+     * Deletes the sftp running stack thingy in the case that it has malfunctioned.
+     */
+    public function clearSftpRunning()
+    {
+        $this->redis->del(self::KEY_SFTP_FLAG);
+    }
+
+    /**
      * Returns the number of instances of the sftp function running.
      * @return int the number of them running.
      */
@@ -292,15 +300,28 @@ class BacsService
         return $this->redis->llen(self::KEY_SFTP_FLAG);
     }
 
+    /**
+     * Processes all the bacs reports in the sftp folder.
+     * @return array containing some data about the results of the processing.
+     */
     public function sftp()
     {
         $results = [];
         $errorCount = 0;
-        $files = $this->sosureSftpService->listSftp();
-        $significant = count($files) > 0;
-        if ($significant) {
-            $this->redis->lpush(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
+        $files = [];
+        try {
+            $files = $this->sosureSftpService->listSftp();
+        } catch (Exception $e) {
+            $this->logger->error(sprintf(
+                'Failed to list files with message: %s',
+                $e->getMessage()
+            ));
+            return [];
         }
+        if (count($files) == 0) {
+            goto end;
+        }
+        $this->redis->lpush(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
         foreach ($files as $file) {
             $error = false;
             $unzippedFile = null;
@@ -325,12 +346,10 @@ class BacsService
                     ['exception' => $e]
                 );
             }
-            $this->sosureSftpService->moveSftp($file, !$error);
+            try {
+                $this->sosureSftpService->moveSftp($file, !$error);
         }
-        if ($significant) {
-            $this->redis->lpop(self::KEY_SFTP_FLAG);
-        }
-
+        $this->redis->lpop(self::KEY_SFTP_FLAG);
         // if files were present and no errors, the we should approve mandates and payments
         // assuming during the time when we should have done the morning file import
         if (count($files) > 0 && $errorCount == 0) {
@@ -340,16 +359,15 @@ class BacsService
                 $results['autoApprove'] = $this->autoApprovePaymentsAndMandates($date);
             }
         }
-
         // State that bacs has been processed for the rest of the day.
-        $time = new \DateTime(SoSure::TIMEZONE);
-        $this->redis->setex(
-            self::KEY_BACS_PROCESSED,
-            $this->endOfDay($time)->getTimestamp() - $time->getTimestamp(),
-            $time->format("d-m-Y H:i")
-        );
-
-        return $results;
+        end:
+            $time = new \DateTime(SoSure::TIMEZONE);
+            $this->redis->setex(
+                self::KEY_BACS_PROCESSED,
+                $this->endOfDay($time)->getTimestamp() - $time->getTimestamp(),
+                $time->format("d-m-Y H:i")
+            );
+            return $results;
     }
 
     /**
