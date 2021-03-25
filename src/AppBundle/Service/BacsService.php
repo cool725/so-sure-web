@@ -284,7 +284,7 @@ class BacsService
     }
 
     /**
-     * Deletes the sftp running stack thingy in the case that it has malfunctioned.
+     * Deletes the sftp running flag thing in case it has malfunctioned.
      */
     public function clearSftpRunning()
     {
@@ -292,12 +292,12 @@ class BacsService
     }
 
     /**
-     * Returns the number of instances of the sftp function running.
-     * @return int the number of them running.
+     * Tells you if bacs sftp is currently running.
+     * @return boolean true if it is running.
      */
     public function sftpRunning()
     {
-        return $this->redis->llen(self::KEY_SFTP_FLAG);
+        return $this->redis->get(self::KEY_SFTP_FLAG);
     }
 
     /**
@@ -306,6 +306,13 @@ class BacsService
      */
     public function sftp()
     {
+        if ($this->sftpRunning()) {
+            $this->logger->error(sprintf(
+                'Cannot run multiple instances of bacs sftp, existing key is %s',
+                $this->redis->get(self::KEY_SFTP_FLAG)
+            ));
+            return [];
+        }
         $results = [];
         $errorCount = 0;
         $files = [];
@@ -313,7 +320,7 @@ class BacsService
             $files = $this->sosureSftpService->listSftp();
         } catch (Exception $e) {
             $this->logger->error(sprintf(
-                'Failed to list files with message: %s',
+                'Failed to list bacs report files with message: %s',
                 $e->getMessage()
             ));
             return [];
@@ -321,7 +328,7 @@ class BacsService
         if (count($files) == 0) {
             goto end;
         }
-        $this->redis->lpush(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
+        $this->redis->set(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
         foreach ($files as $file) {
             $error = false;
             $unzippedFile = null;
@@ -348,8 +355,15 @@ class BacsService
             }
             try {
                 $this->sosureSftpService->moveSftp($file, !$error);
+            } catch (Exception $e) {
+                $this->logger->error(sprintf(
+                    'failed to move bacs report file %s with message: %s',
+                    $file,
+                    $e->getMessage()
+                ));
+            }
         }
-        $this->redis->lpop(self::KEY_SFTP_FLAG);
+        $this->redis->del(self::KEY_SFTP_FLAG);
         // if files were present and no errors, the we should approve mandates and payments
         // assuming during the time when we should have done the morning file import
         if (count($files) > 0 && $errorCount == 0) {
