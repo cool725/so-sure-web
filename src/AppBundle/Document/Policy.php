@@ -174,6 +174,8 @@ abstract class Policy
     const COOLOFF_REASON_TECHNICAL = 'technical';
     const COOLOFF_REASON_PICSURE = 'pic-sure';
     const COOLOFF_REASON_UNKNOWN = 'unknown';
+    const COOLOFF_REASON_ANNUAL_PAYMENT = 'annual';
+    const COOLOFF_REASON_UNDER_EIGHTEEN = 'under-18';
 
     public static $cooloffReasons = [
         self::COOLOFF_REASON_DAMAGED,
@@ -184,6 +186,8 @@ abstract class Policy
         self::COOLOFF_REASON_TECHNICAL,
         self::COOLOFF_REASON_PICSURE,
         self::COOLOFF_REASON_UNKNOWN,
+        self::COOLOFF_REASON_ANNUAL_PAYMENT,
+        self::COOLOFF_REASON_UNDER_EIGHTEEN,
     ];
 
     public static $riskLevels = [
