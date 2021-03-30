@@ -9,7 +9,6 @@ body {
     z-index: 1010;
     padding-top: 4rem;
     padding-bottom: 1rem;
-    // font-family: $g-re;
 
     @include dark-blue-gradient;
 
@@ -21,6 +20,7 @@ body {
     &__links {
 
         a {
+            font-family: $g-regular;
             text-decoration: underline;
 
             &:hover {
