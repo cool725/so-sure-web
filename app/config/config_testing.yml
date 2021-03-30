@@ -89,3 +89,7 @@ nelmio_security:
     forced_ssl:
         hsts_max_age: 3600 # 30 days
         hsts_subdomains: true
+
+twig:
+    globals:
+        home_contents_funnel: https://purchase.staging.home.wearesosure.com/

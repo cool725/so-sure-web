@@ -9,19 +9,68 @@
 
 .hero {
     position: relative;
-    padding-top: 8rem;
-    padding-bottom: 4rem;
+    padding-top: 6rem;
+    padding-bottom: 6rem;
 
     @include blue-gradient-45;
 
     .container-large {
         position: relative;
         z-index: 4;
+
+        h1, h2, p, ul {
+            color: $white;
+        }
     }
 
-    &__illustration {
-        img {
-            opacity: 0.7;
+    &-claims {
+        position: relative;
+        z-index: 4;
+
+        .cardbox {
+            width: 80%; height: 385px;
+            margin-right: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            text-align: center;
+
+            @include media-breakpoint-up(lg) {
+                width: 444px; height: 230px;
+                max-width: none;
+                text-align: left;
+                margin-right: 2rem;
+
+                &__body {
+                    display: flex;
+                    align-items: center;
+                }
+            }
+        }
+
+        .flickity-page-dots .dot {
+            width: 12px;
+            height: 12px;
+            opacity: 0.5;
+            background: white;
+            border: 2px solid white;
+        }
+
+        .flickity-page-dots .dot.is-selected {
+            opacity: 1;
+        }
+
+        &:after {
+            content: 'flickity';
+            display: none;
+        }
+
+        @include media-breakpoint-up(lg) {
+            display: flex;
+            justify-content: center;
+
+            &:after {
+                content: '';
+            }
         }
     }
 
@@ -45,213 +94,41 @@
     }
 
 }
-.intro {
-    text-align: center;
-    background-color: $pattens-blue;
-}
 
-.cover {
-    position: relative;
+.hero-phone {
+    padding-bottom: 0rem;
 
-    &__illustration__mobile {
-        height: 240px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    &__mobile {
-        background-color: $pattens-blue;
-    }
-
-    &__list {
-        margin-top: 7rem;
-    }
-
-    svg {
-        position: absolute;
-        bottom: -1px; left: 0; right: 0;
-    }
-}
-
-.differently {
-    position: relative;
-    z-index: 1;
-    background-color: $pattens-blue;
-
-    @include media-breakpoint-up(lg) {
-        background: $pattens-blue url('#{$cdn_url}/images/rebrand/homepage/so-sure_intro-illustration.png') no-repeat -110px 200px;
-        background-size: 500px;
-    }
-
-    @include media-breakpoint-up(xl) {
-        background-position: -40px 200px;
-        background-size: 600px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 500px 200px;
-        background-size: 600px;
-    }
-
-    &__illustration__mobile {
-        position: relative;
-    }
-}
-
-.reward {
-    background-color: $white;
-
-    @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_why-illustration.png') no-repeat -220px 440px;
-        background-size: 480px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 500px 440px;
-    }
-}
-
-.app {
-    position: relative;
-
-    @include media-breakpoint-up(lg) {
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_app-illustration.png') no-repeat 550px 120px;
-        background-size: 600px;
-    }
-
-    @include media-breakpoint-up(xl) {
-        background-position: 800px 120px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 1400px 120px;
-    }
-
-    &__illustration__mobile {
-        position: relative;
-    }
-}
-
-.claims {
-    background-color: $pattens-blue;
-    text-align: center;
-
-    &__step {
-        width: 180px;
-        margin: 0 auto;
-        position: relative;
-
-        img {
-            display: none;
-
-            @include media-breakpoint-up(sm) {
-                display: inline;
-            }
-        }
-    }
-
-    &__number {
-        width: 55px; height: 55px;
-        background-color: $white;
-        margin: 0 auto 1.2rem;
-
-        @include border-radius(50%);
-        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-                    0 5px 15px 0 rgba(8,27,154,0.08);
-
-        @include media-breakpoint-up(sm) {
-            position: absolute;
-            top: 20%; left: -20px;
-        }
-    }
-}
-
-.comparison {
-    position: relative;
-    background-color: $pattens-blue;
-
-    // .table-list {
-    //     position: relative;
-
-    //     @include media-breakpoint-up(md) {
-    //         width: 520px;
-    //     }
-
-    //     @include media-breakpoint-up(lg) {
-
-    //         &__insurers {
-    //             transform: translateX(25px);
-    //             z-index: 10;
-    //         }
-
-    //         &__so-sure {
-    //             transform: translateX(-25px);
-    //             z-index: 11;
-    //         }
-    //     }
-    // }
-
-    .table-comparison  {
-        position: relative;
-        z-index: 4;
-    }
-
-    svg {
-        position: absolute;
-        top: -20%; left: 0;
-        z-index: 1;
-    }
-}
-
-.reviews {
-    padding-bottom: 200px;
-    margin-bottom: 4rem;
-
-    .carousel-inner {
-        min-height: 280px;
-        background: $white url('#{$cdn_url}/images/rebrand/misc/so-sure_quote-background.svg') no-repeat right 50%;
+    .container-large {
+        padding-bottom: 380px;
+        background-image: url('#{$cdn_url}/images/rebrand/claims/so-sure_broken_phone_hand_mobile_version.svg');
+        background-repeat: no-repeat;
+        background-position: center bottom;
+        background-size: 280px;
 
         @include media-breakpoint-up(lg) {
-            min-height: none;
+            padding-bottom: 3rem;
+            background-image: url('#{$cdn_url}/images/rebrand/claims/so-sure_broken_phone_hand_desktop.svg');
+            background-position: left bottom;
+            background-size: 380px;
         }
-    }
-
-    background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 80px bottom;
-    background-size: 500px;
-
-    @include media-breakpoint-up(sm) {
-        background-position: 300px bottom;
-    }
-
-    @include media-breakpoint-up(lg) {
-        padding-bottom: inherit;
-        margin-bottom: 0;
-        background: $white url('#{$cdn_url}/images/rebrand/homepage/so-sure_reviews-image.png') no-repeat 800px 70px;
-        background-size: 600px;
-    }
-
-    @include media-breakpoint-up(xl) {
-        background-position: 940px 70px;
-        background-size: 700px;
-    }
-
-    @include media-breakpoint-up(fk) {
-        background-position: 1400px 70px;
     }
 }
 
-.banner {
-    position: relative;
-    text-align: center;
+.hero-contents {
+    padding-bottom: 0rem;
 
-    @include blue-gradient;
+    .container-large {
+        padding-bottom: 280px;
+        background-image: url('#{$cdn_url}/images/rebrand/claims/so-sure_home_mobile.svg');
+        background-repeat: no-repeat;
+        background-position: center bottom;
+        background-size: 280px;
 
-    &__close {
-        position: absolute;
-        top: 2rem; right: 2rem;
-    }
-
-    @include media-breakpoint-up(lg) {
-        text-align: left;
+        @include media-breakpoint-up(lg) {
+            padding-bottom: 240px;
+            background-image: url('#{$cdn_url}/images/rebrand/claims/so-sure_home_desktop.svg');
+            background-position: left bottom;
+            background-size: 444px;
+        }
     }
 }

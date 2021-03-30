@@ -14,14 +14,6 @@
         {% block meta %}{% endblock %}
         {% block pixel %}{% endblock %}
         {% block schema %}{% endblock %}
-        {% if environment == 'prod' %}
-            {% if hide_cookie_warning is not defined or not hide_cookie_warning %}
-                <script type="text/javascript" async>
-                var _iub = _iub || [];
-                _iub.csConfiguration = {"lang":"en","siteId":505658,"cookiePolicyId":7804419,"cookiePolicyUrl":"https://www.iubenda.com/privacy-policy/7805295/cookie-policy", "banner":{ "acceptButtonDisplay":true,"customizeButtonDisplay":true,"position":"float-top-center","acceptButtonColor":"#3fc67d","acceptButtonCaptionColor":"#ffffff","customizeButtonColor":"#2593f3","customizeButtonCaptionColor":"#ffffff","textColor":"#081a9a","backgroundColor":"#f5f7f9","backgroundOverlay":true }};
-                </script><script type="text/javascript" src="https://cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
-            {% endif %}
-        {% endif %}
         <script>
             var dataLayer = window.dataLayer = window.dataLayer || [];
 

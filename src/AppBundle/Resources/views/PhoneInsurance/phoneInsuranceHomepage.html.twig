@@ -5,102 +5,86 @@
 {% set include_get_a_quote = true %}
 {% set robots_noindex = is_noindex %}
 
-{% block title %}so-sure | Social Mobile Phone Insurance That's Better{% endblock %}
+{% block title %}Mobile Phone Insurance From &pound;{{ from_price|number_format(2) }} Monthly | SO-SURE{% endblock %}
 {% block meta %}
-    <meta name="description" content="The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure."/>
+    <meta name="description" content="Choose Phone Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. We insure hundreds of different phone models. Find your best price today."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-
-{% block schema %}
-<script type="application/ld+json">
-{
-    "@context" : "http://schema.org",
-    "@graph":
-    [
-        {
-            "@type" : "Organization",
-            "url": "https://wearesosure.com/",
-            "legalName": "so-sure Ltd",
-            "location": {
-                "@type": "Place",
-                "address": {
-                  "@type": "PostalAddress",
-                  "addressLocality": "City of London",
-                  "addressRegion": "London",
-                  "postalCode": "EC3V 0EE",
-                  "streetAddress": "55 Gracechurch Street"
-                },
-                "name": "6th Floor"
-            },
-            "logo": "{{ cdn_url }}/images/rebrand/logo/so-sure_logo_square.png",
-            "description": "The future of phone insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from so-sure.",
-            "sameAs": [
-                "https://twitter.com/wearesosure",
-                "https://www.facebook.com/wearesosure",
-                "https://www.instagram.com/wearesosure"
-            ]
-        },
-        {
-            "@type" : "WebSite",
-            "url": "https://wearesosure.com/"
-        }
-    ]
-}
-</script>
-{% endblock %}
+{% set og_title = 'Mobile Phone Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | SO-SURE' %}
+{% set og_description = "Choose Phone Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. We insure hundreds of different phone models. Find your best price today." %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance-homepage.css') }}">
 {% endblock %}
 
 {% block body %}
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="text-white text-center fit">
-                Mobile Insurance <br class="d-lg-none"><span class="sub text-deep-sky-blue-d">That’s a Win-Win 🙌</span>
+            <div class="breadcrumbs">
+                <ul class="list-inline"
+                    vocab="https://schema.org/"
+                    typeof="BreadcrumbList">
+                    <li class="list-inline-item"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <a href="{{ path('homepage') }}"
+                            class="text-columbia-blue-e"
+                            property="item"
+                            typeof="WebPage">
+                            <span property="name">Home</span>
+                        </a>
+                        <meta property="position" content="1">
+                    </li>
+                    <li class="list-inline-item text-white">
+                        <i class="fal fa-angle-right text-white"></i>
+                    </li>
+                    <li class="list-inline-item text-white"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <span property="name">Phone Insurance</span>
+                        <meta property="position" content="2">
+                    </li>
+                </ul>
+            </div>
+            <h1 class="hero-heading fit">
+                Mobile Phone Insurance<br class="d-md-none" />
+                <span class="sub">from just &pound;{{ from_price|number_format(2) }} per month</span>
             </h1>
-            <p class="lead mb-4 text-white text-center">Great value if you need us — Money back if you don’t!</p>
+            <p class="hero-lead lead">Great value if you need us — Money back if you don’t!</p>
             <div class="row">
-                <div class="col-md-6 d-none d-md-block">
-                    <div class="hero__illustration mt-md-4">
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                             data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png"
-                             alt="so-sure - social insurance"
-                             class="img-fluid lozad">
-                        <div class="hero__badge animated tada">
-                            <div class="hero__badge-inner">{{ free_months|capitalize }}<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
-                        </div>
-                    </div>
-                    {# Toasts #}
-                    {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left' } %}
-                </div>
-                <div class="col-md-6 col-lg-5 offset-lg-1">
+                <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-1 order-xl-2">
                     {% if phone is defined and phone %}
                         {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
                             'type': 'homepage',
+                            'source': 'phone',
                             'id': phone.id }|merge(app.request.query.all)
                         )) }}
                     {% else %}
                         {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
-                            'type': 'homepage' }|merge(app.request.query.all)
+                            'type': 'homepage',
+                            'source': 'phone' }|merge(app.request.query.all)
                         )) }}
                     {% endif %}
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-8 offset-md-2">
-                    <div class="hero__illustration d-block d-md-none mt-4">
-                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-illustration-with-no-shadow.png" alt="so-sure - social insurance" class="img-fluid lozad">
-                        <div class="hero__badge animated tada">
-                            <div class="hero__badge-inner">{{ free_months|capitalize }}<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
+                <div class="col-xl-6 order-xl-1">
+                    <div class="hero-image">
+                        <div class="hero-badge animated tada">
+                            <div class="hero-badge-inner">
+                                {{ free_months|capitalize }}<br>
+                                <span class="h5 mb-0">FREE</span><br>
+                                when you pay <br>
+                                yearly
+                            </div>
                         </div>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                        data-srcset="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero_excited_girl_with_phone_mobile.png 768w, {{ cdn_url }}/images/rebrand/homepage/so-sure_hero_excited_girl_with_phone.png 992w"
+                        alt=""
+                        class="img-fluid lozad">
+                        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left', 'toast_css': 'd-none d-md-block' } %}
                     </div>
                 </div>
-            </div>
-            <div class="d-md-none">
-                {# Toasts #}
-                {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left' } %}
             </div>
         </div>
     </section>
@@ -109,7 +93,7 @@
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
     {# Reviews #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_reviewsB.html.twig' %}
+    {% include 'AppBundle::Components/_reviews.html.twig' %}
 
     <section class="video d-flex align-items-center justify-content-center">
         <a href="#"
@@ -137,11 +121,14 @@
     {# Top Manufacturers #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_topManufacturers.html.twig' %}
 
-    {# Claims Process #}
-    {# {% include 'AppBundle::Default/CommonSections/_claimsProcessB.html.twig' %} #}
-
     {# Top Models #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_topModels.html.twig' %}
+
+    {# Mini FAQ #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_miniFaq.html.twig' %}
+
+    {# Articles #}
+    {% include 'AppBundle::PhoneInsurance/CommonSections/_articles.html.twig' %}
 
     <section class="banner py-5">
         <div class="container-large">
@@ -176,5 +163,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    <script src="{{ asset('css-js/phone-insurance-homepage.js') }}"></script>
 {% endblock %}

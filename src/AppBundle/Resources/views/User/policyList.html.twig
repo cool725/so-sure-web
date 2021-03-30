@@ -63,9 +63,9 @@
                 <div class="cardbox-divider d-none d-lg-flex excess">
                     <div class="excess-item text-left flex-fill">
                         {% if policy.status == 'picsure-required' %}
-                            <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                            <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                         {% elseif not policy.isPicSureValidated %}
-                            <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                            <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                         {% elseif policy.isPicSureValidated %}
                             <p>Your phone has been validated 🥳</p>
                         {% endif %}
@@ -110,9 +110,9 @@
                 </div>
                 <div class="cardbox__body cardbox-divider d-lg-none bg-athens-gray">
                     {% if policy.status == 'picsure-required' %}
-                        <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                        <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                     {% elseif not policy.isPicSureValidated %}
-                        <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                        <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                     {% endif %}
                     {% if policy.getPolicyTermsFiles|length > 0 %}
                         <a href="{{ s3DownloadLink(policy.getPolicyTermsFiles[0].bucket, policy.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Terms</a>
@@ -210,9 +210,9 @@
                     <div class="cardbox-divider d-none d-lg-flex excess">
                         <div class="excess-item text-left flex-fill">
                             {% if policy.status == 'picsure-required' %}
-                                <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                                <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                             {% elseif not policyItem.isPicSureValidated %}
-                                <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                                <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                             {% endif %}
                             {% if policyItem.getPolicyTermsFiles|length > 0 %}
                                 <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary mr-2"><i class="fal fa-file-download text-primary fa-fw"></i> Policy Terms</a>
@@ -251,9 +251,9 @@
                     </div>
                     <div class="cardbox__body cardbox-divider d-lg-none bg-athens-gray">
                         {% if policy.status == 'picsure-required' %}
-                            <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                            <p>Your cover does NOT start till you validate your phone, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                         {% elseif not policyItem.isPicSureValidated %}
-                            <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#the-so-sure-app-and-pic-sure">here</a>.</p>
+                            <p>Validate your phone to reduce your excess, find out how <a href="{{ path('faq') }}#mobile-phone-insurance-policy">here</a>.</p>
                         {% endif %}
                         {% if policyItem.getPolicyTermsFiles|length > 0 %}
                             <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}" class="btn btn-outline-primary btn-block"><i class="fal fa-file-download text-primary fa-fw d-none"></i> <span class="d-none">Policy</span> Terms</a>

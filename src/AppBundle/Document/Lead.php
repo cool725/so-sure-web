@@ -29,6 +29,10 @@ class Lead
     const SOURCE_QUOTE_EMAIL_HOME_REQUIRED = 'quote-email-home-required';
     const SOURCE_EXIT_POPUP = 'exit-popup';
 
+    // Phone Insurance
+    const SOURCE_QUOTE_PHONE_LANDING_PAGE = 'quote-phone-landing-page';
+    const SOURCE_QUOTE_MAKE_LANDING_PAGE = 'quote-make-landing-page';
+
     // Home Contents
     const SOURCE_CONTENTS_BUZZ = 'home-contents-buzz';
     const SOURCE_CONTENTS_BUZZ_FOOTER = 'home-contents-buzz-footer';
@@ -102,7 +106,8 @@ class Lead
      *                 "invite-not-ready", "competition",
      *                 "aggregator", "send-quote",
      *                 "quote-email-home", "quote-email-home-required",
-     *                 "exit-popup", "home-contents-buzz", "home-contents-buzz-footer"}, strict=true)
+     *                 "exit-popup", "home-contents-buzz", "home-contents-buzz-footer",
+     *                 "quote-phone-landing-page", "quote-make-landing-page"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

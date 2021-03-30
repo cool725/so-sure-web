@@ -24,15 +24,31 @@ class HomeContentsController extends BaseController
 {
     /**
      * @Route("/contents-insurance", name="contents_insurance")
+     * @Route("/contents-insurance/m", name="contents_insurance_m")
      */
-    public function contentsInsuranceAction()
+    public function contentsInsuranceAction(Request $request)
     {
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'contents_insurance_m') {
+            $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - LP']);
+        } else {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+                'Page' => 'landing_page',
+                'Step' => 'contents_insurance'
+            ]);
+        }
+
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
         $data = [
             'lead_csrf' => $csrf->refreshToken('lead'),
+            'is_noindex' => $noindex,
         ];
 
         return $this->render($template, $data);

@@ -98,14 +98,16 @@ twig:
         rollbar_client_access_token: "%rollbar_client_access_token%"
         checkout_salva_public_key: "%checkout_salva_apipublic%"
         checkout_helvetia_public_key: "%checkout_helvetia_apipublic%"
-        business_address: "6th floor\n 55 Gracechurch Street\n London\n EC3V 0EE"
+        business_address: "6th Floor\n 55 Gracechurch Street\n London\n EC3V 0EE"
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
         support_number: "03450744839"
+        support_number_home: "0330 174 2076"
         broker_name: "Shepherd Compello Ltd"
         policy_doc_version: 16,
         free_months: "one month"
         lowest_excess: "£25"
         trustpilot_rating: 4.5
+        home_contents_funnel: https://home.wearesosure.com
 
 doctrine_mongodb:
     connections:
