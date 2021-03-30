@@ -288,7 +288,7 @@ class BacsService
      */
     public function clearSftpRunning()
     {
-        $this->redis->del(self::KEY_SFTP_FLAG);
+        $this->redis->del([self::KEY_SFTP_FLAG]);
     }
 
     /**
@@ -297,7 +297,7 @@ class BacsService
      */
     public function sftpRunning()
     {
-        return $this->redis->get(self::KEY_SFTP_FLAG);
+        return ($this->redis->get(self::KEY_SFTP_FLAG) ? true : false);
     }
 
     /**
@@ -318,7 +318,7 @@ class BacsService
         $files = [];
         try {
             $files = $this->sosureSftpService->listSftp();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logger->error(sprintf(
                 'Failed to list bacs report files with message: %s',
                 $e->getMessage()
@@ -355,7 +355,7 @@ class BacsService
             }
             try {
                 $this->sosureSftpService->moveSftp($file, !$error);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->error(sprintf(
                     'failed to move bacs report file %s with message: %s',
                     $file,
@@ -363,7 +363,7 @@ class BacsService
                 ));
             }
         }
-        $this->redis->del(self::KEY_SFTP_FLAG);
+        $this->redis->del([self::KEY_SFTP_FLAG]);
         // if files were present and no errors, the we should approve mandates and payments
         // assuming during the time when we should have done the morning file import
         if (count($files) > 0 && $errorCount == 0) {
