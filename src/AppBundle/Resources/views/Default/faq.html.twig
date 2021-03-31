@@ -4,6 +4,7 @@
 {% set body_class = 'faq' %}
 {% set itemscope = true %}
 {% set itemtype = 'https://schema.org/FAQPage' %}
+{% set include_get_a_quote = true %}
 
 {% block title %}Frequently Asked Questions | SO-SURE{% endblock %}
 
@@ -51,7 +52,7 @@
                         </div>
                         <h1 class="text-primary mb-4">Frequently Asked Questions</h1>
                     {% endif %}
-                    <p class="mb-5">We all need a little extra info sometimes, that's why we've put together this handy FAQ section for you! Can't find what you're looking for? Then don't hesitate to ask via <a href="#" class="open-intercom">live chat</a> {{ support_hours }} or by emailing us at <a href="mailto:support@spam.so-sure.net" class="mailto append-email">support</a>.</p>
+                    <p class="mb-3">We all need a little extra info sometimes, that's why we've put together this handy FAQ section for you! Can't find what you're looking for? Then don't hesitate to ask via <a href="#" class="open-intercom">live chat</a> {{ support_hours }} or by emailing us at <a href="mailto:support@spam.so-sure.net" class="mailto append-email">support</a>.</p>
                     <h2 id="general" class="mb-4">General FAQs</h2>
                     <div class="expanding-cardbox mb-4"
                             itemscope
@@ -632,6 +633,12 @@
                         </div>
                     </div>
                     <h2 id="mobile-phone-insurance" class="mt-5 mb-4">Mobile Phones FAQs</h2>
+                    <p>
+                        <strong>No time to study materials? Get an instant quote and proceed with speedy sign-up.</strong>
+                    </p>
+                    <div class="mb-5">
+                        <a href="#" class="btn btn-success get-a-quote disabled btn-block-xs">Quote me</a>
+                    </div>
                     <div class="expanding-cardbox mb-4"
                             itemscope
                             itemprop="mainEntity"
@@ -1355,6 +1362,12 @@
                         </div>
                     </div>
                     <h2 id="contents-insurance" class="mt-5 mb-4">Contents Insurance FAQs</h2>
+                    <p>
+                        <strong>No time to study materials? Get an instant quote and proceed with speedy sign-up.</strong>
+                    </p>
+                    <div class="mb-5">
+                        <a href="{{ home_contents_funnel }}" class="btn btn-success btn-block-xs">Quote me</a>
+                    </div>
                     <div class="expanding-cardbox mb-4"
                             itemscope
                             itemprop="mainEntity"
