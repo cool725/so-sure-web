@@ -85,7 +85,7 @@ class PolicyBiReport extends PolicyReport
      */
     public function getFile()
     {
-        return $this->reduced ? 'policies-reduced.csv' : 'policies.csv';
+        return $this->reduced ? 'policies-reduced' : 'policies';
     }
 
     /**
