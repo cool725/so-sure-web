@@ -102,7 +102,7 @@
                                 {% if claim_form.proofOfUsage is defined %}
                                     {% if claim.network in matchNetworks %}
                                         {% set formLabel = 'Latest Bill' %}
-                                        <p>Contact your network to request your 'Latest Bill'. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).</p>
+                                        <p>Please attached a copy of your latest bill.</p>
                                     {% elseif claim.network == 'giffgaff' %}
                                         {% set showPOF = false %}
                                         <div class="form-group">
