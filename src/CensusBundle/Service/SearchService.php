@@ -75,6 +75,7 @@ class SearchService
 
     public function findNearest($code)
     {
+        return null;
         $postcode = $this->getPostcode($code);
         if (!$postcode) {
             return null;
@@ -93,6 +94,7 @@ class SearchService
 
     public function findNearestPostcode($code, $excluded = null)
     {
+        return null;
         if (!$excluded) {
             $excluded = [$code];
         }
