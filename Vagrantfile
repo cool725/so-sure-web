@@ -63,7 +63,7 @@ Vagrant.configure("2") do |config|
   # there may be an additional error about unable to read from remote git repo
   # copy your ssh id_rsa key to source folder; then vagrant ssh; cp /vagrant/id_rsa ~/.ssh/id_rsa
   # exit; vagrant halt; vagrant up --provision
-  config.vm.define "dev1804", primary: true, autostart: true do |devgs1804_config|
+  config.vm.define "dev1804", primary: true, autostart: true do |dev1804_config|
     dev1804_config.vm.box = "geerlingguy/ubuntu1804"
     dev1804_config.vm.box_check_update = false
     dev1804_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
@@ -73,8 +73,8 @@ Vagrant.configure("2") do |config|
     #dev1804_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
     dev1804_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
     # Comment above and uncomment below for macos!
-    # dev1804_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
-    # dev1804_config.vm.synced_folder "/System/Volumes/Data" + Dir.pwd, '/[DIR-NAME]', nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
+    #uncomment for mac: dev1804_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
+    #uncomment for mac: dev1804_config.vm.synced_folder "/System/Volumes/Data" + Dir.pwd, '/[DIR-NAME]', nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
     #dev1804_config.vm.synced_folder ".", "/vagrant"
     dev1804_config.ssh.forward_agent = true
     dev1804_config.vm.provision "shell",
