@@ -62,7 +62,7 @@ class PricingUpdateCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('sosure:phone:pricing')
+            ->setName('sosure:phone:pricing-update')
             ->setDescription('Add new pricing to phones from CSV')
             ->addOption(
                 'csv',
