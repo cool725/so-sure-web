@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\PhonePrice;
 
-class UpdatePricingCommand extends ContainerAwareCommand
+class PricingUpdateCommand extends ContainerAwareCommand
 {
     /** @var DocumentManager  */
     protected $dm;
