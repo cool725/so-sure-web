@@ -69,12 +69,18 @@ class PricingExportCommand extends ContainerAwareCommand
             $row[] = $phone->getMake();
             $row[] = $phone->getModel();
             $row[] = $phone->getMemory();
-            $row[] = number_format($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp(), 2);
-            $row[] = number_format($phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp(), 2);
-            $row[] = number_format($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'essentials')->getGwp(), 2);
-            $row[] = number_format($phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'essentials')->getGwp(), 2);
-            $row[] = number_format($phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'damage')->getGwp(), 2);
-            $row[] = number_format($phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'damage')->getGwp(), 2);
+            $row[] = number_format($phone
+                    ->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp(), 2);
+            $row[] = number_format($phone
+                    ->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp(), 2);
+            $row[] = number_format($phone
+                    ->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'essentials')->getGwp(), 2);
+            $row[] = number_format($phone
+                    ->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'essentials')->getGwp(), 2);
+            $row[] = number_format($phone
+                    ->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'damage')->getGwp(), 2);
+            $row[] = number_format($phone
+                    ->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'damage')->getGwp(), 2);
             $row[] = $excess->getDamage();
             $row[] = $excess->getWarranty();
             $row[] = $excess->getExtendedWarranty();
@@ -86,7 +92,7 @@ class PricingExportCommand extends ContainerAwareCommand
             $row[] = $picSureExcess->getLoss();
             $row[] = $picSureExcess->getTheft();
 
-            print(implode($row,','));
+            print(implode($row, ','));
             echo "\n";
         }
     }
