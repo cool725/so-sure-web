@@ -770,4 +770,46 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/what-is-phone-cosmetic-damage",
+     * name="what_is_phone_cosmetic_damage", options={"sitemap" = true})
+     * @Template
+     */
+    public function whatIsPhoneCosmeticDamageAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/what-is-phone-cosmetic-damage.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/contents-insurance-in-a-shared-house",
+     * name="contents_insurance_in_a_shared_house", options={"sitemap" = true})
+     * @Template
+     */
+    public function contentsInsuranceInASharedHouseAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/contents-insurance-in-a-shared-house.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/what-is-a-single-article-limit",
+     * name="what_is_a_single_article_limit", options={"sitemap" = true})
+     * @Template
+     */
+    public function whatIsASingleArticleLimitAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/what-is-a-single-article-limit.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
