@@ -4,7 +4,6 @@ namespace AppBundle\Command;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
-use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
@@ -27,8 +26,6 @@ use phpseclib\Crypt\RSA;
 
 class BacsReportCommand extends ContainerAwareCommand
 {
-    use DateTrait;
-
     /** @var DocumentManager  */
     protected $dm;
 
@@ -51,33 +48,31 @@ class BacsReportCommand extends ContainerAwareCommand
 
     protected function configure()
     {
-        $this
-            ->setName('sosure:bacs:report')
+        $this->setName('sosure:bacs:report')
             ->setDescription('Import bacs reports')
-        ;
+            ->addOption('clear-flag', null, InputOption::VALUE_NONE, 'clear the processing flag and exit');
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @return int|null|void
-     * @throws \Exception
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $results = $this->bacsService->sftp();
-        if (count($results) > 0) {
-            $data = json_encode($results, JSON_PRETTY_PRINT);
-            $output->writeln($data);
-            $this->mailerService->send(
-                'Bacs Report Input',
-                'tech+ops@so-sure.com',
-                sprintf('Bacs Report Input Results:<br /> %s', nl2br($data))
-            );
+        $clear = $input->getOption('clear-flag');
+        if ($clear) {
+            $this->bacsService->clearSftpRunning();
+            $output->writeln('cleared');
         } else {
-            $output->writeln('Nothing to process');
+            $results = $this->bacsService->sftp();
+            if (count($results) > 0) {
+                $data = json_encode($results, JSON_PRETTY_PRINT);
+                $output->writeln($data);
+                $this->mailerService->send(
+                    'Bacs Report Input',
+                    'tech+ops@so-sure.com',
+                    sprintf('Bacs Report Input Results:<br /> %s', nl2br($data))
+                );
+            } else {
+                $output->writeln('Nothing to process');
+            }
+            $output->writeln('Finished');
         }
-
-        $output->writeln('Finished');
     }
 }

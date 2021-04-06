@@ -114,11 +114,11 @@ doctrine_mongodb:
         default:
             server: "%mongodb_url%"
             options:
-                readPreference: "primaryPreferred"
+                readPreference: "secondaryPreferred"
         census:
             server: "%census_mongodb_url%"
             options:
-                readPreference: "primaryPreferred"
+                readPreference: "secondaryPreferred"
     default_database: "%mongodb_db%"
     document_managers:
         default:
