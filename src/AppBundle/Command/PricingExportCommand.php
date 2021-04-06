@@ -58,6 +58,9 @@ class PricingExportCommand extends ContainerAwareCommand
     {
         print(implode($this->headers, ','));
         echo "\n";
+        /**
+         * @var PhoneRepository $repo
+        */
         $repo = $this->dm->getRepository(Phone::class);
         $phones = $repo->findActive()->getQuery()->execute();
 
