@@ -103,4 +103,4 @@ class RefundCommand extends ContainerAwareCommand
             ));
         }
     }
-};
+}
