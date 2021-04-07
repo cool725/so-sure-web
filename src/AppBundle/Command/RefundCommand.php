@@ -11,6 +11,7 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Service\CheckoutService;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Document\Payment;
+use AppBundle\Document\CheckoutPayment;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
