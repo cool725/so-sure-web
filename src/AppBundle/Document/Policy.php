@@ -1231,22 +1231,28 @@ abstract class Policy
     }
 
     /**
-     * @return Payment|null
+     * Gives you the last successful user payment that was a credit.
+     * @param \DateTime|null $date is the maximum date if given, otherwise there is none.
+     * @param string|null    $type is the type of payment object we want if any specific.
+     * @return Payment|null the found payment if any.
      */
-    public function getLastSuccessfulUserPaymentCredit()
+    public function getLastSuccessfulUserPaymentCredit($date = null, $type = null)
     {
         $payments = $this->getSuccessfulUserPaymentCredits();
         if (count($payments) == 0) {
             return null;
         }
-
-        // sort more recent to older
         usort($payments, function ($a, $b) {
             return $a->getDate() < $b->getDate();
         });
-        //\Doctrine\Common\Util\Debug::dump($payments, 3);
-
-        return $payments[0];
+        foreach ($payments as $payment) {
+            if (!$date or $payment->getDate() <= $date) {
+                if (!$type or $payment->getType() === $type) {
+                    return $payment;
+                }
+            }
+        }
+        return null;
     }
 
     /**
