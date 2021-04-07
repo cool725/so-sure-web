@@ -1,0 +1,127 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}What Is Phone Cosmetic Damage? | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Cosmetic damage usually applies to any appearance-related phone damage that doesn’t affect the functionality, such as scratches or chips to the exterior."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'What Is Phone Cosmetic Damage? | SO-SURE' %}
+{% set og_description = "Cosmetic damage usually applies to any appearance-related phone damage that doesn’t affect the functionality, such as scratches or chips to the exterior." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/what-is-phone-cosmetic-damage.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">What Is Phone Cosmetic Damage?</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">What Is Phone Cosmetic Damage?</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Feb 28, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/what-is-phone-cosmetic-damage.jpg"
+                                     alt="Hand Dropping Phone"
+                                     class="img-fluid lozad mb-5">
+                                <p>There are a million ways you can damage your phone, but cosmetic damage is one of the most common categories. While cosmetic damage to a phone is naturally less frustrating than serious hardware issues, given that you can still use its fundamental features, it’s still a pain.</p>
+                                <p>If you’re wondering what the label ‘cosmetic damage’ actually refers to, whether your phone is cosmetically damaged, or how cosmetic damage affects a phone’s value, read on for all the information you need.</p>
+                                <h2>What counts as cosmetic damage?</h2>
+                                <p>Generally, this term applies to any minor damage your phone might encounter that doesn’t inhibit any of its functions. This usually means things such as scuffs, scrapes, or chips that occur when your phone is dropped or encounters something sharp. Over time, it’s almost a guarantee that your phone will sustain some cosmetic damage – no matter how careful you are.</p>
+                                <p>However, cosmetic damage is quite a difficult term to define exactly, because what counts as cosmetic damage to you may not to someone else. For example, a <a href="{{ path('how_to_fix_cracked_phone_screen') }}">phone with a cracked screen</a> may just be cosmetic damage to one person, but to another it’s a broken screen that they can’t live with and have to get repaired as soon as possible.</p>
+                                <h2>Cosmetic damage and insurance</h2>
+                                <p>If you drop your phone and sustain a few scratches, or even a slight crack in your screen, you might be tempted to contact your insurance provider to try to get it repaired.</p>
+                                <p>However, cosmetic damage often is not covered by an <a href="{{ path('homepage') }}">insurance provider</a>, because it doesn’t actually hamper how well you are able to use your phone. The lines are a bit blurry on this one, especially when it comes to screen damage. So, if you want to see if any damage is covered, you should make an enquiry just in case.</p>
+                                <p>It’s important to be super careful when it comes to cosmetic damage. Even if there is minimal damage on the outside of your phone, there may be serious issues within if it’s taken a particularly nasty tumble. So, be wary, and contact your provider or manufacturer if you think it may lose function.</p>
+                                <p>All hope is never lost when it comes to cosmetic damage, though; many small scratches can be buffed out or cleaned for relatively affordable prices.</p>
+                                <h2>Can I sell a phone with cosmetic damage?</h2>
+                                <p>Because cosmetic damage is considered almost inevitable, your device’s trade-in value will likely be largely unaffected. Most customers who want to purchase used devices understand that cosmetic blemishes tend to be part and parcel. If your screen is in one piece and your phone works okay, there should still be some demand for your device.</p>
+                                <h2>How to avoid cosmetic damage</h2>
+                                <p>We’ve already reiterated that cosmetic damage is likely to happen, regardless of how careful you are, or the kind of phone you have. However, there are some steps you can take to minimise how badly your phone might be affected by everyday wear and tear.</p>
+                                <p>For starters, consider investing in a good <a href="{{ path('best_phone_cases') }}">case</a>. There are thousands of phone cases out there, and they increase the longevity of your phone massively. In the same vein, you should look into getting a <a href="{{ path('best_screen_protectors') }}">screen protector</a>. Whilst these won’t always stop your screen from smashing, they can limit the impact and prevent your screen from any scratches.</p>
+                                <p>The most important thing is just to be as careful as possible with your device. Avoid carrying it in the same pocket or bag as sharp keys or coins and try not to leave it anywhere it could easily be knocked off. </p>
+                                <h2>Avoid the risk of cosmetic damage with SO-SURE</h2>
+                                <p>Our phone insurance policies cover plenty of common accidental damages – from water damage to cracked screens – as well as theft, accidental loss, and hardware failure. If you want to keep your phone protected and get peace of mind, find out how much a SO-SURE policy would cost you today.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

@@ -45,10 +45,22 @@ class HomeContentsController extends BaseController
             ]);
         }
 
+        $utms = null;
+        $source = $request->query->get('utm_source');
+        $medium = $request->query->get('utm_medium');
+        $campaign = $request->query->get('utm_campaign');
+        if ($source || $medium || $campaign) {
+            $source = preg_replace('/\s+/', '+', $source);
+            $medium = preg_replace('/\s+/', '+', $medium);
+            $campaign = preg_replace('/\s+/', '+', $campaign);
+            $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
+        }
+
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
         $data = [
             'lead_csrf' => $csrf->refreshToken('lead'),
             'is_noindex' => $noindex,
+            'utms' => $utms,
         ];
 
         return $this->render($template, $data);

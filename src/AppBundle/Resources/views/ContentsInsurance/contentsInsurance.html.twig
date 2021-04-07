@@ -71,7 +71,7 @@
                                     Up to 40% no claims cashback
                                 </li>
                             </ul>
-                            <a href="{{ home_contents_funnel }}" class="btn btn-success btn-block-xs">Get a quote</a>
+                            <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}" class="btn btn-success btn-block-xs">Get a quote</a>
                         </div>
                     </div>
                 </div>
