@@ -839,29 +839,38 @@ class PhoneInsuranceController extends BaseController
                 // Placeholder for generic use with partners
                 $requester = 'requesterId';
             }
-            $prices = [[
+
+            $subVariantArr['standard'] = [
                 'subvariant' => 'standard',
-                'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
-            ]];
+                'price' => [
+                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
+                ]
+            ];
+
             foreach ($subvariants as $subvariant) {
                 $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
                 $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvariant->getName());
+
                 if ($monthly && $yearly) {
-                    $prices[] = [
-                        'subvariant' => $subvariant->getName(),
+                    $price = [
                         'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
                         'yearlyPremium' => $yearly->getYearlyPremiumPrice()
                     ];
                 }
+                $subVariantArr[$subvariant->getName()] = [
+                    'subvariant' => $subvariant->getName(),
+                    'price' => $price,
+                    'excess' => $subvariant->ge
+                ];
             }
             $list[] = [
                 'id'            => $phone->getId(),
                 'make'          => $phone->getMake(),
                 'model'         => $phone->getModel(),
                 'memory'        => $phone->getMemory(),
-                'devices' => $phone->getDevices(),
-                'price' => $prices,
+                'devices'       => $phone->getDevices(),
+                'subvariants'   => $subVariantArr,
                 'excesses' => [
                     'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
@@ -872,6 +881,7 @@ class PhoneInsuranceController extends BaseController
                 ],
                 $requester      => $aggregatorId
             ];
+
         }
         $response = new JsonResponse($list);
         $response->headers->set('Access-Control-Allow-Origin', '*');
