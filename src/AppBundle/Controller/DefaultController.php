@@ -104,12 +104,12 @@ class DefaultController extends BaseController
             'Step' => 'homepage'
         ]);
 
-        $fromPrice = $this->getLowestPremium();
+        // $fromPrice = $this->getLowestPremium();
 
         $data = array(
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex,
-            'from_price' => $fromPrice
+            // 'from_price' => $fromPrice
         );
 
         return $this->render('AppBundle:Default:indexHomepage.html.twig', $data);
