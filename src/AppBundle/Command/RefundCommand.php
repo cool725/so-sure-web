@@ -84,6 +84,7 @@ class RefundCommand extends ContainerAwareCommand
                 $output->writeln("<error>{$id} is not a valid policy id</error>");
                 continue;
             }
+            /** @var CheckoutPayment|null $payment */
             $payment = $policy->getLastSuccessfulUserPaymentCredit($date, 'checkout');
             if (!$payment) {
                 $output->writeln("<error>Policy {$id} has no payment to refund</error>");
