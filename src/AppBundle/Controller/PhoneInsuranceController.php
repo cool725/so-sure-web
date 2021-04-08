@@ -183,7 +183,7 @@ class PhoneInsuranceController extends BaseController
     public function phoneInsuranceAction(Request $request)
     {
         // Select the lowest
-        $fromPrice = $this->getLowestPremium();
+        // $fromPrice = $this->getLowestPremium();
 
         $competitorData = new Competitors();
 
@@ -202,7 +202,7 @@ class PhoneInsuranceController extends BaseController
         }
 
         $data = [
-            'from_price' => $fromPrice,
+            // 'from_price' => $fromPrice,
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex
         ];
@@ -302,8 +302,24 @@ class PhoneInsuranceController extends BaseController
             'makeCanonical' => mb_strtolower($make)
         ]);
 
+        // To display lowest monthly premium
+        $fromPhones = $repo->findBy([
+            'active' => true,
+            'makeCanonical' => mb_strtolower($make)
+        ]);
+
+        $fromPhones = array_filter($phones, function ($phone) {
+            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        });
+
+        // Sort by cheapest
+        usort($fromPhones, function ($a, $b) {
+            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        });
+
         // Select the lowest
-        $fromPrice = $this->getLowestPremium();
+        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
         $competitorData = new Competitors();
 
