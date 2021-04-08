@@ -143,7 +143,7 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'from_price' => $fromPrice,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
         ];
 
         return $this->render('AppBundle:PhoneInsurance:secondHandPhoneInsurance.html.twig', $data);
@@ -169,7 +169,7 @@ class PhoneInsuranceController extends BaseController
 
         $data = [
             'from_price' => $fromPrice,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
         ];
 
         return $this->render('AppBundle:PhoneInsurance:refurbishedHandPhoneInsurance.html.twig', $data);
@@ -197,14 +197,14 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PHONE_INSURANCE_HOME_PAGE);
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
                 'Page' => 'landing_page',
-                'Step' => 'mobile_insurance'
+                'Step' => 'mobile_insurance',
             ]);
         }
 
         $data = [
             'from_price' => $fromPrice,
             'competitor' => $competitorData::$competitorComparisonData,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
         ];
 
         // return $this->render('AppBundle:PhoneInsurance:phoneInsurance.html.twig', $data);
@@ -265,7 +265,7 @@ class PhoneInsuranceController extends BaseController
 
         $phones = $repo->findBy([
             'active' => true,
-            'makeCanonical' => mb_strtolower($make)
+            'makeCanonical' => mb_strtolower($make),
         ]);
 
         if (count($phones) != 0) {
@@ -280,7 +280,7 @@ class PhoneInsuranceController extends BaseController
         // Check if caps in url and redirect back with make in lowercase - SEO
         if (preg_match("/^[A-Z]/", $make)) {
             return $this->redirectToRoute('phone_insurance_make', [
-                'make' => mb_strtolower($make)
+                'make' => mb_strtolower($make),
             ], 301);
         }
 
@@ -299,7 +299,7 @@ class PhoneInsuranceController extends BaseController
         $topPhones = $repo->findBy([
             'active' => true,
             'topPhone' => true,
-            'makeCanonical' => mb_strtolower($make)
+            'makeCanonical' => mb_strtolower($make),
         ]);
 
         // Select the lowest
@@ -326,7 +326,7 @@ class PhoneInsuranceController extends BaseController
             'from_price' => $fromPrice,
             'competitor' => $competitorData::$competitorComparisonData,
             'money_version' => $money,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMake.html.twig', $data);
@@ -378,7 +378,7 @@ class PhoneInsuranceController extends BaseController
 
         $phones = $repo->findBy([
             'makeCanonical' => mb_strtolower($make),
-            'modelCanonical' => mb_strtolower($decodedModel)
+            'modelCanonical' => mb_strtolower($decodedModel),
         ]);
 
         if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
@@ -423,7 +423,7 @@ class PhoneInsuranceController extends BaseController
         ];
         // TODO: use make in template names
         $templateOverides = [
-            'nokia 6'
+            'nokia 6',
         ];
         $templateOveride = $make." ".$model;
         $hideSection = false;
@@ -465,7 +465,7 @@ class PhoneInsuranceController extends BaseController
             'hide_section' => $hideSection,
             'competitor' => $competitorData::$competitorComparisonData,
             'money_version' => $money,
-            'is_noindex' => $noindex
+            'is_noindex' => $noindex,
         ];
 
         return $this->render($template, $data);
@@ -495,7 +495,7 @@ class PhoneInsuranceController extends BaseController
             'active' => true,
             'makeCanonical' => mb_strtolower($make),
             'modelCanonical' => mb_strtolower($decodedModel),
-            'memory' => (int) $memory
+            'memory' => (int) $memory,
         ]);
         // check for historical urls
         if (!$phone || mb_stripos($model, ' ') !== false) {
@@ -503,7 +503,7 @@ class PhoneInsuranceController extends BaseController
                 'active' => true,
                 'makeCanonical' => mb_strtolower($make),
                 'modelCanonical' => mb_strtolower($decodedModelHyph),
-                'memory' => (int) $memory
+                'memory' => (int) $memory,
             ]);
         }
 
@@ -641,7 +641,7 @@ class PhoneInsuranceController extends BaseController
                 [
                     'active' => true,
                     'makeCanonical' => mb_strtolower($make),
-                    'modelCanonical' => mb_strtolower($decodedModel)
+                    'modelCanonical' => mb_strtolower($decodedModel),
                 ],
                 ['memory' => 'asc']
             ),
@@ -672,7 +672,7 @@ class PhoneInsuranceController extends BaseController
 
         $phones = $repo->findBy([
             'makeCanonical' => mb_strtolower($make),
-            'modelCanonical' => mb_strtolower($decodedModel)
+            'modelCanonical' => mb_strtolower($decodedModel),
         ]);
 
         if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
@@ -741,7 +741,7 @@ class PhoneInsuranceController extends BaseController
                             'active' => true,
                             'makeCanonical' => mb_strtolower($goCompare::$models[$id]['make']),
                             'modelCanonical' => mb_strtolower($goCompare::$models[$id]['model']),
-                            'memory' => (int) $goCompare::$models[$id]['memory']
+                            'memory' => (int) $goCompare::$models[$id]['memory'],
                         ]);
                     }
                 }
@@ -758,14 +758,14 @@ class PhoneInsuranceController extends BaseController
                 'active' => true,
                 'makeCanonical' => mb_strtolower($make),
                 'modelCanonical' => mb_strtolower($decodedModel),
-                'memory' => (int) $memory
+                'memory' => (int) $memory,
             ]);
         }
         if ($phone) {
             $prices = [[
                 'subvariant' => 'standard',
                 'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
+                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice(),
             ]];
             foreach ($subvariants as $subvariant) {
                 $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
@@ -774,7 +774,7 @@ class PhoneInsuranceController extends BaseController
                     $prices[] = [
                         'subvariant' => $subvariant->getName(),
                         'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
-                        'yearlyPremium' => $yearly->getYearlyPremiumPrice()
+                        'yearlyPremium' => $yearly->getYearlyPremiumPrice(),
                     ];
                 }
             }
@@ -787,7 +787,7 @@ class PhoneInsuranceController extends BaseController
                         [],
                     'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
-                        []
+                        [],
                 ]
 
                 // disabled temporarily to not confuse Comparison Creator
@@ -817,6 +817,7 @@ class PhoneInsuranceController extends BaseController
         $phones = $repo->findActive()->getQuery()->execute();
         $list = [];
 
+        /** @var Phone $phone */
         foreach ($phones as $phone) {
             // Loop through each phone and make an array for the response
             $aggregatorId = '';
@@ -844,24 +845,41 @@ class PhoneInsuranceController extends BaseController
                 'subvariant' => 'standard',
                 'price' => [
                     'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice()
-                ]
+                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice(),
+                ],
+                'excesses' => [
+                    'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
+                        [],
+                    'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
+                        $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
+                        [],
+                ],
             ];
 
             foreach ($subvariants as $subvariant) {
-                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
-                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvariant->getName());
-
+                $subvarName = $subvariant->getName();
+                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvarName);
+                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvarName);
+                $price = [];
                 if ($monthly && $yearly) {
                     $price = [
                         'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
-                        'yearlyPremium' => $yearly->getYearlyPremiumPrice()
+                        'yearlyPremium' => $yearly->getYearlyPremiumPrice(),
                     ];
                 }
-                $subVariantArr[$subvariant->getName()] = [
-                    'subvariant' => $subvariant->getName(),
+
+                $subVariantArr[$subvarName] = [
+                    'subvariant' => $subvarName,
                     'price' => $price,
-                    'excess' => $subvariant->ge
+                    'excesses' => [
+                        'defaultExcess' => $monthly->getExcess() ?
+                            $monthly->getExcess()->toApiArray($subvariant) :
+                            [],
+                        'validatedExcess' => $monthly->getPicSureExcess() ?
+                            $monthly->getPicSureExcess()->toApiArray($subvariant) :
+                            [],
+                    ],
                 ];
             }
             $list[] = [
@@ -871,17 +889,8 @@ class PhoneInsuranceController extends BaseController
                 'memory'        => $phone->getMemory(),
                 'devices'       => $phone->getDevices(),
                 'subvariants'   => $subVariantArr,
-                'excesses' => [
-                    'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
-                        $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
-                        [],
-                    'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
-                        $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
-                        []
-                ],
-                $requester      => $aggregatorId
+                $requester      => $aggregatorId,
             ];
-
         }
         $response = new JsonResponse($list);
         $response->headers->set('Access-Control-Allow-Origin', '*');
@@ -930,7 +939,7 @@ class PhoneInsuranceController extends BaseController
                 [
                     'make' => $phone->getMakeCanonical(),
                     'model' => $phone->getModelCanonical(),
-                    'memory' => $phone->getMemory()
+                    'memory' => $phone->getMemory(),
                 ]
             );
             ksort($phonesMem[$phone->getName()]['mem']);
