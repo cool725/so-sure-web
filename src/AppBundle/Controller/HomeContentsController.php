@@ -24,21 +24,57 @@ class HomeContentsController extends BaseController
 {
     /**
      * @Route("/contents-insurance", name="contents_insurance")
-     * @Route("/contents-insurance-beta", name="contents_insurance_beta")
+     * @Route("/contents-insurance/m", name="contents_insurance_m")
+     * @Route("/contents-insurance/getmyslice", name="contents_insurance_getmyslice")
      */
     public function contentsInsuranceAction(Request $request)
     {
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
-        $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
-        $beta = false;
-        if ($request->get('_route') == 'contents_insurance_beta') {
-            $beta = true;
+        // Temp
+        $promo = false;
+
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'contents_insurance_m') {
+            $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - LP']);
+        } elseif ($request->get('_route') == 'contents_insurance_getmyslice') {
+            $noindex = true;
+            $promo = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Get My Slice']);
+        } else {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+                'Page' => 'landing_page',
+                'Step' => 'contents_insurance'
+            ]);
         }
+
+        $utms = null;
+        $source = $request->query->get('utm_source');
+        $medium = $request->query->get('utm_medium');
+        $campaign = $request->query->get('utm_campaign');
+        if ($source || $medium || $campaign) {
+            $source = preg_replace('/\s+/', '+', $source);
+            $medium = preg_replace('/\s+/', '+', $medium);
+            $campaign = preg_replace('/\s+/', '+', $campaign);
+            $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
+        }
+
+        $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
+        if ($promo) {
+            $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
+        }
+
         $data = [
             'lead_csrf' => $csrf->refreshToken('lead'),
-            'beta' => $beta,
+            'is_noindex' => $noindex,
+            'utms' => $utms,
+            'promo' => $promo,
         ];
 
         return $this->render($template, $data);

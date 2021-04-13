@@ -27,7 +27,6 @@ use AppBundle\Classes\SoSure;
 class PolicyReportCommand extends ContainerAwareCommand
 {
     const INTERVAL = 'P7D';
-    const START_INTERVAL = 'P15M';
 
     /** @var S3Client */
     protected $s3;
@@ -82,7 +81,7 @@ class PolicyReportCommand extends ContainerAwareCommand
                 'Choose a timezone to use for policies report',
                 'Europe/London'
             )
-            ->addOption('limit', null, InputOption::VALUE_OPTIONAL, 'How many policies to process in batches', 1000)
+            ->addOption('startperiod', null, InputOption::VALUE_OPTIONAL, 'How many months back', 15)
             ->addOption(
                 'bclear',
                 null,
@@ -101,15 +100,21 @@ class PolicyReportCommand extends ContainerAwareCommand
         $batchStart = time();
         $now = new \DateTime();
         $policyCounter = 0;
-        $begin = (clone $now)->sub(new \DateInterval(self::START_INTERVAL));
+
 
         // Set up reports to run.
         $reportName = $input->getOption('report');
-        $limit = $input->getOption('limit');
+        $startPeriod = $input->getOption('startperiod');
         $bclear = $input->getOption('bclear');
         $debug = $input->getOption('debug') == true;
         $timezone = new DateTimeZone($input->getOption('timezone'));
 
+        if (!is_numeric($startPeriod)) {
+            $output->writeln("<error>Must be a integer only</error>");
+            return;
+        }
+        $startInterval = 'P'.$startPeriod.'M';
+        $begin = (clone $now)->sub(new \DateInterval($startInterval));
         $report = PolicyReport::createReport($reportName, $this->searchService, $this->dm, $timezone, $this->logger);
         if (!$report) {
             $output->writeln("<error>{$reportName} is not a valid report type</error>");
@@ -190,13 +195,14 @@ class PolicyReportCommand extends ContainerAwareCommand
         }
         // Now run the reports.
         // Output and upload.
+        $fileName = $report->getFile() . '-' . $startPeriod . '.csv';
         if ($debug) {
-            $output->writeln("<info>{$report->getFile()}</info>");
+            $output->writeln("<info>{$fileName}</info>");
             $output->writeln($report->getLines());
         }
         try {
-            $this->uploadS3($report->getLines(), $report->getFile());
-            $output->writeln("<info>Uploaded {$report->getFile()}");
+            $this->uploadS3($report->getLines(), $fileName);
+            $output->writeln("<info>Uploaded {$fileName}");
         } catch (IOException $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
         }

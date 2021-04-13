@@ -29,8 +29,7 @@ On top of that, you’ll also get a further £10 in your no claims ‘Reward Pot
 
 Learn more: {{ url('user_home', {'id': policy.id }) }}
 
-The important (but boring 😴) bits
-
+The important (but boring 😴) bits:
 - Your policy is for a {{ policy.phone }}
 - Your policy starts:: {{ policy.start | date('d M Y', 'Europe/London') }}
 - Your policy ends: {{ policy.end | date('d M Y H:i', 'Europe/London') }}
@@ -57,6 +56,7 @@ Your cover includes:
 {% endif %}
 
 If your phone is already broken 👮
+
 On a serious note, if your phone was already damaged before you purchased this policy, you should cancel it now or risk prosecution.
 
 Find out why this is no joke: {{ url('faq') }}

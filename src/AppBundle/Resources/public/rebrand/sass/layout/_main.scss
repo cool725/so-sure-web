@@ -39,11 +39,19 @@
     }
 
     &__main {
-        padding-top: 2rem;
-        padding-bottom: 1.76rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        margin: {
+            left: 1.5rem;
+            right: 1.5rem;
+        }
 
         @include media-breakpoint-up(lg) {
             padding-top: 3rem;
+            margin: {
+                left: 3rem;
+                right: 3rem;
+            }
         }
     }
 
@@ -97,6 +105,24 @@
     }
 
     // Contents
+    &__logo {
+        display: block;
+        text-align: center;
+        margin: {
+            left: 1.5rem;
+            right: 1.5rem;
+            top: 2rem;
+        }
+
+        @include media-breakpoint-up(lg) {
+            text-align: left;
+            margin: {
+                left: 3rem;
+                right: 3rem;
+            }
+        }
+    }
+
     &__h1 {
         color: $deep-sky-blue-d;
         text-align: center;
@@ -118,9 +144,11 @@
     &__h5 {
         color: $white;
         text-align: center;
+        display: none;
 
         @include media-breakpoint-up(lg) {
             text-align: left;
+            display: block;
         }
     }
 

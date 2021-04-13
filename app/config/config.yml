@@ -98,9 +98,10 @@ twig:
         rollbar_client_access_token: "%rollbar_client_access_token%"
         checkout_salva_public_key: "%checkout_salva_apipublic%"
         checkout_helvetia_public_key: "%checkout_helvetia_apipublic%"
-        business_address: "6th floor\n 55 Gracechurch Street\n London\n EC3V 0EE"
+        business_address: "6th Floor\n 55 Gracechurch Street\n London\n EC3V 0EE"
         support_hours: "Monday to Thursday 9am-5pm and Friday 9am-4pm"
         support_number: "03450744839"
+        support_number_home: "0330 174 2076"
         broker_name: "Shepherd Compello Ltd"
         policy_doc_version: 16,
         free_months: "one month"
@@ -550,6 +551,8 @@ nelmio_security:
                 - https://frstre.com
                 - https://tapi.tapfiliate.com
                 - https://monitor.clickcease.com
+                - https://surveystats.hotjar.io
+                - https://analytics.tiktok.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -900,6 +903,7 @@ nelmio_security:
                 - https://dcc4iyjchzom0.cloudfront.net
                 - https://script.tapfiliate.com
                 - https://www.clickcease.com/monitor/stat.js
+                - https://analytics.tiktok.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac

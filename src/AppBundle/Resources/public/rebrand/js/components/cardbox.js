@@ -12,9 +12,9 @@ $(function() {
 
         let next = $(this).parent().parent().siblings('.expanding-cardbox');
 
-        next.removeClass('expanding-cardbox__open')
-        .find('.expanding-cardbox__expand, .expanding-cardbox__excerpt')
-        .hide('fast');
+        // next.removeClass('expanding-cardbox__open')
+        // .find('.expanding-cardbox__expand, .expanding-cardbox__excerpt')
+        // .hide('fast');
 
         // Toggle the content
         $(this).parent().parent().toggleClass('expanding-cardbox__open')

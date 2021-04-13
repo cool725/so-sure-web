@@ -32,7 +32,7 @@ $(function() {
         }
     });
 
-    $('#back-to-top-faq').on('click', function(e) {
+    $('.back-to-top-faq').on('click', function(e) {
         e.preventDefault();
 
         $('html, body').animate({

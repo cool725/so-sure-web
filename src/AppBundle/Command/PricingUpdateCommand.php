@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\PhonePrice;
 
-class UpdatePricingCommand extends ContainerAwareCommand
+class PricingUpdateCommand extends ContainerAwareCommand
 {
     /** @var DocumentManager  */
     protected $dm;
@@ -62,7 +62,7 @@ class UpdatePricingCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('sosure:phone:pricing')
+            ->setName('sosure:phone:pricing-update')
             ->setDescription('Add new pricing to phones from CSV')
             ->addOption(
                 'csv',

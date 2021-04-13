@@ -1,0 +1,135 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}What Is A Single Article Limit? | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="There are a few tricky terms in the insurance world; fortunately, single article limit is one of the simpler ones. Learn what a single article limit is here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'What Is A Single Article Limit? | SO-SURE' %}
+{% set og_description = "There are a few tricky terms in the insurance world; fortunately, single article limit is one of the simpler ones. Learn what a single article limit is here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/what-is-a-single-article-limit.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">What Is A Single Article Limit?</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">What Is A Single Article Limit?</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Mar 28, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/what-is-a-single-article-limit.jpg"
+                                     alt="Woman playing guitar"
+                                     class="img-fluid lozad mb-5">
+                                <p>There are a few tricky terms in the world of insurance, but single article limit is one of the simpler ones to understand. This blog defines the term and provides some handy example scenarios to help you fully understand the concept of a single article limit, making it easier for you to make an informed decision regarding your contents insurance.</p>
+                                <h2>What is a single article limit?</h2>
+                                <p>A single article limit – also known as a single item limit – is the maximum you can claim on your contents insurance policy for any one item that’s damaged or stolen. For instance, if your single item limit is £1000, but your engagement ring is worth more than that, you won’t be adequately covered to replace it to its full value should the worst happen.</p>
+                                <h2>How much is the single article limit?</h2>
+                                <p>The single article limit is typically around £1,500, but this figure can vary between insurance providers. Therefore, you should always check any policy you’re considering to ensure the single article limit suits your needs.</p>
+                                <h2>What about valuables that exceed my single article limit?</h2>
+                                <p>Suppose you have possessions worth more than the single article limit. In that case, you’ll need to inform your insurer so they can list these items individually on your policy and ensure their full value is covered. Remember, if you don’t declare your high-value items, you risk being underinsured, meaning you won’t be reimbursed for your belongings’ full value should they be damaged or stolen. When listing high-value possessions on your contents insurance policy, it also helps to have a recent valuation certificate on hand for each item, as most insurance providers require them.</p>
+                                <h2>What about items I take out of the house?</h2>
+                                <p>Items you take out of the house with you, such as watches, smartphones, laptops and tablets, are considered high risk by insurers –  this is where personal possessions insurance comes in.</p>
+                                <p>Personal possessions insurance covers your personal belongings when you’re out and about. Some insurance companies include it as part of their standard policies, while others don’t, so be sure to check your policy to ensure your high-risk items are fully covered. If your standard policy doesn’t include personal possessions insurance, you can add it to your policy for an additional cost.</p>
+                                <h2>How do I value my home contents?</h2>
+                                <p>Most of us accumulate our contents over a long period, so it can be daunting when valuing all of our belongings. Unfortunately, there’s no getting around it, but you’ll streamline the process and value your contents in no time by following the simple steps below:</p>
+                                <ul>
+                                  <li>Room by room, make a list of everything you own</li>
+                                  <li>Estimate the value of each item (this doesn’t have to be exact but try to be as accurate as possible)</li>
+                                  <li>For valuable possessions like artwork or jewellery, seek professional valuations from an accredited valuer</li>
+                                  <li>When you’re finished, calculate your total – a home insurance calculator can help during this stage.</li>
+                                </ul>
+                                <h2>I’m not sure how much my contents are worth</h2>
+                                <p>Being unaware of your contents’ value puts you at risk of paying over the odds for your insurance. Or, on the other hand, you’ll be underinsured when you come to make a claim. Also, if your insurer suspects you’ve deliberately underestimated your contents’ value, they’d be well within their rights to refuse to pay you or at least reduce the figure significantly.</p>
+                                <h3>Getting your contents professionally valued</h3>
+                                <p>If you’ve received, inherited, or simply bought some of your contents a long time ago, it’s worth having them valued by a professional. In the case of jewellery, you can have it valued for a small fee by a specialist jeweller or antique dealer. Head over to the Institute of Registered Valuers’ (IRV) <a href="https://www.naj.co.uk/find-an-irv" target="_blank" rel="noopener noreferrer">website</a> to find an accredited jewellery valuer in your area.</p>
+                                <h2>Is having my jewellery professionally valued worth the expense?</h2>
+                                <p>Having your jewellery valued by a professional is most certainly worth the expense since the value of silver and gold frequently fluctuates. Jewellery you bought or received a couple of decades ago could be worth much more today, or vice versa. Therefore, getting your jewellery valued provides peace of mind should the worst happen, and you might even be in for a pleasant surprise should its value have increased!</p>
+                                <h2>Cover your contents with SO-SURE</h2>
+                                <p>If you want to make sure your possessions are covered against damage or theft, learn more about our contents insurance policies here. All you have to do is download our app and scan your belongings to find out how much contents insurance would cost you.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

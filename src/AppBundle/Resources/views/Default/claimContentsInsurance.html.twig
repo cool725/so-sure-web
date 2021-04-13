@@ -1,0 +1,76 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'make-a-claim' %}
+
+{% block title %}Contents Insurance Claim | SO-SURE{% endblock %}
+{% block meta %}
+    <meta name="description" content="Did you want to make a claim on your contents insurance? Anything lost, stolen or broken? Start your claim online with SO-SURE for a fast and pain-free claims process. Learn more about each step here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/make-a-claim.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero hero-contents">
+        <div class="container-large">
+            <div class="row">
+            <div class="col-lg-8 offset-lg-4 col-xl-7 offset-xl-5">
+                <div class="breadcrumbs">
+                    <ul class="list-inline"
+                        vocab="https://schema.org/"
+                        typeof="BreadcrumbList">
+                        <li class="list-inline-item"
+                            property="itemListElement"
+                            typeof="ListItem">
+                            <a href="{{ path('homepage') }}"
+                                class="text-columbia-blue-e"
+                                property="item"
+                                typeof="WebPage">
+                                <span property="name">Home</span>
+                            </a>
+                            <meta property="position" content="1">
+                        </li>
+                        <li class="list-inline-item text-white">
+                            <i class="fal fa-angle-right text-white"></i>
+                        </li>
+                        <li class="list-inline-item"
+                            property="itemListElement"
+                            typeof="ListItem">
+                            <a href="{{ path('claim') }}"
+                                class="text-columbia-blue-e"
+                                property="item"
+                                typeof="WebPage">
+                                <span property="name">Make a claim</span>
+                            </a>
+                            <meta property="position" content="1">
+                        </li>
+                        <li class="list-inline-item text-white">
+                            <i class="fal fa-angle-right text-white"></i>
+                        </li>
+                        <li class="list-inline-item text-white"
+                            property="itemListElement"
+                            typeof="ListItem">
+                            <span property="name">Contents Insurance</span>
+                            <meta property="position" content="3">
+                        </li>
+                    </ul>
+                </div>
+                <h1 class="mb-4 fit">Claim on your<br class="d-md-none" /> Contents Insurance</h1>
+                <p>Uh-oh! Is something broken, lost, or stolen? <strong>Don’t worry, we’re here to help 🙂</strong></p>
+                <p>We’ll guide you through the claims process, step-by-step.</p>
+                <p class="mb-4">But first, help us help you. By providing the right information and responding to our calls and emails promptly, we can get your items repaired or replaced quicker.</p>
+                <h2 class="h5 mb-3">To start your claim, please call:</h2>
+                <a href="tel:{{ support_number_home }}" class="h3 text-deep-sky-blue-d"><u>{{ support_number_home }}</u></a>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/make-a-claim.js') }}"></script>
+{% endblock %}

@@ -128,8 +128,12 @@ class SearchController extends BaseController
      * @Route("/phone-search-dropdown-two/{type}/{id}", name="phone_search_dropdown_type_id_two")
      * @Template()
      */
-    public function phoneSearchDropdownCardAction(Request $request, $type = null, $id = null)
-    {
+    public function phoneSearchDropdownCardAction(
+        Request $request,
+        $type = null,
+        $id = null,
+        $source = null
+    ) {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
@@ -163,7 +167,11 @@ class SearchController extends BaseController
                     if ($email) {
                         $lead = new Lead();
                         $lead->setEmail($email);
-                        $lead->setSource(Lead::SOURCE_QUOTE_EMAIL_HOME_REQUIRED);
+                        // TODO: This could be done better
+                        $lead->setSource(Lead::SOURCE_QUOTE_PHONE_LANDING_PAGE);
+                        if ($source == 'make') {
+                            $lead->setSource(Lead::SOURCE_QUOTE_MAKE_LANDING_PAGE);
+                        }
                         $leadRepo = $dm->getRepository(Lead::class);
                         $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
