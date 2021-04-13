@@ -63,8 +63,26 @@
                 <p>Uh-oh! Is something broken, lost, or stolen? <strong>Don’t worry, we’re here to help 🙂</strong></p>
                 <p>We’ll guide you through the claims process, step-by-step.</p>
                 <p class="mb-4">But first, help us help you. By providing the right information and responding to our calls and emails promptly, we can get your items repaired or replaced quicker.</p>
-                <h2 class="h5 mb-3">To start your claim, please call:</h2>
-                <a href="tel:{{ support_number_home }}" class="h3 text-deep-sky-blue-d"><u>{{ support_number_home }}</u></a>
+                <h2 class="h5 mb-3">To start your claim, please open the app and select "Make a claim":</h2>
+                {# <a href="tel:{{ support_number_home }}" class="h3 text-deep-sky-blue-d"><u>{{ support_number_home }}</u></a> #}
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                        <a class="ga-outbound-click"
+                            data-clicklabel="iTunes"
+                            href="{{ apple_download('make-a-claim-home') }}"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download SO-SURE on the App Store" /></a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="ga-outbound-click"
+                            data-clicklabel="PlayStore"
+                            href="{{ google_download('make-a-claim-home') }}"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get SO-SURE on Google Play" /></a>
+                    </li>
+                </ul>
             </div>
         </div>
     </section>
