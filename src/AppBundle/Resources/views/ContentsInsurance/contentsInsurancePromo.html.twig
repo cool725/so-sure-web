@@ -6,9 +6,12 @@
 
 {% block title %}Contents Insurance | SO-SURE{% endblock %}
 {% block meta %}
-    <meta name="description" content="Add description..."/>
+    <meta name="description" content="Low cost contents insurance with up to 40% no claims cashback and price freeze. Claims sorted in 72hrs covering almost all contents, accidental, fire, damage and theft."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
+{% set og_title = 'Contents Insurance | SO-SURE' %}
+{% set og_description = "Low cost contents insurance with up to 40% no claims cashback and price freeze. Claims sorted in 72hrs covering almost all contents, accidental, fire, damage and theft." %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/contents-insurance.css') }}">
