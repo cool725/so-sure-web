@@ -54,15 +54,24 @@ class HomeContentsController extends BaseController
             ]);
         }
 
+        // Pass along UTM params to web app for Mixapanel
         $utms = null;
         $source = $request->query->get('utm_source');
         $medium = $request->query->get('utm_medium');
         $campaign = $request->query->get('utm_campaign');
+        $sskey = $request->query->get('sskey');
+
         if ($source || $medium || $campaign) {
-            $source = preg_replace('/\s+/', '+', $source);
-            $medium = preg_replace('/\s+/', '+', $medium);
-            $campaign = preg_replace('/\s+/', '+', $campaign);
+            $source = urlencode($source);
+            $medium = urlencode($medium);
+            $campaign = urlencode($campaign);
             $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
+        }
+
+        // Optimise - pass along sskey
+        if ($sskey) {
+            $sskey = sprintf('&sskey=%s', $sskey);
+            $utms = $utms . $sskey;
         }
 
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
