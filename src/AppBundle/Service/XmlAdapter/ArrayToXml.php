@@ -14,7 +14,7 @@ class ArrayToXml
      * @param SimpleXMLElement $xml          - should only be used recursively
      * @return string XML
      */
-    public static function toXml($data, $rootNodeName = 'data', &$xml = null)
+    public function toXml($data, $rootNodeName = 'data', &$xml = null)
     {
         // turn off compatibility mode as simple xml throws a wobbly if you don't.
         if (ini_get('zend.ze1_compatibility_mode') == 1) {
@@ -57,7 +57,7 @@ class ArrayToXml
             }
             // if there is another array found recursively call this function
             if (is_array($value)) {
-                if (ArrayToXML::isAssoc($value) || $numeric) {
+                if ($this->isAssoc($value) || $numeric) {
                     // older SimpleXMLElement Libraries do not have the addChild Method
                     if (method_exists('SimpleXMLElement', 'addChild')) {
                         $node = $xml->addChild($key, null, 'phone');
@@ -75,7 +75,7 @@ class ArrayToXml
                 if ($numeric) {
                     $key = 'anon';
                 }
-                ArrayToXML::toXml($value, $key, $node);
+                $this->toXml($value, $key, $node);
             } else {
                 // older SimplXMLElement Libraries do not have the addChild Method
                 if (method_exists('SimpleXMLElement', 'addChild')) {
@@ -93,7 +93,7 @@ class ArrayToXml
         try {
             $doc = new DOMDocument('1.0');
             $doc->preserveWhiteSpace = false;
-            $doc->loadXML(ArrayToXML::fixCDATA($xml->asXML()));
+            $doc->loadXML($this->fixCDATA($xml->asXML()));
             $doc->formatOutput = true;
             $xmlString = $doc->saveXML();
         } catch (XmlParsingException $e) {
@@ -102,7 +102,7 @@ class ArrayToXml
         return $xmlString;
     }
 
-    public static function fixCDATA($string)
+    public function fixCDATA($string)
     {
         //fix CDATA tags
         $find[]     = '&lt;![CDATA[';
@@ -119,9 +119,9 @@ class ArrayToXml
      * Pass in an XML document (or SimpleXMLElement object) and this recrusively loops
      *
      * @param string $xml - XML document - can optionally be a SimpleXMLElement object
-     * @return array ARRAY
+     * @return array ARRAY|string
      */
-    public static function toArray($xml)
+    public function toArray($xml)
     {
         if (is_string($xml)) {
             $xml = new SimpleXMLElement($xml);
@@ -132,7 +132,7 @@ class ArrayToXml
         }
         $arr = array();
         foreach ($children as $key => $node) {
-            $node = ArrayToXML::toArray($node);
+            $node = $this->toArray($node);
 
             // support for 'anon' non-associative arrays
             if ($key === 'anon') {
@@ -152,7 +152,7 @@ class ArrayToXml
         return $arr;
     }
 
-    public static function isAssoc($array)
+    public function isAssoc($array)
     {
         return (is_array($array) && 0 !== count(array_diff_key($array, array_keys(array_keys($array)))));
     }

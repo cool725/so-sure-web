@@ -911,7 +911,8 @@ class PhoneInsuranceController extends BaseController
             ];
         }
         if (true == $xmlOutput) {
-            $result = ArrayToXml::toXml($list);
+            $xmlAdapter = new ArrayToXml();
+            $result = $xmlAdapter->toXml($list);
             $response = new Response($result);
             $response->headers->set('Content-Type', 'text/xml');
             $response->headers->set('Access-Control-Allow-Origin', '*');
