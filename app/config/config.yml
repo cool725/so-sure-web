@@ -114,11 +114,11 @@ doctrine_mongodb:
         default:
             server: "%mongodb_url%"
             options:
-                readPreference: "secondaryPreferred"
+                readPreference: "primaryPreferred"
         census:
             server: "%census_mongodb_url%"
             options:
-                readPreference: "secondaryPreferred"
+                readPreference: "primaryPreferred"
     default_database: "%mongodb_db%"
     document_managers:
         default:
@@ -551,6 +551,8 @@ nelmio_security:
                 - https://frstre.com
                 - https://tapi.tapfiliate.com
                 - https://monitor.clickcease.com
+                - https://surveystats.hotjar.io
+                - https://analytics.tiktok.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -901,6 +903,7 @@ nelmio_security:
                 - https://dcc4iyjchzom0.cloudfront.net
                 - https://script.tapfiliate.com
                 - https://www.clickcease.com/monitor/stat.js
+                - https://analytics.tiktok.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac

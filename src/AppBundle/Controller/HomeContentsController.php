@@ -25,11 +25,15 @@ class HomeContentsController extends BaseController
     /**
      * @Route("/contents-insurance", name="contents_insurance")
      * @Route("/contents-insurance/m", name="contents_insurance_m")
+     * @Route("/contents-insurance/getmyslice", name="contents_insurance_getmyslice")
      */
     public function contentsInsuranceAction(Request $request)
     {
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
+
+        // Temp
+        $promo = false;
 
         // Is indexed?
         $noindex = false;
@@ -37,6 +41,11 @@ class HomeContentsController extends BaseController
             $noindex = true;
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Contents Insurance - LP']);
+        } elseif ($request->get('_route') == 'contents_insurance_getmyslice') {
+            $noindex = true;
+            $promo = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Get My Slice']);
         } else {
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
@@ -45,10 +54,36 @@ class HomeContentsController extends BaseController
             ]);
         }
 
+        // Pass along UTM params to web app for Mixapanel
+        $utms = null;
+        $source = $request->query->get('utm_source');
+        $medium = $request->query->get('utm_medium');
+        $campaign = $request->query->get('utm_campaign');
+        $sskey = $request->query->get('sskey');
+
+        if ($source || $medium || $campaign) {
+            $source = urlencode($source);
+            $medium = urlencode($medium);
+            $campaign = urlencode($campaign);
+            $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
+        }
+
+        // Optimise - pass along sskey
+        if ($sskey) {
+            $sskey = sprintf('&sskey=%s', $sskey);
+            $utms = $utms . $sskey;
+        }
+
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
+        if ($promo) {
+            $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
+        }
+
         $data = [
             'lead_csrf' => $csrf->refreshToken('lead'),
             'is_noindex' => $noindex,
+            'utms' => $utms,
+            'promo' => $promo,
         ];
 
         return $this->render($template, $data);
