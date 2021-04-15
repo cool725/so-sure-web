@@ -119,7 +119,7 @@ class ArrayToXml
      * Pass in an XML document (or SimpleXMLElement object) and this recrusively loops
      *
      * @param string $xml - XML document - can optionally be a SimpleXMLElement object
-     * @return array ARRAY|string
+     * @return array|string
      */
     public function toArray($xml)
     {
