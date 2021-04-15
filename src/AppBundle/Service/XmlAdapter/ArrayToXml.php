@@ -24,7 +24,7 @@ class ArrayToXml
             libxml_use_internal_errors(true);
             $xml = simplexml_load_string(
                 stripslashes('<?xml version="1.0" encoding="utf-8"?>
-                        <root xmlns="http://example.com/some-unique-url" version="1.0"></root>'),
+                        <root xmlns="https://wearesosure.com" version="1.0"></root>'),
                 "SimpleXMLElement",
                 LIBXML_NOWARNING
             );
