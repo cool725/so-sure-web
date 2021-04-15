@@ -6,6 +6,7 @@ use AppBundle\Document\Subvariant;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Service\XmlAdapter\ArrayToXml;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
@@ -814,6 +815,7 @@ class PhoneInsuranceController extends BaseController
         $repo = $dm->getRepository(Phone::class);
         $subvariantRepo = $dm->getRepository(Subvariant::class);
         $subvariants = $subvariantRepo->findAll();
+        $xmlOutput = ($request->query->get('xml')) ?: null;
         $phones = $repo->findActive()->getQuery()->execute();
         $list = [];
 
@@ -892,8 +894,15 @@ class PhoneInsuranceController extends BaseController
                 $requester      => $aggregatorId,
             ];
         }
-        $response = new JsonResponse($list);
-        $response->headers->set('Access-Control-Allow-Origin', '*');
+        if (true == $xmlOutput) {
+            $result = ArrayToXml::toXml($list);
+            $response = new Response($result);
+            $response->headers->set('Content-Type', 'text/xml');
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+        } else {
+            $response = new JsonResponse($list);
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+        }
         return $response;
     }
 
