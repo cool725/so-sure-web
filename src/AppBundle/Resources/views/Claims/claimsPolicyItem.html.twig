@@ -7,7 +7,15 @@
     {% set yearlyBacsMonthly = policy.phone.currentYearlyPhonePrice.monthlyPremiumPrice %}
     {% set yearlyBacsYearly = policy.phone.currentYearlyPhonePrice.yearlyPremiumPrice %}
 {% endif %}
-
+{% if policy.isPolicy %}
+    {% if policy.company %}
+        <div class="row">
+            <div style="background: #0A3BD6; margin: 10px; width:98%" class="col-md-12 text-center ">
+                <h3 style="color: #FFFFFF;">Company Policy Scheme</h3>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
 <div id="claimPolicyItem">
     <div class="text-center" style="{% if policy.active %}background-color: {{ policy.riskColour }}; color: white;{% endif %} font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
       Risk:({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
