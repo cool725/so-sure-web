@@ -179,6 +179,7 @@ class PhoneInsuranceController extends BaseController
      * SEO Pages - Phone Insurance
      * @Route("/phone-insurance", name="phone_insurance", options={"sitemap" = true})
      * @Route("/phone-insurance/m", name="phone_insurance_m")
+     * @Route("/phone-insurance-hyperjar", name="phone_insurance_hyperjar")
      */
     public function phoneInsuranceAction(Request $request)
     {
@@ -193,6 +194,13 @@ class PhoneInsuranceController extends BaseController
             $noindex = true;
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Phone Insurance - LP']);
+        } elseif ($request->get('_route') == 'phone_insurance_hyperjar') {
+            $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Phone Insurance - Hyperjar']);
+
+            $session = $this->get('session');
+            $session->set('bacsnotallowed', true);
         } else {
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PHONE_INSURANCE_HOME_PAGE);
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
