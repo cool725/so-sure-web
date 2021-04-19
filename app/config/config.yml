@@ -106,6 +106,7 @@ twig:
         policy_doc_version: 16,
         free_months: "one month"
         lowest_excess: "£25"
+        lowest_premium: 3.38
         trustpilot_rating: 4.5
         home_contents_funnel: https://home.wearesosure.com
 

@@ -310,24 +310,24 @@ class PhoneInsuranceController extends BaseController
             'makeCanonical' => mb_strtolower($make)
         ]);
 
-        // To display lowest monthly premium
-        $fromPhones = $repo->findBy([
-            'active' => true,
-            'makeCanonical' => mb_strtolower($make)
-        ]);
+        // // To display lowest monthly premium
+        // $fromPhones = $repo->findBy([
+        //     'active' => true,
+        //     'makeCanonical' => mb_strtolower($make)
+        // ]);
 
-        $fromPhones = array_filter($phones, function ($phone) {
-            return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
-        });
+        // $fromPhones = array_filter($phones, function ($phone) {
+        //     return $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+        // });
 
-        // Sort by cheapest
-        usort($fromPhones, function ($a, $b) {
-            return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
-            $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
-        });
+        // // Sort by cheapest
+        // usort($fromPhones, function ($a, $b) {
+        //     return $a->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() <
+        //     $b->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice() ? -1 : 1;
+        // });
 
-        // Select the lowest
-        $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        // // Select the lowest
+        // $fromPrice = $fromPhones[0]->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
 
         $competitorData = new Competitors();
 
@@ -347,7 +347,7 @@ class PhoneInsuranceController extends BaseController
         $data = [
             'phone' => $phone,
             'top_phones' => $topPhones,
-            'from_price' => $fromPrice,
+            // 'from_price' => 3.38,
             'competitor' => $competitorData::$competitorComparisonData,
             'money_version' => $money,
             'is_noindex' => $noindex
