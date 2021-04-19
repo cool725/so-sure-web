@@ -49,7 +49,8 @@ class PromoCodeCommand extends ContainerAwareCommand
     /** @var RouterService */
     protected $route;
 
-    protected $adminPolicyRoute;
+    /** @var String */
+    protected $dateFrom;
 
     /** @var string */
     protected $environment;
@@ -96,6 +97,13 @@ class PromoCodeCommand extends ContainerAwareCommand
                 'What email address(s) to send to',
                 self::PROMO_EMAIL_ADDRESS
             )
+            ->addOption(
+                'date-from',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Filter policies from set date Y-m-d',
+                '2021-03-01'
+            )
         ;
     }
 
@@ -126,6 +134,12 @@ class PromoCodeCommand extends ContainerAwareCommand
             } else {
                 $this->emailAccounts = self::PROMO_EMAIL_ADDRESS;
             }
+        }
+
+        $this->dateFrom = $input->getOption('date-from');
+        if (!$this->validateDate($this->dateFrom)) {
+            $output->writeln('Date formate incorrect, please input: Y-m-d');
+            exit();
         }
 
         /** @var RewardRepository $rewardRepo */
@@ -162,13 +176,17 @@ class PromoCodeCommand extends ContainerAwareCommand
                 if ($rewardConnections) {
                     /** @var Connection $connection */
                     foreach ($rewardConnections as $idx2 => $connection) {
-                        if (null !== $connection->getSourcePolicy()) {
-                            $policies[] = [
-                                'policy' => $connection->getSourcePolicy(),
-                                'reward' => $reward,
-                                'organisation' => $organisation,
-                                'conn_date' => $connection->getDate()
-                            ];
+                        $policy = $connection->getSourcePolicy();
+                        if (null !== $policy) {
+                            $fPolicy = $this->filterPolicy($policy);
+                            if (null !== $fPolicy) {
+                                $policies[] = [
+                                    'policy'       => $connection->getSourcePolicy(),
+                                    'reward'       => $reward,
+                                    'organisation' => $organisation,
+                                    'conn_date'    => $connection->getDate()
+                                ];
+                            }
                         }
                     }
                 }
@@ -189,8 +207,20 @@ class PromoCodeCommand extends ContainerAwareCommand
             $output->writeln($exc->getMessage());
         }
         $output->writeln('All done!');
+    }
 
+    private function filterPolicy(Policy $policy) : bool
+    {
+        if ($policy->promoFilter($this->dateFrom)) {
+            return true;
+        }
+        return false;
+    }
 
+    private function validateDate($date, $format = 'Y-m-d')
+    {
+        $d = \DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
     }
 
     private function filterActiveRewards($rewards, $promoCodesArr = null) : array

@@ -2695,6 +2695,52 @@ abstract class Policy
         ]);
     }
 
+    public function promoFilter(String $date) : bool
+    {
+        $createDate = \DateTime::createFromFormat('Y-m-d', $this->getCreated()->format('Y-m-d'));
+        $dateFrom = \DateTime::createFromFormat('Y-m-d', $date);
+
+        if ($dateFrom > $createDate) {
+            return false;
+        }
+
+        if (in_array($this->getStatus(), [
+            self::STATUS_CANCELLED,
+            self::STATUS_UNPAID,
+        ])) {
+            return false;
+        }
+
+        if (count($this->getClaims()) > 0) {
+            return false;
+        }
+
+        if (!$this->isBacMandateCancelled()) {
+            return false;
+        }
+
+        $ltAtt = $this->getUser()->getLatestAttribution();
+        if ($ltAtt) {
+            if (!empty($ltAtt->getCampaignName())) {
+                if ($ltAtt === 'Quidco' || $ltAtt === 'Topcashback') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public function isBacMandateCancelled()
+    {
+        /** @var BacsPaymentMethod $bacsPaymentMethod */
+        $bacsPaymentMethod = $this->getPolicyOrUserBacsPaymentMethod();
+        if ($bacsPaymentMethod instanceof BacsPaymentMethod &&
+            $bacsPaymentMethod->getBankAccount()->isMandateInvalid()) {
+            return false;
+        }
+        return true;
+    }
+
     public function getPolicyFiles()
     {
         return $this->policyFiles;
