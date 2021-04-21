@@ -26,6 +26,7 @@ class HomeContentsController extends BaseController
      * @Route("/contents-insurance", name="contents_insurance")
      * @Route("/contents-insurance/m", name="contents_insurance_m")
      * @Route("/contents-insurance/getmyslice", name="contents_insurance_getmyslice")
+     * @Route("/contents-insurance/creditspring", name="contents_insurance_creditspring")
      */
     public function contentsInsuranceAction(Request $request)
     {
@@ -34,6 +35,7 @@ class HomeContentsController extends BaseController
 
         // Temp
         $promo = false;
+        $partner = null;
 
         // Is indexed?
         $noindex = false;
@@ -44,8 +46,15 @@ class HomeContentsController extends BaseController
         } elseif ($request->get('_route') == 'contents_insurance_getmyslice') {
             $noindex = true;
             $promo = true;
+            $partner = 'getmyslice';
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Contents Insurance - Get My Slice']);
+        } elseif ($request->get('_route') == 'contents_insurance_creditspring') {
+            $noindex = true;
+            $promo = true;
+            $partner = 'creditspring';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Creditspring']);
         } else {
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
@@ -84,6 +93,7 @@ class HomeContentsController extends BaseController
             'is_noindex' => $noindex,
             'utms' => $utms,
             'promo' => $promo,
+            'partner' => $partner,
         ];
 
         return $this->render($template, $data);
