@@ -9,7 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 
 use AppBundle\Classes\ApiErrorCode;
 
@@ -79,6 +81,11 @@ class HomeContentsController extends BaseController
 
         // Optimise - pass along sskey
         if ($sskey) {
+            // Set the cookie
+            $response = new Response();
+            $cookie = new Cookie('optimise-sskey', $sskey, time() + 1000 * 60 * 60 * 24 * 30);
+            $response->headers->setCookie($cookie);
+            $response->send();
             $sskey = sprintf('&sskey=%s', $sskey);
             $utms = $utms . $sskey;
         }
