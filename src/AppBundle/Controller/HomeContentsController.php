@@ -83,7 +83,13 @@ class HomeContentsController extends BaseController
         if ($sskey) {
             // Set the cookie
             $response = new Response();
-            $cookie = new Cookie('optimise-sskey', $sskey, time() + 1000 * 60 * 60 * 24 * 30);
+            $cookie = new Cookie(
+                'optimise-sskey',
+                $sskey,
+                time() + 1000 * 60 * 60 * 24 * 30,
+                '/',
+                '.wearesosure.com'
+            );
             $response->headers->setCookie($cookie);
             $response->send();
             $sskey = sprintf('&sskey=%s', $sskey);
