@@ -1,0 +1,134 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}A Guide To Student Contents Insurance | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Student contents insurance covers your possessions whilst you’re at university. It takes into account the realities of living in shared spaces, and should protect you if your gadgets are stolen or damaged."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'A Guide To Student Contents Insurance | SO-SURE' %}
+{% set og_description = "Student contents insurance covers your possessions whilst you’re at university. It takes into account the realities of living in shared spaces, and should protect you if your gadgets are stolen or damaged." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/a-guide-to-student-contents-insurance.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">A Guide To Student Contents Insurance</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">A Guide To Student Contents Insurance</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Apr 6, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure,contentsinsurance,studentscontentsinsurance' } %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/a-guide-to-student-contents-insurance.jpg"
+                                     alt="Student Contents Insurance"
+                                     class="img-fluid lozad mb-5">
+                                <p>Regardless of whether you live in halls of residence or a shared house, student contents insurance is an absolute necessity. This is because students are a prime target for crime, especially those in large cities. Even if you have a full-time security guard where you reside you can still be a victim of crime.</p>
+                                <p>In freshers week, students flock en masse to university, usually living on their own for the first time, and fully equipped with essential gadgets for their studies. They are essentially a burglar magnet, and it’s important to ensure you have the right coverage no matter where you live.</p>
+                                <h2>What is student contents insurance?</h2>
+                                <p>This is a form of contents insurance specifically designed for those studying at university. It works the same as regular contents insurance, in that it can protect your possessions from theft or damage, but it also recognises the realities of living in shared spaces – particularly when you don’t know your housemates very well.</p>
+                                <p>Coverage will vary depending on the provider, as with all forms of contents insurance. In most cases, you will be covered for any damage or theft of your property that occurs within your accommodation.</p>
+                                <h2>Does my university provide cover?</h2>
+                                <p>A common misconception when it comes to contents cover is that the university (or a private landlord) will have cover in place for you already, but this isn’t always the case. Usually, the university or landlord will only cover building insurance, and you would be expected to look after your own personal items.</p>
+                                <p>Some universities offer contents protection, but this can vary. You could find that your university does provide good cover, that’s good and includes all laptops, electrical and sports equipment, and other universities will offer no coverage at all.</p>
+                                <p>You should be sure to check what your circumstances are before you move to your accommodation, to ensure you can arrange your own cover in the meantime.</p>
+                                <h2>Will all my items be covered?</h2>
+                                <p>For the most part, yes – but more expensive items may need their own separate coverage. Lots of free student coverage that comes with your accommodation fees don’t cover higher value items, so you might need to seek extra coverage for these.</p>
+                                <p>This also applies to any student contents insurance you obtain for yourself, as there are single article limits (usually a cap of £1500) that may require you to get specialist cover. Be sure to declare all high-value items, such as a laptop or a bike, to your provider. Additionally, you should keep all receipts of purchase and a note of any relevant serial numbers should the worst happen.</p>
+                                <h2>Student contents insurance in shared accommodation</h2>
+                                <p>Something to be wary of, whether you have personal contents coverage or cover provided by the university, is that the rules on claiming can vary slightly when you live in shared accommodation.</p>
+                                <p>Most policies usually only pay out on items stolen or damaged from a private room; for example, if you left your laptop in a shared space like a common room and it was stolen, you may not receive any compensation. Additionally, if an item is stolen from your room and there are no signs of forced entry (such as a broken lock or window) you may also be refused a pay-out.</p>
+                                <p>Your belongings also may not be covered when out and about, so be sure to read the wording carefully and consider taking out personal possessions cover (which will cover you outside your home), if you’re worried that you’ll need it.</p>
+                                <h2>Coverage as part of existing contents insurance policy</h2>
+                                <p>Sometimes your contents can be covered by your parents’ contents insurance, but this isn’t as common as it was a few years ago. There are providers that can include a detail in contents insurance policies that state if you return home at least once within a set timeframe, you can be covered by your parents’ policy.</p>
+                                <p>It’s worth checking if you are or can be covered by these already existing policies, but you must note that your parents’ excess will likely be higher, and their no claims bonus will be affected if you need to claim. It’s important to be sensible.</p>
+                                <h2>Saving money on student contents insurance</h2>
+                                <p>It’s understandable to be concerned about the cost of contents coverage as a student when you have so many other expenses, but there are ways to make it as affordable as possible.</p>
+                                <p>The main point to stress is that you shouldn’t under or overestimate the value of your contents, because this will cost you in the long run.</p>
+                                <p>Shop around for different quotes to find which one covers and suits you best. You don’t have to choose the first option you find, or even necessarily the cheapest. It’s all about making sure you’re happy with the level of coverage.</p>
+                                <p>If you can, pay the total cost up-front as this will reduce any extra charges for paying monthly. In the same way, increasing the excess you’re willing to pay will make the policy itself cheaper – but you will have to contribute more if you need to claim.</p>
+                                <p>Finally, you can pick and choose which items you want to insure if you’re strapped for cash. You might already have <a href="{{ path('phone_insurance') }}">phone insurance</a> that covers your device appropriately. You may also only have one or two valuable items, and the rest you don’t need to worry about insuring. You can save money by eliminating these extra items where you see fit.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home', 'hashtags': 'wearesosure,contentsinsurance,studentscontentsinsurance' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

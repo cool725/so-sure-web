@@ -812,4 +812,46 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/is-contents-insurance-mandatory",
+     * name="is_contents_insurance_mandatory", options={"sitemap" = true})
+     * @Template
+     */
+    public function isContentsInsuranceMandatoryAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/is-contents-insurance-mandatory.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/a-guide-to-student-contents-insurance",
+     * name="a_guide_to_student_contents_insurance", options={"sitemap" = true})
+     * @Template
+     */
+    public function aGuideToStudentContentsInsuranceAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/a-guide-to-student-contents-insurance.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/what-counts-as-high-value-contents",
+     * name="what_counts_as_high_value_contents", options={"sitemap" = true})
+     * @Template
+     */
+    public function whatCountsAsHighValueContentsAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/what-counts-as-high-value-contents.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

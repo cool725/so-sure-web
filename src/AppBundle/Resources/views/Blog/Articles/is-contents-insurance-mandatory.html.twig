@@ -1,0 +1,136 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Is Contents Insurance Mandatory? | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Home contents insurance covers the cost of replacing your belongings in your home if they are damaged, destroyed, or stolen. But is it mandatory? Find out here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Is Contents Insurance Mandatory? | SO-SURE' %}
+{% set og_description = "Home contents insurance covers the cost of replacing your belongings in your home if they are damaged, destroyed, or stolen. But is it mandatory? Find out here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/is-contents-insurance-mandatory.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Is Contents Insurance Mandatory?</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Is Contents Insurance Mandatory?</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Apr 1, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure,contentsinsurance' } %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/is-contents-insurance-mandatory.jpg"
+                                     alt="Home Contents"
+                                     class="img-fluid lozad mb-5">
+                                <p>Home contents insurance covers the cost of replacing your belongings in your home if they are damaged, destroyed, or stolen. Generally, your ‘contents’ are the items that you would take with if you moved home, for example:</p>
+                                <ul>
+                                  <li>Furniture: beds, sofas, wardrobes, dining tables and chairs</li>
+                                  <li>Entertainment: toys, books, musical instruments, DVDs, and CDs</li>
+                                  <li>Electricals: TVs, laptops, and game consoles</li>
+                                  <li>Clothes and jewellery.</li>
+                                </ul>
+                                <p>For further information on what contents insurance is, head over to our <a href="{{ path('what_is_contents_insurance') }}">What Is Contents Insurance article</a>. In this blog, we’re concerned with the legal aspects of contents insurance, and answer the burning question: Is contents insurance mandatory?</p>
+                                <h2>Is contents insurance mandatory?</h2>
+                                <p>When applying for a mortgage, lenders will typically insist that you have the appropriate level of home insurance. In such contexts, however, it’s crucial to note that home insurance usually means buildings insurance, which is a policy that covers the structure of your home, not the contents within.</p>
+                                <p>Mortgage lenders make buildings insurance mandatory to protect their investment, and in some cases, they’ll specify insurers you can use from their own list. Contents insurance, on the other hand, is a different kind of policy that focuses on the possessions kept inside. However, contents insurance is not mandatory and isn’t required by mortgage lenders, but this doesn’t mean that it’s not worth having.</p>
+                                <h2>What is the difference between buildings insurance and contents insurance?</h2>
+                                <p>When selecting your policy, it’s essential to distinguish the critical differences between buildings and contents cover. The following section fully explains these differences.</p>
+                                <h3>Buildings insurance</h3>
+                                <p>Buildings insurance covers the cost of repairing the structure if it is ever damaged or destroyed in a fire, flood, or any other disaster. This insurance is based on your home’s value and how much it would cost to rebuild entirely, including demolition costs, site clearance, and architects’ fees. Additional costs such as replacing sheds, garages, pipes, and cables will also be included.</p>
+                                <p>When considering buildings insurance, it’s vital that you take out the appropriate level of cover, as underestimating the cost to rebuild your home could lead to severe consequences should the worst happen. <a href="https://www.abi.org.uk/products-and-issues/choosing-the-right-insurance/home-insurance/buildings-insurance/calculating-your-rebuild-cost/" target="_blank" rel="noopener noreferrer">This calculator</a> provided by the Building Cost Information Service will help you accurately calculate the level of cover you need.</p>
+                                <h3>Contents insurance</h3>
+                                <p>Contents insurance provides cover for all your possessions, from your living room TV to your garden shed tools. While manually itemising your belongings to value your contents can be labour-intensive, several <a href="https://www.confused.com/home-insurance/contents-calculator" target="_blank" rel="noopener noreferrer">online calculators</a> can help you do this.</p>
+                                <p>If you suffer a loss, your contents insurance will cover the cost of a replacement. Insurers either use a new-for-old system or an indemnity policy. The former pays the going rate for a brand-new replacement, while the latter takes wear and tear into account, so you’ll ultimately receive less.</p>
+                                <h2>What happens if you don’t have contents insurance?</h2>
+                                <p>While contents insurance ultimately means paying another bill, the crucial question is – could you afford to replace all your possessions if the worst were to happen? When deciding whether or not contents insurance is right for you, consider the possible worst-case scenarios:</p>
+                                <ul>
+                                  <li>Your house is burgled while you’re on holiday</li>
+                                  <li>Your possessions are destroyed in a domestic fire</li>
+                                  <li>You live in an area where there’s a high risk of flooding.</li>
+                                </ul>
+                                <p>While these are extreme examples, such scenarios occur more frequently than you might think. According to the Association of British Insurers (2018), the average home contains contents worth at least £35,000, so it’s well worth getting a quote to safeguard your items and provide peace of mind.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home', 'hashtags': 'wearesosure,contentsinsurance' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
