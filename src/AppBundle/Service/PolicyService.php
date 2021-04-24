@@ -2957,6 +2957,12 @@ class PolicyService
      */
     public function changeInstallments($policy, $installments)
     {
+        if ($policy->getPendingBacsPaymentsTotal(true) > 0) {
+            throw new \RuntimeException(sprintf(
+                'policy %s cannot change installments while there are pending bacs payments',
+                $policy->getId()
+            ));
+        }
         if ($policy->getPremiumInstallments() == $installments) {
             return;
         }
@@ -2974,12 +2980,14 @@ class PolicyService
             }
         } else {
             $upcomingPayments = $policy->getInvoiceSchedule(new \DateTime());
-            $this->schedulePayment(
-                $policy,
-                count($upcomingPayments) * $policy->getStandardUpgradedMonthlyPremiumPrice()
-            );
+            if ($policy->isPolicyPaidToDate()) {
+                $this->schedulePayment(
+                    $policy,
+                    0 - count($upcomingPayments) * $policy->getUpgradedStandardMonthlyPrice()
+                );
+            }
             foreach ($upcomingPayments as $upcoming) {
-                $this->schedulePayment($policy, $policy->getStandardUpgradedMonthlyPremiumPrice(), $upcoming);
+                $this->schedulePayment($policy, $policy->getUpgradedStandardMonthlyPrice(), $upcoming);
             }
         }
         $this->dm->flush();
@@ -2987,9 +2995,9 @@ class PolicyService
 
     /**
      * Creates a scheduled payment. If the amount is negative it automatically sets the type as a refund.
-     * @param Policy $policy is the policy that the scheduled payment is for.
-     * @param number $amount is the amount the scheduled payment is for.
-     * @param \DateTime|null $date is the date that the scheduled payment is for which defaults to right now.
+     * @param Policy         $policy is the policy that the scheduled payment is for.
+     * @param number         $amount is the amount the scheduled payment is for.
+     * @param \DateTime|null $date   is the date that the scheduled payment is for which defaults to right now.
      * @return ScheduledPayment the scheduled payment so you can do things to it.
      */
     public function schedulePayment($policy, $amount, $date = null)
