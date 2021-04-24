@@ -197,7 +197,6 @@ class PolicyServiceTest extends WebTestCase
                 $this->assertEquals($policy->getUpgradedStandardMonthlyPrice(), $scheduled->getAmount());
             } else {
                 $negativeFound++;
-                print(count($policy->getInvoiceSchedule($date)));
                 $this->assertEquals(
                     0 - (count($policy->getInvoiceSchedule($date)) * $policy->getUpgradedStandardMonthlyPrice()),
                     $scheduled->getAmount()
