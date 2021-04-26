@@ -34,6 +34,7 @@ trait DateTrait
             new \DateTime('2020-05-25'),
             new \DateTime('2020-08-31'),
             new \DateTime('2020-12-25'),
+            new \DateTime('2020-12-28'),
             new \DateTime('2021-01-01'),
             new \DateTime('2021-04-02'),
             new \DateTime('2021-04-05'),
