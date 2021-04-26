@@ -2501,19 +2501,15 @@ class PolicyService
 
     public function autoRenew(Policy $policy, DateTime $date = null)
     {
-        if ($policy->getStatus() == Policy::STATUS_CANCELLED ||
-            $policy->getOutstandingPremium() - $policy->getPendingBacsPaymentsTotal() >= 0.01
-        ) {
+        if ($policy->getStatus() == Policy::STATUS_CANCELLED) {
             $this->logger->error(sprintf(
-                'Skipping renewal as policy %s/%s is not fully paid or cancelled',
+                'Skipping renewal as policy %s/%s is cancelled',
                 $policy->getId(),
                 $policy->getPolicyNumber()
             ));
             $policy->getNextPolicy()->setStatus(Policy::STATUS_UNRENEWED);
             $this->dm->flush();
-
             $this->skippedRenewalEmail($policy);
-
             return false;
         } else {
             return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, true, $date);

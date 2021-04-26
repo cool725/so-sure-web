@@ -227,4 +227,8 @@ $(function(){
         return this.optional(element) || (value.toLowerCase() == $(param).val().toLowerCase());
 
     }, 'Signature does not match name on policy');
+
+    jQuery.validator.addMethod('bacsnotallowed', function(value, element, param) {
+        return value == '' || !value.match(param);
+    }, 'Direct Debit not allowed for Hypejar customers, please go back and make a card payment');
 });

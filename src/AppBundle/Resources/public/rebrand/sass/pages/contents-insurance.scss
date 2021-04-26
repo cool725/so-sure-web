@@ -10,34 +10,42 @@
 
 .hero {
   position: relative;
-  padding: 5rem 0;
+  padding: 5rem 0 0;
 
   background-color: $crayon-blue;
-  // @include blue-gradient-45;
   background: url('#{$cdn_url}/images/rebrand/home-contents/so-sure_contents-insurance-hero-girl-sitting-mobile.jpg') no-repeat center bottom;
   background-size: cover;
 
   .container-large {
     position: relative;
     z-index: 4;
-    padding-bottom: 20rem;
+    padding-bottom: 400px;
     text-align: left;
 
     @include media-breakpoint-up(sm) {
-      padding-bottom: 500px;
+      padding-bottom: 560px;
     }
 
     @include media-breakpoint-up(lg) {
-      padding-bottom: 3rem;
-      text-align: center;
+      padding-bottom: 6rem;
     }
   }
 
-  .hero-p {
+  &-p {
     text-align: left;
     font-size: 114%;
     color: $white;
     text-shadow: 0 0 $ultramarine;
+
+    @include media-breakpoint-up(lg) {
+      padding: 1rem 0 0 0;
+    }
+  }
+
+  .breadcrumbs {
+    @include media-breakpoint-up(sm) {
+      text-align: center;
+    }
   }
 
   @include media-breakpoint-up(lg) {

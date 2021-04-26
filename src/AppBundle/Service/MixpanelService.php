@@ -60,6 +60,9 @@ class MixpanelService
         self::QUEUE_FREEZE_ATTRIBUTION
     ];
 
+    // Page Load
+    const EVENT_PAGE_LOAD = 'page_load';
+
     // Homepage
     const EVENT_HOME_PAGE = 'Home Page';
     const EVENT_QUOTE_PAGE = 'Quote Page';
@@ -67,7 +70,9 @@ class MixpanelService
     const EVENT_HOME_TO_DETAILS = 'Home Quote To Details Step';
     const EVENT_QUOTE_TO_DETAILS = 'Dropdown Quote To Details Step';
     const EVENT_MODEL_PAGE_TO_DETAILS = 'Model Pages To Details Step';
-    // Unused, but reserved
+
+    // Phone Insurance
+    const EVENT_PHONE_INSURANCE_HOME_PAGE = 'Phone Insurance';
     const EVENT_MANUFACTURER_PAGE = 'Manufacturer Page';
     const EVENT_MODEL_PAGE = 'Model Page';
 
@@ -76,7 +81,11 @@ class MixpanelService
     const EVENT_COMPANY_LEAD_CAPTURE = 'Company Lead Capture';
 
     // Home Contents
+    const EVENT_CONTENTS_INSURANCE_HOME_PAGE = 'Contents Insurance';
     const EVENT_CONTENTS_LEAD_CAPTURE = 'Contents Lead';
+
+    // Claims
+    const EVENT_MAKE_A_CLAIM = '';
 
     // Deprecated - use EVENT_CPC_QUOTE_PAGE
     const EVENT_LANDING_PAGE = 'Landing Page';
@@ -199,7 +208,10 @@ class MixpanelService
         self::EVENT_UPGRADE_POLICY,
         self::EVENT_COMPANY_PHONES,
         self::EVENT_COMPANY_LEAD_CAPTURE,
-        self::EVENT_CONTENTS_LEAD_CAPTURE
+        self::EVENT_CONTENTS_LEAD_CAPTURE,
+        self::EVENT_PHONE_INSURANCE_HOME_PAGE,
+        self::EVENT_CONTENTS_INSURANCE_HOME_PAGE,
+        self::EVENT_PAGE_LOAD
     ];
 
     public static function getCampaignSources($event)

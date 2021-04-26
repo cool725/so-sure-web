@@ -2365,7 +2365,26 @@ class UserController extends BaseController
         if ($samePhone) {
             $newPhonePremium = $oldPhonePremium;
         } else {
-            $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+            // We need to confirm if there is a claim on the user
+            // If status is in pending/review/FNOL state redirect user
+            if ($policy->isAnyLinkedClaimByReviewStatus()) {
+                $this->addFlash('warning', 'You have an open claim - please contact our customer service online 
+                chat and we will be able to resolve this for you');
+                return $this->redirectToRoute('user_policy_list');
+            }
+
+            if ($policy->isAnyLinkedClaimByApprovedStatus()) {
+                // Check if new premium is lower than existing
+                // set to original premium amount
+                $tPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+                if ($tPhonePremium->getMonthlyPremiumPrice() < $oldPhonePremium->getMonthlyPremiumPrice()) {
+                    $newPhonePremium = $oldPhonePremium;
+                } else {
+                    $newPhonePremium = $tPhonePremium;
+                }
+            } else {
+                $newPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
+            }
         }
         if ($futurePayments <= 1) {
             $upgradePremium = $policy->getPremiumUpgradeCostYearly($newPhonePremium, $now);

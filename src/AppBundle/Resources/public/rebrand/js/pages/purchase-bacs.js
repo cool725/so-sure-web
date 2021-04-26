@@ -36,6 +36,7 @@ $(function(){
                 },
                 "bacs_form[sortCode]": {
                     required: true,
+                    bacsnotallowed: '04-00-85'
                 },
                 "bacs_form[billingDate]": {
                     required: true,

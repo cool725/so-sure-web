@@ -79,7 +79,7 @@ class BICommand extends ContainerAwareCommand
         'rewards',
         'rewardsBudget',
         'bacsPayments',
-        'referrals'
+        'referrals',
     ];
 
     /** @var S3Client */
@@ -272,7 +272,7 @@ class BICommand extends ContainerAwareCommand
             '"Warranty"',
             '"Ext Warranty"',
             '"Loss"',
-            '"Theft"'
+            '"Theft"',
         ]);
 
         foreach ($phones as $phone) {
@@ -324,7 +324,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getWarranty() : ''),
                 sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getExtendedWarranty() : ''),
                 sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getLoss() : ''),
-                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : '') . ','
+                sprintf('"%0.2f"', $mPhonePrice ? $mPhonePrice->getPicSureExcess()->getTheft() : '') . ',',
             ]);
             $lines[$count] .= $batch3;
         }
@@ -380,7 +380,7 @@ class BICommand extends ContainerAwareCommand
             '"Claim Closed Date"',
             "'Risk Rating'",
             "'Network'",
-            "'Phone Make/Model/Memory'"
+            "'Phone Make/Model/Memory'",
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -441,7 +441,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $this->timezoneFormat($claim->getClosedDate(), $timezone, 'Y-m-d')),
                 sprintf('"%s"', $claim->getRisk()),
                 sprintf('"%s"', $claim->getNetwork()),
-                sprintf('"%s"', $phonePolicy ? $phonePolicy->getPhone()->__toString() : '')
+                sprintf('"%s"', $phonePolicy ? $phonePolicy->getPhone()->__toString() : ''),
             ]);
         }
         if (!$skipS3) {
@@ -497,7 +497,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
-                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : '')
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
             ]);
         }
         if (!$skipS3) {
@@ -529,7 +529,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
                 sprintf('"%s"', $this->timezoneFormat($invitation->getCreated(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $invitation->getChannel()),
-                sprintf('"%s"', $this->timezoneFormat($invitation->getAccepted(), $timezone, 'Y-m-d H:i:s'))
+                sprintf('"%s"', $this->timezoneFormat($invitation->getAccepted(), $timezone, 'Y-m-d H:i:s')),
             ]);
         }
         if (!$skipS3) {
@@ -552,12 +552,27 @@ class BICommand extends ContainerAwareCommand
         $lines[] = implode(',', [
             '"Source Policy"',
             '"Linked Policy"',
+            '"Initial Reward Pot Amount"',
+            '"Reward Pot Amount"',
+            '"Initial Promo Reward Pot Amount"',
+            '"Promo Reward Pot Amount"',
             '"Invitation Date"',
             '"Invitation Method"',
-            '"Connection Date"',
+            '"Connection Date"'
         ]);
         foreach ($connections as $connection) {
             /** @var Connection $connection */
+            $initRewardPot = 0;
+            $rewardPot = 0;
+            $initPromoValue = 0;
+            $promoValue = 0;
+            if ($connection->getSourcePolicy()) {
+                $initRewardPot = ($connection->getInitialValue() ?: 0);
+                $rewardPot = ($connection->getValue() ?: 0);
+                $initPromoValue = ($connection->getInitialPromoValue() ?: 0);
+                $promoValue = ($connection->getPromoValue() ?: 0);
+            }
+
             $lines[] = implode(',', [
                 sprintf(
                     '"%s"',
@@ -566,6 +581,22 @@ class BICommand extends ContainerAwareCommand
                 sprintf(
                     '"%s"',
                     $connection->getLinkedPolicy() ? $connection->getLinkedPolicy()->getPolicyNumber() : ''
+                ),
+                sprintf(
+                    '"%s"',
+                    $initRewardPot
+                ),
+                sprintf(
+                    '"%s"',
+                    $rewardPot
+                ),
+                sprintf(
+                    '"%s"',
+                    $initPromoValue
+                ),
+                sprintf(
+                    '"%s"',
+                    $promoValue
                 ),
                 sprintf(
                     '"%s"',
@@ -621,7 +652,7 @@ class BICommand extends ContainerAwareCommand
             '"Termination week number"',
             '"Call week number"',
             '"Call month"',
-            '"Cancellation month"'
+            '"Cancellation month"',
         ]);
         foreach ($policies as $policy) {
             $note = $policy->getLatestNoteByType(Note::TYPE_CALL);
@@ -660,7 +691,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf(
                     '"%s"',
                     $policy->getPolicyExpirationDate() ? $policy->getPolicyExpirationDate()->format('M') : null
-                )
+                ),
             ]);
         }
         if (!$skipS3) {
@@ -929,10 +960,6 @@ class BICommand extends ContainerAwareCommand
     {
         $rewardRepo = $this->dm->getRepository(ReferralBonus::class);
 
-        //Initialise data arrays
-        $headers = [];
-        $data = [];
-
         //Initialise csv lines array
         $lines = [];
 
@@ -940,6 +967,8 @@ class BICommand extends ContainerAwareCommand
         $lines[] = implode(',', [
             "Created",
             "Inviter",
+            "Inviter Policy Number",
+            "Invitee Policy Number",
             "Inviter Bonus Value",
             "Applied to Inviter",
             "Invitee",
@@ -956,6 +985,8 @@ class BICommand extends ContainerAwareCommand
             $lines[] = implode(',', [
                 sprintf('"%s"', $referral->getCreated()->format('Y-m-d')),
                 sprintf('"%s"', $referral->getInviter()->getId()),
+                sprintf('"%s"', $referral->getInviter()->getPolicyNumber()),
+                sprintf('"%s"', $referral->getInvitee()->getPolicyNumber()),
                 sprintf('"%s"', $referral->getAmountForInviter()),
                 sprintf('"%s"', $referral->getInviterPaid()?"Yes":"No"),
                 sprintf('"%s"', $referral->getInvitee()->getId()),
@@ -1002,7 +1033,7 @@ class BICommand extends ContainerAwareCommand
         $this->s3->putObject([
             'Bucket' => SoSure::S3_BUCKET_ADMIN,
             'Key' => $s3Key,
-            'SourceFile' => $tmpFile
+            'SourceFile' => $tmpFile,
         ]);
         unlink($tmpFile);
         return $s3Key;

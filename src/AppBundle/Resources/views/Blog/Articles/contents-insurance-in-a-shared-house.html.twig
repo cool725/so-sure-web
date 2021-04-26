@@ -1,0 +1,138 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Contents Insurance In A Shared House | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Contents insurance can provide cover for an individual’s possessions in a shared house – but there are some things to consider when seeking cover."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Contents Insurance In A Shared House | SO-SURE' %}
+{% set og_description = "Contents insurance can provide cover for an individual’s possessions in a shared house – but there are some things to consider when seeking cover." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/contents-insurance-in-a-shared-house.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Contents Insurance In A Shared House</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Contents Insurance In A Shared House</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Mar 12, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/contents-insurance-in-a-shared-house.jpg"
+                                     alt=""
+                                     class="img-fluid lozad mb-5">
+                                <p>If you live in a shared house, or you’re a lodger renting a single room, you can still get contents insurance that effectively covers your belongings. You won’t need building insurance as a tenant – your landlord should cover this for you – but it’s worth considering whether contents insurance is worth the cost to protect your valuables.</p>
+                                <h2>What is shared house contents insurance?</h2>
+                                <p><a href="{{ path('what_is_contents_insurance') }}">Contents insurance</a> for people living in a shared house, sometimes known as renters’ insurance, provides the cover that tenants need to protect only their possessions. Contents insurance can cover you whether you live in a privately rented shared house or in halls of residence as a student.</p>
+                                <p>Most contents cover will offer the option of covering only your room, so it does not have to be a policy for the contents owned by everyone who lives there. The type of contents cover you will need depends completely on the nature of your living situation.</p>
+                                <h3>Students in shared accommodation</h3>
+                                <p>If you are a student moving into shared halls, you might find that you are already covered by your university. However, this is not always the case, and you may have to separately insure higher-value items.</p>
+                                <p>Student contents insurance can also be an extension of a parent’s pre-existing contents policy that covers contents away from home. Additionally, there are student specific contents insurance policies that can give added extras, such as personal possessions cover, that will protect their items outside of their home, too.</p>
+                                <p>It’s important to note, whether your university provides the cover, or you’ve found it for yourself, that most policies will only pay out on any accidents or theft that occurs within your own room, and not in any communal/shared areas.</p>
+                                <h3>Professionals living in shared housing</h3>
+                                <p>If you aren’t a student but live in shared accommodation, you won’t benefit from any policies aimed at students. It can be slightly more difficult to obtain standard renter’s contents insurance, as the risk of theft or damage is higher whilst in a shared property.</p>
+                                <p>Because of this, it might be easier for the whole household to take out a collective contents policy where possible. This could provide you with easier cover at a potentially lower price, but there are some things you should be aware of if this is the choice you make. If one tenant makes a claim, then everyone’s claims history will be affected, and you might find it more difficult to find cover in the future.</p>
+                                <p>Therefore, it might be worth your while seeking out a <a href="{{ path('contents_insurance') }}">shared contents</a> policy that will provide only the cover that you need, for your room and belongings. This way, you will be in full control of your own claims history. This will cover much of the same as a standard contents policy, only it will apply directly to your room and won’t extend to the rest of the property – such as in the event of a fire or storm.</p>
+                                <p>Like with students shared contents cover, providers will usually insist that you can claim only for items damaged or stolen from within your locked bedroom.</p>
+                                <h2>What shared house contents insurance covers</h2>
+                                <p>In most cases, you will find that the exclusions for shared house contents insurance are roughly the same as a regular contents policy. Limitations can include wear and tear, as well as high-value items. Like in many other policies, this coverage will usually not pay out for theft where there is no sign of forced entry (for example, it something was stolen via an open window). You should be sure to check what exclusions are present by thoroughly reading your policy document.</p>
+                                <h2>Important things to consider in shared houses</h2>
+                                <p>Because you are living with more people, some or all of whom may be strangers, there is a higher level of risk posed to your possessions. There will be a lot of communal areas that usually aren’t covered, and whilst you might not think anything of leaving a phone or a laptop in a communal area, insurers will view this as a risky move.</p>
+                                <p>Some insurers might even have stipulations on the kind of locks that have to be installed on your bedroom door before they will provide you with coverage, so it’s worth checking your lock before you inquire. If you want to be covered elsewhere in your home, you might want to consider personal possessions cover as an extra.</p>
+                                <p>Additionally, you might want to consider what condition your home and its appliances are in before inquiring. It’s your landlord’s responsibility to make sure everything is in working order, but if a faulty washing machine spoils your clothes, you may not be able to claim for these. It’s always best to double check with your insurer what eventualities they cover you for.</p>
+                                <h2>Cost of shared house contents insurance</h2>
+                                <p>The overall cost of shared house contents insurance might be more expensive than what you might find in a family home for reasons we’ve already mentioned. You might live with complete strangers, and your housemates may not always respect your ownership.</p>
+                                <p>Shared spaces, in conjunction with shared items such as a house TV, can contribute greatly to the cost of your contents insurance. That is why you should deeply consider covering only your own items. You can select exactly what you need, and this will help to reduce the cost of your cover.</p>
+                                <h2>How to reduce the cost of shared house contents insurance</h2>
+                                <p>There are ways to crunch the numbers, and they are relatively straightforward. You should consider improving your security; if you can, lock any valuables in a safe and install burglar alarms where possible.</p>
+                                <p>Be sure to also check any fire alarms in your property. Whilst landlords have to provide working smoke detectors and carbon monoxide alarms, you must also be sure to test them regularly to be sure they still work. If you don’t test them and they have stopped working, your policy may be invalidated in the case of a fire.</p>
+                                <p>Also try to insulate pipes where you can. This can reduce the risk of them bursting and damaging any of your possessions.</p>
+                                <p>There are also smaller steps you can take, such as only insuring what you need. Perhaps you already have <a href="{{ path('phone_insurance') }}">phone insurance</a>, so you can leave your device off your policy. You can also cut costs by agreeing to pay more excess (although this will cost more in the long run), and by paying annually as opposed to monthly.</p>
+                                <h2>Get shared house contents insurance</h2>
+                                <p>If you live in a shared house and want protection for your belongings against theft or damage, get a SO-SURE quote today. We offer shared house contents insurance that will give you peace of mind that your possessions are covered, whether you live with one roommate or ten.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

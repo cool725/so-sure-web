@@ -53,6 +53,7 @@ class BankAccount
             BacsService::AUDDIS_REASON_EXPIRED => 'Instruction has expired',
             BacsService::AUDDIS_REASON_DUPLICATE_REFERENCE => 'Payer reference is not unique',
             BacsService::AUDDIS_REASON_INCORRECT_DETAILS => 'Account details incorrect',
+            BacsService::AUDDIS_REASON_CANCELLED_BY_PSP => 'PSP not allowing us to make mandates for this account',
             BacsService::AUDDIS_REASON_CODE_INCOMPATIBLE => 'Incorrect transaction code sent',
             BacsService::AUDDIS_REASON_NOT_ALLOWED => 'Transaction disallowed at branch',
             BacsService::AUDDIS_REASON_INVALID_REFERENCE => 'Invalid Reference',

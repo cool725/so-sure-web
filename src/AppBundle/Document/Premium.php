@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\Excess\Excess;
+use AppBundle\Document\Excess\PhoneExcess;
 use AppBundle\Interfaces\EqualsInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Form\PreloadedExtension;

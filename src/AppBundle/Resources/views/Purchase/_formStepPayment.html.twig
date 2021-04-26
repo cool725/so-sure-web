@@ -18,7 +18,9 @@
     {% set hide_options = 'd-none' %}
     {% set dd_active = '' %}
     {% set cc_active = 'active' %}
-    {% if feature_enabled('allow-bacs-payment-method') %}
+
+    {# Check for bacs allowed feature & if bascs allowed session through route #}
+    {% if feature_enabled('allow-bacs-payment-method') and not bacsnotallowed %}
         {% set cta_class = 'hideme' %}
         {% set hide_options = '' %}
         {% set dd_active = 'active' %}

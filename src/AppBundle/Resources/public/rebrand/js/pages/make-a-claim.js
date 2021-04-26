@@ -6,9 +6,24 @@ require('../../sass/pages/make-a-claim.scss');
 
 // Require components
 let textFit = require('textfit');
+let jQueryBridget = require('jquery-bridget');
+let Flickity = require('flickity');
+
+// make Flickity a jQuery plugin
+Flickity.setJQuery( $ );
+jQueryBridget( 'flickity', Flickity, $ );
 
 $(function(){
 
-    textFit($('.fit'), {detectMultiLine: false});
+    // Reviews
+    let $carousel = $('#claims_cards').flickity({
+        prevNextButtons: false,
+        pageDots: true,
+        watchCSS: true
+    });
+
+    if ($('.fit').length) {
+        textFit($('.fit'), {detectMultiLine: false});
+    }
 
 });

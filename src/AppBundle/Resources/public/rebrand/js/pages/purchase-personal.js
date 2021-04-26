@@ -211,6 +211,10 @@ sosure.purchaseStepAddress = (function() {
             $('.step--hide').show();
             $('#step--one-controls').hide();
 
+            $('html, body').animate({
+                scrollTop: $('.birthday').offset().top - 50,
+            }, 500);
+
             clearTimeout(self.delayTimer);
             if (self.name_email_changed) {
                 self.name_email_changed = false;
@@ -371,9 +375,9 @@ sosure.purchaseStepAddress = (function() {
             let addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
 
-            $('.qpw__sub__container').animate({
-                scrollTop: $('.address-search').offset().top,
-            }, 250);
+            $('html, body').animate({
+                scrollTop: $('#display_address').offset().top - 50,
+            }, 500);
 
             $.ajax({
                 method: "POST",
@@ -402,14 +406,6 @@ $(function(){
         sosure.purchaseStepAddress.step_one_change();
     });
 
-    $('#purchase_form_email').on('blur', function(e) {
-        let was_hidden = $('#step--one-controls').is(":visible");
-        sosure.purchaseStepAddress.step_one_continue();
-        if (was_hidden) {
-            sosure.purchaseStepAddress.focusBirthday();
-        }
-    });
-
     // Click check validate form?
     // Case: user clicks continue before filling in any fields
     $('#step--validate').on('click', function(e) {
@@ -427,8 +423,8 @@ $(function(){
             return false;
         }
 
-        $('.qpw__sub__container').animate({
-            scrollTop: $('.address-show').offset().top,
+        $('.html, body').animate({
+            scrollTop: $('.address-show').offset().top - 50,
         }, 250);
 
         return true;

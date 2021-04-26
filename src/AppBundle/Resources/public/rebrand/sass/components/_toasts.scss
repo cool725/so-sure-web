@@ -12,6 +12,7 @@
 
     &-body {
         padding: 1rem 2.4rem 1rem 1.4rem;
+        text-align: left;
     }
 
     &-bottom-right {
@@ -23,7 +24,7 @@
     }
 
     &-bottom-left {
-        bottom: 0;
+        bottom: 1.4rem;
 
         @include media-breakpoint-up(lg) {
             bottom: 2rem; left: 3rem;
@@ -44,9 +45,5 @@
         @include media-breakpoint-up(lg) {
             top: 3.4rem; left: 3rem;
         }
-    }
-
-    &-review {
-
     }
 }

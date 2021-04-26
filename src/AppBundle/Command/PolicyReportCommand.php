@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
+use CensusBundle\Service\SearchService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,8 +26,7 @@ use AppBundle\Classes\SoSure;
  */
 class PolicyReportCommand extends ContainerAwareCommand
 {
-    const INTERVAL = 'P11D';
-    const START_INTERVAL = 'P15M';
+    const INTERVAL = 'P7D';
 
     /** @var S3Client */
     protected $s3;
@@ -40,24 +40,30 @@ class PolicyReportCommand extends ContainerAwareCommand
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var SearchService */
+    protected $searchService;
+
     /**
      * inserts the required dependencies into the command.
-     * @param S3Client        $s3          is the amazon s3 client for uploading generated reports.
-     * @param DocumentManager $dm          is the document manager for loading data.
-     * @param string          $environment is the environment name used to upload to the right location in amazon s3.
-     * @param LoggerInterface $logger      is used for logging.
+     * @param S3Client        $s3            is the amazon s3 client for uploading generated reports.
+     * @param DocumentManager $dm            is the document manager for loading data.
+     * @param string          $environment   is the environment name used to upload to the right location in amazon s3.
+     * @param LoggerInterface $logger        is used for logging.
+     * @param SearchService   $searchService provides information about users.
      */
     public function __construct(
         S3Client $s3,
         DocumentManager $dm,
         $environment,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SearchService $searchService
     ) {
         parent::__construct();
         $this->s3 = $s3;
         $this->dm = $dm;
         $this->environment = $environment;
         $this->logger = $logger;
+        $this->searchService = $searchService;
     }
 
     /**
@@ -75,7 +81,14 @@ class PolicyReportCommand extends ContainerAwareCommand
                 'Choose a timezone to use for policies report',
                 'Europe/London'
             )
-            ->addOption('limit', null, InputOption::VALUE_OPTIONAL, 'How many policies to process in batches', 1000)
+            ->addOption('startperiod', null, InputOption::VALUE_OPTIONAL, 'How many months back', 15)
+            ->addOption(
+                'bclear',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Option to flush out the batch from each memory',
+                true
+            )
             ->addOption('report', null, InputOption::VALUE_REQUIRED, 'Choose a report to generate', 'policy');
     }
 
@@ -87,15 +100,22 @@ class PolicyReportCommand extends ContainerAwareCommand
         $batchStart = time();
         $now = new \DateTime();
         $policyCounter = 0;
-        $begin = (clone $now)->sub(new \DateInterval(self::START_INTERVAL));
+
 
         // Set up reports to run.
         $reportName = $input->getOption('report');
-        $limit = $input->getOption('limit');
+        $startPeriod = $input->getOption('startperiod');
+        $bclear = $input->getOption('bclear');
         $debug = $input->getOption('debug') == true;
         $timezone = new DateTimeZone($input->getOption('timezone'));
 
-        $report = PolicyReport::createReport($reportName, $this->dm, $timezone, $this->logger);
+        if (!is_numeric($startPeriod)) {
+            $output->writeln("<error>Must be a integer only</error>");
+            return;
+        }
+        $startInterval = 'P'.$startPeriod.'M';
+        $begin = (clone $now)->sub(new \DateInterval($startInterval));
+        $report = PolicyReport::createReport($reportName, $this->searchService, $this->dm, $timezone, $this->logger);
         if (!$report) {
             $output->writeln("<error>{$reportName} is not a valid report type</error>");
             return;
@@ -118,111 +138,54 @@ class PolicyReportCommand extends ContainerAwareCommand
             $top = ($begin < $now) ? (clone $begin)->add(new \DateInterval(self::INTERVAL)) : null;
             $policyCount = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top, 0, 0, true);
             $policyCounter += $policyCount;
-            $offsetCounter = 0;
-            // if we need to handle many policies, lets handle in batches
-            if ($policyCount > 2000) {
-                $policies = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top);
-                $policyArr = iterator_to_array($policies->getIterator(), true);
-                for ($v = 0; $v <= $policyCount; $v += $limit) {
-                    $starttime = time();
-
-                    if (!$policies instanceof \Doctrine\MongoDB\Query\Query) {
-                        throw new MongoDBException('Invalid return type for query');
-                    }
-
-                    $policyBatch = array_slice($policyArr, $offsetCounter, $limit, true);
-
-                    $output->writeln(sprintf(
-                        'Time Range: %s - %s. Offset count %d. Policies processing: %d',
-                        $begin->format('Y-m-d'),
-                        $top ? $top->format('Y-m-d') : '',
-                        $offsetCounter,
-                        count($policyBatch)
-                    ));
-
-                    try {
-                        if ($policyBatch) {
-                            foreach ($policyBatch as $policy) {
-                                $report->process($policy);
-                            }
-                            sleep(1);
-                            // Clear for each batch
-                            $this->dm->clear();
-                        }
-                    } catch (\Exception $e) {
-                        $output->writeln(sprintf(
-                            'Error found: %s',
-                            $e->getMessage()
-                        ));
-                    }
-
-                    $endtime = time();
-                    $duration = ($endtime - $starttime) - 1;
-                    $output->writeln(sprintf(
-                        'Time Range: %s - %s. Time taken: %s: Offset count %d.',
-                        $begin->format('Y-m-d'),
-                        $top ? $top->format('Y-m-d') : '',
-                        $duration,
-                        $offsetCounter
-                    ));
-                    $offsetCounter += $limit;
-                }
-                $policyTotalCount -= $policyCount;
-                $output->writeln(sprintf(
-                    'Time Range: %s - %s. Complete. Policies remaining: %d',
-                    $begin->format('Y-m-d'),
-                    $top ? $top->format('Y-m-d') : '',
-                    $policyTotalCount
-                ));
-
+            $starttime = time();
+            $output->writeln(sprintf(
+                'SB: Policy count %d.',
+                $policyCount
+            ));
+            if ($policyCount == 0) {
                 $begin->add(new \DateInterval(self::INTERVAL));
-            } else {
-                $starttime = time();
-                $output->writeln(sprintf(
-                    'SB: Policy count %d.',
-                    $policyCount
-                ));
-                if ($policyCount == 0) {
-                    $begin->add(new \DateInterval(self::INTERVAL));
-                    continue;
-                }
-                $policies = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top);
-                if (!$policies instanceof \Doctrine\MongoDB\Query\Query) {
-                    throw new MongoDBException('Invalid return type for query');
-                }
-                // process entire batch as its small enough
-                $policyBatch = iterator_to_array($policies->getIterator(), true);
-                try {
-                    if ($policyBatch) {
-                        foreach ($policyBatch as $policy) {
-                            $report->process($policy);
-                        }
-                        sleep(1);
+                continue;
+            }
+            $policies = $phonePolicyRepo->findPoliciesQueryByDate($begin, $top);
+            if (!$policies instanceof \Doctrine\MongoDB\Query\Query) {
+                throw new MongoDBException('Invalid return type for query');
+            }
+            // process entire batch as its small enough
+            $policyBatch = iterator_to_array($policies->getIterator(), true);
+            try {
+                if ($policyBatch) {
+                    foreach ($policyBatch as $policy) {
+                        $report->process($policy);
+                    }
+                    sleep(1);
+                    if ($bclear) {
                         // Clear for each batch
                         $this->dm->clear();
                     }
-                } catch (\Exception $e) {
-                    $output->writeln(sprintf(
-                        'Error found: %s',
-                        $e->getMessage()
-                    ));
-                    $begin->add(new \DateInterval(self::INTERVAL));
-                    continue;
                 }
-
-                $endtime = time();
-                $duration = ($endtime - $starttime) - 1;
-                $policyTotalCount -= $policyCount;
+            } catch (\Exception $e) {
                 $output->writeln(sprintf(
-                    'SB: Time Range: %s - %s. Time taken: %s. Policies remaining: %d',
-                    $begin->format('Y-m-d'),
-                    $top ? $top->format('Y-m-d') : '',
-                    $duration,
-                    $policyTotalCount
+                    'Error found: %s',
+                    $e->getMessage()
                 ));
                 $begin->add(new \DateInterval(self::INTERVAL));
+                continue;
             }
+
+            $endtime = time();
+            $duration = ($endtime - $starttime) - 1;
+            $policyTotalCount -= $policyCount;
+            $output->writeln(sprintf(
+                'SB: Time Range: %s - %s. Time taken: %s. Policies remaining: %d',
+                $begin->format('Y-m-d'),
+                $top ? $top->format('Y-m-d') : '',
+                $duration,
+                $policyTotalCount
+            ));
+            $begin->add(new \DateInterval(self::INTERVAL));
         }
+
         if ($policyCounter > 0) {
             $output->writeln(sprintf(
                 '%f -- %f / row',
@@ -232,13 +195,14 @@ class PolicyReportCommand extends ContainerAwareCommand
         }
         // Now run the reports.
         // Output and upload.
+        $fileName = $report->getFile() . '-' . $startPeriod . '.csv';
         if ($debug) {
-            $output->writeln("<info>{$report->getFile()}</info>");
+            $output->writeln("<info>{$fileName}</info>");
             $output->writeln($report->getLines());
         }
         try {
-            $this->uploadS3($report->getLines(), $report->getFile());
-            $output->writeln("<info>Uploaded {$report->getFile()}");
+            $this->uploadS3($report->getLines(), $fileName);
+            $output->writeln("<info>Uploaded {$fileName}");
         } catch (IOException $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
         }

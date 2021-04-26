@@ -3,6 +3,7 @@
 namespace AppBundle\Classes;
 
 use AppBundle\Document\Policy;
+use CensusBundle\Service\SearchService;
 use AppBundle\Helpers\CsvHelper;
 use Doctrine\MongoDB\Query\Query;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -45,15 +46,27 @@ abstract class PolicyReport
     protected $logger;
 
     /**
-     * Injects some dependencies.
-     * @param DocumentManager $dm is used to get repositories.
-     * @param DateTimeZone    $tz the timezone to put dates in.
+     * @var SearchService $searchService
      */
-    public function __construct(DocumentManager $dm, DateTimeZone $tz, LoggerInterface $logger, $reduced = false)
-    {
+    protected $searchService;
+
+    /**
+     * Injects some dependencies.
+     * @param SearchService   $searchService provides geographical information about users.
+     * @param DocumentManager $dm            for the report to use.
+     * @param DateTimeZone    $tz            is the time zone to report in.
+     */
+    public function __construct(
+        SearchService $searchService,
+        DocumentManager $dm,
+        DateTimeZone $tz,
+        LoggerInterface $logger,
+        $reduced = false
+    ) {
         $header = $this->getHeaders();
         $this->lines = [CsvHelper::line(...$header)];
         $this->columns = count($header);
+        $this->searchService = $searchService;
         $this->dm = $dm;
         $this->tz = $tz;
         $this->logger = $logger;
@@ -95,26 +108,28 @@ abstract class PolicyReport
 
     /**
      * Creates a report based on string name.
-     * @param string          $name is the name of the report to create.
-     * @param DocumentManager $dm   is the document manager used.
-     * @param DateTimeZone    $tz   is the timezone to do the report in.
-     * @return PolicyReport|null the created report unless you gave a junk value in which case it's null.
+     * @param string          $name          is the name of the report to create.
+     * @param SearchService   $searchService is the search service used.
+     * @param DocumentManager $dm            is the document manager used.
+     * @param DateTimeZone    $tz            is the timezone to do the report in.
+     * @return PolicyReport|null             the created report.
      */
     public static function createReport(
         $name,
+        SearchService $searchService,
         DocumentManager $dm,
         DateTimeZone $tz,
         LoggerInterface $logger
     ) {
         switch ($name) {
             case 'policy':
-                return new PolicyBiReport($dm, $tz, $logger, true);
+                return new PolicyBiReport($searchService, $dm, $tz, $logger, true);
             case 'policy-full':
-                return new PolicyBiReport($dm, $tz, $logger);
+                return new PolicyBiReport($searchService, $dm, $tz, $logger);
             case 'picsure':
-                return new PolicyPicSureReport($dm, $tz, $logger);
+                return new PolicyPicSureReport($searchService, $dm, $tz, $logger);
             case 'scode':
-                return new PolicyScodeReport($dm, $tz, $logger);
+                return new PolicyScodeReport($searchService, $dm, $tz, $logger);
             default:
                 return null;
         }

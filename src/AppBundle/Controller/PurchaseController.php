@@ -1141,6 +1141,9 @@ class PurchaseController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
+        // Hypejar
+        $bacsnotallowed = $this->get('session')->get('bacsnotallowed');
+
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
@@ -1168,7 +1171,8 @@ class PurchaseController extends BaseController
             'instore' => $instore,
             'validation_required' => $validationRequired,
             'user_code' => $scode,
-            'user_code_type' => $scodeType
+            'user_code_type' => $scodeType,
+            'bacsnotallowed' => $bacsnotallowed,
         );
 
         if ($toCardForm) {

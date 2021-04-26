@@ -2,12 +2,13 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Document\Form\UpdatePremium;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\HelvetiaPhonePolicy;
 use AppBundle\Document\Phone;
-use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
@@ -19,6 +20,7 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Tests\Create;
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\Helvetia;
+use Checkout\Models\Payments\Payment;
 
 /**
  * Tests the behaviour of the policy document.
@@ -64,6 +66,67 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
             $this->assertContains($refund, $refunds);
         }
         $this->assertEquals($nRefunds, count($foundRefunds));
+    }
+
+    /**
+     * Tests if the get scheduled payment refunds method works correctly.
+     */
+    public function testPremiumUpdate()
+    {
+        $policy = new HelvetiaPhonePolicy();
+        $startDate = new \DateTime();
+        $yesterday = $startDate->modify('-7 day');
+        $date = clone $startDate;
+        $endDate = $date->modify('+1 year');
+        $nNonRefunds = rand(4, 11);
+        $nPaid = rand(1, 4);
+
+        // Create the premium data
+        $newGwp = rand(4, 8);
+        $nonRefundAmount = $newGwp / 90;
+        $premium = new PhonePremium();
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $premium->setExcess(PolicyTerms::getHighExcess());
+        $premium->setPicSureExcess(PolicyTerms::getLowExcess());
+        $policy->setPremium($premium);
+
+        // Add random scheduled payments
+        for ($i = 0; $i < $nNonRefunds; $i++) {
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+            $scheduledPayment->setAmount($newGwp);
+            $scheduledPayment->setScheduled($this->addDays($date, rand(50, 200)));
+            $policy->addScheduledPayment($scheduledPayment);
+        }
+
+        $policy->setStart($yesterday);
+        $policy->setEnd($endDate);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $updatePremium = new UpdatePremium();
+        $updatePremium->setNotes($updatePremium->getNotes());
+        $updatePremium->setAmount(rand($newGwp, 12));
+        $updatePremium->setPremium($policy->getPremium());
+        $updatePremium->setPaytype(Policy::PLAN_MONTHLY);
+        $updatePremium->setPolicy($policy);
+
+        $this->assertNotEquals($updatePremium->getAmount(), $policy->getPremium()->getMonthlyPremiumPrice());
+        $policy->processPolicyPremium($updatePremium);
+        $this->assertEquals($updatePremium->getAmount(), $policy->getPremium()->getMonthlyPremiumPrice());
+
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setType(ScheduledPayment::TYPE_REFUND);
+        $scheduledPayment->setAmount($nonRefundAmount);
+        $scheduledPayment->setScheduled($date);
+        $policy->addScheduledPayment($scheduledPayment);
+        $foundRefunds = $policy->getScheduledPaymentRefunds();
+        foreach ($foundRefunds as $refund) {
+            $this->assertNotEmpty($refund);
+        }
     }
 
     /**

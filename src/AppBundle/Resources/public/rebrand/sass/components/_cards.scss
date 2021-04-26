@@ -157,6 +157,20 @@
     &__expand {
         display: none;
         padding: 1.2rem 1.56rem 1.56rem 1.56rem;
+
+        li {
+            margin-bottom: 0.5rem;
+
+            &:last-of-type {
+                margin-bottom: 0;
+            }
+        }
+
+        div {
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
 
     &:hover {

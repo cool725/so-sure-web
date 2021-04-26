@@ -9,7 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 
 use AppBundle\Classes\ApiErrorCode;
 
@@ -24,15 +26,87 @@ class HomeContentsController extends BaseController
 {
     /**
      * @Route("/contents-insurance", name="contents_insurance")
+     * @Route("/contents-insurance/m", name="contents_insurance_m")
+     * @Route("/contents-insurance/getmyslice", name="contents_insurance_getmyslice")
+     * @Route("/contents-insurance/creditspring", name="contents_insurance_creditspring")
      */
-    public function contentsInsuranceAction()
+    public function contentsInsuranceAction(Request $request)
     {
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
+        // Temp
+        $promo = false;
+        $partner = null;
+
+        // Is indexed?
+        $noindex = false;
+        if ($request->get('_route') == 'contents_insurance_m') {
+            $noindex = true;
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - LP']);
+        } elseif ($request->get('_route') == 'contents_insurance_getmyslice') {
+            $noindex = true;
+            $promo = true;
+            $partner = 'getmyslice';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Get My Slice']);
+        } elseif ($request->get('_route') == 'contents_insurance_creditspring') {
+            $noindex = true;
+            $promo = true;
+            $partner = 'creditspring';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Creditspring']);
+        } else {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+                'Page' => 'landing_page',
+                'Step' => 'contents_insurance'
+            ]);
+        }
+
+        // Pass along UTM params to web app for Mixapanel
+        $utms = null;
+        $source = $request->query->get('utm_source');
+        $medium = $request->query->get('utm_medium');
+        $campaign = $request->query->get('utm_campaign');
+        $sskey = $request->query->get('sskey');
+
+        if ($source || $medium || $campaign) {
+            $source = urlencode($source);
+            $medium = urlencode($medium);
+            $campaign = urlencode($campaign);
+            $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
+        }
+
+        // Optimise - pass along sskey
+        if ($sskey) {
+            // Set the cookie
+            $response = new Response();
+            $cookie = new Cookie(
+                'optimise-sskey',
+                $sskey,
+                time() + 1000 * 60 * 60 * 24 * 30,
+                '/',
+                '.wearesosure.com'
+            );
+            $response->headers->setCookie($cookie);
+            $response->send();
+            $sskey = sprintf('&sskey=%s', $sskey);
+            $utms = $utms . $sskey;
+        }
+
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
+        if ($promo) {
+            $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
+        }
+
         $data = [
             'lead_csrf' => $csrf->refreshToken('lead'),
+            'is_noindex' => $noindex,
+            'utms' => $utms,
+            'promo' => $promo,
+            'partner' => $partner,
         ];
 
         return $this->render($template, $data);
