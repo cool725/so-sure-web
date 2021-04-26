@@ -34,7 +34,25 @@ trait DateTrait
             new \DateTime('2020-05-25'),
             new \DateTime('2020-08-31'),
             new \DateTime('2020-12-25'),
-            new \DateTime('2020-12-28'),
+            new \DateTime('2021-01-01'),
+            new \DateTime('2021-04-02'),
+            new \DateTime('2021-04-05'),
+            new \DateTime('2021-05-03'),
+            new \DateTime('2021-05-31'),
+            new \DateTime('2021-08-30'),
+            new \DateTime('2021-12-25'),
+            new \DateTime('2021-12-26'),
+            new \DateTime('2021-12-27'),
+            new \DateTime('2021-12-28'),
+            new \DateTime('2022-01-03'),
+            new \DateTime('2022-04-15'),
+            new \DateTime('2022-04-18'),
+            new \DateTime('2022-05-02'),
+            new \DateTime('2022-06-02'),
+            new \DateTime('2022-06-03'),
+            new \DateTime('2022-08-29'),
+            new \DateTime('2022-12-26'),
+            new \DateTime('2022-12-27')
         ];
     }
 
