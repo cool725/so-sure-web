@@ -100,10 +100,9 @@ class AboutController extends BaseController
                 if ($contactForm->isValid()) {
                     // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        "Name: %s<br>Email: %s<br>Contact #: %s<br>Message: %s",
+                        "Name: %s<br>Email: %s <br>Message: %s",
                         $contactForm->getData()['name'],
                         $contactForm->getData()['email'],
-                        $contactForm->getData()['phone'],
                         $contactForm->getData()['message']
                     );
                     // @codingStandardsIgnoreEnd
