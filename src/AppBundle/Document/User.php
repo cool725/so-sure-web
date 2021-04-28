@@ -1596,6 +1596,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['picsureRequired'] = false;
         $data['connectedWithFacebook'] = mb_strlen($this->getFacebookId()) > 0;
         $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
+        $data['billingDay'] = null;
+        $data['totalPremiumPaid'] = 0;
 
         $data['paymentMethod'] = 'none';
         foreach ($this->getValidPolicies(true) as $policy) {
@@ -1631,6 +1633,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             }
             $data['connections'] += count($policy->getConnections());
             $data['scode'] = ($this->getStandardSCode() === null) ? "" : $this->getStandardSCode()->getCode();
+
             $data['rewardPot'] += $policy->getPotValue();
             $data['approvedClaims'] += count($policy->getApprovedClaims());
             $data['approvedNetworkClaims'] += count($policy->getNetworkClaims(true));
@@ -1667,6 +1670,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             if ($policy->getStatus() == Policy::STATUS_UNPAID) {
                 $data['accountPaidToDate'] = false;
             }
+
+            $billingDay = '';
+            $totalPremium = 0;
+            if ($policy) {
+                $billingDay = ($policy->getBilling()) ? $policy->getBillingDay() : '';
+                if ($policy->getSuccessfulPayments()) {
+                    $totalPremium = $policy->getTotalSuccessfulPayments();
+                }
+            }
+            $data['billingDay'] = $billingDay;
+            $data['totalPremiumPaid'] = $totalPremium;
         }
 
         if ($this->hasCancelledPolicyWithPaymentOwed()) {
@@ -1678,6 +1692,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             $data['renewalMonthlyPremiumWithPot'] +=
                 $policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice($policy->getPotValue());
         }
+
+
+
         $data['firstPolicy'] = [];
         $data['firstPolicy']['promoCode'] = null;
         $data['firstPolicy']['monthlyPremium'] = null;

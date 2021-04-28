@@ -571,6 +571,8 @@ class IntercomService
         $data['custom_attributes']['Displayable Max Pot'] = (string) sprintf('%.2f', $analytics['maxPot']);
         $data['custom_attributes']['Has Full Pot'] = $analytics['hasFullPot'];
         $data['custom_attributes']['Scode'] = $analytics['scode'];
+        $data['custom_attributes']['Billing Day'] = $analytics['billingDay'];
+        $data['custom_attributes']['Total Premium Paid'] = $analytics['totalPremiumPaid'];
         $data['custom_attributes']['Connections'] = $analytics['connections'];
         $data['custom_attributes']['Approved Claims'] = $analytics['approvedClaims'];
         $data['custom_attributes']['Approved Network Claims'] = $analytics['approvedNetworkClaims'];
