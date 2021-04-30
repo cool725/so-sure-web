@@ -854,4 +854,32 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/how-to-transfer-data-to-your-new-phone",
+     * name="how_to_transfer_data_to_your_new_phone", options={"sitemap" = true})
+     * @Template
+     */
+    public function howToTransferDataToYourNewPhoneAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/how-to-transfer-data-to-your-new-phone.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/samsung-care-plus-vs-phone-insurance",
+     * name="samsung_care_plus_vs_phone_insurance", options={"sitemap" = true})
+     * @Template
+     */
+    public function samsungCarePlusVsPhoneInsuranceAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/samsung-care-plus-vs-phone-insurance.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

@@ -81,7 +81,7 @@
                                                 <time>Blog date</time>
                                             </li>
                                         </ul>
-                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' %}
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure' } %}
                                     </div>
                                 </hgroup>
                             </header>
@@ -94,7 +94,7 @@
                             </div>
                             <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
                             <footer class="my-4">
-                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' %}
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home', 'hashtags': 'wearesosure' } %}
                             </footer>
                         </article>
                     </div>

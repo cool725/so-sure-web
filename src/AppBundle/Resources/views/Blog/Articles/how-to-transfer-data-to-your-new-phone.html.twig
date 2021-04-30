@@ -1,0 +1,183 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}How To Transfer Data To Your New Phone | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Transferring data to your new phone needn't be difficult. This article explains how to seamlessly transfer your apps and data to your new smartphone device."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'How To Transfer Data To Your New Phone | SO-SURE' %}
+{% set og_description = "Transferring data to your new phone needn't be difficult. This article explains how to seamlessly transfer your apps and data to your new smartphone device." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/how-to-transfer-data-to-your-new-phone.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">How To Transfer Data To Your New Phone</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">How To Transfer Data To Your New Phone</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Apr 19, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure,phoneinsurance' } %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/how-to-transfer-data-to-your-new-phone.jpg"
+                                     alt="Transfer data to new phone"
+                                     class="img-fluid lozad mb-5">
+                                <p>Upgrading to a new mobile device is always exciting, but there are a few things to do at your end to make the transition as seamless as possible. In this article, we’ll set out a checklist explaining how you can transfer your data and all-important apps to your new phone.</p>
+                                <p>Our checklist covers four possible data flows:</p>
+                                <ul>
+                                    <li>iPhone to iPhone</li>
+                                    <li>iPhone to Android</li>
+                                    <li>Android to Android</li>
+                                    <li>Android to iPhone.</li>
+                                </ul>
+                                <p>Bear in mind that Android slightly varies between manufacturers, and the prominent names like Google, Samsung, and OnePlus may include some proprietary methods of moving your apps and data. Before you start, it’s best to get a few things in order:</p>
+                                <ul>
+                                    <li>In all cases, ensure you have a good connection to your local Wi-Fi</li>
+                                    <li>Backup your old phone’s data (you’ll need your Google or iCloud ID and password for this)</li>
+                                    <li>Ensure your old phone’s operating system is the latest update</li>
+                                    <li>Now you’re ready to begin the migration process.</li>
+                                </ul>
+                                <h2>iPhone to iPhone</h2>
+                                <p>Perhaps the simplest process, here’s how to transfer your data from your old iPhone to a new version:</p>
+                                <ol>
+                                    <li>When you place your new iPhone next to your old one, a screen will pop up on the older phone, with instructions on setting up the new one.</li>
+                                    <li>Your new phone will then display a pattern on its screen – take a photo of this with your old phone to pair the handsets.</li>
+                                    <li>The old phone will then direct you to finish setting up the new device</li>
+                                    <li>Next, enter your old phone’s passcode into your new phone.</li>
+                                    <li>You’ll be prompted to set up a biometric ID, and your iCloud ID will copy over.</li>
+                                    <li>Now you can restore from an iCloud or iTunes backup or set up the phone as new if you’d prefer.</li>
+                                </ol>
+                                <h2>iPhone to Android</h2>
+                                <p>Migrating from an iPhone to Android involves backing up all your data to your Google Drive before downloading it to your new phone.</p>
+                                <ol>
+                                    <li>After tapping through the Terms and Conditions screens on your new phone, you’ll be asked if you want to transfer your data. You’ll be presented with a screen that lets you choose where your data comes from – tap ‘an iPhone device.’</li>
+                                    <li>Your phone will then tell you to open Safari and navigate to android.com/switch.</li>
+                                    <li>If you don’t have a Google account yet, Google Drive will guide you through the setup process, as you’ll need a Google account to use Android.</li>
+                                    <li>In Google Drive, you’ll see a menu on the upper left of the screen.</li>
+                                    <li>Tap the Settings gear in the menu that slides out from the left, then tap Backup.</li>
+                                    <li>Next, tap on Contacts, Calendar Events, and Photos & Videos before sliding the toggle on for everything you want to back up to Google Drive – it’s usually all of the above!</li>
+                                    <li>Tap Start Backup.</li>
+                                    <li>Depending on how much data you have, it can take a while (hours) to back up everything to the cloud.</li>
+                                    <li>Top tip: If your new Android phone has the same number as your iPhone (e.g., if you’re swapping the SIM card), turn off iMessage and FaceTime, or you’ll never receive another text message!</li>
+                                    <li>To do this, head to Settings, scroll down to Messages and tap it.</li>
+                                    <li>Next, slide the iMessage toggle to the left, turning it off.</li>
+                                    <li>Go back to Settings, tap on FaceTime, and turn it off, too.</li>
+                                    <li>Continue setting up your new Android phone, logging into Google with the same ID you used on the iPhone to back up that phone to Google Drive. Eventually, all your backed up data will appear, safe and sound.</li>
+                                </ol>
+                                <h2>Android to Android</h2>
+                                <ol>
+                                    <li>After the Terms and Conditions screens, tap ‘Backup from an Android Phone’ and open the Google app on the other phone before tapping Next.</li>
+                                    <li>You’ll be prompted to launch the Google app on your old phone (the Google app, not Chrome).</li>
+                                    <li>Your old phone will display a Getting Started screen without much information. Tap Next to get started.</li>
+                                    <li>Both phones want to establish where you’re moving your account in case there’s more than one device in Bluetooth range –Tap the correct device icon on each handset.</li>
+                                    <li>Both phones will also show a screen with numbers and coloured shapes to confirm that your data is heading to the right place.</li>
+                                    <li>Tap Next on your old phone (you’ll notice that there’s no place to tap on the new one).</li>
+                                    <li>Enter your screen lock code on your old phone and approve the copy to your new phone – your account will now appear on your new phone.</li>
+                                    <li>On your new phone, log into your Google account – all of your data will be there, minus your apps.</li>
+                                    <li>To import your apps, launch the Google Play Store</li>
+                                    <li>Tap the menu icon, then tap ‘My apps and games.’</li>
+                                    <li>Here, you’ll be shown a list of apps that were on your old phone.</li>
+                                    <li>Pick the ones you want to migrate (you might not want to move brand-specific or carrier-specific apps from the old phone to the new) and download them. While you’re there, you could update the apps that came with the new phone, too.</li>
+                                </ol>
+                                <h2>Android 8.X to iPhone</h2>
+                                <p>If you’re moving from a relatively new Android to an iPhone, there’s an issue you should be aware of. At the time of writing, Apple’s Android migration tool, Move to iOS, doesn’t appear to work with the latest Android OS (Android 9 Pie) – this is reinforced in some <a href="https://discussions.apple.com/thread/8542696" target="_blank" rel="noopener noreferrer">online support forums</a>. However, previous versions, such as Android Oreo (8.x), work fine.</p>
+                                <p>Some third-party workarounds (e.g., <a href="https://go.redirectingat.com/?id=66960X1514734&xs=1&url=https://www.imobie.com/anytrans/&referrer=theverge.com&sref=https://www.theverge.com/2019/3/28/18282698/iphone-android-data-transfer-how-to-new-phone&xcust=___vg__e_18046739__r_theverge.com/2019__t_w__d_D" target="_blank" rel="noopener noreferrer">AnyTrans</a>) use your PC as an intermediary. If you have another Android phone handy, another possibility is to transfer you data to that phone per the above instructions, then migrate to the new iPhone as follows:</p>
+                                <ol>
+                                    <li>After choosing your location and language on the iPhone, you’ll see a Quick Start screen to migrate from another iOS device. However, we’re not doing that, so tap Set Up Manually. </li>
+                                    <li>Connect to your Wi-Fi network (you can also do this using your phone data if you’d prefer).</li>
+                                    <li>Set up Touch ID / Face ID, or just set a PIN – you can come back to do the biometrics later.</li>
+                                    <li>You’ll then be asked if you want to migrate data to your iPhone and from where.</li>
+                                    <li>Tap Move Data from Android, and then tap Continue. A six or 10-digit code will appear.</li>
+                                    <li>On your Android phone, go to the Play Store and download the app ‘Move to iOS.’</li>
+                                    <li>Open the app, tap Continue, and accept the Terms and Conditions. A Find Your Code screen will appear. In the upper right corner, tap Next.</li>
+                                    <li>Enter the code from your iPhone into your Android phone. The phones will then pair.</li>
+                                    <li>The Android app will ask what data and apps you want to move. Select the data, hit Next, and the data will transfer will begin.</li>
+                                    <li>Once you enter or set up your Apple IDs, you’ll be prompted to download iOS versions of your Android apps.</li>
+                                </ol>
+                                <h2>Insure your new phone with SO-SURE</h2>
+                                <p>Once you’ve got all of your data transferred over to your new device, you’re good to go. If you want to make sure your new phone lasts as long as possible, why not consider a SO-SURE insurance policy?</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home', 'hashtags': 'wearesosure,phoneinsurance' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
