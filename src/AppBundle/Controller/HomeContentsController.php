@@ -79,23 +79,6 @@ class HomeContentsController extends BaseController
             $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
         }
 
-        // Optimise - pass along sskey
-        if ($sskey) {
-            // Set the cookie
-            $response = new Response();
-            $cookie = new Cookie(
-                'optimise-sskey',
-                $sskey,
-                time() + 1000 * 60 * 60 * 24 * 30,
-                '/',
-                '.wearesosure.com'
-            );
-            $response->headers->setCookie($cookie);
-            $response->send();
-            $sskey = sprintf('&sskey=%s', $sskey);
-            $utms = $utms . $sskey;
-        }
-
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
         if ($promo) {
             $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';

@@ -908,6 +908,10 @@ nelmio_security:
                 - https://www.clickcease.com/monitor/stat.js
                 - https://analytics.tiktok.com
                 - http://rum-static.pingdom.net/
+                - http://*.rakuten.com
+                - http://*.linksynergy.com
+                - http://*.nxtck.com
+                - http://*.xg4ken.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1175,6 +1179,10 @@ nelmio_security:
                 - https://www.googletagmanager.com
                 - https://optimize.google.com
                 - https://www.googleoptimize.com
+                - http://*.rakuten.com
+                - http://*.linksynergy.com
+                - http://*.nxtck.com
+                - http://*.xg4ken.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com
