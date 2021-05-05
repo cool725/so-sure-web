@@ -177,7 +177,7 @@ class DefaultController extends BaseController
             if ($environment === 'prod') {
                 $parse = parse_url($url);
                 $host = $parse['host'];
-                if ($host !== 'www.wearesosure.com' || $host !== 'wearesosure.com') {
+                if ($host !== 'www.wearesosure.com' && $host !== 'wearesosure.com') {
                     throw new NotFoundHttpException();
                 }
             }
