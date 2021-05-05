@@ -1598,6 +1598,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['connectedWithGoogle'] = mb_strlen($this->getGoogleId()) > 0;
         $data['billingDay'] = null;
         $data['totalPremiumPaid'] = 0;
+        $data['premiumInstallments'] = null;
 
         $data['paymentMethod'] = 'none';
         foreach ($this->getValidPolicies(true) as $policy) {
@@ -1648,6 +1649,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $data['annualPremium'] += $policy->getPremium()->getYearlyPremiumPrice();
                 $data['monthlyPremium'] += $policy->getPremium()->getMonthlyPremiumPrice();
                 $data['paymentsReceived'] += count($policy->getSuccessfulPaymentCredits());
+                $data['premiumInstallments'] += $policy->getPremiumInstallments();
 
                 if ($payment = $policy->getLastSuccessfulUserPaymentCredit()) {
                     if (!$data['lastPaymentReceived'] || $data['lastPaymentReceived'] < $payment->getDate()) {
