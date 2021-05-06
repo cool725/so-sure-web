@@ -207,8 +207,8 @@ class RakutenService
                 'http://'.$this->rootDomain,
                 'https://'.$this->rootDomain,
                 $this->rootDomain
-            ]
-            
+            ];
+
             foreach ($acceptedDomains as $domain) {
                 // redirection has to start with one of our domains
                 // if NOT, will redirect to home page
