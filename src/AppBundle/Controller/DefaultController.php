@@ -172,14 +172,26 @@ class DefaultController extends BaseController
             if ($ranSiteId === null || $url === null) {
                 throw new NotFoundHttpException();
             }
-
+            $match = true;
             $environment = $this->getParameter('kernel.environment');
             if ($environment === 'prod') {
+                $match = false;
                 $parse = parse_url($url);
-                $host = $parse['host'];
-                if ($host !== 'www.wearesosure.com' && $host !== 'wearesosure.com') {
-                    throw new NotFoundHttpException();
+                $inithost = $parse['host'];
+                $hosts = array('www.wearesosure.com', 'wearesosure.com', 'sosure.net');
+
+                //loop over all the hosts
+                foreach ($hosts as $host) {
+                    // check if url contains correct host
+                    if (mb_strpos($inithost, $host) !== false) {
+                        $match = true;
+                        break;
+                    }
                 }
+            }
+
+            if (!$match) {
+                throw new NotFoundHttpException();
             }
 
             $rakutenHelper = $this->get('app.rakutenhelper');
