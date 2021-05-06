@@ -1120,6 +1120,7 @@ class MixpanelService
         $userData['Number of Connections'] = $analytics['connections'];
         $userData['Reward Pot Value'] = $analytics['rewardPot'];
         $userData['Payment Method'] = $analytics['paymentMethod'];
+        $userData['Premium Installments'] = $analytics['premiumInstallments'];
         if (isset($analytics['devices'])) {
             $userData['Insured Devices'] = join(';', $analytics['devices']);
         }

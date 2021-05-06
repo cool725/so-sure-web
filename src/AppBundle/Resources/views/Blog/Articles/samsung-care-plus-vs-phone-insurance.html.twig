@@ -1,0 +1,239 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Samsung Care Plus vs Phone Insurance | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Samsung Care+ is Samsung's proprietary service for insuring products, but how does it stack up next to SO-SURE Samsung insurance? Find out here."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Samsung Care Plus vs Phone Insurance | SO-SURE' %}
+{% set og_description = "Samsung Care+ is Samsung's proprietary service for insuring products, but how does it stack up next to SO-SURE Samsung insurance? Find out here." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/samsung-care-plus-vs-phone-insurance.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Samsung Care Plus vs Phone Insurance</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Samsung Care Plus vs Phone Insurance</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">Rachel</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Apr 23, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure,phoneinsurance' } %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/samsung-care-plus-vs-phone-insurance.jpg"
+                                     alt="Samsung Care Plus vs Phone Insurance"
+                                     class="img-fluid lozad mb-5">
+                                <p>Samsung Care+, Samsung's proprietary service for insuring products, is available for Samsung devices, but how well does it stack up next to third party <a href="{{ path('phone_insurance_make', {'make': 'samsung'}) }}">samsung phone insurance</a>, like the policies we offer at SO-SURE? And what is Samsung Care+ anyway? This article explains the key differences between the policies so you can make an informed decision on how best to protect your Samsung device.</p>
+                                <h2>What is Samsung Care+?</h2>
+                                <p><a href="https://www.samsung.com/uk/offer/samsung-care-plus/" target="_blank" rel="noopener noreferrer">Samsung Care+</a> is an extended version of Samsung’s standard warranty, protecting your Galaxy device against all accidental damage for up to two years. It includes four main features:</p>
+                                <ul>
+                                    <li>Fast, convenient repairs using genuine Samsung parts, from authorised technicians</li>
+                                    <li>Hassle-free battery replacements reduce downtime</li>
+                                    <li>If your device isn’t running smoothly, Samsung’s technicians will check and fix the issue</li>
+                                    <li>You can make up to four claims for repairs or replacements within two years.</li>
+                                </ul>
+                                <h2>What isn’t included with Samsung Care+</h2>
+                                <p>Bear in mind that Samsung Care+ does not cover:</p>
+                                <ul>
+                                    <li>Product loss</li>
+                                    <li>Deliberate damage</li>
+                                    <li>Cosmetic damage</li>
+                                    <li>Pickpocketing or theft of any kind</li>
+                                    <li>Lack of reasonable care</li>
+                                    <li>Damage resulting from normal wear and tear.</li>
+                                </ul>
+                                <h2>How much does Samsung Care+ cost?</h2>
+                                <p>See below for a breakdown of prices for different Samsung devices and payment plans:</p>
+                                <table class="table mt-3 mb-5">
+                                    <thead>
+                                        <tr>
+                                            <th>Galaxy devices</th>
+                                            <th>Samsung Care+ monthly price</th>
+                                            <th>Samsung Care+ 2-year upfront price</th>
+                                            <th>Service fee per claim</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                Galaxy S Series<br>
+                                                Galaxy Note Series<br>
+                                                Galaxy Tab S7 LTE<br>
+                                                Galaxy Tab S7+ WiFi & LTE<br>
+                                                Galaxy Tab S6 LTE<br>
+                                                Galaxy Book S
+                                            </td>
+                                            <td>£7.49</td>
+                                            <td>£159</td>
+                                            <td>£59</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Galaxy A71<br>
+                                                Galaxy S10 Lite<br>
+                                                 Galaxy Note10 Lite<br>
+                                                Galaxy A51 5G<br>
+                                                Galaxy Tab S7 WiFi<br>
+                                                Galaxy Tab Active 2<br>
+                                                Galaxy Tab Active Pro<br>
+                                                Galaxy Tab S6 WiFi<br>
+                                                Galaxy Tab S5e
+                                            </td>
+                                            <td>£5.99</td>
+                                            <td>£109</td>
+                                            <td>£49</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Galaxy A30S<br>
+                                                Galaxy A41<br>
+                                                Galaxy A51<br>
+                                                Galaxy Tab S6 Lite WiFi<br>
+                                                Galaxy Tab A 10.1” LTE
+                                            </td>
+                                            <td>£4.99</td>
+                                            <td>£89</td>
+                                            <td>£39</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Galaxy A10<br>
+                                                Galaxy A20e<br>
+                                                Galaxy A21S<br>
+                                                Galaxy Tab 10.1” WiFi<br>
+                                                Galaxy Tab A 8”
+                                            </td>
+                                            <td>£3.99</td>
+                                            <td>£79</td>
+                                            <td>£29</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p class="text-center"><small><em>Prices accurate as of February 2021.</em></small></p>
+                                <h2>SO-SURE Samsung insurance</h2>
+                                <p>At SO-SURE, we believe your Samsung insurance policy should include real benefits and rewards. How about 24/7 online claims reporting, a rapid repair and replacement service, and money back when you don’t claim? You can get all this and more with SO-SURE.</p>
+                                <p>Our comprehensive insurance keeps your Samsung device fully covered for loss, theft, and accidental damage as standard, both at home and abroad, providing peace of mind wherever your next adventure takes you. <a href="{{ path('phone_insurance_second_hand')}}">Second hand</a> and <a href="{{ path('phone_insurance_refurbished') }}">refurbished</a> handsets up to three years old are also included in our Samsung insurance policy, plus coverage for up to £100 worth of Samsung accessories.</p>
+                                <h3><a href="{{ path('social_insurance') }}">Social insurance</a></h3>
+                                <p>Our social insurance allows you to connect your policy to friends and family members. And if no one claims for the duration of your policy year, we’ll give you up to 80% of your premium back. So how does this work exactly? Well, if you were to buy Samsung insurance with us and invite your best friend to buy a policy for his or her phone, too, you can then connect your policies. Once connected, you’ll each receive £10 in your <a href="{{ path('social_insurance') }}">Reward Pot</a>, which is essentially our group no claims bonus. If neither of you claims the duration of your policy, we’ll reimburse you the value of your Reward Pot at the end of it.</p>
+                                <h2>SO-SURE Samsung insurance vs Samsung Care+</h2>
+                                <table class="table mt-3 mb-5">
+                                    <thead>
+                                        <tr>
+                                            <th>Features</th>
+                                            <th>SO-SURE</th>
+                                            <th>Samsung Care+</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Time to repair/replace after approval</td>
+                                            <td>24-72 hours</td>
+                                            <td>Same day</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Up to 80% Cashback at end of policy year</td>
+                                            <td>✅</td>
+                                            <td>❌</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Loss, Theft & Accidental Damage included as standard</td>
+                                            <td>✅</td>
+                                            <td>❌</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Insure second-hand phones</td>
+                                            <td>✅</td>
+                                            <td>❌</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Save up to £100 off your excess</td>
+                                            <td>✅</td>
+                                            <td>❌</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p>We might be a little biased, but we think it’s clear which is the right choice for protecting your Samsung phone. Find out how much a SO-SURE policy would cost you today.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'phone', 'hashtags': 'wearesosure,phoneinsurance' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}
