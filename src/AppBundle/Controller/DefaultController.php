@@ -173,10 +173,14 @@ class DefaultController extends BaseController
                 throw new NotFoundHttpException();
             }
             $match = true;
+
+            $rakutenHelper = $this->get('app.rakutenhelper');
+            $rakutenURL = $rakutenHelper->setConfig($url);
+
             $environment = $this->getParameter('kernel.environment');
             if ($environment === 'prod') {
                 $match = false;
-                $parse = parse_url($url);
+                $parse = parse_url($rakutenURL);
                 $inithost = $parse['host'];
                 $hosts = array('www.wearesosure.com', 'wearesosure.com', 'sosure.net');
 
@@ -193,9 +197,6 @@ class DefaultController extends BaseController
             if (!$match) {
                 throw new NotFoundHttpException();
             }
-
-            $rakutenHelper = $this->get('app.rakutenhelper');
-            $rakutenURL = $rakutenHelper->setConfig();
 
             if (null !== $rakutenURL) {
                 return new RedirectResponse($rakutenURL);

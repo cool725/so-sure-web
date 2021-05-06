@@ -54,7 +54,7 @@ class RakutenService
     /**
      * CODE BELOW THIS BLOCK SHOULD NOT BE EDITIED IN ANY WAY
      */
-    public function setConfig()
+    public function setConfig($urlD = null)
     {
         try {
             /**
@@ -200,8 +200,8 @@ class RakutenService
              Subroutine to confirm destination URL provided in paramater (url) belongs to same domain for redirection
              if not then build destination url to root domain.
             */
-            $url = urldecode($_REQUEST['url']);
-            if (isset($url) && mb_strripos($url, $this->rootDomain) !== false) {
+            $url = urldecode($urlD);
+            if (!empty($url) && mb_strripos($url, $this->rootDomain) !== false) {
                 // IF $url is set and it belongs to same top level domain then go to $url
                 $this->destinationUrl = $url;
             } else {
