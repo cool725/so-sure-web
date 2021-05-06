@@ -201,13 +201,20 @@ class RakutenService
              if not then build destination url to root domain.
             */
             $url = urldecode($urlD);
-            if (!empty($url) && mb_strripos($url, $this->rootDomain) !== false) {
-                // IF $url is set and it belongs to same top level domain then go to $url
-                $this->destinationUrl = $url;
-            } else {
-                // If $url is NOT set or is set to nothing ('&url=') or it doesnt belong to same domain then
-                // redirect to current domain (home page).
-                $this->destinationUrl = $urlPrefix . $this->rootDomain . "?" . $_SERVER['QUERY_STRING'];
+            $this->destinationUrl = $urlPrefix . $this->rootDomain . "?" . $_SERVER['QUERY_STRING'];
+
+            $acceptedDomains = [
+                'http://'.$this->rootDomain,
+                'https://'.$this->rootDomain,
+                $this->rootDomain
+            ];
+
+            foreach ($acceptedDomains as $domain) {
+                // redirection has to start with one of our domains
+                // if NOT, will redirect to home page
+                if (mb_substr($url, 0, mb_strlen($domain)) == $domain) {
+                    $this->destinationUrl = $url;
+                }
             }
             return $this->destinationUrl;
         } catch (\Exception $exception) {
