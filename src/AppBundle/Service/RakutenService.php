@@ -212,7 +212,7 @@ class RakutenService
             foreach ($acceptedDomains as $domain) {
                 // redirection has to start with one of our domains
                 // if NOT, will redirect to home page
-                if (substr($url, 0, strlen($domain)) == $domain) {
+                if (mb_substr($url, 0, mb_strlen($domain)) == $domain) {
                     $this->destinationUrl = $url;
                 }
             }
