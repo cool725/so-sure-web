@@ -1,0 +1,90 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'invite' %}
+{% set robots_noindex = true %}
+{% set small_footer = true %}
+{% set include_get_a_quote = true %}
+
+{# Set Meta #}
+{% block title %}Refer your friends {{ scode.policy.user.firstname }} | SO-SURE{% endblock %}
+{% block meta %}
+    <meta name="description" content="Check out SO-SURE to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!"/>
+{% endblock %}
+
+{% set og_title = 'Refer your friends ' ~ scode.policy.user.firstname %}
+{% set og_description = 'Check out SO-SURE to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!' %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-referral.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/refer.css') }}">
+{% endblock %}
+
+{% block body %}
+    <section class="hero">
+        <div class="container-large">
+            <h1 class="text-white">Hey, {{ scode.policy.user.firstname }} 👋</h1>
+            <div class="h2 text-white mb-4"><span class="sub text-deep-sky-blue-d">Connect with friend earn Cashback &amp; Rewards</span></div>
+            <div class="h4 text-white">
+                <span class="d-inline-block mr-2">
+                    <span class="text-deep-sky-blue-d sub">Connections:</span> {{ scode.policy.connections|length }}/{{ scode.policy.getMaxConnections }}
+                </span>
+                <span class="d-inline-block">
+                    <span class="text-deep-sky-blue-d sub">Reward Pot:</span> &pound;{{ scode.policy.potValue|number_format(2, '.', ',') }}
+                </span>
+            </div>
+            <hr />
+            <h2 class="h3 text-white">Share your link</h2>
+            <div class="custom-input-with-btn mb-4">
+                <input type="text"
+                        class="form-control form-control-white form-control-shadow"
+                        value="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                        disabled />
+                <button class="btn btn-primary btn-copy btn-sm"
+                        data-clipboard-text="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}">Copy</button>
+            </div>
+            <hr />
+            <h2 class="h3 text-white">Share on social</h2>
+            <div class="d-flex align-items-center">
+                <a href="#"
+                    class="track-data"
+                    data-sharer="twitter"
+                    data-title="{{ og_description }}"
+                    data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                    data-via="wearesosure"
+                    data-hashtags="wearesosure,phoneinsurance"
+                    data-event="share-twitter-user-refer-page">
+                    <span class="fa-stack fa-2x">
+                        <i class="fas fa-square text-white fa-stack-2x"></i>
+                        <i class="fab fa-twitter text-twitter fa-stack-1x fa-inverse"></i>
+                    </span><span class="sr-only">Tweet</span></a>
+                <a href="#"
+                    class="track-data"
+                    data-sharer="facebook"
+                    data-title="{{ og_description }}"
+                    data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                    data-hashtags="wearesosure,phoneinsurance"
+                    data-event="share-facebook-user-refer-page">
+                    <span class="fa-stack fa-2x">
+                        <i class="fas fa-square text-white fa-stack-2x"></i>
+                        <i class="fab fa-facebook text-facebook fa-stack-1x fa-inverse"></i>
+                    </span><span class="sr-only">Facebook</span></a>
+                <a href="#"
+                    class="track-data"
+                    data-sharer="whatsapp"
+                    data-web
+                    data-title="{{ og_description }}"
+                    data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                    data-event="share-whatsapp-user-refer-page">
+                    <span class="fa-stack fa-2x">
+                        <i class="fas fa-square text-white fa-stack-2x"></i>
+                        <i class="fab fa-whatsapp text-whatsapp fa-stack-1x fa-inverse"></i>
+                    </span><span class="sr-only">Whatsapp</span></a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/refer.js') }}"></script>
+{% endblock %}
