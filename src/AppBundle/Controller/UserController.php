@@ -1384,6 +1384,13 @@ class UserController extends BaseController
             $template = 'AppBundle:User:validationRequired.html.twig';
         }
 
+        // Get scode
+        $scode = null;
+        if ($session = $this->get('session')) {
+            /** @var SCode $scode */
+            $scode = $session->get('scode');
+        }
+
         return $this->render($template, [
             'cancel_url' => $this->generateUrl('purchase_cancel_damaged', ['id' => $user->getLatestPolicy()->getId()]),
             'policy_key' => $this->getParameter('policy_key'),
@@ -1391,6 +1398,7 @@ class UserController extends BaseController
             'has_visited_welcome_page' => $pageVisited,
             'user' => $user,
             'instore' => $instore,
+            'used_scode' => $scode,
         ]);
     }
 
