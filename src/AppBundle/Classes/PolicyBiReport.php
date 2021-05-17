@@ -491,7 +491,9 @@ class PolicyBiReport extends PolicyReport
         foreach ($connections as $connection) {
             if (!$connection instanceof RewardConnection) {
                 if ($connection->getLinkedPolicy() instanceof Policy) {
-                    $retVal .= $connection->getLinkedPolicy()->getStandardSCode()->getCode() . ';';
+                    if ($connection->getLinkedPolicy()->getStandardSCode()->getCode() != null) {
+                        $retVal .= $connection->getLinkedPolicy()->getStandardSCode()->getCode() . ';';
+                    }
                 }
             }
         }
