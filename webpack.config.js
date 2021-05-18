@@ -102,6 +102,9 @@ Encore
     // Signup
     .addEntry('signup', './src/AppBundle/Resources/public/rebrand/js/pages/signup.js')
 
+    // Refer
+    .addEntry('refer', './src/AppBundle/Resources/public/rebrand/js/pages/refer.js')
+
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
     .addEntry('rollbar-js-error', './src/AppBundle/Resources/public/rebrand/js/pages/rollbar-js-error.js')
