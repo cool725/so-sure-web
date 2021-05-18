@@ -495,7 +495,7 @@ class PolicyBiReport extends PolicyReport
                         if ($connection->getLinkedPolicy()->getStandardSCode()) {
                             $retVal .= $connection->getLinkedPolicy()->getStandardSCode()->getCode() . ';';
                         }
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         echo $e->getMessage(), "\n";
                     }
                 }
