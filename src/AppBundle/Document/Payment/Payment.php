@@ -678,7 +678,7 @@ abstract class Payment
         foreach ($payments as $payment) {
             /** @var Payment $payment */
             // For prod, skip invalid policies
-            if ($requireValidPolicy && (!$payment->getPolicy() || !$payment->getPolicy()->isValidPolicy())) {
+            if ($requireValidPolicy && !$payment->getPolicy()) {
                 continue;
             }
             if ($class && !$payment instanceof $class) {
