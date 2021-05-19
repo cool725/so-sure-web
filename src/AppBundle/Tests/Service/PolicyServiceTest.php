@@ -108,6 +108,105 @@ class PolicyServiceTest extends WebTestCase
     {
     }
 
+    /**
+     * Tests changing from a fully paid to date monthly policy to a yearly policy.
+     */
+    public function testChangeInstallmentsMonthlyToYearly()
+    {
+        $date = new \DateTime();
+        $start = (clone $date)->sub(new \DateInterval('P100D'));
+        $user = Create::user();
+        $policy = Create::policy($user, $start, Policy::STATUS_ACTIVE, 12);
+        Create::save(static::$dm, $user, $policy);
+        $future = count($policy->getInvoiceSchedule($date));
+        for ($i = 0; $i < 12; $i++) {
+            $scheduledStatus = ScheduledPayment::STATUS_SCHEDULED;
+            if ($start < $date) {
+                $scheduledStatus = ScheduledPayment::STATUS_SUCCESS;
+                Create::save(static::$dm, Create::standardPayment($policy, $start, true));
+            }
+            Create::save(
+                static::$dm,
+                Create::standardScheduledPayment($policy, $start, $scheduledStatus, ScheduledPayment::TYPE_SCHEDULED)
+            );
+            $start->add(new \DateInterval('P1M'));
+        }
+        static::$policyService->changeInstallments($policy, 1);
+        $found = 0;
+        foreach ($policy->getScheduledPayments() as $scheduled) {
+            if ($scheduled->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $found++;
+                $this->assertEquals(
+                    $policy->getUpgradedStandardMonthlyPrice() * $future,
+                    $scheduled->getAmount()
+                );
+            }
+        }
+        $this->assertEquals(1, $found);
+    }
+
+    /**
+     * Tests changing from an unpaid monthly policy to a yearly policy.
+     */
+    public function testChangeInstallmentsMonthlyToYearlyUnpaid()
+    {
+        $date = new \DateTime();
+        $start = (clone $date)->sub(new \DateInterval('P100D'));
+        $user = Create::user();
+        $policy = Create::policy($user, $start, Policy::STATUS_UNPAID, 12);
+        Create::save(static::$dm, $user, $policy);
+        for ($i = 0; $i < 12; $i++) {
+            Create::save(static::$dm, Create::standardScheduledPayment(
+                $policy,
+                $start,
+                ScheduledPayment::STATUS_SCHEDULED,
+                ScheduledPayment::TYPE_SCHEDULED
+            ));
+            $start->add(new \DateInterval('P1M'));
+        }
+        static::$policyService->changeInstallments($policy, 1);
+        $found = 0;
+        foreach ($policy->getScheduledPayments() as $scheduled) {
+            if ($scheduled->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $found++;
+                $this->assertEquals($policy->getUpgradedYearlyPrice(), $scheduled->getAmount());
+            }
+        }
+        $this->assertEquals(1, $found);
+    }
+
+    /**
+     * Tests changing from yearly to monthly which means they will get a refund upfront.
+     */
+    public function testChangeInstallmentsYearlyToMonthly()
+    {
+        $date = new \DateTime();
+        $start = (clone $date)->sub(new \DateInterval('P100D'));
+        $user = Create::user();
+        $policy = Create::policy($user, $start, Policy::STATUS_ACTIVE, 1);
+        Create::save(static::$dm, $user, $policy);
+        Create::save(static::$dm, Create::standardPayment($policy, $start, true));
+        static::$policyService->changeInstallments($policy, 12);
+        $positiveFound = 0;
+        $negativeFound = 0;
+        foreach ($policy->getScheduledPayments() as $scheduled) {
+            if ($scheduled->getStatus() != ScheduledPayment::STATUS_SCHEDULED) {
+                continue;
+            } elseif ($scheduled->getAmount() >= 0) {
+                $positiveFound++;
+                $this->assertEquals($policy->getUpgradedStandardMonthlyPrice(), $scheduled->getAmount());
+            } else {
+                $negativeFound++;
+                $this->assertEquals(
+                    0 - (count($policy->getInvoiceSchedule($date)) * $policy->getUpgradedStandardMonthlyPrice()),
+                    $scheduled->getAmount()
+                );
+            }
+        }
+        $this->assertEquals(1, $negativeFound);
+        $this->assertEquals(count($policy->getInvoiceSchedule($date)), $positiveFound);
+    }
+
     public function testCancelPolicy()
     {
         $user = static::createUser(
