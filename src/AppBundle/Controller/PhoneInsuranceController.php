@@ -779,25 +779,12 @@ class PhoneInsuranceController extends BaseController
             ]);
         }
         if ($phone) {
-            $prices = [[
+            $subVariantArr['standard'] = [
                 'subvariant' => 'standard',
-                'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice(),
-            ]];
-            foreach ($subvariants as $subvariant) {
-                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvariant->getName());
-                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvariant->getName());
-                if ($monthly && $yearly) {
-                    $prices[] = [
-                        'subvariant' => $subvariant->getName(),
-                        'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
-                        'yearlyPremium' => $yearly->getYearlyPremiumPrice(),
-                    ];
-                }
-            }
-            $response = new JsonResponse([
-                'phoneId' => $phone->getId(),
-                'price' => $prices,
+                'price' => [
+                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice(),
+                ],
                 'excesses' => [
                     'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
@@ -805,7 +792,41 @@ class PhoneInsuranceController extends BaseController
                     'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
                         $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
                         [],
-                ]
+                ],
+            ];
+            $prices = [[
+                'subvariant' => 'standard',
+                'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice(),
+            ]];
+            foreach ($subvariants as $subvariant) {
+                $subvarName = $subvariant->getName();
+                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvarName);
+                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvarName);
+                $price = [];
+                if ($monthly && $yearly) {
+                    $price = [
+                        'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
+                        'yearlyPremium' => $yearly->getYearlyPremiumPrice(),
+                    ];
+                }
+
+                $subVariantArr[$subvarName] = [
+                    'subvariant' => $subvarName,
+                    'price' => $price,
+                    'excesses' => [
+                        'defaultExcess' => $monthly->getExcess() ?
+                            $monthly->getExcess()->toApiArray($subvariant) :
+                            [],
+                        'validatedExcess' => $monthly->getPicSureExcess() ?
+                            $monthly->getPicSureExcess()->toApiArray($subvariant) :
+                            [],
+                    ],
+                ];
+            }
+            $response = new JsonResponse([
+                'phoneId' => $phone->getId(),
+                'subvariants'   => $subVariantArr
 
                 // disabled temporarily to not confuse Comparison Creator
                 /*'purchaseUrlRedirect' => $this->getParameter('web_base_url').'/phone-insurance/'.
