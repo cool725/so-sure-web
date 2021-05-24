@@ -57,7 +57,6 @@ class Create
      * Persists and flushes a collection of items to the database in a single operation.
      * @param DocumentManager $dm       is the document manager to use to persist to the database.
      * @param mixed           ...$items is the set of all items to persist.
-     * @return mixed the first item passed if there were any and otherwise null.
      */
     public static function save(DocumentManager $dm, ...$items)
     {
@@ -65,7 +64,6 @@ class Create
             $dm->persist($item);
         }
         $dm->flush();
-        return (count($items) > 0) ? $items[0] : null;
     }
 
     /**
@@ -168,7 +166,6 @@ class Create
         $policy = new HelvetiaPhonePolicy();
         $user->addPolicy($policy);
         $policy->setStart($startDate);
-        $policy->setBillingForce($startDate);
         $policy->setEnd((clone $startDate)->add(new \DateInterval("P1Y")));
         $policy->setStaticEnd($policy->getEnd());
         if ($phone) {
