@@ -48,6 +48,9 @@ class Lead
     const LEAD_SOURCE_SCODE = 'scode';
     const LEAD_SOURCE_AFFILIATE = 'affiliate';
 
+    // Blog
+    const LEAD_SOURCE_BLOG = 'blog-footer';
+
 
     public static $leadSources = [
         self::LEAD_SOURCE_AFFILIATE,
@@ -107,7 +110,7 @@ class Lead
      *                 "aggregator", "send-quote",
      *                 "quote-email-home", "quote-email-home-required",
      *                 "exit-popup", "home-contents-buzz", "home-contents-buzz-footer",
-     *                 "quote-phone-landing-page", "quote-make-landing-page"}, strict=true)
+     *                 "quote-phone-landing-page", "quote-make-landing-page", "blog-footer"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
