@@ -161,17 +161,24 @@ $(function() {
         addValidationSMS();
     }
 
-    // Swap Login
-    swapLogin.on('click', function(e) {
-        e.preventDefault();
-
+    const loginSwap = () => {
         // Toggle Forms
         formEmail.toggle();
         formSMS.toggle();
 
         // Toggle Text Swap Button
         swapLogin.find('span').toggleText('Mobile Number', 'Email');
+    }
+
+    // Swap Login
+    swapLogin.on('click', function(e) {
+        e.preventDefault();
+        loginSwap();
     });
+
+    if (window.location.hash) {
+        loginSwap();
+    }
 
     // On show populate phone number and add validation
     $('#sms_code_modal').on('show.bs.modal', function (e) {
