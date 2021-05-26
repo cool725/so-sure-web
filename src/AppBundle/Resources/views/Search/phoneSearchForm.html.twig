@@ -1,0 +1,44 @@
+{{ form_start(form_phone, { 'attr': {
+    'data-toggle': 'validator',
+    'class': 'phone-search-dropdown-card validate-form form-400',
+    'data-client-validation': form_client_validation,
+    'data-phones': phones|json_encode|raw,
+    'autocomplete': 'off'
+}}) }}
+    {% include 'AppBundle::Purchase/_purchaseStepsRebrand.html.twig' %}
+    <h2 class="text-dodger-blue text-center">My Phone is</h2>
+    <p class="text-center mb-4">Please make sure you provide accurate details on your phone so we can give you the best pricing tailored to you 💰</p>
+    <div class="form-group">
+        {{ form_label(form_phone.make, 'Make') }}
+        {{ form_widget(form_phone.make, {
+          'attr': {
+            'class': 'form-control phone-search-option-make'
+        }}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form_phone.model, 'Model') }}
+        {{ form_widget(form_phone.model, {
+          'attr': {
+            'class': 'form-control phone-search-option-model',
+            'disabled': 'disabled'
+        }}) }}
+        <small class="form-text five-g-warning hideme">Please double check your phone is the 5G version</small>
+    </div>
+    <div class="form-group">
+        {{ form_label(form_phone.memory, 'Memory') }}
+        {{ form_widget(form_phone.memory, {
+            'attr': {
+                'class': 'form-control phone-search-option-memory',
+                'disabled': 'disabled'
+        }}) }}
+    </div>
+    <div class="form-group text-md-center mt-5">
+        {{ form_widget(form_phone.next, {
+            'label': 'Continue',
+            'fa': 'far fa-long-arrow-right fa-lg ml-2',
+            'right': true,
+            'attr': {
+                'class': 'btn btn-success btn-block-xs phone-search-button'
+        }}) }}
+    </div>
+{{ form_end(form_phone) }}
