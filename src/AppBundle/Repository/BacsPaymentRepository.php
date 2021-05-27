@@ -30,6 +30,23 @@ class BacsPaymentRepository extends PaymentRepository
             ->execute();
     }
 
+    public function getBacsDateRange(\DateTime $start, \DateTime $end)
+    {
+        return $this->createQueryBuilder()
+            ->field('date')->gte($start)
+            ->field('date')->lt($end)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function getBacsBrokenMandates()
+    {
+        return $this->createQueryBuilder()
+            ->field('notes')->equals(new \MongoRegex("/^Arudd payment failure: NO INSTRUCTION/"))
+            ->getQuery()
+            ->execute();
+    }
+
     public function findUnprocessedPaymentsOlderThanDays(array $statuses, $businessDays = 1)
     {
         $date = new \DateTime('now');
@@ -153,7 +170,7 @@ class BacsPaymentRepository extends PaymentRepository
             ->getQuery()
             ->execute();
     }
-          
+
     /**
      * Finds bacs payments that have not been reverted which have got a covering checkout payment which are ready to be
      * reverted.
