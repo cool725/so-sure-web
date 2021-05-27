@@ -38,16 +38,15 @@ label {
     @include media-breakpoint-up(md) {
         font-size: inherit;
     }
-    // &.is-valid-ss,
-    // &.is-valid-ss:focus,
+
     &:focus {
         border-color: $dodger-blue;
         background-color: rgba(37, 147, 243, 0.1);
         box-shadow: rgba(37, 147, 243, 0.1);
     }
 
-    &[disabled]
-    &[readonly], {
+    &[disabled],
+    &[readonly] {
         background-color: darken($white, 10%) !important;
 
         &:focus {
