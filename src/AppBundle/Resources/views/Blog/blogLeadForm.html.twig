@@ -1,0 +1,16 @@
+<section class="sign-up-bottom py-lg-5">
+    <h2 class="h3">Subscribe to our email list</h2>
+    <p class="lead mb-4">Don’t miss out on more guides like this, free deals and much more! Simply sign up today. It’s spam free!</p>
+    <form id="footer-form" class="validate-form"
+        data-toggle="validator"
+        data-client-validation="{{ form_client_validation }}"
+        data-csrf="{{ lead_csrf }}"
+        data-lead="{{ path('blog_lead', {'source': 'blog-footer'}) }}"
+        autocomplete="off">
+        <div class="custom-input-with-btn custom-input-with-btn-responsive">
+            <input type="email" name="blog-lead-email" class="blog-lead-email form-control" placeholder="Enter email address..." />
+            <label class="blog-lead-feedback"></label>
+            <button type="submit" class="btn btn-success blog-lead-submit btn-block-xs btn-sm">Subscribe</button>
+        </div>
+    </form>
+</section>

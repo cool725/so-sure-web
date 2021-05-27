@@ -321,6 +321,53 @@ class SearchController extends BaseController
     }
 
     /**
+     * @Route("/phone-search-dropdown-four", name="phone_search_dropdown_four")
+     * @Template()
+     */
+    public function phoneSearchFormAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = null;
+        $price = null;
+        $phoneMake = new PhoneMake();
+        if ($id) {
+            $phone = $phoneRepo->find($id);
+            if ($phone) {
+                $phoneMake->setMake($phone->getMake());
+            }
+        }
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
+                'action' => $this->generateUrl('phone_search_dropdown_four'),
+            ])
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
+                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
+                if ($phoneId) {
+                    $phone = $phoneRepo->find($phoneId);
+                    if (!$phone) {
+                        throw new \Exception('unknown phone');
+                    }
+                    $quoteUrl = $this->setPhoneSession($request, $phone);
+                    $price = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
+                    $this->setPhoneSession($request, $phone);
+                    return $this->redirectToRoute('purchase', [], 301);
+                }
+            }
+        }
+
+        return [
+            'form_phone' => $formPhone->createView(),
+            'phones' => $this->getPhonesArray(),
+            'phone' => $phone,
+            'step' => 1
+        ];
+    }
+
+    /**
      * @Route("/model-search-dropdown", name="model_search_dropdown")
      * @Route("/model-search-dropdown/{type}", name="model_search_dropdown_type")
      * @Route("/model-search-dropdown/{type}/{id}", name="model_search_dropdown_type_id")
