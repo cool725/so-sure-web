@@ -88,6 +88,7 @@
                 background-size: contain;
                 background-image: url('#{$cdn_url}/images/rebrand/homepage/so-sure_hero-alt-desktop-left-image.png');
                 background-repeat: no-repeat;
+                opacity: 0.9;
             }
 
             &:after {
@@ -96,6 +97,7 @@
                 background-size: contain;
                 background-image: url('#{$cdn_url}/images/rebrand/homepage/so-sure_hero-alt-desktop-right-image.png');
                 background-repeat: no-repeat;
+                opacity: 0.9;
             }
         }
 
@@ -179,6 +181,7 @@
     &-img-mobile {
         display: block;
         margin: 0 auto 1rem;
+        opacity: 0.9;
 
         @include media-breakpoint-up(lg) {
             display: none;

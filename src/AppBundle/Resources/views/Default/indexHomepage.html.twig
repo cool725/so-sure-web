@@ -55,67 +55,39 @@
 
 {% block body %}
 
-    {% if hero_exp %}
-        <section class="hero-alt">
-            <div class="container-large">
-                <h1 class="text-white mb-4">
-                    Start Your {{ greeting }} With <br class="d-none d-md-inline"> Insurance That's a
-                    <span class="text-deep-sky-blue-d">Win-Win!</span>
-                </h1>
-                <p class="lead text-white mb-4">SO-SURE makes it fast and easy to claim when you need us. And when <br class="d-none d-md-inline"> you don’t? We reward you with up to 80% of your premium back.</p>
-                <div class="hero-alt-links">
-                    <a href="{{ path('phone_insurance') }}" class="hero-alt-link">
-                        <div class="hero-alt-link-body">
-                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="SO-SURE Phone Insurance" width="80px" class="lozad mr-2">
-                            <span class="h5">Phone Insurance</span>
-                            <i class="far fa-angle-right fa-lg"></i>
-                        </div>
-                    </a>
-                    <a href="{{ path('contents_insurance') }}" class="hero-alt-link">
-                        <div class="hero-alt-link-body">
-                            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_home_contents.png" alt="SO-SURE Contents Insurance" width="80px" class="lozad mr-2">
-                            <span class="h5">Contents Insurance</span>
-                            <i class="far fa-angle-right fa-lg"></i>
-                        </div>
-                    </a>
-                </div>
-                <span class="badge badge-pill badge-info text-zaffre">
-                    1 month FREE if you pay yearly
-                </span>
-                <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-alt-mobile-image.png" alt="SO-SURE Happy Couple" width="" class="lozad hero-alt-img-mobile">
-                <span class="hero-alt-scroll-down">
-                    <small>Scroll Down</small>
-                    <i class="far fa-angle-down fa-lg"></i>
-                </span>
-            </div>
-        </section>
-    {% else %}
-        <section class="hero">
-            <div class="container-large">
-                <div class="row">
-                    <div class="col-lg-5">
-                        <div class="hero-left">
-                            <h1 class="hero-heading">
-                                Finally,<br>
-                                Insurance That's a
-                                <span class="text-nowrap">Win-Win!</span>
-                            </h1>
-                            <p class="lead text-white">SO-SURE makes it fast and easy to claim when you need us. And when you don’t? We reward you with up to 80% of your premium back.</p>
-                        </div>
+    <section class="hero-alt">
+        <div class="container-large">
+            <h1 class="text-white mb-4">
+                Start your {{ greeting }} with <br class="d-none d-md-inline"> insurance that's a
+                <span class="text-deep-sky-blue-d">win-win!</span>
+            </h1>
+            <p class="lead text-white mb-4">SO-SURE makes it fast and easy to claim when you need us. And when <br class="d-none d-md-inline"> you don’t? We reward you with up to 80% of your premium back.</p>
+            <div class="hero-alt-links">
+                <a href="{{ path('phone_insurance') }}" class="hero-alt-link">
+                    <div class="hero-alt-link-body">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-smile.png" alt="SO-SURE Phone Insurance" width="80px" class="lozad mr-2">
+                        <span class="h5">Phone Insurance</span>
+                        <i class="far fa-angle-right fa-lg"></i>
                     </div>
-                    <div class="col-lg-7">
-                        <div class="hero-right">
-                            <img src="{{ cdn_url }}/images/onexone.png"
-                            data-srcset="{{ cdn_url }}/images/rebrand/homepage/so-sure_homepage_hero_couple_moble.png 768w, {{ cdn_url }}/images/rebrand/homepage/so-sure_homepage_hero_couple_desktop.png 992w"
-                            alt=""
-                            class="img-fluid lozad">
-                        </div>
+                </a>
+                <a href="{{ path('contents_insurance') }}" class="hero-alt-link">
+                    <div class="hero-alt-link-body">
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_home_contents.png" alt="SO-SURE Contents Insurance" width="80px" class="lozad mr-2">
+                        <span class="h5">Contents Insurance</span>
+                        <i class="far fa-angle-right fa-lg"></i>
                     </div>
-                </div>
+                </a>
             </div>
-        </section>
-    {% endif %}
-
+            <span class="badge badge-pill badge-info text-zaffre">
+                1 month FREE if you pay yearly
+            </span>
+            <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-alt-mobile-image.png" alt="SO-SURE Happy Couple" width="" class="lozad hero-alt-img-mobile">
+            <span class="hero-alt-scroll-down">
+                <small>Scroll Down</small>
+                <i class="far fa-angle-down fa-lg"></i>
+            </span>
+        </div>
+    </section>
 
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
 
