@@ -81,6 +81,7 @@ class DefaultController extends BaseController
      * @Route("/replacement-72", name="replacement_72_landing")
      * @Route("/reimagined", name="reimagined")
      * @Route("/hasslefree", name="hasslefree")
+     * @Route("/alt", name="homepage_alt")
      */
     public function indexAction(Request $request)
     {
@@ -106,10 +107,27 @@ class DefaultController extends BaseController
         ]);
 
         // $fromPrice = $this->getLowestPremium();
+        $alt = false;
+        if ($request->get('_route') == 'homepage_alt') {
+            $alt = true;
+        }
+
+        // Set Greeting
+        if (date('H') >= 12 && date('H') <= 18) {
+            $greeting = 'Afternoon';
+        } elseif (date('H') > 18 && date('H') <= 22) {
+            $greeting = 'Evening';
+        } elseif (date('H') > 22 && date('H') <= 5) {
+            $greeting = 'Night';
+        } else {
+            $greeting = 'Morning';
+        }
 
         $data = array(
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex,
+            'hero_exp' => $alt,
+            'greeting' => $greeting,
             // 'from_price' => $fromPrice
         );
 
