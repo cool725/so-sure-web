@@ -19,6 +19,10 @@ const tracking = (name, type, location, callback) => {
     } else if (type == 'competition') {
         url = '/ops/track/onboarding/' + location;
 
+    // Share buttons
+    } else if (type == 'social') {
+        url = '/ops/track/social/' + name + '/' + location;
+
     // Track name
     } else {
         // Default
@@ -48,7 +52,7 @@ $(function() {
         }
 
         if (log) {
-            console.log(name, url);
+            console.log(name, type, location);
         }
 
         if (once != true) {
