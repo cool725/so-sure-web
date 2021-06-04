@@ -23,6 +23,10 @@ const tracking = (name, type, location, callback) => {
     } else if (type == 'social') {
         url = '/ops/track/social/' + name + '/' + location;
 
+    // Click event
+    } else if (type == 'click') {
+        url = '/ops/track/click/' + name + '/' + location;
+
     // Track name
     } else {
         // Default

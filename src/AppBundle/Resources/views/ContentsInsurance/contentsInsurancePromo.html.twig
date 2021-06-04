@@ -41,7 +41,14 @@
                             Up to 40% no claims cashback
                         </li>
                     </ul>
-                    <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}" class="btn btn-success mb-2 btn-block-xs">Get a quote</a>
+                    <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                       class="btn btn-success mb-5 mb-xl-0 btn-block-xs track-data"
+                       data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                       data-event="get-a-quote"
+                       data-event-type="click"
+                       data-event-location="home-contents">
+                       Get a quote
+                    </a>
                     <div class="d-xl-flex align-items-xl-center">
                         <span class="text-white mr-xl-2">In partnership with:</span>
                         <img src="{{ cdn_url }}/images/onexone.png"

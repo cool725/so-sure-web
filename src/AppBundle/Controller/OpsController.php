@@ -493,6 +493,7 @@ class OpsController extends BaseController
      * @Route("/track/social/{event}/{location}", name="ops_social_share_location")
      * @Route("/track/scodecopied/{location}", name="ops_scodecopied_location")
      * @Route("/track/onboarding/{location}", name="ops_onboarding_location")
+     * @Route("/track/click/{event}/{location}", name="ops_click_location")
      */
     public function trackAction(Request $request, $event = null, $location = null)
     {
@@ -514,6 +515,11 @@ class OpsController extends BaseController
             ]);
         } elseif ($request->get('_route') == 'ops_onboarding_location') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_ONBOARDING, [
+                'Location' => $location,
+            ]);
+        } elseif ($request->get('_route') == 'ops_click_location') {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CLICK, [
+                'Event' => $event,
                 'Location' => $location,
             ]);
         } else {

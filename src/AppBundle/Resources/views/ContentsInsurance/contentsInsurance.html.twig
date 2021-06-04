@@ -67,7 +67,14 @@
                             Up to 40% no claims cashback
                         </li>
                     </ul>
-                    <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}" class="btn btn-success mb-5 mb-xl-0 btn-block-xs">Get a quote</a>
+                    <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                       class="btn btn-success mb-5 mb-xl-0 btn-block-xs track-data"
+                       data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                       data-event="get-a-quote"
+                       data-event-type="click"
+                       data-event-location="home-contents">
+                       Get a quote
+                    </a>
                 </div>
                 <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
                     <div class="hero-image">
