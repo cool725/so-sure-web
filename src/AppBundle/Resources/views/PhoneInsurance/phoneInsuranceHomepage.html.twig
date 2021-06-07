@@ -48,13 +48,12 @@
                     </li>
                 </ul>
             </div>
-            <h1 class="hero-heading fit">
+            <h1 class="hero-heading fit mb-4">
                 Mobile Phone Insurance<br class="d-md-none" />
                 <span class="sub">from just &pound;{{ lowest_premium }} per month</span>
             </h1>
-            <p class="hero-lead lead">Great value if you need us — Money back if you don’t!</p>
             <div class="row">
-                <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-1 order-xl-2">
+                <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-0 order-xl-2">
                     {% if phone is defined and phone %}
                         {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
                             'type': 'homepage',
@@ -68,24 +67,20 @@
                         )) }}
                     {% endif %}
                 </div>
-                <div class="col-xl-6 order-xl-1">
+                <div class="col-sm-8 offset-sm-2 col-xl-7 offset-xl-0 order-xl-1">
                     <div class="hero-image">
-                        <div class="hero-badge animated tada">
-                            <div class="hero-badge-inner">
-                                {{ free_months|capitalize }}<br>
-                                <span class="h5 mb-0">FREE</span><br>
-                                when you pay <br>
-                                yearly
-                            </div>
-                        </div>
-                        <img src="{{ cdn_url }}/images/onexone.png"
-                        data-srcset="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero_excited_girl_with_phone_mobile.png 768w, {{ cdn_url }}/images/rebrand/homepage/so-sure_hero_excited_girl_with_phone.png 992w"
-                        alt=""
-                        class="img-fluid lozad">
-                        {% include 'AppBundle::Components/_trustpilotToasts.html.twig' with {'toast_position': 'toast-bottom-left', 'toast_css': 'd-none d-md-block' } %}
+                        <picture class="lozad">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_phone.png" media="(min-width: 1200px)">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_phone.png" media="(min-width: 992px) and (max-width: 1199px)">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_phone.png" media="(min-width: 320px) and (max-width: 991px)">
+                        </picture>
                     </div>
                 </div>
             </div>
+            <!-- <span class="hero-scroll-down">
+                <small>Scroll Down</small>
+                <i class="far fa-angle-down fa-lg"></i>
+            </span> -->
         </div>
     </section>
 
