@@ -1952,10 +1952,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         if (count($previousInvalidPicSureStatuses) > 0) {
             $hadInvalidPicSureStatus = true;
         }
-
-        /** @var Company $company */
-        $company = $policy->getCompany();
-        $companyName = ($company) ? $company->getName() : '';
         return [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
