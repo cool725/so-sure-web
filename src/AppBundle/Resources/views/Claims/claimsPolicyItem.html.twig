@@ -102,7 +102,7 @@
                                             {% for iteration in policy.previousIterations %}
                                                 <li>
                                                     {{iteration.phone}} {{iteration.imei}}:
-                                                    {{iteration.start}} - {{iteration.end}}
+                                                    {{iteration.start|date}} - {{iteration.end|date}}
                                                     @ {{iteration.premium.gwp}}
                                                 </li>
                                             {% endfor %}
