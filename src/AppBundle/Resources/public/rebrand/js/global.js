@@ -20,5 +20,5 @@ require('./components/get-quote.js');
 require('./common/native-share.js');
 require('./common/scroll-to.js');
 require('./common/lazy-images.js');
-require('./components/exit-popup.js');
+// require('./components/exit-popup.js');
 

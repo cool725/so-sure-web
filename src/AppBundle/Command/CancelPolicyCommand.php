@@ -54,6 +54,12 @@ class CancelPolicyCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Wihtout this option no changes are persisted.'
             )
+            ->addOption(
+                'back-date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Use this to set the end date to a date in the past e.g. --back-date="2020-12-25"'
+            )
             ->addArgument('ids', InputArgument::IS_ARRAY, 'id of policy to cancel.');
     }
 
@@ -65,6 +71,7 @@ class CancelPolicyCommand extends ContainerAwareCommand
         // Get and validate arguments.
         $reason = $input->getOption('reason');
         $wet = $input->getOption('wet') == true;
+        $backDate = $input->getOption('back-date');
         $ids = $input->getArgument('ids');
         if (!in_array($reason, Policy::CANCELLED_REASONS)) {
             $output->writeln("<error>{$reason} is not a valid cancellation reason.</error>");
@@ -87,6 +94,10 @@ class CancelPolicyCommand extends ContainerAwareCommand
                 $success[] = $id;
                 if ($wet) {
                     $this->policyService->cancel($policy, $reason, false, null, true);
+                    if ($backDate) {
+                        $policy->setEnd(new \DateTime($backDate));
+                        $this->dm->flush();
+                    }
                 }
             }
         }

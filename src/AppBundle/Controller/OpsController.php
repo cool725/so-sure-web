@@ -490,8 +490,10 @@ class OpsController extends BaseController
     /**
      * @Route("/track/{event}", name="ops_track")
      * @Route("/track/invite/{event}/{location}", name="ops_track_invite_location")
+     * @Route("/track/social/{event}/{location}", name="ops_social_share_location")
      * @Route("/track/scodecopied/{location}", name="ops_scodecopied_location")
      * @Route("/track/onboarding/{location}", name="ops_onboarding_location")
+     * @Route("/track/click/{event}/{location}", name="ops_click_location")
      */
     public function trackAction(Request $request, $event = null, $location = null)
     {
@@ -501,6 +503,11 @@ class OpsController extends BaseController
                 'Shared Bundle' => $event,
                 'Location' => $location,
             ]);
+        } elseif ($request->get('_route') == 'ops_social_share_location') {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_INVITE, [
+                'Invitation Method' => $event,
+                'Location' => $location,
+            ]);
         } elseif ($request->get('_route') == 'ops_scodecopied_location') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_INVITE, [
                 'Invitation Method' => 'scode copied',
@@ -508,6 +515,11 @@ class OpsController extends BaseController
             ]);
         } elseif ($request->get('_route') == 'ops_onboarding_location') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_ONBOARDING, [
+                'Location' => $location,
+            ]);
+        } elseif ($request->get('_route') == 'ops_click_location') {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CLICK, [
+                'Event' => $event,
                 'Location' => $location,
             ]);
         } else {
