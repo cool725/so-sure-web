@@ -103,7 +103,7 @@ class BacsReportCommand extends ContainerAwareCommand
     private static function processBacs($bacsService, $output, $mailer)
     {
         return $bacsService->getSftpLock()->with(function () use ($bacsService, $output, $mailer) {
-            $results = $this->bacsService->sftp();
+            $results = $bacsService->sftp();
             if (count($results) > 0) {
                 $data = json_encode($results, JSON_PRETTY_PRINT);
                 $output->writeln($data);

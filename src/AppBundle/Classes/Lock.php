@@ -1,13 +1,15 @@
 <?php
 namespace AppBundle\Classes;
 
+use Predis\Client;
+
 /**
  * Helper class for locking resources across servers in such a way that the resources should automatically be freed if
  * there is an error.
  */
 class Lock
 {
-    /** @var Redis */
+    /** @var Client */
     private $redis;
 
     /** @var string */
@@ -17,7 +19,7 @@ class Lock
     private $expiry;
 
     /**
-     * @param Redis       $redis  gives the lock access to redis where it stores the info.
+     * @param Client      $redis  gives the lock access to redis where it stores the info.
      * @param string      $name   the name of the lock in redis.
      * @param number|null $expiry the number of seconds the lock will take to automatically expire if something bad
      *                            happens.
@@ -41,7 +43,7 @@ class Lock
 
     /**
      * Checks if the lock is available for use.
-     * @param function $callback is a callback to call with the lock.
+     * @param callable $callback is a callback to call with the lock.
      * @return null|string null if all worked ok, and a string with an error message if either an exception was thrown
      *                     from the callback or the lock could not be acquired.
      */
@@ -56,7 +58,7 @@ class Lock
         }
         try {
             $callback();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
         $this->destroy();
