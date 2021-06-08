@@ -8,81 +8,49 @@
 @import "../abstracts/variables";
 
 .hero {
-    padding: 8rem 0 1rem;
     position: relative;
     overflow: hidden;
+    padding: 6rem 0 3rem;
 
-    @include blue-gradient;
+    @include blue-gradient-45;
 
     .container-large {
         position: relative;
         z-index: 4;
     }
 
-    svg {
-        position: absolute;
-        bottom: -2px; left: 0; right: 0;
-        z-index: 3;
-    }
-
-    &__intro {
+    &-heading {
+        color: $white;
         text-align: center;
 
-        @include media-breakpoint-up(lg) {
-            padding-top: 4rem;
-            text-align: left;
+        .sub {
+            color: $deep-sky-blue-d;
         }
     }
 
-    &__illustration {
-        width: 300px; height: 270px;
-        margin: 0 auto;
-        position: relative;
-
-        @include media-breakpoint-up(sm) {
-            width: 500px; height: 400px;
-        }
-
-        @include media-breakpoint-up(lg) {
-            width: auto; height: auto;
-        }
-    }
-
-    &__illustration__img {
-        display: none;
-        position: absolute;
-        top: 0; left: 0;
-    }
-
-    &__controls {
+    &-lead {
+        color: $white;
         text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    &-scroll-down {
+        display: flex;
+        text-align: center;
+        flex-direction: column;
+        margin: 2rem 0 1rem;
+        color: $white;
 
         @include media-breakpoint-up(lg) {
-            text-align: left;
+            display: none;
         }
     }
 
-    .carousel {
-
-    }
-
-    .carousel-indicators {
-        position: static;
-        margin: 0;
-
-        > li {
-            background-color: $white;
-            @include border-radius(50%);
-        }
-
-        @include media-breakpoint-up(lg) {
-            justify-content: start;
-        }
-    }
-
-    .carousel-item {
-        min-height: 120px;
-    }
+    // .badge {
+    //     // font-size: 90%;
+    //     padding: 0.6rem 1rem;
+    //     text-transform: uppercase;
+    // }
 
     &:before {
         width: 100%; height: 100%;
@@ -93,30 +61,45 @@
         background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
         background-size: cover;
         opacity: 0.44;
-    }
-
-    @include media-breakpoint-up(md) {
-        padding: 8rem 0 6rem;
+        transform: scaleX(-1);
     }
 
     @include media-breakpoint-up(lg) {
-        padding: 8rem 0;
-
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
         }
     }
 }
 
-.usps {
-    background-color: $white;
+.how-it-works {
+    position: relative;
+    text-align: center;
+    background-color: $athens-gray;
+    z-index: 4;
 
-    @include media-breakpoint-up(lg) {
-        ul {
-            > li {
-                width: 25%;
+    .step {
+        position: relative;
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 110px; left: 50%;
+            width: 100%; height: 2px;
+            background-color: $tropical-blue;
+            z-index: -1;
+        }
+
+        // Stop the last line
+        &:last-of-type {
+            &:before {
+                content: none;
             }
         }
+    }
+
+    @include media-breakpoint-up(lg) {
+        background-color: $white;
     }
 }
 
@@ -161,7 +144,7 @@
 }
 
 .knowledge-base {
-    background-color: $selago;
+    background-color: $athens-gray;
     position: relative;
     z-index: 4;
 
@@ -174,68 +157,29 @@
     }
 }
 
-.end-cta {
+.our-reviews {
+    background-color: $pattens-blue;
     text-align: center;
-    background-color: $selago;
+    position: relative;
 
-    @include media-breakpoint-up(md) {
-        text-align: left;
+    .reviews {
+        position: relative;
+        z-index: 4;
     }
 }
 
+.banner {
+    position: relative;
+    text-align: center;
 
-.feedback {
-    @include dark-blue-gradient;
+    @include blue-gradient-45;
 
-    .carousel-item {
-        height: 250px;
-
-        @include media-breakpoint-up(lg) {
-            height: 380px;
-        }
+    &__close {
+        position: absolute;
+        top: 2rem; right: 2rem;
     }
 
-    &-item {
-        text-align: center;
-        padding: 0 1rem;
-
-        img {
-            // display: block;
-            margin: 0 auto;
-        }
-
-        .btn {
-            position: relative;
-
-            @include media-breakpoint-up(lg) {
-                top: -20px;
-            }
-        }
-
-        @include media-breakpoint-up(lg) {
-            padding: 0;
-        }
-    }
-
-    &-answer {
-        height: 250px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        text-align: center;
-        color: $white;
-
-        form {
-            width: 100%;
-        }
-
-        @include media-breakpoint-up(lg) {
-            height: 380px;
-
-            form {
-                width: auto;
-            }
-        }
+    @include media-breakpoint-up(lg) {
+        text-align: left;
     }
 }

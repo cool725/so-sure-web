@@ -118,17 +118,11 @@ class InvitationController extends BaseController
             ], true);
         }
 
-        $scode = $invitation->getInviter()->getStandardSCode();
-        if ($scode) {
+        if ($invitation) {
+            $scode = $invitation->getInviter()->getStandardSCode();
             $this->get('session')->set('scode', $scode->getCode());
-        }
-
-        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
-
-        $template = 'AppBundle:Invitation:invitation.html.twig';
-
-        if ($referralFeature) {
-            $template = 'AppBundle:Invitation:invitationReferral.html.twig';
+        } else {
+            return $this->redirectToRoute('homepage');
         }
 
         $competitorData = new Competitors();
@@ -139,6 +133,6 @@ class InvitationController extends BaseController
             'competitor' => $competitorData::$competitorComparisonData,
         ];
 
-        return $this->render($template, $data);
+        return $this->render('AppBundle:Invitation:invitation.html.twig', $data);
     }
 }
