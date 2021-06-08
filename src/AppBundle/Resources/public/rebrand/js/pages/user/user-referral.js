@@ -30,7 +30,7 @@ $(function() {
         $('.btn-copy').tooltip({'title':   'Copied 😀','trigger': 'manual'})
                       .tooltip('show');
 
-        tracking('', 'scodecopied', 'user-competition');
+        tracking('', 'scodecopied', 'user-competition', '');
 
         setTimeout(function() {
             $('.btn-copy').tooltip('hide');

@@ -107,9 +107,21 @@ class DefaultController extends BaseController
 
         // $fromPrice = $this->getLowestPremium();
 
+        // Set Greeting
+        if (date('H') >= 12 && date('H') <= 18) {
+            $greeting = 'afternoon';
+        } elseif (date('H') > 18 && date('H') <= 22) {
+            $greeting = 'evening';
+        } elseif (date('H') > 22 && date('H') <= 5) {
+            $greeting = 'night';
+        } else {
+            $greeting = 'morning';
+        }
+
         $data = array(
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex,
+            'greeting' => $greeting,
             // 'from_price' => $fromPrice
         );
 

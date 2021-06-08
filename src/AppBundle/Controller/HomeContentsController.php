@@ -84,12 +84,24 @@ class HomeContentsController extends BaseController
             $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
         }
 
+        // Set Greeting
+        if (date('H') >= 12 && date('H') <= 18) {
+            $greeting = 'afternoon';
+        } elseif (date('H') > 18 && date('H') <= 22) {
+            $greeting = 'evening';
+        } elseif (date('H') > 22 && date('H') <= 5) {
+            $greeting = 'night';
+        } else {
+            $greeting = 'morning';
+        }
+
         $data = [
             'lead_csrf' => $csrf->refreshToken('lead'),
             'is_noindex' => $noindex,
             'utms' => $utms,
             'promo' => $promo,
             'partner' => $partner,
+            'greeting' => $greeting,
         ];
 
         return $this->render($template, $data);

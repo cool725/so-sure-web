@@ -184,8 +184,6 @@ class SCodeController extends BaseController
             return new RedirectResponse($this->generateUrl('user_invite'));
         }
 
-        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
-
         $template = 'AppBundle:SCode:refer.html.twig';
 
         $competitorData = new Competitors();
