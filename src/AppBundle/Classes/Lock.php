@@ -24,7 +24,7 @@ class Lock
      * @param number|null $expiry the number of seconds the lock will take to automatically expire if something bad
      *                            happens.
      */
-    public function __construct($redis, $name, $expiry=21600)
+    public function __construct($redis, $name, $expiry = 21600)
     {
         $this->redis = $redis;
         $this->name = $name;

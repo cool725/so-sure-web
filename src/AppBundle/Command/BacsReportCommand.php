@@ -36,7 +36,8 @@ class BacsReportCommand extends ContainerAwareCommand
      * @param BacsService   $bacsService   allows interaction with the bacs system.
      * @param MailerService $mailerService allows sending emails.
      */
-    public function __construct(BacsService $bacsService, MailerService $mailerService) {
+    public function __construct(BacsService $bacsService, MailerService $mailerService)
+    {
         parent::__construct();
         $this->bacsService = $bacsService;
         $this->mailerService = $mailerService;
