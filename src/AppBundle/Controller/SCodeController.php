@@ -123,14 +123,6 @@ class SCodeController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
 
-        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
-
-        $template = 'AppBundle:SCode:scode.html.twig';
-
-        if ($referralFeature) {
-            $template = 'AppBundle:SCode:scodeReferral.html.twig';
-        }
-
         $competitorData = new Competitors();
 
         $data = [
@@ -140,7 +132,7 @@ class SCodeController extends BaseController
             'competitor' => $competitorData::$competitorComparisonData,
         ];
 
-        return $this->render($template, $data);
+        return $this->render('AppBundle:SCode:scode.html.twig', $data);
     }
 
     /**
