@@ -25,8 +25,16 @@ class HelvetiaPhonePolicy extends PhonePolicy
     protected $previousIterations = [];
 
     /**
-     * Gives you the previous iterations that this policy has has.
-     * @return array containing the previous iterations.
+     * Add a previous iteration to the list of previous iterations.
+     * @param PhonePolicyIteration $previousIteration is the iteration of the policy to add.
+     */
+    public function addPreviousIteration($previousIteration)
+    {
+        $this->previousIterations[] = $previousIteration;
+    }
+
+    /**
+     * @inheritDoc
      */
     public function getPreviousIterations()
     {
@@ -34,15 +42,6 @@ class HelvetiaPhonePolicy extends PhonePolicy
             return $this->previousIterations;
         }
         return $this->previousIterations->toArray();
-    }
-
-    /**
-     * Add a previous iteration to the list of previous iterations.
-     * @param PhonePolicyIteration $previousIteration is the iteration of the policy to add.
-     */
-    public function addPreviousIteration($previousIteration)
-    {
-        $this->previousIterations[] = $previousIteration;
     }
 
     /**

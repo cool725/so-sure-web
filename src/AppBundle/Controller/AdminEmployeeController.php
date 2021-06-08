@@ -1953,9 +1953,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             $hadInvalidPicSureStatus = true;
         }
 
-        /** @var array $phoneUpgrade */
-        $phoneUpgrade = $policy->getPreviousIteration();
-
         /** @var Company $company */
         $company = $policy->getCompany();
         $companyName = ($company) ? $company->getName() : '';
@@ -1966,8 +1963,6 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'installments_form' => $installmentsForm->createView(),
             'note_form' => $noteForm->createView(),
             'formClaimFlags' => $claimFlags->createView(),
-            'upgrade_data' => $phoneUpgrade,
-            'company_name' => $companyName,
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
             'bacs_form' => $bacsForm->createView(),
