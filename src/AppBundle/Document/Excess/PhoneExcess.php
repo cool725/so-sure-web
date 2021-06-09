@@ -4,6 +4,7 @@ namespace AppBundle\Document\Excess;
 
 use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Subvariant;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -169,9 +170,13 @@ class PhoneExcess extends Excess
         );
     }
 
-    public function toApiArray()
+    /**
+     * @param Subvariant|null $subvariant
+     * @return array[]
+     */
+    public function toApiArray(Subvariant $subvariant = null)
     {
-        return [
+        $excessElements = [
             [
                 'type' => Claim::TYPE_LOSS,
                 'display' => 'Loss',
@@ -188,11 +193,61 @@ class PhoneExcess extends Excess
                 'amount' => $this->toTwoDp($this->getDamage()),
             ],
             [
+                'type' => Claim::TYPE_WARRANTY,
+                'display' => 'Warranty',
+                'amount' => $this->toTwoDp($this->getWarranty()),
+            ],
+            [
                 'type' => Claim::TYPE_EXTENDED_WARRANTY,
                 'display' => 'Breakdown',
                 'amount' => $this->toTwoDp($this->getExtendedWarranty()),
             ],
         ];
+
+        if (null === $subvariant) {
+            return $excessElements;
+        }
+
+        if ($subvariant instanceof Subvariant) {
+            $subArray = [
+                [
+                    'name' => 'Loss',
+                    'active' => $subvariant->getLoss()
+                ],
+                [
+                    'name' => 'Theft',
+                    'active' => $subvariant->getTheft()
+                ],
+                [
+                    'name' => 'Accidental Damage',
+                    'active' => $subvariant->getDamage()
+                ],
+                [
+                    'name' => 'Warranty',
+                    'active' => $subvariant->getWarranty()
+                ],
+                [
+                    'name' => 'Breakdown',
+                    'active' => $subvariant->getExtendedWarranty()
+                ]
+            ];
+            $excessEl = [];
+            foreach ($subArray as $sub) {
+                $excessEl[] = $this->filterArrayByKeyValue($excessElements, $sub);
+            }
+
+            return array_values(array_filter($excessEl));
+        }
+        return null;
+    }
+
+    private function filterArrayByKeyValue($array, $sub)
+    {
+        foreach ($array as $key => $value) {
+            if ($value['display'] == $sub['name'] && $sub['active'] === true) {
+                return $value;
+            }
+        }
     }
 
     public function toPriceArray()
