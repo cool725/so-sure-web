@@ -106,6 +106,7 @@ twig:
         policy_doc_version: 16,
         free_months: "one month"
         lowest_excess: "£25"
+        lowest_premium: 3.38
         trustpilot_rating: 4.5
         home_contents_funnel: https://home.wearesosure.com
 
@@ -487,6 +488,7 @@ nelmio_security:
                 - http://track.omguk.com
                 - https://track.omguk.com
                 - https://www.qzzr.com/
+                - https://analytics.tiktok.com
                 - 'data:'
             connect-src:
                 - 'self'
@@ -553,6 +555,7 @@ nelmio_security:
                 - https://monitor.clickcease.com
                 - https://surveystats.hotjar.io
                 - https://analytics.tiktok.com
+                - http://rum-collector-2.pingdom.net
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -904,6 +907,11 @@ nelmio_security:
                 - https://script.tapfiliate.com
                 - https://www.clickcease.com/monitor/stat.js
                 - https://analytics.tiktok.com
+                - http://rum-static.pingdom.net/
+                - http://*.rakuten.com
+                - http://*.linksynergy.com
+                - http://*.nxtck.com
+                - http://*.xg4ken.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -1171,6 +1179,10 @@ nelmio_security:
                 - https://www.googletagmanager.com
                 - https://optimize.google.com
                 - https://www.googleoptimize.com
+                - http://*.rakuten.com
+                - http://*.linksynergy.com
+                - http://*.nxtck.com
+                - http://*.xg4ken.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com

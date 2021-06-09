@@ -123,14 +123,6 @@ class SCodeController extends BaseController
             return new RedirectResponse($this->generateUrl('user_home'));
         }
 
-        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
-
-        $template = 'AppBundle:SCode:scode.html.twig';
-
-        if ($referralFeature) {
-            $template = 'AppBundle:SCode:scodeReferral.html.twig';
-        }
-
         $competitorData = new Competitors();
 
         $data = [
@@ -138,6 +130,59 @@ class SCodeController extends BaseController
             'user_code' => $code,
             'lead_form' => $leadForm->createView(),
             'competitor' => $competitorData::$competitorComparisonData,
+        ];
+
+        return $this->render('AppBundle:SCode:scode.html.twig', $data);
+    }
+
+    /**
+     * @Route("/refer/{code}", name="refer")
+     * @Template
+     */
+    public function referAction(Request $request, $code)
+    {
+        $geoip = $this->get('app.geoip');
+        $ip = $request->getClientIp();
+        $isUK = $geoip->findCountry($ip) == "GB";
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(SCode::class);
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $scode = null;
+
+        try {
+            if ($scode = $repo->findOneBy(['code' => $code])) {
+                // make sure to get policy user in code first rather than in twig in case policy/user was deleted
+                if (in_array($scode->getType(), [SCode::TYPE_STANDARD, SCode::TYPE_MULTIPAY])) {
+                    if (!$scode->getPolicy() || !$scode->getPolicy()->getUser()) {
+                        throw new \Exception('Unknown scode');
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            $scode = null;
+        }
+
+        // Redirect to homepage if refer/scode not found
+        if (!$scode) {
+            return $this->redirectToRoute('homepage');
+        }
+
+        $session = $this->get('session');
+        $session->set('scode', $code);
+
+        if ($scode && $this->getUser()) {
+            // If valid log in session redirect to invite page
+            return new RedirectResponse($this->generateUrl('user_invite'));
+        }
+
+        $template = 'AppBundle:SCode:refer.html.twig';
+
+        $competitorData = new Competitors();
+
+        $data = [
+            'scode'     => $scode,
+            'user_code' => $code,
         ];
 
         return $this->render($template, $data);

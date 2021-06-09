@@ -121,6 +121,9 @@ class MixpanelService
     const EVENT_PROMO_PAGE = 'Promo Page';
     const EVENT_UPGRADE_POLICY = ' Policy Upgraded';
 
+    // Click events
+    const EVENT_CLICK = "Click Event";
+
     const EVENT_EMAIL = 'Email Sent';
     const EVENT_SMS = 'Sms Sent';
 
@@ -211,7 +214,8 @@ class MixpanelService
         self::EVENT_CONTENTS_LEAD_CAPTURE,
         self::EVENT_PHONE_INSURANCE_HOME_PAGE,
         self::EVENT_CONTENTS_INSURANCE_HOME_PAGE,
-        self::EVENT_PAGE_LOAD
+        self::EVENT_PAGE_LOAD,
+        self::EVENT_CLICK
     ];
 
     public static function getCampaignSources($event)
@@ -1120,6 +1124,7 @@ class MixpanelService
         $userData['Number of Connections'] = $analytics['connections'];
         $userData['Reward Pot Value'] = $analytics['rewardPot'];
         $userData['Payment Method'] = $analytics['paymentMethod'];
+        $userData['Premium Installments'] = $analytics['premiumInstallments'];
         if (isset($analytics['devices'])) {
             $userData['Insured Devices'] = join(';', $analytics['devices']);
         }

@@ -3,13 +3,11 @@
 require('../../sass/pages/company-phones.scss');
 
 // Require BS component(s)
-// require('bootstrap/js/dist/carousel');
 
 // Require components
 let textFit = require('textfit');
 require('jquery-validation');
 require('../common/validation-methods.js');
-require('../components/memory-search-dropdown.js');
 
 $(function() {
 

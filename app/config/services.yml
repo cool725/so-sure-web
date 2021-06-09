@@ -258,6 +258,11 @@ services:
             - "@app.shortlink"
             - "@app.branch"
 
+    app.rakutenhelper:
+        class: AppBundle\Service\RakutenService
+        arguments:
+            - "%kernel.environment%"
+
     app.affiliate:
         class: AppBundle\Service\AffiliateService
         arguments:

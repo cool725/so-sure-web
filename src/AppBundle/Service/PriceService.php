@@ -214,7 +214,7 @@ class PriceService
             $date
         )->createPremium($additionalPremium, $date);
         $midPremium = clone $oldPremium;
-        $midPremium->setGwp($midPremium->getGwp() * 0.9);
+        $midPremium->setGwp($midPremium->getGwp() * 0.95);
         $nClaims = count($previous->getApprovedClaims());
         if ($newPremium->getGwp() > $oldPremium->getGwp()) {
             if ($nClaims < 2) {

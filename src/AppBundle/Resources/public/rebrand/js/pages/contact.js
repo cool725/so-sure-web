@@ -37,14 +37,6 @@ $(function() {
                     email: true,
                     emaildomain: true
                 },
-                "contact_form[phone]": {
-                    required: {
-                        depends:function(){
-                            $(this).val($.trim($(this).val()));
-                            return true;
-                        }
-                    }
-                },
                 "contact_form[message]": {
                     required: true
                 },
@@ -55,9 +47,6 @@ $(function() {
                 },
                 "contact_form[email]": {
                     required: 'Please enter your email'
-                },
-                "contact_form[phone]": {
-                    required: 'Please enter your phone number'
                 },
                 "contact_form[message]": {
                     required: 'Please enter your message to us 🍆'

@@ -9,7 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 
 use AppBundle\Classes\ApiErrorCode;
 
@@ -26,6 +28,7 @@ class HomeContentsController extends BaseController
      * @Route("/contents-insurance", name="contents_insurance")
      * @Route("/contents-insurance/m", name="contents_insurance_m")
      * @Route("/contents-insurance/getmyslice", name="contents_insurance_getmyslice")
+     * @Route("/contents-insurance/creditspring", name="contents_insurance_creditspring")
      */
     public function contentsInsuranceAction(Request $request)
     {
@@ -34,6 +37,7 @@ class HomeContentsController extends BaseController
 
         // Temp
         $promo = false;
+        $partner = null;
 
         // Is indexed?
         $noindex = false;
@@ -44,8 +48,15 @@ class HomeContentsController extends BaseController
         } elseif ($request->get('_route') == 'contents_insurance_getmyslice') {
             $noindex = true;
             $promo = true;
+            $partner = 'getmyslice';
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Contents Insurance - Get My Slice']);
+        } elseif ($request->get('_route') == 'contents_insurance_creditspring') {
+            $noindex = true;
+            $promo = true;
+            $partner = 'creditspring';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Creditspring']);
         } else {
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
@@ -68,15 +79,20 @@ class HomeContentsController extends BaseController
             $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
         }
 
-        // Optimise - pass along sskey
-        if ($sskey) {
-            $sskey = sprintf('&sskey=%s', $sskey);
-            $utms = $utms . $sskey;
-        }
-
         $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
         if ($promo) {
             $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
+        }
+
+        // Set Greeting
+        if (date('H') >= 12 && date('H') <= 18) {
+            $greeting = 'afternoon';
+        } elseif (date('H') > 18 && date('H') <= 22) {
+            $greeting = 'evening';
+        } elseif (date('H') > 22 && date('H') <= 5) {
+            $greeting = 'night';
+        } else {
+            $greeting = 'morning';
         }
 
         $data = [
@@ -84,6 +100,8 @@ class HomeContentsController extends BaseController
             'is_noindex' => $noindex,
             'utms' => $utms,
             'promo' => $promo,
+            'partner' => $partner,
+            'greeting' => $greeting,
         ];
 
         return $this->render($template, $data);
