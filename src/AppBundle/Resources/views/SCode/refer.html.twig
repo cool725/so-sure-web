@@ -21,7 +21,95 @@
 {% endblock %}
 
 {% block body %}
+
     <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-2">
+                    <h1 class="text-white">Hey, {{ scode.policy.user.firstname }} 👋</h1>
+                    <div class="h2 text-white mb-3"><span class="sub text-deep-sky-blue-d">Connect with friends and earn Cashback & Rewards</span></div>
+                    <ul class="list-group list-group-horizontal refer-list mb-4">
+                        <li class="list-group-item">
+                            Connections <br>
+                            <span>{{ scode.policy.standardConnections|length }}/{{ scode.policy.getMaxConnections }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            Rewards <br>
+                            <span>{{ scode.policy.rewardConnections|length }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            Reward Pot <br>
+                            <span>&pound;{{ scode.policy.potValue|number_format(0, '.', ',') }}</span>
+                        </li>
+                    </ul>
+                    <h2 class="h4 text-white">Share your link</h2>
+                    <div class="custom-input-with-btn mb-4">
+                        <input type="text"
+                                class="form-control form-control-white form-control-shadow"
+                                value="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                                disabled />
+                        <button class="btn btn-primary btn-copy btn-sm"
+                                data-clipboard-text="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}">Copy</button>
+                    </div>
+                    <hr class="border-deep-sky-blue-d" />
+                    <h2 class="h4 text-white">Share on social</h2>
+                    <div class="d-flex align-items-center mb-4">
+                        <a href="#"
+                            class="track-data"
+                            data-sharer="twitter"
+                            data-title="{{ og_description }}"
+                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                            data-via="wearesosure"
+                            data-hashtags="wearesosure,phoneinsurance"
+                            data-event="twitter"
+                            data-event-type="social"
+                            data-event-location="refer-page">
+                            <span class="fa-stack fa-2x">
+                                <i class="fas fa-square text-white fa-stack-2x"></i>
+                                <i class="fab fa-twitter text-twitter fa-stack-1x fa-inverse"></i>
+                            </span><span class="sr-only">Tweet</span></a>
+                        <a href="#"
+                            class="track-data"
+                            data-sharer="facebook"
+                            data-title="{{ og_description }}"
+                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                            data-hashtags="wearesosure,phoneinsurance"
+                            data-event="facebook"
+                            data-event-type="social"
+                            data-event-location="refer-page">
+                            <span class="fa-stack fa-2x">
+                                <i class="fas fa-square text-white fa-stack-2x"></i>
+                                <i class="fab fa-facebook text-facebook fa-stack-1x fa-inverse"></i>
+                            </span><span class="sr-only">Facebook</span></a>
+                        <a href="#"
+                            class="track-data"
+                            data-sharer="whatsapp"
+                            data-web
+                            data-title="{{ og_description }}"
+                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                            data-event="whatsapp"
+                            data-event-type="social"
+                            data-event-location="refer-page">
+                            <span class="fa-stack fa-2x">
+                                <i class="fas fa-square text-white fa-stack-2x"></i>
+                                <i class="fab fa-whatsapp text-whatsapp fa-stack-1x fa-inverse"></i>
+                            </span><span class="sr-only">Whatsapp</span></a>
+                    </div>
+                </div>
+                <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
+                    <div class="hero-image">
+                        <picture class="lozad">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_invite.png" media="(min-width: 1200px)">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_invite.png" media="(min-width: 992px) and (max-width: 1199px)">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_invite.png" media="(min-width: 320px) and (max-width: 991px)">
+                        </picture>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# <section class="hero">
         <div class="container-large">
             <h1 class="text-white">Hey, {{ scode.policy.user.firstname }} 👋</h1>
             <div class="h2 text-white mb-4"><span class="sub text-deep-sky-blue-d">Connect with friend earn Cashback &amp; Rewards</span></div>
@@ -91,8 +179,7 @@
                     </span><span class="sr-only">Whatsapp</span></a>
             </div>
         </div>
-    </section>
-    {# {{ dump(scode) }} #}
+    </section> #}
 {% endblock %}
 
 {% block javascriptsPage %}

@@ -27,14 +27,9 @@ class PromoController extends BaseController
     /**
      * @Route("/promo/{code}", name="promo")
      * @Route("/amazon/{code}", name="amazon_promo")
-     * @Route("/pizzaexpress/{code}", name="pizzaexpress_promo")
-     * @Route("/xiaomi/{code}", name="xiaomi_promo")
      * @Route("/share/{code}", name="share_promo")
-     * @Route("/uswitch/{code}", name="uswitch_promo")
      * @Route("/offer/{code}", name="offer_promo")
-     * @Route("/hotukdeals/{code}", name="hotukdeals_promo")
      * @Route("/student/{code}", name="student_promo")
-     * @Route("/groupon/{code}", name="groupon_promo")
      * @Route("/benefithub/{code}", name="benefithub_promo")
      * @Route("/lifeworks/{code}", name="lifeworks_promo")
      * @Route("/idealworld/{code}", name="idealworld_promo")
@@ -55,6 +50,8 @@ class PromoController extends BaseController
         $scode = null;
         $custom = null;
         $amazonVoucher = null;
+        $logo = null;
+        $logoWidth = null;
 
         try {
             if ($scode = $repo->findOneBy(['code' => $code, 'active' => true, 'type' => Scode::TYPE_REWARD])) {
@@ -67,6 +64,11 @@ class PromoController extends BaseController
             $scode = null;
         }
 
+        // Redirect to homepage if scode not found
+        if (!$scode) {
+            return $this->redirectToRoute('homepage');
+        }
+
         $session = $this->get('session');
         $session->set('scode', $code);
 
@@ -76,47 +78,50 @@ class PromoController extends BaseController
         if ($request->get('_route') == 'amazon_promo') {
             $custom = 'amazon';
             $amazonVoucher = 15;
-        } elseif ($request->get('_route') == 'pizzaexpress_promo') {
-            $custom = 'pizzaexpress';
-        } elseif ($request->get('_route') == 'xiaomi_promo') {
-            $custom = 'xiaomi';
         } elseif ($request->get('_route') == 'share_promo') {
             $template = 'AppBundle:Promo:influencer.html.twig';
         } elseif ($request->get('_route') == 'student_promo') {
             $template = 'AppBundle:Promo:influencerStudent.html.twig';
-        } elseif ($request->get('_route') == 'uswitch_promo') {
-            $custom = 'uswitch';
-            $amazonVoucher = 15;
-        } elseif ($request->get('_route') == 'offer_promo') {
-            $template = 'AppBundle:Promo:indexOffer.html.twig';
-        } elseif ($request->get('_route') == 'hotukdeals_promo') {
-            $custom = 'hotukdeals';
-            $amazonVoucher = 20;
-        } elseif ($request->get('_route') == 'groupon_promo') {
-            $custom = 'groupon';
-            $amazonVoucher = 15;
         } elseif ($request->get('_route') == 'benefithub_promo') {
             $custom = 'benefithub';
             $amazonVoucher = 15;
+            $logo = 'so-sure_benefithub-white-logo.png';
+            $logoWidth = '200px';
         } elseif ($request->get('_route') == 'lifeworks_promo') {
             $custom = 'lifeworks';
             $amazonVoucher = 15;
+            $logo = 'so-sure_lifeworks-logo.svg';
+            $logoWidth = '200px';
         } elseif ($request->get('_route') == 'idealworld_promo') {
             $custom = 'idealworld';
             $amazonVoucher = 10;
+            $logo = 'so-sure_idealworld-logo.svg';
+            $logoWidth = '113px';
         } elseif ($request->get('_route') == 'ipse_promo') {
             $custom = 'ipse';
             $amazonVoucher = 15;
+            $logo = 'so-sure_ipse-logo.svg';
+            $logoWidth = '113px';
         } elseif ($request->get('_route') == 'canopy_promo') {
             $custom = 'canopy';
+            $logo = 'so-sure_canopy_logo.svg';
+            $logoWidth = '113px';
         } elseif ($request->get('_route') == 'youatwork_promo') {
             $custom = 'youatwork';
+            $logo = 'so-sure_youatwork_white_logo.svg';
+            $logoWidth = '160px';
         } elseif ($request->get('_route') == 'creditspring_promo') {
             $custom = 'creditspring';
+            $logo = 'so-sure_creditspring_logo.svg';
+            $logoWidth = '133px';
         } elseif ($request->get('_route') == 'ben_promo') {
             $custom = 'ben';
+            $logo = 'so-sure_ben_logo.svg';
+            $logoWidth = '133px';
         } elseif ($request->get('_route') == 'suitsme_promo') {
             $custom = 'suitsme';
+            $logo = 'so-sure_suitsme_logo.svg';
+            $logoWidth = '133px';
         }
 
         $lead = new Lead();
@@ -180,7 +185,9 @@ class PromoController extends BaseController
             'custom' => $custom,
             'lead_form' => $leadForm->createView(),
             'competitor' => $competitorData::$competitorComparisonData,
-            'amazon_voucher' => $amazonVoucher
+            'amazon_voucher' => $amazonVoucher,
+            'partner_logo' => $logo,
+            'partner_logo_width' => $logoWidth,
         ];
 
         return $this->render($template, $data);
@@ -191,6 +198,6 @@ class PromoController extends BaseController
      */
     public function forwardIdealWorld()
     {
-        return $this->redirectToRoute('idealworld_promo', ['code'=>'IDEALW10'], 301);
+        return $this->redirectToRoute('homepag', ['code'=>'IDEALW10'], 301);
     }
 }

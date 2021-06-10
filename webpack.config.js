@@ -44,7 +44,6 @@ Encore
     .addEntry('usa', './src/AppBundle/Resources/public/rebrand/js/pages/usa.js')
     .addEntry('promo', './src/AppBundle/Resources/public/rebrand/js/pages/promo.js')
     .addEntry('blog', './src/AppBundle/Resources/public/rebrand/js/pages/blog.js')
-    .addEntry('invite-competition', './src/AppBundle/Resources/public/rebrand/js/pages/invite-competition.js')
     .addEntry('competition', './src/AppBundle/Resources/public/rebrand/js/pages/competition.js')
     .addEntry('competition-questions', './src/AppBundle/Resources/public/rebrand/js/pages/competition-questions.js')
     .addEntry('competition-confirm', './src/AppBundle/Resources/public/rebrand/js/pages/competition-confirm.js')
