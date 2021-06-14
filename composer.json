@@ -67,7 +67,7 @@
         "thiagoalessio/tesseract_ocr": "^2.0",
         "imagine/imagine": "^0.7.1",
         "peerj/peerj-user-security-bundle": "^0.2",
-        "phpseclib/phpseclib": "^2.0",
+        "phpseclib/phpseclib": "2.0.31",
         "defuse/php-encryption": "^2.1",
         "friendsofsymfony/oauth-server-bundle": "^1.6",
         "excelwebzone/recaptcha-bundle": "^1.5",
@@ -76,7 +76,8 @@
         "ryanwinchester/hubspot-php": "^1.2",
         "checkout/checkout-php-api": "^1.2",
         "checkout/checkout-sdk-php": "^1.0",
-        "aws/aws-sdk-php-symfony": "~2.0"
+        "aws/aws-sdk-php-symfony": "~2.0",
+        "symfony/webpack-encore-bundle": "1.0.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
