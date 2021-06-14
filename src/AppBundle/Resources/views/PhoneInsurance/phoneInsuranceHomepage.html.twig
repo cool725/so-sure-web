@@ -53,7 +53,7 @@
                 <span class="sub">from just &pound;{{ lowest_premium }} per month</span>
             </h1>
             <div class="row">
-                <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-0 order-xl-2">
+                <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-1 order-xl-2">
                     {% if phone is defined and phone %}
                         {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
                             'type': 'homepage',
@@ -67,7 +67,7 @@
                         )) }}
                     {% endif %}
                 </div>
-                <div class="col-sm-8 offset-sm-2 col-xl-7 offset-xl-0 order-xl-1">
+                <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
                     <div class="hero-image">
                         <picture class="lozad">
                             <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_phone.png" media="(min-width: 1200px)">
@@ -77,10 +77,6 @@
                     </div>
                 </div>
             </div>
-            <!-- <span class="hero-scroll-down">
-                <small>Scroll Down</small>
-                <i class="far fa-angle-down fa-lg"></i>
-            </span> -->
         </div>
     </section>
 
