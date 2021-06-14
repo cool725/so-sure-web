@@ -38,6 +38,7 @@ Encore
     .addEntry('careers', './src/AppBundle/Resources/public/rebrand/js/pages/careers.js')
     .addEntry('seo-pages', './src/AppBundle/Resources/public/rebrand/js/pages/seo-pages.js')
     .addEntry('phone-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance.js')
+    .addEntry('phone-insurance-make', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-make.js')
     .addEntry('phone-insurance-quote', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-quote.js')
     .addEntry('invite', './src/AppBundle/Resources/public/rebrand/js/pages/invite.js')
     .addEntry('company-phones', './src/AppBundle/Resources/public/rebrand/js/pages/company-phones.js')
