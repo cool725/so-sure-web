@@ -1302,7 +1302,7 @@ class UserController extends BaseController
             'bacs_feature' => $bacsFeature,
             'unpaid_reason' => $unpaidReason,
             'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
-            'bacs_sftp' => ($bacsService->sftpRunning() > 0)
+            'bacs_sftp' => $bacsService->getSftpLock()->check()
         ];
     }
 
