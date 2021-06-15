@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Excess;
 
+use AppBundle\Document\Subvariant;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -20,6 +21,6 @@ abstract class Excess
 {
     abstract public function getValue($type);
 
-    abstract public function toApiArray();
+    abstract public function toApiArray(Subvariant $subvariant = null);
     abstract public function toPriceArray();
 }
