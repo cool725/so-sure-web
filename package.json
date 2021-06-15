@@ -8,17 +8,15 @@
   "license": "proprietary",
   "private": true,
   "devDependencies": {
-    "@symfony/webpack-encore": "git://github.com/symfony/webpack-encore.git#master",
+    "@symfony/webpack-encore": "^1.4.0",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "concat-cli": "^4.0.0",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "node-sass": "^4.13.1",
-    "sass-loader": "^7.0.3",
-    "webpack": "^4.12.2",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-middleware": "^2.0.6",
-    "webpack-dev-server": "^3.1.11",
+    "sass-loader": "^9.0.1",
+    "webpack-bundle-analyzer": "^4.4.2",
+    "webpack-cli": "^4.7.2",
     "webpack-notifier": "^1.6.0"
   },
   "dependencies": {
