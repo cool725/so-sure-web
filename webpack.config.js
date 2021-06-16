@@ -132,7 +132,7 @@ Encore
     // allow sass/scss files to be processed
     .enableSassLoader()
 
-    // .splitEntryChunks()
+    .splitEntryChunks()
     // .configureSplitChunks(function(splitChunks) {
     //     // change the configuration
     //     splitChunks.minSize = 100;
@@ -149,7 +149,7 @@ Encore
         })
     )
 
-    // .addPlugin(new BundleAnalyzerPlugin())
+    .addPlugin(new BundleAnalyzerPlugin())
 ;
 
 var config = Encore.getWebpackConfig();

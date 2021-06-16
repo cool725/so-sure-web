@@ -58,8 +58,12 @@ framework:
     fragments:       ~
     http_method_override: true
     validation: { enabled: true, enable_annotations: true }
+    # assets:
+    #     json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
     assets:
-        json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
+        packages:
+            website:
+                json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
 
 # Twig Configuration
 twig:

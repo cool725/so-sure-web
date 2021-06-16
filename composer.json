@@ -77,7 +77,8 @@
         "checkout/checkout-php-api": "^1.2",
         "checkout/checkout-sdk-php": "^1.0",
         "aws/aws-sdk-php-symfony": "~2.0",
-        "symfony/webpack-encore-bundle": "1.0.0"
+        "symfony/webpack-encore-bundle": "1.0.0",
+        "composer/package-versions-deprecated": "1.11.99.2"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
