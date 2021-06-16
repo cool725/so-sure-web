@@ -62,7 +62,7 @@ framework:
     #     json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
     assets:
         packages:
-            website:
+            webpack_encore:
                 json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
 
 # Twig Configuration
