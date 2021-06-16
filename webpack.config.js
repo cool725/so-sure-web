@@ -133,6 +133,10 @@ Encore
     .enableSassLoader()
 
     // .splitEntryChunks()
+    // .configureSplitChunks(function(splitChunks) {
+    //     // change the configuration
+    //     splitChunks.minSize = 100;
+    // })
 
     .addPlugin(
         new webpack.ProvidePlugin({
