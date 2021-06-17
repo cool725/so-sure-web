@@ -17,8 +17,9 @@
         <link rel="preload" href="{{ cdn_url }}/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="preload" href="{{ cdn_url }}/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
         <link rel="preload" href="{{ cdn_url }}/fonts/fa-duotone-900.woff2" as="font" type="font/woff2" crossorigin>
-        <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
-
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('global') }}
+        {% endblock %}
         {% block cssPage %}{% endblock %}
     </head>
     <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
@@ -31,10 +32,9 @@
 
         {% include '::footer_data.html.twig' %}
 
-        <script src="{{ asset('css-js/runtime.js') }}"></script>
-        {# <script src="{{ asset('css-js/vendor.js') }}" async></script> #}
-        <script src="{{ asset('css-js/global.js') }}"></script>
-
+        {% block javascripts %}
+            {{ encore_entry_script_tags('global') }}
+        {% endblock %}
         {% block javascriptsPage %}{% endblock %}
     </body>
 </html>

@@ -9,8 +9,8 @@
 {% block title %}Request Cashback | so-sure{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
+    {{ encore_entry_link_tags('user') }}
+    {{ encore_entry_link_tags('user-dashboard') }}
 {% endblock %}
 
 {% block body %}
@@ -66,6 +66,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/user.js') }}"></script>
-    <script src="{{ asset('css-js/user-cashback.js') }}"></script>
+    {{ encore_entry_script_tags('user') }}
+    {{ encore_entry_script_tags('user-cashback') }}
 {% endblock %}

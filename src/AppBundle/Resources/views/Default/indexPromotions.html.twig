@@ -13,10 +13,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
-    {% if page_type == 'vdayphonecase' %}
-        <link rel="stylesheet" href="{{ asset('css-js/homepage-vday.css') }}">
-    {% endif %}
+    {{ encore_entry_link_tags('homepage') }}
 {% endblock %}
 
 {% block body %}
@@ -314,8 +311,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>
-    {% if page_type == 'vdayphonecase' %}
-        <script src="{{ asset('css-js/homepage-vday.js') }}"></script>
-    {% endif %}
+    {{ encore_entry_script_tags('homepage') }}
 {% endblock %}

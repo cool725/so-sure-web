@@ -33,7 +33,7 @@
 {% block meta %}{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
+    {{ encore_entry_link_tags('purchase') }}
 {% endblock %}
 
 {% block body %}
@@ -89,6 +89,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/purchase.js') }}"></script>
-    <script src="{{ asset('css-js/purchase-phone.js') }}"></script>
+    {{ encore_entry_script_tags('purchase') }}
+    {{ encore_entry_script_tags('purchase-phone') }}
 {% endblock %}

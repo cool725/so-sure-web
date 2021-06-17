@@ -17,7 +17,7 @@
 {% endif %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user-competition.css') }}">
+    {{ encore_entry_link_tags('user-competition') }}
 {% endblock %}
 
 {% block gtm_data %}
@@ -171,5 +171,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/user-competition.js') }}"></script>
+    {{ encore_entry_script_tags('uuser-competitionser') }}
 {% endblock %}

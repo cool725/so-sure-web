@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/landing-search.css') }}">
+    {{ encore_entry_link_tags('landing-search') }}
 {% endblock %}
 
 {% block body %}
@@ -220,5 +220,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/landing-search.js') }}"></script>
+    {{ encore_entry_script_tags('landing-search') }}
 {% endblock %}

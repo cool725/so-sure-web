@@ -14,7 +14,7 @@
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/contents-insurance.css') }}">
+    {{ encore_entry_link_tags('contents-insurance') }}
 {% endblock %}
 
 {% block body %}
@@ -300,5 +300,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/contents-insurance.js') }}"></script>
+    {{ encore_entry_script_tags('contents-insurance') }}
 {% endblock %}

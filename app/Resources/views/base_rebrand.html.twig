@@ -10,8 +10,7 @@
         {% include '::meta_rebrand.html.twig' %}
         <title>{% block title %}SO-SURE{% endblock %}</title>
         {% block stylesheets %}
-        {# <link rel="stylesheet" href="{{ asset('css-js/global.css') }}"> #}
-            {{ encore_entry_script_tags('global') }}
+            {{ encore_entry_link_tags('global') }}
         {% endblock %}
         {% block cssPage %}{% endblock %}
         {% block meta %}{% endblock %}
@@ -129,16 +128,13 @@
             {% endif %}
         {% endblock %}
         {% include '::footer_data.html.twig' %}
-        {#<script src="{{ asset('css-js/runtime.js') }}" async></script>
-        {# <script src="{{ asset('css-js/vendor.js') }}" async></script>
-        <script src="{{ asset('css-js/global.js') }}" async></script>#}
         {% block javascripts %}
             {{ encore_entry_script_tags('global') }}
+            {% if environment != 'prod' %}
+                 {{ encore_entry_script_tags('dev') }}
+            {% endif %}
         {% endblock %}
         {% block javascriptsPage %}{% endblock %}
         <script async type="text/javascript" src="https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"></script>
-        {% if environment != 'prod' %}
-            <script src="{{ asset('css-js/dev.js') }}" async></script>
-        {% endif %}
     </body>
 </html>

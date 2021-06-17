@@ -2,8 +2,8 @@ webpack_encore:
     # The path where Encore is building the assets.
     # This should match Encore.setOutputPath() in webpack.config.js.
     output_path: '%kernel.root_dir%/../web/css-js'
-    script_attributes:
-        defer: true
+    # script_attributes:
+    #     defer: true
     # If multiple builds are defined (as shown below), you can disable the default build:
     # output_path: false
 

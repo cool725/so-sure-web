@@ -16,7 +16,7 @@
 {% set og_image = cdn_url ~ '/images/rebrand/phones/generic/so-sure_hero-second-hand.png' %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance.css') }}">
+    {{ encore_entry_link_tags('phone-insurance') }}
 {% endblock %}
 
 {% block body %}
@@ -330,5 +330,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/phone-insurance.js') }}"></script>
+    {{ encore_entry_script_tags('phone-insurance') }}
 {% endblock %}

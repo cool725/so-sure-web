@@ -10,9 +10,10 @@
 {% block meta %}{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/user-cancel.css') }}">
+    {{ encore_entry_link_tags('user') }}
+    {{ encore_entry_link_tags('user-cancel') }}
 {% endblock %}
+
 
 {% block body %}
 
@@ -32,5 +33,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/user-cancel.js') }}"></script>
+    {{ encore_entry_script_tags('user-cancel') }}
 {% endblock %}
