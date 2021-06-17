@@ -1835,12 +1835,12 @@ class PurchaseController extends BaseController
                     }
                 }
             } else {
-                if ($this->get('app.bacs')->sftpRunning() > 0) {
-                    $this->addFlash('warning', 'an unknown error occurred. Please try again later.');
-                    return new RedirectResponse($redirectFailure);
-                }
                 $bacsPayment = null;
                 if ($saveBacs) {
+                    if ($this->get('app.bacs')->getSftpLock()->check()) {
+                        $this->addFlash('warning', 'an unknown error occurred. Please try again later.');
+                        return new RedirectResponse($redirectFailure);
+                    }
                     $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
                 }
                 $bacsPaymentMethod = $policy->getBacsPaymentMethod();

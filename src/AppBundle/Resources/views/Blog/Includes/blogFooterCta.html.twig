@@ -2,6 +2,10 @@
     <div class="share-links-mobile mb-4">
         <span class="h6">Share this article: </span>
         <a href="#"
+        class="track-data"
+        data-event="facebook"
+        data-event-type="social"
+        data-event-location="blog"
         data-sharer="facebook"
         data-title="{{ og_title}}"
         data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"
@@ -11,6 +15,10 @@
                 <i class="fab fa-facebook-square text-white fa-stack-1x fa-inverse"></i>
             </span><span class="sr-only">Facebook</span></a>
         <a href="#"
+        class="track-data"
+        data-event="linkedin"
+        data-event-type="social"
+        data-event-location="blog"
         data-sharer="linkedin"
         data-web
         data-title="{{ og_title}}"
@@ -20,6 +28,10 @@
                 <i class="fab fa-linkedin text-white fa-stack-1x fa-inverse"></i>
             </span><span class="sr-only">Linkedin</span></a>
         <a href="#"
+        class="track-data"
+        data-event="twitter"
+        data-event-type="social"
+        data-event-location="blog"
         data-sharer="twitter"
         data-title="{{ og_title}}"
         data-url="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}"

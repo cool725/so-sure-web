@@ -955,4 +955,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/dog-damage-and-other-findings-from-our-new-research",
+     * name="dog_damage_and_other_findings_from_our_new_research", options={"sitemap" = true})
+     * @Template
+     */
+    public function dogDamageAndOtherFindingsFromOurNewResearchAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/dog-damage-and-other-findings-from-our-new-research.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

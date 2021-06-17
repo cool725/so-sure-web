@@ -5586,23 +5586,14 @@ abstract class Policy
         return SoSure::FULL_POLICY_NAME;
     }
 
-    public function getPreviousIteration() : array
+    /**
+     * Gives you all the previous iterations (ie upgrades) that this policy has had. For non Helvetia policies this
+     * will tend to be an empty array which is the default behaviour.
+     * @return array containing each past iteration.
+     */
+    public function getPreviousIterations()
     {
-        $isUpgraded = false;
-        $previousIteration = null;
-        if ($this instanceof SalvaPhonePolicy) {
-            $isUpgraded = false;
-        } elseif ($this instanceof HelvetiaPhonePolicy) {
-            $previousIteration = $this->getLastIterationOrFalse();
-            if (null !== $previousIteration) {
-                $isUpgraded = true;
-            }
-        }
-
-        return [
-            'is_upgraded' => $isUpgraded,
-            'previous_iteration' => $previousIteration,
-        ];
+        return [];
     }
 
     /**

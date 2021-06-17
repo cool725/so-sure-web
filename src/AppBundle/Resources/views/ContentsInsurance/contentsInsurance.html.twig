@@ -21,61 +21,68 @@
 
     <section class="hero">
         <div class="container-large">
-            <div class="breadcrumbs">
-                <ul class="list-inline"
-                    vocab="https://schema.org/"
-                    typeof="BreadcrumbList">
-                    <li class="list-inline-item"
-                        property="itemListElement"
-                        typeof="ListItem">
-                        <a href="{{ path('homepage') }}"
-                           class="text-columbia-blue-e"
-                           property="item"
-                           typeof="WebPage">
-                           <span property="name">Home</span>
-                        </a>
-                        <meta property="position" content="1">
-                    </li>
-                    <li class="list-inline-item text-white">
-                        <i class="fal fa-angle-right text-white"></i>
-                    </li>
-                    <li class="list-inline-item text-white"
-                        property="itemListElement"
-                        typeof="ListItem">
-                        <span property="name">Contents Insurance</span>
-                        <meta property="position" content="2">
-                    </li>
-                </ul>
-            </div>
-            <h1 class="text-deep-sky-blue-d text-sm-center">
-                Win-Win<br class="d-md-none">
-                <span class="text-white">Contents Insurance</span>
-            </h1>
-            <p class="lead text-white text-sm-center">
-                <strong>Amazing cover if you need us <br class="d-md-none">— Money back if you don’t!</strong>
-            </p>
             <div class="row">
-                <div class="col-md-8 offset-md-2 col-lg-5 offset-lg-5">
-                    <p class="d-none d-md-block lead hero-p">Protect the stuff you love in your home. You can include accidental or pet damage, out of home cover and even work equipment.</p>
-                    <div class="cardbox cardbox-100 mt-4">
-                        <div class="cardbox__body">
-                            <h2 class="h4 mb-3 text-primary text-nowrap fit">Fair, Fast, and Rewarding 🇬🇧</h2>
-                            <ul class="list-unstyled icn-fa-list mb-4">
-                                <li class="mb-2">
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    Cover from £2.80/month and excess from £50
-                                </li>
-                                <li class="mb-2">
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    Most claims resolved within 72hrs
-                                </li>
-                                <li>
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    Up to 40% no claims cashback
-                                </li>
-                            </ul>
-                            <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}" class="btn btn-success btn-block-xs">Get a quote</a>
-                        </div>
+                <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-2">
+                    <div class="breadcrumbs">
+                        <ul class="list-inline"
+                            vocab="https://schema.org/"
+                            typeof="BreadcrumbList">
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('homepage') }}"
+                                class="text-columbia-blue-e"
+                                property="item"
+                                typeof="WebPage">
+                                <span property="name">Home</span>
+                                </a>
+                                <meta property="position" content="1">
+                            </li>
+                            <li class="list-inline-item text-white">
+                                <i class="fal fa-angle-right text-white"></i>
+                            </li>
+                            <li class="list-inline-item text-white"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <span property="name">Contents Insurance</span>
+                                <meta property="position" content="2">
+                            </li>
+                        </ul>
+                    </div>
+                    <h1 class="text-white mb-4">
+                        Start your {{ greeting }} with <span class="text-deep-sky-blue-d">win-win! contents insurance</span>
+                    </h1>
+                    <p class="lead text-white mb-4">Protect the stuff you love in your home. You can include accidental or pet damage, out of home cover and even work equipment.</p>
+                    <ul class="list-unstyled icn-fa-list mb-4">
+                        <li class="mb-3 lead text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Cover from £2.80/month and excess from £50
+                        </li>
+                        <li class="mb-3 lead text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Most claims resolved within 72hrs
+                        </li>
+                        <li class="lead text-white">
+                            <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                            Up to 40% no claims cashback
+                        </li>
+                    </ul>
+                    <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                       class="btn btn-success mb-5 mb-xl-0 btn-block-xs track-data"
+                       data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                       data-event="get-a-quote"
+                       data-event-type="click"
+                       data-event-location="home-contents">
+                       Get a quote
+                    </a>
+                </div>
+                <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
+                    <div class="hero-image">
+                        <picture class="lozad">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_contents.png" media="(min-width: 1200px)">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_contents.png" media="(min-width: 992px) and (max-width: 1199px)">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_contents.png" media="(min-width: 320px) and (max-width: 991px)">
+                        </picture>
                     </div>
                 </div>
             </div>

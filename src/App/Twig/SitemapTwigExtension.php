@@ -89,6 +89,7 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/what-counts-as-high-value-contents' => 'What Counts as High-Value Contents?',
             '/blog/how-to-transfer-data-to-your-new-phone' => 'How To Transfer Data To Your New Phone',
             '/blog/samsung-care-plus-vs-phone-insurance' => 'Samsung Care Plus vs Phone Insurance',
+            '/blog/dog-damage-and-other-findings-from-our-new-research' => 'Dog Damage and Other Findings From Our New Research',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',
