@@ -15,8 +15,8 @@
 {% set og_description = "In the latest instalment of the fight for smartphone supremacy, we’re welcoming Apple again into the ring with its latest release, the iPhone XS. Its challenger this month is the mighty Google and their Pixel 3, which is yet to be released but one of the worst kept secrets in phone history thanks to its alleged availability on the Russian black market." %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -189,5 +189,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

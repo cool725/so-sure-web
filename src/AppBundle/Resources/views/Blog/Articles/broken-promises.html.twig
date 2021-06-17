@@ -15,8 +15,8 @@
 {% set og_description = "The news last week that the company behind Boots' travel insurance is being investigated for medical negligence and fraud made me feel extremely sorry for those affected. It also reminded me why we’re building" %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -127,5 +127,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

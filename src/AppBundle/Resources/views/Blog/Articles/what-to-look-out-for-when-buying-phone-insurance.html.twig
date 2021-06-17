@@ -15,8 +15,8 @@
 {% set og_description = "Buying phone insurance can be a real pain. But it doesn’t have to be. Here’s 3 simple tips for making phone insurance as stress free as possible." %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -135,5 +135,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

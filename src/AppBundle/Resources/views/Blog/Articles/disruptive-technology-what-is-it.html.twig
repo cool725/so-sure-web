@@ -15,8 +15,8 @@
 {% set og_description = "In short, a disruptive technology is something that transforms a historically expensive product, which only a few people with a lot of money and a lot of skill have access to, by making it more affordable and available to a wider group of people." %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -122,5 +122,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

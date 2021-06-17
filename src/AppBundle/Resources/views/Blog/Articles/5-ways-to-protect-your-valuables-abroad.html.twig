@@ -15,8 +15,8 @@
 {% set og_description = "There’s nothing better than a winter holiday… but nothing’s more stressful than when something goes wrong whilst you’re on it. It might sound boring and, of course, you can get ripped off anywhere, but planning ahead and being careful whilst travelling can help reduce the risks and keep your valuables safe." %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -133,5 +133,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

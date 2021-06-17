@@ -15,8 +15,8 @@
 {% set og_description = "Dylan is a down to earth kind of guy who would rather get his head down, manage the team and deal with customers that write blog posts extolling his virtues. But he’s happy for me to do it! I recently sat down with him to hear the story behind so-sure." %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -115,5 +115,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

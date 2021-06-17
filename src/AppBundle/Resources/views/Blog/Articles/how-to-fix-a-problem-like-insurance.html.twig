@@ -15,8 +15,8 @@
 {% set og_description = "It’s ironic that an industry designed to help people protect themselves from risk has ended up with such a bad name amongst consumers. In the long run, what’s good for customers is good for insurers. But short-term thinking has blighted the industry and created a needless asymmetry between buyers and sellers." %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -115,5 +115,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

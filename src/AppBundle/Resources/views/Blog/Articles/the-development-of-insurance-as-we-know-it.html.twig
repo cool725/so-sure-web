@@ -15,7 +15,7 @@
 {% set og_description = "By the 1700s, sections of society, such as business communities and lives, could now be insured. Insurance no longer meant just single item insurance, like one journey, one cargo or one house. It included national insurance, medical insurance and pensions, too." %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -120,5 +120,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}
