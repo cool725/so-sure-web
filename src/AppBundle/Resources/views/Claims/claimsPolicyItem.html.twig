@@ -96,17 +96,22 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Previous phone upgrade </td>
-                                    <td>{% if upgrade_data.is_upgraded %}
-                                            {% for key, value in upgrade_data.previous_iteration %}
-                                                {{ key }}: {{ value }}<br />
+                                    <td>Past Upgrades</td>
+                                    <td>
+                                        <ul>
+                                            {% for iteration in policy.previousIterations %}
+                                                <li>
+                                                    {{iteration.phone}} {{iteration.imei}}:
+                                                    {{iteration.start|date}} - {{iteration.end|date}}
+                                                    @ {{iteration.premium.gwp}}
+                                                </li>
                                             {% endfor %}
-                                        {% else %} No previous upgrade done {% endif %}
+                                        </ul>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Company </td>
-                                    <td>{{ company_name }}</td>
+                                    <td>{% if policy.company %}{{ policy.company.name }}{% endif %}</td>
                                 </tr>
                                 <tr>
                                     <td>Phone Warranty Status</td>
@@ -402,16 +407,25 @@
                                     <tr>
                                         <td>Policy Installments</td>
                                         <td>
-                                            {% if policy.premiumPlan == 'monthly' %}
-                                                Bill every month on <span title="{{ policy.billing|date('d M Y H:i', 'Europe/London') }}">{{ policy.billing|date('jS','Europe/London') }} @ {{ policy.billing|date('H:m','Europe/London') }}</span>.
-                                                <br>
-                                            {% endif %}
-                                            {{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}
-                                            {% if policy.hasPolicyDiscountPresent %}
-                                                <br>
-                                                £{{ policy.premium.annualDiscount|number_format(2, '.', ',')}} discount applied for
-                                                11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',')}}
-                                                & 1 final monthly payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                            <div class="col-sm-8">
+                                                {% if policy.premiumPlan == 'monthly' %}
+                                                    Bill every month on <span title="{{ policy.billing|date('d M Y H:i', 'Europe/London') }}">{{ policy.billing|date('jS','Europe/London') }} @ {{ policy.billing|date('H:m','Europe/London') }}</span>.
+                                                    <br>
+                                                {% endif %}
+                                                {{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}
+                                                {% if policy.hasPolicyDiscountPresent %}
+                                                    <br>
+                                                    £{{ policy.premium.annualDiscount|number_format(2, '.', ',')}} discount applied for
+                                                    11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                                    & 1 final monthly payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                                {% endif %}
+                                            </div>
+                                            {% if installments_form is defined %}
+                                                <div class="col-sm-4">
+                                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#installmentsModal">
+                                                        Change Installments
+                                                    </button>
+                                                </div>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -2090,8 +2104,8 @@
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:salvaStatusForm', 'policy': policy, 'id': 'salvaStatusForm'} %}
         {% endif %}
         {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:createScheduledPaymentForm', 'policy': policy, 'id': 'createScheduledPaymentForm'} %}
-        {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:updatePremiumForm', 'policy': policy, 'id': 'updatePremiumForm'} %}
         {% if policy.isPolicy %}
+            {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:updatePremiumForm', 'policy': policy, 'id': 'updatePremiumForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:judoRefundForm', 'policy': policy, 'id': 'judoRefundForm'} %}
             {% include 'AppBundle::Admin/adminConfirmModal.html.twig' with {'route': 'AppBundle:Admin:checkoutRefundForm', 'policy': policy, 'id': 'checkoutRefundForm'} %}
         {% endif %}
@@ -2104,6 +2118,52 @@
     {% endif %}
 
     {% include 'AppBundle::Claims/claimsModal.html.twig' %}
+
+{% if installments_form is defined %}
+    <div class="modal fade" id="installmentsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Set Premium Installments</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(installments_form)}}
+                    <div class="row">
+                        <div class="col-sm-12">
+                        {{ form_label(installments_form.installments) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                {{ form_widget(installments_form.installments, {'attr': {'rows': 3, 'cols': '60'}}) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                        {{ form_label(installments_form.notes) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                {{ form_widget(installments_form.notes, {'attr': {'rows': 3, 'cols': '60'}}) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ form_widget(installments_form.add, {'label': 'Change Installments', 'attr': {'class': 'btn btn-success'}}) }}
+                        </div>
+                    </div>
+                    {{ form_end(installments_form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 <div class="modal fade" id="policyNotesModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">

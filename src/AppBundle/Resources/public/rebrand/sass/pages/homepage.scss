@@ -10,53 +10,177 @@
 
 .hero {
     position: relative;
-    padding-top: 6rem;
+    overflow: hidden;
+    padding: 6rem 0 3rem;
 
     @include blue-gradient-45;
 
     .container-large {
         position: relative;
         z-index: 4;
+
+        @include media-breakpoint-up(lg) {
+            &:before,
+            &:after {
+                display: block;
+                width: 420px;
+                height: 420px;
+                content: '';
+                position: absolute;
+                top: -50px;
+            }
+
+            &:before {
+                left: 0;
+                margin-left: -240px;
+                background-size: contain;
+                background-image: url('#{$cdn_url}/images/rebrand/homepage/so-sure_hero-alt-desktop-left-image.png');
+                background-repeat: no-repeat;
+                opacity: 0.9;
+            }
+
+            &:after {
+                right: 0;
+                margin-right: -240px;
+                background-size: contain;
+                background-image: url('#{$cdn_url}/images/rebrand/homepage/so-sure_hero-alt-desktop-right-image.png');
+                background-repeat: no-repeat;
+                opacity: 0.9;
+            }
+        }
+
+        @include media-breakpoint-up(fa) {
+            &:before {
+                margin-left: -340px;
+            }
+
+            &:after {
+                margin-right: -340px;
+            }
+        }
+
+        @include media-breakpoint-up(fk) {
+            &:before {
+                margin-left: -140px;
+            }
+
+            &:after {
+                margin-right: -140px;
+            }
+        }
     }
 
-    &-left {
-        @include media-breakpoint-up(lg) {
-            height: 100%;
+    &-links {
+        margin-bottom: 1.5rem;
+
+        @include media-breakpoint-up(md) {
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: center;
         }
     }
 
-    &-right {
-        text-align: center;
-    }
+    &-link {
+        display: block;
+        background-color: $white;
+        @include border-radius($g-border-radius-large);
+        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+        0 5px 15px 0 rgba(8,27,154,0.08);
+        transition: box-shadow 0.3s ease-in-out;
 
-    &-heading {
-        color: $white;
-        margin-bottom: 2rem;
+        &-body {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0.2rem 1rem;
 
-        span {
-            color: $deep-sky-blue-d;
+            .h5 {
+                color: $primary;
+                margin: 0;
+            }
+
+            .far {
+                margin-left: auto;
+            }
+        }
+
+        &:hover {
+            text-decoration: none;
+            box-shadow: 0 0 0 0.2rem rgba($color: $deep-sky-blue-d, $alpha: 0.5);
+        }
+
+        @include media-breakpoint-up(md) {
+            min-width: 320px;
+
+            &:first-of-type {
+                margin-right: 1rem;
+            }
         }
     }
 
-    &:after {
-        width: 100%;
-        height: 100%;
+    &-link + &-link {
+        margin-top: 1rem;
 
+        @include media-breakpoint-up(md) {
+            margin: 0;
+        }
+    }
+
+    &-img-mobile {
+        display: block;
+        margin: 0 auto 1rem;
+        opacity: 0.9;
+
+        @include media-breakpoint-up(lg) {
+            display: none;
+        }
+    }
+
+    &-scroll-down {
+        display: flex;
+        text-align: center;
+        flex-direction: column;
+        margin: 0;
+        color: $white;
+
+        @include media-breakpoint-up(lg) {
+            display: none;
+        }
+    }
+
+    .badge {
+        // font-size: 90%;
+        padding: 0.6rem 1rem;
+        text-transform: uppercase;
+    }
+
+    &:before {
+        width: 100%; height: 100%;
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: 0; left: 0; right: 0; bottom: 0;
         content: '';
         z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+        transform: scaleX(-1);
+    }
 
-        opacity: 0.8;
-        background-repeat: repeat;
-        background-size: 1140px;
-        background-image: url('#{$cdn_url}/images/rebrand/homepage/so-sure_homepage_hero_confetti_background.svg');
+    @include media-breakpoint-up(md) {
+        text-align: center;
+    }
+
+    @include media-breakpoint-up(lg) {
+        padding: 7rem 0;
+
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
+        }
+    }
+
+    @include media-breakpoint-up(xl) {
+        padding: 8rem 0;
     }
 }
 
