@@ -1,0 +1,75 @@
+// refer.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+@import "../base/fonts";
+
+body {
+    position: relative;
+    @include blue-gradient-45;
+
+    &:before {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        content: '';
+        z-index: 1;
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-size: cover;
+        opacity: 0.44;
+        transform: scaleX(-1);
+    }
+
+    @include media-breakpoint-up(lg) {
+        &:before {
+            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
+            transform: scaleX(-1);
+        }
+    }
+}
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    padding: 6rem 0 3rem;
+
+    .container-large {
+      position: relative;
+      z-index: 4;
+    }
+}
+
+.custom-input-with-btn {
+    max-width: 600px;
+}
+
+.refer-list {
+    font-family: $g-medium;
+    text-align: center;
+    color: $white;
+    justify-content: space-between;
+    border-color: $deep-sky-blue-d;
+
+    li {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        background-color: rgba($color:$white, $alpha: 0.08);
+        border-color: $deep-sky-blue-d;
+        font-size: 80%;
+
+        span {
+            margin-top: auto;
+            font-family: $g-bold;
+            font-size: 180%;
+        }
+
+        @include media-breakpoint-up(md) {
+            font-size: 100%;
+        }
+    }
+}

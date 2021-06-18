@@ -124,6 +124,19 @@ class PurchaseController extends BaseController
     use ValidatorTrait;
 
     /**
+     * @Route("/quote", name="purchase_step_quote")
+     * @Template
+     */
+    public function purchaseStepNoDeviceAction()
+    {
+        $template = 'AppBundle:Purchase:purchaseStepQuote.html.twig';
+        $data = [
+            'step' => 1,
+        ];
+        return $this->render($template, $data);
+    }
+
+    /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
      *
@@ -145,6 +158,10 @@ class PurchaseController extends BaseController
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = $this->getSessionQuotePhone($request);
+        // Redirect to start if no phone in session
+        if (!$phone) {
+            return $this->redirectToRoute('purchase_step_quote', [], 301);
+        }
 
         $purchase = new PurchaseStepPersonalAddress();
         if ($user) {
@@ -338,8 +355,11 @@ class PurchaseController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
-
         $phone = $this->getSessionQuotePhone($request);
+        // Redirect to start if no phone in session
+        if (!$phone) {
+            return $this->redirectToRoute('purchase_step_quote', [], 301);
+        }
 
         $purchase = new PurchaseStepPhone();
         $purchase->setUser($user);
@@ -879,8 +899,11 @@ class PurchaseController extends BaseController
         $phoneRepo = $dm->getRepository(Phone::class);
         /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
-
         $phone = $this->getSessionQuotePhone($request);
+        // Redirect to start if no phone in session
+        if (!$phone) {
+            return $this->redirectToRoute('purchase_step_quote', [], 301);
+        }
 
         $purchase = new PurchaseStepPledge();
         $purchase->setUser($user);
@@ -1001,8 +1024,12 @@ class PurchaseController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         /** @var SCodeRepository $scodeRepo */
         $scodeRepo = $dm->getRepository(SCode::class);
-
         $phone = $this->getSessionQuotePhone($request);
+        // Redirect to start if no phone in session
+        if (!$phone) {
+            return $this->redirectToRoute('purchase_step_quote', [], 301);
+        }
+
         $priceService = $this->get('app.price');
 
         $purchase = new PurchaseStepPayment();
@@ -1808,12 +1835,12 @@ class PurchaseController extends BaseController
                     }
                 }
             } else {
-                if ($this->get('app.bacs')->sftpRunning() > 0) {
-                    $this->addFlash('warning', 'an unknown error occurred. Please try again later.');
-                    return new RedirectResponse($redirectFailure);
-                }
                 $bacsPayment = null;
                 if ($saveBacs) {
+                    if ($this->get('app.bacs')->getSftpLock()->check()) {
+                        $this->addFlash('warning', 'an unknown error occurred. Please try again later.');
+                        return new RedirectResponse($redirectFailure);
+                    }
                     $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
                 }
                 $bacsPaymentMethod = $policy->getBacsPaymentMethod();

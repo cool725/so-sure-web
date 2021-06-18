@@ -9,7 +9,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Cookie;
+
+use AppBundle\Classes\ApiErrorCode;
 
 use AppBundle\Service\IntercomService;
 use AppBundle\Service\MailerService;
@@ -18,6 +23,12 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\Lead;
+use AppBundle\Document\User;
+
+use AppBundle\Exception\InvalidEmailException;
+
+use AppBundle\Service\MixpanelService;
 
 /**
  * @Route("/blog")
@@ -37,6 +48,68 @@ class BlogController extends BaseController
         $template = 'AppBundle:Blog:index.html.twig';
 
         return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/blog-lead-form", name="blog_lead_form")
+     * @Template
+     */
+    public function blogLeadFormAction(Request $request)
+    {
+        /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
+        $csrf = $this->get('security.csrf.token_manager');
+
+        $data = [
+            'lead_csrf' => $csrf->refreshToken('lead'),
+        ];
+
+        return $data;
+    }
+
+    /**
+     * @Route("/blog-lead/{source}", name="blog_lead")
+     */
+    public function blogLeadAction(Request $request, $source)
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$this->validateFields(
+            $data,
+            ['email', 'csrf']
+        )) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+        }
+
+        if (!$this->isCsrfTokenValid('lead', $data['csrf'])) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid csrf', 422);
+        }
+
+        $email = $this->getDataString($data, 'email');
+
+        $dm = $this->getManager();
+        $userRepo = $dm->getRepository(User::class);
+        $leadRepo = $dm->getRepository(Lead::class);
+        $existingLead = $leadRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+        $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
+
+        // Add tracking - always catpure lead as we need to verify if exisiting users signed up
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CONTENTS_LEAD_CAPTURE, [
+            'email' => $email]);
+
+        if (!$existingLead && !$existingUser) {
+            $lead = new Lead();
+            $lead->setSource($source);
+            $lead->setEmail($email);
+
+            try {
+                $this->validateObject($lead);
+            } catch (InvalidEmailException $e) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid email format', 200);
+            }
+                $dm->persist($lead);
+                $dm->flush();
+        }
+
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
     }
 
     /**
@@ -851,6 +924,48 @@ class BlogController extends BaseController
         $data = [];
 
         $template = 'AppBundle:Blog:Articles/what-counts-as-high-value-contents.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/how-to-transfer-data-to-your-new-phone",
+     * name="how_to_transfer_data_to_your_new_phone", options={"sitemap" = true})
+     * @Template
+     */
+    public function howToTransferDataToYourNewPhoneAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/how-to-transfer-data-to-your-new-phone.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/samsung-care-plus-vs-phone-insurance",
+     * name="samsung_care_plus_vs_phone_insurance", options={"sitemap" = true})
+     * @Template
+     */
+    public function samsungCarePlusVsPhoneInsuranceAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/samsung-care-plus-vs-phone-insurance.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/dog-damage-and-other-findings-from-our-new-research",
+     * name="dog_damage_and_other_findings_from_our_new_research", options={"sitemap" = true})
+     * @Template
+     */
+    public function dogDamageAndOtherFindingsFromOurNewResearchAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/dog-damage-and-other-findings-from-our-new-research.html.twig';
 
         return $this->render($template, $data);
     }

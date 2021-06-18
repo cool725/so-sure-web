@@ -336,7 +336,7 @@ class SlackCommand extends ContainerAwareCommand
             $end->format('d/m/Y'),
             $weeksRemaining
         );
-        $growthTarget = 25000;
+        $growthTarget = 40000;
 
         $yesterday = $this->subDays($startOfDay, 1);
         $oneWeekAgo = $this->subDays($startOfDay, 7);

@@ -28,6 +28,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Classes\SoSure;
+use AppBundle\Classes\Lock;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Exception\ValidationException;
@@ -284,20 +285,12 @@ class BacsService
     }
 
     /**
-     * Deletes the sftp running flag thing in case it has malfunctioned.
+     * Gives you a lock object for the bacs service processing sftp lock.
+     * @return Lock a new lock for that.
      */
-    public function clearSftpRunning()
+    public function getSftpLock()
     {
-        $this->redis->del([self::KEY_SFTP_FLAG]);
-    }
-
-    /**
-     * Tells you if bacs sftp is currently running.
-     * @return boolean true if it is running.
-     */
-    public function sftpRunning()
-    {
-        return ($this->redis->get(self::KEY_SFTP_FLAG) ? true : false);
+        return new Lock($this->redis, self::KEY_SFTP_FLAG);
     }
 
     /**
@@ -306,13 +299,6 @@ class BacsService
      */
     public function sftp()
     {
-        if ($this->sftpRunning()) {
-            $this->logger->error(sprintf(
-                'Cannot run multiple instances of bacs sftp, existing key is %s',
-                $this->redis->get(self::KEY_SFTP_FLAG)
-            ));
-            return [];
-        }
         $results = [];
         $errorCount = 0;
         $files = [];
@@ -328,7 +314,6 @@ class BacsService
         if (count($files) == 0) {
             goto end;
         }
-        $this->redis->set(self::KEY_SFTP_FLAG, (new \DateTime())->format('Y-m-d H:i'));
         foreach ($files as $file) {
             $error = false;
             $unzippedFile = null;
@@ -363,7 +348,6 @@ class BacsService
                 ));
             }
         }
-        $this->redis->del([self::KEY_SFTP_FLAG]);
         // if files were present and no errors, the we should approve mandates and payments
         // assuming during the time when we should have done the morning file import
         if (count($files) > 0 && $errorCount == 0) {

@@ -21,6 +21,7 @@ Encore
     .addEntry('login', './src/AppBundle/Resources/public/rebrand/js/pages/login.js')
     .addEntry('homepage', './src/AppBundle/Resources/public/rebrand/js/pages/homepage.js')
     .addEntry('quotepage', './src/AppBundle/Resources/public/rebrand/js/pages/quotepage.js')
+    .addEntry('purchase-quote', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-quote.js')
     .addEntry('purchase', './src/AppBundle/Resources/public/rebrand/js/pages/purchase.js')
     .addEntry('purchase-personal', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-personal.js')
     .addEntry('purchase-phone', './src/AppBundle/Resources/public/rebrand/js/pages/purchase-phone.js')
@@ -37,13 +38,13 @@ Encore
     .addEntry('careers', './src/AppBundle/Resources/public/rebrand/js/pages/careers.js')
     .addEntry('seo-pages', './src/AppBundle/Resources/public/rebrand/js/pages/seo-pages.js')
     .addEntry('phone-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance.js')
+    .addEntry('phone-insurance-make', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-make.js')
     .addEntry('phone-insurance-quote', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-quote.js')
     .addEntry('invite', './src/AppBundle/Resources/public/rebrand/js/pages/invite.js')
     .addEntry('company-phones', './src/AppBundle/Resources/public/rebrand/js/pages/company-phones.js')
     .addEntry('usa', './src/AppBundle/Resources/public/rebrand/js/pages/usa.js')
     .addEntry('promo', './src/AppBundle/Resources/public/rebrand/js/pages/promo.js')
     .addEntry('blog', './src/AppBundle/Resources/public/rebrand/js/pages/blog.js')
-    .addEntry('invite-competition', './src/AppBundle/Resources/public/rebrand/js/pages/invite-competition.js')
     .addEntry('competition', './src/AppBundle/Resources/public/rebrand/js/pages/competition.js')
     .addEntry('competition-questions', './src/AppBundle/Resources/public/rebrand/js/pages/competition-questions.js')
     .addEntry('competition-confirm', './src/AppBundle/Resources/public/rebrand/js/pages/competition-confirm.js')
@@ -101,6 +102,9 @@ Encore
 
     // Signup
     .addEntry('signup', './src/AppBundle/Resources/public/rebrand/js/pages/signup.js')
+
+    // Refer
+    .addEntry('refer', './src/AppBundle/Resources/public/rebrand/js/pages/refer.js')
 
     // Dev
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')

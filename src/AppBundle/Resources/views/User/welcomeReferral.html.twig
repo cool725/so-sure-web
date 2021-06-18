@@ -20,6 +20,14 @@
     <link rel="stylesheet" href="{{ asset('css-js/user-referral.css') }}">
 {% endblock %}
 
+{% if policy.getPremiumPlan == 'monthly'%}
+    {% set premium = policy.premium.gwp %}
+    {% set tax = policy.premium.ipt %}
+{% elseif policy.getPremiumPlan == 'yearly' %}
+    {% set premium = policy.premium.gwp * 12 %}
+    {% set tax = policy.premium.ipt * 12 %}
+{% endif %}
+
 {% block gtm_data %}
     ,
     'policy': {
@@ -27,7 +35,7 @@
     },
     'affilinet': {
         'rate': {% if policy.getPremiumPlan == 'monthly'%}1{% elseif policy.getPremiumPlan == 'yearly' %}2{% else %}-1{% endif %},
-        'gwp': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %}
+        'gwp': {{ premium }}
     },
     {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
         'ecommerce': {
@@ -35,28 +43,31 @@
                 'products': [{
                     'id': '{{ policy.phone.id }}',
                     'name': '{{ policy.phone.make }} {{ policy.phone.model }}',
-                    'price': '{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}',
+                    'price': '{{ premium }}',
                     'brand': '{{ policy.phone.make }}',
                     'category': '{{ policy.phone.make }}',
                     'variant': '{{ policy.phone.memory }}GB',
                     'quantity': 1
-                }]
+                }],
+                'actionField': {
+                    coupon: '{{ used_scode }}'
+                }
             }
         },
         'transactionId': '{{ policy.policyNumber }}',
-        'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+        'transactionTotal': {{ premium }},
+        'transactionTax': {{ tax }},
         'transactionProducts': [{
             'name': '{{ policy.phone.make }} {{ policy.phone.model }}',
             'sku':  '{{ policy.phone.id }}',
             'category': '{{ policy.phone.make }}',
-            'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+            'price': {{ premium }},
             'quantity': 1
         }]
     {% endif %}
 {% endblock %}
 
 {% block body %}
-
     <section class="hero">
         <div class="container-large">
             <div class="row">

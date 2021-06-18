@@ -21,6 +21,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -106,9 +107,21 @@ class DefaultController extends BaseController
 
         // $fromPrice = $this->getLowestPremium();
 
+        // Set Greeting
+        if (date('H') >= 12 && date('H') <= 18) {
+            $greeting = 'afternoon';
+        } elseif (date('H') > 18 && date('H') <= 22) {
+            $greeting = 'evening';
+        } elseif (date('H') > 22 && date('H') <= 5) {
+            $greeting = 'night';
+        } else {
+            $greeting = 'morning';
+        }
+
         $data = array(
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex,
+            'greeting' => $greeting,
             // 'from_price' => $fromPrice
         );
 
@@ -158,6 +171,53 @@ class DefaultController extends BaseController
     {
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE, ['page' => 'social-insurance']);
         return $this->render('AppBundle:Default:socialInsurance.html.twig');
+    }
+
+    /**
+     * @Route("/rakuten", name="rakuten")
+     */
+    public function processRakutenCookies(Request $request)
+    {
+        try {
+            $ranSiteId = $request->query->get('ranSiteID');
+            $url = $request->query->get('url');
+            if ($ranSiteId === null || $url === null) {
+                throw new NotFoundHttpException();
+            }
+            $match = true;
+
+            $rakutenHelper = $this->get('app.rakutenhelper');
+            $rakutenURL = $rakutenHelper->setConfig($url);
+
+            $environment = $this->getParameter('kernel.environment');
+            if ($environment === 'prod') {
+                $match = false;
+                $parse = parse_url($rakutenURL);
+                $inithost = $parse['host'];
+                $hosts = array('www.wearesosure.com', 'wearesosure.com', 'sosure.net');
+
+                //loop over all the hosts
+                foreach ($hosts as $host) {
+                    // check if url contains correct host
+                    if (mb_strpos($inithost, $host) !== false) {
+                        $match = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$match) {
+                throw new NotFoundHttpException();
+            }
+
+            if (null !== $rakutenURL) {
+                return new RedirectResponse($rakutenURL);
+            }
+
+            return $this->redirectToRoute('homepage');
+        } catch (NotFoundHttpException $e) {
+            return $this->redirectToRoute('homepage');
+        }
     }
 
     /**

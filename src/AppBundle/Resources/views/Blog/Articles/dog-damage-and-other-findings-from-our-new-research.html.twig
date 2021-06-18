@@ -1,0 +1,216 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Mobile Phone Insurance Research | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="From damage caused by dogs to the most likely age, location and phone model for claiming, we reveal our new mobile phone insurance research."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Mobile Phone Insurance Research | SO-SURE' %}
+{% set og_description = "From damage caused by dogs to the most likely age, location and phone model for claiming, we reveal our new mobile phone insurance research." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research.jpg' %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
+    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">Dog Damage and Other Findings From Our New Research</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">Dog Damage and Other Findings From Our New Research</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">SO-SURE</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>June 2, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure' } %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research.jpg"
+                                     alt="Dog"
+                                     class="img-fluid lozad mb-5">
+                                <p>Here at SO-SURE, we get our fair share of mobile insurance claims, so we decided to dig into some of our recent data to pick out trends about what causes mobile phone loss and damage, which phones suffer the most, and who is most likely to lose or damage their phone. It’s fair to say that our research turned out some interesting results…</p>
+                                <p>The first thing we did was to analyse some of the most commonly occurring terms in our mobile phone claims. We found that a third of all our claims mentioned dropping phones, while 21% of them included phones falling. There were, however, some more unusual claims, with 2% of our claimants blaming their dogs for damaging their phones.</p>
+                                <p>This got us thinking – how many phones do man’s best friends damage every year? To work that out, we found the average <a href="https://www.globenewswire.com/news-release/2019/09/09/1912898/0/en/United-Kingdom-Mobile-Phone-Insurance-Market-Report-2019-24-of-Mobile-Phone-Owners-are-Covered-by-Mobile-Phone-Insurance.html" target="_blank" rel="noopener noreferrer">number of claims per year in the UK</a> and multiplied that by our percentages. This showed us that 34,221 phones are broken by our canine pals every year. With the average claim cost sitting at £234.62, this means our pooches are causing over £8million of damage to our devices every year!</p>
+                                <p>Exercising was a major cause of loss and damage too, with running and cycling leading to £11million and £8million of claims respectively. Some of these claims came from the users themselves running or biking, while others were caused by the actions of other runners or cyclists. Driving and getting the bus led to a whopping £24million and £14million of claims, with many phones being dropped or falling out of pockets when people were getting out of cars or on or off the bus. We even calculated that there are around £1.6million of claims per year because of phones being damaged while their owners were climbing. The following table illustrates this breakdown:</p>
+                                <table class="table mt-3 mb-5">
+                                  <thead>
+                                      <tr>
+                                          <th>Claims</th>
+                                          <th>Percentage</th>
+                                          <th>Overall UK Claims</th>
+                                          <th>Cost</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr>
+                                          <td>Dropping</td>
+                                          <td>33.5%</td>
+                                          <td>602,281</td>
+                                          <td>£141,307,255</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Falling</td>
+                                        <td>20.9%</td>
+                                        <td>376,426</td>
+                                        <td>£88,317,034</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Shopping</td>
+                                        <td>6.1%</td>
+                                        <td>109,506</td>
+                                        <td>25,692,228</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Driving</td>
+                                        <td>5.7%</td>
+                                        <td>102,662</td>
+                                        <td>£24,086,464</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Bus</td>
+                                        <td>3.4%</td>
+                                        <td>61,597</td>
+                                        <td>£14,451,878</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Running</td>
+                                        <td>2.7%</td>
+                                        <td>47,909</td>
+                                        <td>£11,240,350</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Cycling</td>
+                                        <td>2.3%</td>
+                                        <td>41,065</td>
+                                        <td>£9,634,586</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Dog</td>
+                                        <td>1.9%</td>
+                                        <td>34,221</td>
+                                        <td>£8,028,821</td>
+                                      </tr>
+                                      <tr>
+                                        <td>Climbing</td>
+                                        <td>0.4%</td>
+                                        <td>6,844</td>
+                                        <td>£1,605,764</td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <p>All of our claims are broken down by type, with accidental damage constituting 83% of claims, followed by 1 in 10 which are down to accidental loss. Breakdown and theft both represented 3% of the claims.</p>
+                                  <p>We also looked into the split of mobile phone brands across our claims, and Apple came out on top with 58%, while Samsung and Huawei represented 30% and 6% of claims respectively. The iPhone X is the most claimed for device in the UK.</p>
+                                  <p>We compared these stats with data about <a href="https://www.statista.com/statistics/387227/market-share-of-smartphone-manufacturers-in-the-uk/" target="_blank" rel="noopener noreferrer">the UK’s phone split</a>, which showed that iPhone users are the clumsiest, with their 58% of claims dwarfing their 43% share of the UK smartphone market. On the other hand, Nokia and Samsung users were considerably less likely to claim. They each represent 3% of the country’s mobile phone market, but less than 1% each of our claims. Whether that’s down to the phones themselves (the Nokia 3310 had a formidable reputation for resilience, after all!) or the users, we’ll leave it to you to decide.</p>
+                                  <p>We also investigated the location data of our claims to find the UK’s clumsiest cities, based on their likelihood of making a phone insurance claim. To do this, we compared claim numbers with the populations of cities up and down the country. It turns out phone users in Truro, Norwich and Gloucester were most likely to claim, with the top ten cities for claims per person as follows:</p>
+                                  <ol>
+                                    <li>Truro</li>
+                                    <li>Norwich</li>
+                                    <li>Gloucester</li>
+                                    <li>Chester</li>
+                                    <li>Preston</li>
+                                    <li>Salisbury</li>
+                                    <li>Bath</li>
+                                    <li>Belfast</li>
+                                    <li>Chelmsford</li>
+                                    <li>Southampton</li>
+                                  </ol>
+                                  <p>On the flipside, those in London, Edinburgh and Plymouth were far more careful and less likely to claim.</p>
+                                  <p>We also broke down the data by age group, with customers in their 20s damaging or losing their phones the most and 29-year-olds representing the highest number of claims for a single age. The wider age bracket of 25 to 34-year-olds represents 46% of claims, followed by 18 to 24-year-olds, who make up 24%. Over-55s are the least likely to claim, representing just 4% of all claims made.</p>
+                                  <p>This also allowed us to put together a profile for the most at-risk mobile phone user in the UK, which would be a 29-year-old from Truro with an iPhone X who drives, enjoys shopping and running, and owns a dog. If that’s you, we’d most definitely recommend getting in touch and making sure your device is fully insured!</p>
+                                  <h2>Bizarre Phone Claims</h2>
+                                  <p>As you can imagine, our Customer Support Team have heard all sorts of reasons for phone breakages over the years. From the extreme to the mundane, they’ve heard it all.</p>
+                                  <p>So, when looking at our own claims data and some of the claims we’ve heard through the grapevine, we thought it would be fun to visualise and share them with you. With the help of some of our favourite childhood toys, here are some of the funniest, most shocking and most extreme phone insurance claims our team have heard...</p>
+                                  <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research-1.jpg" alt="Barbie Vibrating Phone" class="img-fluid lozad mb-2">
+                                  <p>A lady claimed the vibration function on her phone had stopped working, after she had been using it for self-pleasure</p>
+                                  <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research-2.jpg" alt="Furbie Eat Phone" class="img-fluid lozad mb-2">
+                                  <p>A young gentleman claimed to have had his phone eaten and damaged by his dog.</p>
+                                  <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research-3.jpg" alt="Drunk Barbie Phone" class="img-fluid lozad mb-2">
+                                  <p>A young lady claimed that she was so sick after a night-out that her phone had suffered water damage.</p>
+                                  <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research-4.jpg" alt="Toilet Phone" class="img-fluid lozad mb-2">
+                                  <p>Some poor soul accidentally dropped their phone in a public toilet, which happened to be full of someone else's waste.</p>
+                                  <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research-5.jpg" alt="Lego Shark Phone" class="img-fluid lozad mb-2">
+                                  <p>A couple were re-enacting the famous “I'm the king of the world” scene from ‘Titanic’ whilst on a riverboat cruise, but accidentally dropped and lost their phone in the river whilst trying to get a selfie.</p>
+                                  <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research-6.jpg" alt="Potato Head Phone" class="img-fluid lozad mb-2">
+                                  <p>A lady claimed to have broken her phone in anger by throwing it at her husband, after she found out he had been unfaithful to her.</p>
+                                  <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research-7.jpg" alt="Buzz Lightyear phone" class="img-fluid lozad mb-2">
+                                  <p>One unlucky guy left his phone in the blast zone of a large local firework display, which led to the phone being rocketed high into the air and sustaining a considerable amount of damage.</p>
+                                  <p>So, there you have it – our research around the UK’s phone insurance claims, uncovering everything from the millions of pounds of canine damage sustained every year, to the city, age group and phones most responsible for claims. With the reasons for claims wide-ranging and all of us at risk of damaging our phones in one way or another, there’s never been a more important time to <a href="{{ path('phone_insurance') }}">insure your device</a>.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'phone', 'hashtags': 'wearesosure' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+{% endblock %}

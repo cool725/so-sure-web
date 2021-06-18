@@ -113,7 +113,8 @@ class PicsureController extends BaseController implements ContainerAwareInterfac
         $mailer = $this->get('app.mailer');
         $trustpilot = 'wearesosure.com+f9e2e9f7ce@invite.trustpilot.com';
         // Don't ask Gmail users for Truspilot review
-        $bcc = $this->isGmail($policy->getUser()->getEmail()) ? null : $trustpilot;
+        //$bcc = $this->isGmail($policy->getUser()->getEmail()) ? null : $trustpilot;
+        $bcc = $trustpilot;
         $mailer->sendTemplateToUser(
             'Phone validation successful ✅',
             $policy->getUser(),
