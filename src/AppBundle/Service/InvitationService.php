@@ -917,11 +917,10 @@ class InvitationService
             }
             $from = ['noreply@wearesosure.com' => $invitation->getInviter()->getName()];
             $to = $invitation->getEmail();
-            if ($referralFeature) {
-                $subject = 'Irresistible perks inside. Open with care';
-            } else {
-                $subject = sprintf('%s has invited you to so-sure', $invitation->getInviterName());
-            }
+            $subject = sprintf(
+                '%s invited you to check out Win-Win Mobile Phone Insurance!',
+                $invitation->getInviterName()
+            );
         } elseif ($type == self::TYPE_EMAIL_INVITE_USER) {
             // Only able to do for EmailInvitations
             if (!$invitation instanceof EmailInvitation) {
