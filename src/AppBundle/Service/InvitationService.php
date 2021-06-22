@@ -1398,6 +1398,6 @@ class InvitationService
         if ($diff->d > 6 || ($diff->m > 0 || $diff->y > 0)) {
             return false;
         }
-        return true;
+        return $scode->getReward()->canApply($policy);
     }
 }
