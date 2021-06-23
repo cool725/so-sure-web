@@ -47,6 +47,14 @@
       }
   }
 
+  &-image {
+    display: none;
+
+    @include media-breakpoint-up(md) {
+      display: block;
+    }
+  }
+
   // .badge {
   //     // font-size: 90%;
   //     padding: 0.6rem 1rem;
@@ -71,6 +79,10 @@
           transform: scaleX(-1);
       }
   }
+}
+
+.reviews {
+  text-align: center;
 }
 
 .hc-lead-form {
