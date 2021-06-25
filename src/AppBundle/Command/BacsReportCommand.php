@@ -56,7 +56,7 @@ class BacsReportCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'wait for a given number of seconds and do nothing else',
-                10
+                null
             );
     }
 
