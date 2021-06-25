@@ -4,13 +4,13 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Title - Blog | SO-SURE{% endblock %}
+{% block title %}Title  | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content=""/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Title - Blog | SO-SURE' %}
+{% set og_title = 'Title  | SO-SURE' %}
 {% set og_description = "" %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/' %}
 

@@ -395,6 +395,16 @@ class PhoneInsuranceController extends BaseController
             ]);
         }
 
+        if (preg_match("/^[A-Z]/", $make) || preg_match("/^[A-Z]/", $model)) {
+            return $this->redirectToRoute('phone_insurance_make_model', [
+                'make' => mb_strtolower($make),
+                'model' => mb_strtolower($model),
+            ], 301);
+        }
+
+        // Model caps redirect
+        // Model hyp caps redirect
+
         if (!$phone) {
             $this->get('logger')->info(sprintf(
                 'Failed to find phone for make/model page - make: %s model: %s',
