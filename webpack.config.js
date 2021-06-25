@@ -149,7 +149,9 @@ Encore
         })
     )
 
-    .addPlugin(new BundleAnalyzerPlugin())
+    .addPlugin(new BundleAnalyzerPlugin({
+        analyzerMode: 'disabled'
+    }))
 ;
 
 var config = Encore.getWebpackConfig();
