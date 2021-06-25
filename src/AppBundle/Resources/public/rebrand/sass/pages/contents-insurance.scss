@@ -162,8 +162,13 @@
   }
 }
 
-.home-contents {
+.home-contents-compare {
   background-color: $athens-gray;
+  text-align: center;
+}
+
+.home-contents {
+  background-color: $white;
 
   @include media-breakpoint-up(lg) {
     text-align: center;
