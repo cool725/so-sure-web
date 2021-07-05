@@ -14,6 +14,36 @@
 {% set og_title = 'Money Saving Tips  | SO-SURE' %}
 {% set og_description = "Everyone (well nearly everyone) is in the same financial boat. Working, getting paid, living it large and then waiting for pay day! In these summer months it is expensive, lots of drinks to buy in the sun, summer holidays on the beach. Anyway, as its summer, and we are not detoxing our bodies, we’re here to show you how to perform a financial detox on your wallet." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/money-saving-tips"
+  },
+  "headline": "Money Saving Tips - Blog | so-sure",
+  "description": "Everyone (well nearly everyone) is in the same financial boat. Working, getting paid, living it large and then waiting for pay day! In these summer months it is expensive, lots of drinks to buy in the sun, summer holidays on the beach. Anyway, as its summer, and we are not detoxing our bodies, we’re here to show you how to perform a financial detox on your wallet.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-06-29"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

@@ -14,6 +14,36 @@
 {% set og_title = '5 Great Gadgets from 2018 for the January Sales  | SO-SURE' %}
 {% set og_description = "2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/5-great-gadgets-from-2018-for-the-january-sales"
+  },
+  "headline": "5 Great Gadgets from 2018 for the January Sales - Blog | so-sure",
+  "description": "2018 has been a great year for electronics and there’s no better time get your hands on the best gadgets from the last year than in the upcoming January sales.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2019-01-07"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

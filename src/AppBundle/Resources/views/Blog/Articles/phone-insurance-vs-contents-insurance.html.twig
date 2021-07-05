@@ -14,6 +14,36 @@
 {% set og_description = "Your home contents insurance might well cover your phone. But there are lots of caveats that can mean making a claim is not as quick or easy as you expect." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/phone-insurance-vs-contents-insurance-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/phone-insurance-vs-contents-insurance"
+  },
+  "headline": "Phone Insurance vs Contents Insurance - Pros & Cons | so-sure",
+  "description": "Your home contents insurance might well cover your phone. But there are lots of caveats that can mean making a claim is not as quick or easy as you expect.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/phone-insurance-vs-contents-insurance-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-03-31"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

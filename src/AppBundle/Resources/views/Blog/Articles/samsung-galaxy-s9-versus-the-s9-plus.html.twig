@@ -14,6 +14,36 @@
 {% set og_title = 'Samsung Galaxy S9 versus the S9+  | SO-SURE' %}
 {% set og_description = "Firstly they are even more brilliant than the previous Galaxy phones. Both have great battery life, storage capabilities (so much more storage for all your cool photos and videos) ..festivals here we come! Oh yeah and did Samsung mention their amazing new camera lens that takes crystal clear photos anywhere in any light (we’re sure you have see the huge billboards all over the place)." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/samsung-galaxy-s9-versus-the-s9-plus"
+  },
+  "headline": "Samsung Galaxy S9 versus the S9+ - Blog | so-sure",
+  "description": "Firstly they are even more brilliant than the previous Galaxy phones. Both have great battery life, storage capabilities (so much more storage for all your cool photos and videos) ..festivals here we come! Oh yeah and did Samsung mention their amazing new camera lens that takes crystal clear photos anywhere in any light (we’re sure you have see the huge billboards all over the place).",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-07-24"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

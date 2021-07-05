@@ -14,6 +14,36 @@
 {% set og_title = 'What to do if you break your phone screen  | SO-SURE' %}
 {% set og_description = "Nearly all breakages occur due to accidental damage, which means you’ll only be covered for repair or replacement if you have phone insurance. So, it’s worth digging into that pesky small print to check where you stand with regards to accidental damage." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/what-to-do-if-you-break-your-phone-screen"
+  },
+  "headline": "What to do if you break your phone screen - Blog | so-sure",
+  "description": "Nearly all breakages occur due to accidental damage, which means you’ll only be covered for repair or replacement if you have phone insurance. So, it’s worth digging into that pesky small print to check where you stand with regards to accidental damage.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2019-01-16"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

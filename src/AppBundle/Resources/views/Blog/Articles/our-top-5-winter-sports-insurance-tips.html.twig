@@ -14,6 +14,36 @@
 {% set og_title = 'Our Top 5 Winter Sports Insurance Tips  | SO-SURE' %}
 {% set og_description = " trip to the slopes with family and friends is one of the best holidays of the year but, let’s face it, skiing isn’t the safest, so it’s vitally important that you travel and ski with the correct insurance." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/our-top-5-winter-sports-insurance-tips"
+  },
+  "headline": "Our Top 5 Winter Sports Insurance Tips - Blog | so-sure",
+  "description": " trip to the slopes with family and friends is one of the best holidays of the year but, let’s face it, skiing isn’t the safest, so it’s vitally important that you travel and ski with the correct insurance.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-11-29"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

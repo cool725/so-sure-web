@@ -14,6 +14,36 @@
 {% set og_description = "Due to launch February 11th, learn everything you need to know about the Galaxy S11/Galaxy S20 in our rumour hub!" %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-samsung.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/samsung-galaxy-rumours"
+  },
+  "headline": "Samsung Galaxy S11/Galaxy S20 Rumours, News & Leaks | so-sure",
+  "description": "Due to launch February 11th, learn everything you need to know about the Galaxy S11/Galaxy S20 in our rumour hub!",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-samsung.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-01-24"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

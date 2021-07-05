@@ -14,6 +14,37 @@
 {% set og_description = "Why is your phone so hot? In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/why-is-my-phone-so-hot-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/why-is-my-phone-so-hot"
+  },
+  "headline": "Why Is My Phone So Hot? | so-sure",
+  "description": "Why is your phone so hot? In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/why-is-my-phone-so-hot-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-03-10"
+}
+</script>
+
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

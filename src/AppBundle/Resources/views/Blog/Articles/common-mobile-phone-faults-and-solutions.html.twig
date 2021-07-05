@@ -14,6 +14,36 @@
 {% set og_description = "Did you know that lots of smartphone issues can be resolved quickly and easily at home? Read on to learn common solutions to smartphone problems." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/common-mobile-phone-faults-and-solutions-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/common-mobile-phone-faults-and-solutions"
+  },
+  "headline": " Common Mobile Phone Faults And Solutions | so-sure",
+  "description": "Did you know that lots of smartphone issues can be resolved quickly and easily at home? Read on to learn common solutions to smartphone problems.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/common-mobile-phone-faults-and-solutions-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-03-12"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

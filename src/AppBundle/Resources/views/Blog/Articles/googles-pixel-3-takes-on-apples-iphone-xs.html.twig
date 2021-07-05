@@ -14,6 +14,36 @@
 {% set og_title = 'Google’s Pixel 3 takes on Apple’s iPhone XS  | SO-SURE' %}
 {% set og_description = "In the latest instalment of the fight for smartphone supremacy, we’re welcoming Apple again into the ring with its latest release, the iPhone XS. Its challenger this month is the mighty Google and their Pixel 3, which is yet to be released but one of the worst kept secrets in phone history thanks to its alleged availability on the Russian black market." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/googles-pixel-3-takes-on-apples-iphone-xs"
+  },
+  "headline": "Google’s Pixel 3 takes on Apple’s iPhone XS - Blog | so-sure",
+  "description": "In the latest instalment of the fight for smartphone supremacy, we’re welcoming Apple again into the ring with its latest release, the iPhone XS. Its challenger this month is the mighty Google and their Pixel 3, which is yet to be released but one of the worst kept secrets in phone history thanks to its alleged availability on the Russian black market.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-09-24"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

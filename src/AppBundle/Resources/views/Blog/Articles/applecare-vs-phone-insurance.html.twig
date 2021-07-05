@@ -14,6 +14,36 @@
 {% set og_description = "Do you really need AppleCare or AppleCare+ to cover your iPhone? Check out our guide comparing Apple’s service versus phone insurance." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/applecare-vs-phone-insurance-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/applecare-vs-phone-insurance"
+  },
+  "headline": "AppleCare+ vs iPhone Insurance | so-sure",
+  "description": "Do you really need AppleCare or AppleCare+ to cover your iPhone? Check out our guide comparing Apple’s service versus phone insurance.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/applecare-vs-phone-insurance-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-02-27"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

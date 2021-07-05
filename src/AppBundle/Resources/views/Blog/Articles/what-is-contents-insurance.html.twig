@@ -14,6 +14,36 @@
 {% set og_description = "Home contents insurance covers the cost of replacing your belongings if they're damaged, destroyed, or stolen. Learn more about contents insurance here." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/what-is-contents-insurance.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/what-is-contents-insurance"
+  },
+  "headline": "What is Contents Insurance? | SO-SURE",
+  "description": "Home contents insurance covers the cost of replacing your belongings if they're damaged, destroyed, or stolen. Learn more about contents insurance here.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/what-is-contents-insurance.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-02-11"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

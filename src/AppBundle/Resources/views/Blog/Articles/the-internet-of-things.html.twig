@@ -14,6 +14,36 @@
 {% set og_title = 'The Internet Of Things  | SO-SURE' %}
 {% set og_description = "You’ve probably heard of the Internet of Things (IoT) even if you only have a passing interest in new technology. However, for those that haven’t, it’s essentially a system of interconnected ‘things’ or devices, which are able to send each other information without human instruction. ‘Things’ is quite a loose term and can mean anything from household appliances, such as dishwashers to more advanced things such as cars and vehicles." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/the-internet-of-things"
+  },
+  "headline": "The Internet Of Things - Blog | so-sure",
+  "description": "You’ve probably heard of the Internet of Things (IoT) even if you only have a passing interest in new technology. However, for those that haven’t, it’s essentially a system of interconnected ‘things’ or devices, which are able to send each other information without human instruction. ‘Things’ is quite a loose term and can mean anything from household appliances, such as dishwashers to more advanced things such as cars and vehicles.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-06-29"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

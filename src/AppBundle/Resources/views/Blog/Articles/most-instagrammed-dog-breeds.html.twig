@@ -14,6 +14,36 @@
 {% set og_description = "Find your new favourite Instagram account with our list of the most famous Instagram dogs and what makes them so special. Your feed's about to improve." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/most-instagrammed-dog-breeds.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/most-instagrammed-dog-breeds"
+  },
+  "headline": "The Most Famous Instagram Dogs | so-sure",
+  "description": "Find your new favourite Instagram account with our list of the most famous Instagram dogs and what makes them so special. Your feed's about to improve.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/most-instagrammed-dog-breeds.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-02-21"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

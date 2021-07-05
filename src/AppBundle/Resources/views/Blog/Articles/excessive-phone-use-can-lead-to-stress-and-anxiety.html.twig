@@ -14,6 +14,36 @@
 {% set og_description = "Did you know that, on average, most people use their phone for 2 hours and 51 minutes per day? That’s quite excessive! Between looking at meme’s on the internet, constantly checking social media or shopping straight from our smartphones..." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/excessive-phone-use-can-lead-to-stress-and-anxiety-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/excessive-phone-use-can-lead-to-stress-and-anxiety"
+  },
+  "headline": "Excessive Phone Use Can Lead To Stress And Anxiety. - Blog | so-sure",
+  "description": "Did you know that, on average, most people use their phone for 2 hours and 51 minutes per day? That’s quite excessive! Between looking at meme’s on the internet, constantly checking social media or shopping straight from our smartphones...",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/excessive-phone-use-can-lead-to-stress-and-anxiety-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-11-04"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

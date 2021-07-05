@@ -14,6 +14,36 @@
 {% set og_title = 'All I want for Christmas is a new phone  | SO-SURE' %}
 {% set og_description = "Time to cram a tree into the back of your car and hope it isn’t too dishevelled by the time you get it home. Time to run around the shops like a headless turkey as you scramble to buy presents for your family without bankrupting yourself. And maybe, just maybe, it’s time to treat yourself to a shiny new phone." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/all-i-want-for-christmas-is-a-new-phone"
+  },
+  "headline": "All I want for Christmas is a new phone - Blog | so-sure",
+  "description": "Time to cram a tree into the back of your car and hope it isn’t too dishevelled by the time you get it home. Time to run around the shops like a headless turkey as you scramble to buy presents for your family without bankrupting yourself. And maybe, just maybe, it’s time to treat yourself to a shiny new phone.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-12-17"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

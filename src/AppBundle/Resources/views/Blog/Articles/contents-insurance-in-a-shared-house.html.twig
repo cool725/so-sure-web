@@ -14,6 +14,36 @@
 {% set og_description = "Contents insurance can provide cover for an individual’s possessions in a shared house – but there are some things to consider when seeking cover." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/contents-insurance-in-a-shared-house.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/contents-insurance-in-a-shared-house"
+  },
+  "headline": "Contents Insurance In A Shared House | SO-SURE",
+  "description": "Contents insurance can provide cover for an individual’s possessions in a shared house – but there are some things to consider when seeking cover.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/contents-insurance-in-a-shared-house.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-03-12"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

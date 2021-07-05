@@ -14,6 +14,36 @@
 {% set og_description = "From damage caused by dogs to the most likely age, location and phone model for claiming, we reveal our new mobile phone insurance research." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/dog-damage-and-other-findings-from-our-new-research"
+  },
+  "headline": "Mobile Phone Insurance Research | SO-SURE",
+  "description": "From damage caused by dogs to the most likely age, location and phone model for claiming, we reveal our new mobile phone insurance research.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/dog-damage-and-other-findings-from-our-new-research.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-06-02"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

@@ -14,6 +14,36 @@
 {% set og_title = 'The Development of Insurance as we know it  | SO-SURE' %}
 {% set og_description = "By the 1700s, sections of society, such as business communities and lives, could now be insured. Insurance no longer meant just single item insurance, like one journey, one cargo or one house. It included national insurance, medical insurance and pensions, too." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/the-development-of-insurance-as-we-know-it"
+  },
+  "headline": "The Development of Insurance as we know it - Blog | so-sure",
+  "description": "By the 1700s, sections of society, such as business communities and lives, could now be insured. Insurance no longer meant just single item insurance, like one journey, one cargo or one house. It included national insurance, medical insurance and pensions, too.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-09-13"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
 {% endblock %}

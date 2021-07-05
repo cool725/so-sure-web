@@ -14,6 +14,36 @@
 {% set og_description = "The iPhone SE2 is being touted as Apple's first release of the decade, and their maiden venture into the mid-priced smartphone market. Find out more here." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/new-iphone-se2-rumour-hub-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/new-iphone-se2-rumour-hub"
+  },
+  "headline": "iPhone SE2 Rumour Hub | Release Date, Price, Design | so-sure",
+  "description": "The iPhone SE2 is being touted as Apple's first release of the decade, and their maiden venture into the mid-priced smartphone market. Find out more here.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/new-iphone-se2-rumour-hub-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-03-04"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

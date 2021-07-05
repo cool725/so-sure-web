@@ -14,6 +14,36 @@
 {% set og_title = 'The Insurtech Revolution  | SO-SURE' %}
 {% set og_description = "Insurtech is everywhere. And it’s only getting bigger. At so-sure we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/the-insurtech-revolution"
+  },
+  "headline": "The Insurtech Revolution - Blog | so-sure",
+  "description": "Insurtech is everywhere. And it’s only getting bigger. At so-sure we’re proud to be a part of the sector and delighted to say that London, our home, is at the forefront of the movement that’s shaking up the insurance market.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-08-01"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

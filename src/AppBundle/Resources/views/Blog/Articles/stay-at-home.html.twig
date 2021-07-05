@@ -14,6 +14,36 @@
 {% set og_description = "So, we’re announcing our ‘Stay at Home Insurance’, which is just a nifty way of saying we’re launching a competition for you lovely lot. Share a photo yourself staying safely in the UK or at home for a chance to win a £250 Amazon voucher. Want in on the action? Here’s how to enter" %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/stay-at-home-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/stay-at-home"
+  },
+  "headline": "It Pays To ‘Stay At Home’ - Blog | so-sure",
+  "description": "So, we’re announcing our ‘Stay at Home Insurance’, which is just a nifty way of saying we’re launching a competition for you lovely lot. Share a photo yourself staying safely in the UK or at home for a chance to win a £250 Amazon voucher. Want in on the action? Here’s how to enter",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/stay-at-home-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-02-15"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

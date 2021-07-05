@@ -14,6 +14,36 @@
 {% set og_title = 'Starling Bank and SO-SURE up to offer mobile phone insurance | SO-SURE' %}
 {% set og_description = "Starling Bank today welcomes so-sure, the pioneering start-up mobile insurance company, to its in-app Marketplace. The partnership will mean that Starling customers will now be able apply for mobile phone insurance within minutes, directly from their Starling app." %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/starling-bank-and-so-sure-team-up-to-offer-mobile-phone-insurance-through-the-starling-marketplace"
+  },
+  "headline": "Starling Bank and so-sure team up to offer mobile phone insurance - Blog | so-sure",
+  "description": "Starling Bank today welcomes so-sure, the pioneering start-up mobile insurance company, to its in-app Marketplace. The partnership will mean that Starling customers will now be able apply for mobile phone insurance within minutes, directly from their Starling app.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-10-09"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

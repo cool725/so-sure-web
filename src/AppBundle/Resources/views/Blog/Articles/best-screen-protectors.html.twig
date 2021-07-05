@@ -14,6 +14,36 @@
 {% set og_description = "While smartphone screens are becoming more robust, even the strongest glass is susceptible to shattering when dropped. Check out our screen protector top picks to keep your phone screen – and bank balance – firmly intact." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/best-screen-protectors-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/best-screen-protectors"
+  },
+  "headline": "Best Screen Protectors | so-sure",
+  "description": "While smartphone screens are becoming more robust, even the strongest glass is susceptible to shattering when dropped. Check out our screen protector top picks to keep your phone screen – and bank balance – firmly intact.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/best-screen-protectors-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-02-24"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

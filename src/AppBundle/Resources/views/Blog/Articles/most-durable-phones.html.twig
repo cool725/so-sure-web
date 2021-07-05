@@ -14,6 +14,36 @@
 {% set og_description = "With the rugged smartphone market in full swing, we share our top seven durable handset recommendations that’ll keep you connected, whatever the weather." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/most-durable-phones-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/most-durable-phones"
+  },
+  "headline": "The Most Durable Rugged Smartphones | so-sure",
+  "description": "With the rugged smartphone market in full swing, we share our top seven durable handset recommendations that’ll keep you connected, whatever the weather.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/most-durable-phones-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-01-17"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

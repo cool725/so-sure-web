@@ -14,6 +14,9 @@
 {% set og_description = "" %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/' %}
 
+{% block schema %}
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">

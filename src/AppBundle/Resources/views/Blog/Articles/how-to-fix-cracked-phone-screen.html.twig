@@ -14,6 +14,36 @@
 {% set og_description = "Smartphones are invaluable, and we use them all the time, so it&rsquo;s no wonder we might end up with a smashed screen. Find out what to do with a smashed phone screen in our blog." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/how-to-fix-cracked-phone-screen-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/how-to-fix-cracked-phone-screen"
+  },
+  "headline": "How to Fix Cracked Phone Screen | Smashed Screen | so-sure",
+  "description": "Smartphones are invaluable, and we use them all the time, so it’s no wonder we might end up with a smashed screen. Find out what to do with a smashed phone screen in our blog.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/how-to-fix-cracked-phone-screen-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-03-23"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
     <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
