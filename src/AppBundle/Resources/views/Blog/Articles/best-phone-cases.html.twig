@@ -4,15 +4,45 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Best Phone Cases For Protection | so-sure{% endblock %}
+{% block title %}Best Phone Cases For Protection | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Keep your handset safe with our picks of the best phone cases, whether you're looking for pure protection or good looks too."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Best Phone Cases For Protection | so-sure' %}
+{% set og_title = 'Best Phone Cases For Protection | SO-SURE' %}
 {% set og_description = "Keep your handset safe with our picks of the best phone cases, whether you’re looking for pure protection or good looks too." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/best-phone-cases-1.jpg' %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/best-phone-cases"
+  },
+  "headline": "Best Phone Cases For Protection | so-sure",
+  "description": "Keep your handset safe with our picks of the best phone cases, whether you’re looking for pure protection or good looks too.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/best-phone-cases-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-02-05"
+}
+</script>
+{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('blog') }}

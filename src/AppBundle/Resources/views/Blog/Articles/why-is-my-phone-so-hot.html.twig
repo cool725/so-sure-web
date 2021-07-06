@@ -4,15 +4,46 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Why Is My Phone So Hot? | so-sure{% endblock %}
+{% block title %}Why Is My Phone So Hot? | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Why is your phone so hot? In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Why Is My Phone So Hot? | so-sure' %}
+{% set og_title = 'Why Is My Phone So Hot? | SO-SURE' %}
 {% set og_description = "Why is your phone so hot? In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/why-is-my-phone-so-hot-1.jpg' %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/why-is-my-phone-so-hot"
+  },
+  "headline": "Why Is My Phone So Hot? | so-sure",
+  "description": "Why is your phone so hot? In this blog, we'll cover both iPhones and Android devices; helping you find the cause, fix it, and prevent it from happening again.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/why-is-my-phone-so-hot-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-03-10"
+}
+</script>
+
+{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('blog') }}

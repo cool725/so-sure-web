@@ -14,6 +14,36 @@
 {% set og_description = "Home contents insurance covers the cost of replacing your belongings in your home if they are damaged, destroyed, or stolen. But is it mandatory? Find out here." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/is-contents-insurance-mandatory.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/is-contents-insurance-mandatory"
+  },
+  "headline": "Is Contents Insurance Mandatory? | SO-SURE",
+  "description": "Home contents insurance covers the cost of replacing your belongings in your home if they are damaged, destroyed, or stolen. But is it mandatory? Find out here.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/is-contents-insurance-mandatory.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-04-01"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
     {{ encore_entry_link_tags('blog') }}
     {{ encore_entry_link_tags('content-pages') }}

@@ -119,9 +119,6 @@ $(function() {
             });
         }
 
-        // On load
-        updateModels();
-
         // Change text for now
         // TODO If wins change FormType
         firstOp.text('Select Make');
@@ -138,6 +135,14 @@ $(function() {
             make.val(makeIs);
             updateModels();
             model.prop('disabled', '');
+            model.trigger('focus');
+        } else {
+            updateModels();
+            // Enable/disable model
+            if (make.val()) {
+                model.prop('disabled', '');
+                model.trigger('focus');
+            }
         }
 
         // On Make change
@@ -148,7 +153,7 @@ $(function() {
             // Enable/disable model
             if ($(this).val()) {
                 model.prop('disabled', '');
-                model.focus();
+                model.trigger('focus');
             } else {
                 model.prop('disabled', 'disabled').val('');
             }
@@ -163,7 +168,7 @@ $(function() {
             // Enable/disable model
             if ($(this).val()) {
                 memory.prop('disabled', '');
-                memory.focus();
+                memory.trigger('focus');
             } else {
                 memory.prop('disabled', 'disabled').val('');
             }

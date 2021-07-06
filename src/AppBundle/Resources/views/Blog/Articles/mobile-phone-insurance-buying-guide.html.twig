@@ -4,15 +4,45 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Mobile Phone Insurance Buying Guide - Blog | so-sure{% endblock %}
+{% block title %}Mobile Phone Insurance Buying Guide  | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Insurance is dull and boring. We know. For exactly that reason, we’ve put together some handy info to help guide you through the mind numbingly dull world of insurance for your phone."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
 
-{% set og_title = 'Mobile Phone Insurance Buying Guide - Blog | so-sure' %}
+{% set og_title = 'Mobile Phone Insurance Buying Guide  | SO-SURE' %}
 {% set og_description = "Insurance is dull and boring. We know. For exactly that reason, we’ve put together some handy info to help guide you through the mind numbingly dull world of insurance for your phone." %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com//blog/mobile-phone-insurance-buying-guide"
+  },
+  "headline": "Mobile Phone Insurance Buying Guide - Blog | so-sure",
+  "description": "Insurance is dull and boring. We know. For exactly that reason, we’ve put together some handy info to help guide you through the mind numbingly dull world of insurance for your phone.",
+  "image": "https://cdn.so-sure.com/images/rebrand/og/so-sure_og-image-2.png",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2018-06-29"
+}
+</script>
+{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('blog') }}
