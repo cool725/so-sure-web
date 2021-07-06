@@ -8,7 +8,7 @@
 {% block title %}SO-SURE | Insurance That’s a Win-Win!{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/promo.css') }}">
+    {{ encore_entry_link_tags('promo') }}
 {% endblock %}
 
 {% block body %}
@@ -120,5 +120,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/promo.js') }}"></script>
+    {{ encore_entry_script_tags('promo') }}
 {% endblock %}

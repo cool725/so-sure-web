@@ -17,7 +17,7 @@
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-referral.jpg' %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/refer.css') }}">
+    {{ encore_entry_link_tags('refer') }}
 {% endblock %}
 
 {% block body %}
@@ -183,5 +183,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/refer.js') }}"></script>
+    {{ encore_entry_script_tags('refer') }}
 {% endblock %}

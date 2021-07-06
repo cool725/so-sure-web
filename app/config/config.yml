@@ -2,6 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
+    - { resource: packages/ }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -58,8 +59,13 @@ framework:
     fragments:       ~
     http_method_override: true
     validation: { enabled: true, enable_annotations: true }
+    # assets:
+    #     json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
+    # New path for assets
     assets:
-        json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
+        packages:
+            webpack_encore:
+                json_manifest_path: '%kernel.root_dir%/../web/css-js/manifest.json'
 
 # Twig Configuration
 twig:

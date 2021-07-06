@@ -443,6 +443,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
-    <script src="{{ asset('css-js/bacs.js') }}"></script>
+    {{ encore_entry_script_tags('datepicker-month') }}
+    {{ encore_entry_script_tags('bacs') }}
 {% endblock %}

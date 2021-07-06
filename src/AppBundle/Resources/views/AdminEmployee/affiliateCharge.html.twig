@@ -417,6 +417,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
-    <script src="{{ asset('css-js/confirm-modal.js') }}"></script>
+    {{ encore_entry_script_tags('datepicker-month') }}
+    {{ encore_entry_script_tags('confirm-modal') }}
 {% endblock %}

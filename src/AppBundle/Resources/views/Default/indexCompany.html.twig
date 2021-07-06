@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/company-phones.css') }}">
+    {{ encore_entry_link_tags('company-phones') }}
 {% endblock %}
 
 {% block body %}
@@ -251,5 +251,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/company-phones.js') }}"></script>
+    {{ encore_entry_script_tags('company-phones') }}
 {% endblock %}

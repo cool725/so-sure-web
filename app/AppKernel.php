@@ -45,6 +45,7 @@ class AppKernel extends Kernel
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
             new EWZ\Bundle\RecaptchaBundle\EWZRecaptchaBundle(),
             new Rollbar\Symfony\RollbarBundle\RollbarBundle(),
+            new Symfony\WebpackEncoreBundle\WebpackEncoreBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

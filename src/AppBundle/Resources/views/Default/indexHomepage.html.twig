@@ -50,7 +50,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/homepage.css') }}">
+    {{ encore_entry_link_tags('homepage') }}
 {% endblock %}
 
 {% block body %}
@@ -198,5 +198,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/homepage.js') }}"></script>
+    {{ encore_entry_script_tags('homepage') }}
 {% endblock %}

@@ -7,7 +7,7 @@
 {% block title %}Complete | so-sure{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/pos.css') }}">
+    {{ encore_entry_link_tags('pos') }}
 {% endblock %}
 
 {% block gtm_data %}
@@ -65,5 +65,5 @@
 {% block footer %}{% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/pos.js') }}"></script>
+    {{ encore_entry_script_tags('pos') }}
 {% endblock %}

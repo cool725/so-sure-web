@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -61,10 +61,9 @@
             </div>
         </div>
     </section>
+
     {# Page Modals #}
 
 {% endblock %}
 
-{% block javascriptsPage %}
-
-{% endblock %}
+{% block javascriptsPage %}{% endblock %}

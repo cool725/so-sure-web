@@ -7,7 +7,7 @@
 {% block title %}so-sure - Server Error{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/error.css') }}">
+    {{ encore_entry_link_tags('error') }}
 {% endblock %}
 
 {% block body %}
@@ -29,5 +29,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/error.js') }}"></script>
+    {{ encore_entry_script_tags('error') }}
 {% endblock %}

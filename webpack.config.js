@@ -1,5 +1,6 @@
-var Encore = require('@symfony/webpack-encore');
-var webpack = require('webpack');
+const Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 Encore
     // Using runtime in it's own js
@@ -10,9 +11,6 @@ Encore
 
     // the public path used by the web server to access the previous directory
     .setPublicPath('/css-js')
-
-    // this creates a 'vendor.js' file with jquery and the bootstrap JS module plus popper
-    .createSharedEntry('vendor', './web/components/vendor.js')
 
     // List all files here
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
@@ -131,6 +129,12 @@ Encore
     // allow sass/scss files to be processed
     .enableSassLoader()
 
+    .splitEntryChunks()
+    // .configureSplitChunks(function(splitChunks) {
+    //     // change the configuration
+    //     splitChunks.minSize = 100;
+    // })
+
     .addPlugin(
         new webpack.ProvidePlugin({
             $: "jquery",
@@ -139,9 +143,12 @@ Encore
             doT: "dot/doT.js",
             moment: "moment",
             fitText: "fitText",
-
         })
     )
+
+    .addPlugin(new BundleAnalyzerPlugin({
+        analyzerMode: 'disabled'
+    }))
 ;
 
 var config = Encore.getWebpackConfig();

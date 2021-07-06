@@ -15,9 +15,10 @@
             <script src="https://twemoji.maxcdn.com/2/twemoji.min.js?2.2.3"></script>
         {% endif %}
 
-        <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
-        <link rel="stylesheet" href="{{ asset('css-js/admin.css') }}">
-
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('global') }}
+            {{ encore_entry_link_tags('admin') }}
+        {% endblock %}
         {% block cssPage %}{% endblock %}
 
         {% include '::meta_rebrand.html.twig' %}
@@ -47,10 +48,10 @@
 
         {% include '::footer_data.html.twig' %}
 
-        <script src="{{ asset('css-js/runtime.js') }}"></script>
-        <script src="{{ asset('css-js/vendor.js') }}"></script>
-        <script src="{{ asset('css-js/global.js') }}"></script>
-        <script src="{{ asset('css-js/admin.js') }}"></script>
+        {% block javascripts %}
+            {{ encore_entry_script_tags('global') }}
+            {{ encore_entry_script_tags('admin') }}
+        {% endblock %}
 
         {% block javascriptsPage %}{% endblock %}
     </body>
