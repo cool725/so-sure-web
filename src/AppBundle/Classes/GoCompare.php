@@ -135,6 +135,7 @@ class GoCompare
         2074 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 128],
         2075 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 256],
         2076 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 512],
+        2356 => ['make' => 'Samsung', 'model' => 'Galaxy A72', 'memory' => 128],
 
         1412 => ['make' => 'Huawei', 'model' => 'P20', 'memory' => 128],
         1413 => ['make' => 'Huawei', 'model' => 'P20 Lite', 'memory' => 64],
@@ -171,6 +172,7 @@ class GoCompare
         1881 => ['make' => 'Motorola', 'model' => 'Moto G8 Power Lite', 'memory' => 64],
         1886 => ['make' => 'Motorola', 'model' => 'One Macro', 'memory' => 64],
         1895 => ['make' => 'Motorola', 'model' => 'Moto G8 Power', 'memory' => 64],
+        2381 => ['make' => 'Motorola', 'model' => 'Moto G9 Play', 'memory' => 64],
 
         1428 => ['make' => 'LG', 'model' => 'G7 ThinQ', 'memory' => 64],
 
@@ -235,10 +237,11 @@ class GoCompare
         1875 => ['make' => 'Oppo', 'model' => 'Find X2 Lite 5G', 'memory' => 128],
         1876 => ['make' => 'Oppo', 'model' => 'Find X2 Pro', 'memory' => 512],
         1877 => ['make' => 'Oppo', 'model' => 'Find X2 Neo', 'memory' => 256],
-        2341 => ['make' => 'Oppo', 'model' => 'Find X3 Pro', 'memory' => 256],
+        2341 => ['make' => 'Oppo', 'model' => 'Find X3 Pro 5G', 'memory' => 256],
         1880 => ['make' => 'Oppo', 'model' => 'A5 2020', 'memory' => 64],
         2346 => ['make' => 'Oppo', 'model' => 'A72', 'memory' => 128],
         1885 => ['make' => 'Oppo', 'model' => 'Reno 2', 'memory' => 256],
+        2343 => ['make' => 'Oppo', 'model' => 'Find X3 Lite 5G', 'memory' => 128],
 
         1872 => ['make' => 'Realme', 'model' => '6', 'memory' => 64],
         1873 => ['make' => 'Realme', 'model' => '6', 'memory' => 128],
@@ -255,5 +258,8 @@ class GoCompare
         1878 => ['make' => 'Xiaomi', 'model' => 'Mi Mix 3', 'memory' => 128],
         1888 => ['make' => 'Xiaomi', 'model' => 'Poco F2 Pro', 'memory' => 128],
         1889 => ['make' => 'Xiaomi', 'model' => 'Poco F2 Pro', 'memory' => 512],
+        2385 => ['make' => 'Xiaomi', 'model' => 'Mi 11 Ultra', 'memory' => 256],
+        2387 => ['make' => 'Xiaomi', 'model' => 'Mi 11', 'memory' => 128],
+        2388 => ['make' => 'Xiaomi', 'model' => 'Mi 11', 'memory' => 256],
     ];
 }
