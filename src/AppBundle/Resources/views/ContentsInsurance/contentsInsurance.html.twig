@@ -52,19 +52,19 @@
                     <h1 class="text-white mb-4">
                         Start your {{ greeting }} with <span class="text-deep-sky-blue-d">win-win! contents insurance</span>
                     </h1>
-                    <p class="lead text-white mb-4">Protect the stuff you love in your home. You can include accidental or pet damage, out of home cover and even work equipment.</p>
+                    <p class="lead text-white mb-4">Protect the stuff you love at home. Get covered in minutes with our customisable policy.</p>
                     <ul class="list-unstyled icn-fa-list mb-4">
                         <li class="mb-3 text-white">
                             <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                            Cover from £2.80/month and excess from £50
+                            <strong>No</strong> price increase at renewal
                         </li>
                         <li class="mb-3 text-white">
                             <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                            Most claims resolved within 72hrs
+                            <strong>No</strong> hidden admin or cancellation fees
                         </li>
                         <li class="text-white">
                             <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
-                            Up to 40% no claims cashback
+                            <strong>No</strong> horrible forms
                         </li>
                     </ul>
                     <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
@@ -91,6 +91,93 @@
 
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="home-contents py-lg-5">
+        <div class="container-large py-5">
+            <div class="cardbox no-box-shadow cardbox-100">
+                <div class="cardbox__body p-lg-5">
+                    <h3 class="text-primary mb-4">Who Is This For?</h3>
+                    <p class="mb-4">SO-SURE’s contents insurance has been designed for renters, but it’s ideal for homeowners, too.</p>
+                    <div class="row who-list">
+                        <div class="col-md-4">
+                            <div class="who-list-item">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_sole-occupant.jpg" class="lozad" alt="Sole Occupants" width="150px">
+                                <h4 class="h5 text-primary">Sole Occupants</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="who-list-item">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_house-sharers-adj.jpg" class="lozad" alt="House Sharers" width="150px">
+                                <h4 class="h5 text-primary">House Sharers</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="who-list-item">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_families.jpg" class="lozad" alt="Families" width="150px">
+                                <h4 class="h5 text-primary">Families</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-5">
+                    <div class="row text-left">
+                        <div class="col-lg-6">
+                            <h4 class="h3 mb-4">What's covered 👍</h4>
+                            <ul class="list-unstyled icn-fa-list">
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Almost everything</strong> in your home, apart from a few specifics (check “What’s not covered”)
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Accidental Damage:</strong>  Drops, spills, scrapes and more; if it was an accident, we can cover it
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Out of home:</strong> For extra peace of mind, your stuff can be covered for when you’re out and about, too
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Business:</strong> WFH? Travelling to the office? We can protect the things you use for your business
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Outdoors:</strong> The contents of your garden or outdoor space (and the space itself) can also be covered
+                                </li>
+                                <li>
+                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
+                                    <strong>Pet Damage:</strong> Got a clumsy four-legged friend or a suspiciously unruly fish? We can protect against damage caused by pets
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <h4 class="h3 mb-4">What's not covered 👎</h4>
+                            <ul class="list-unstyled icn-fa-list">
+                                <li class="mb-3">
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Mobile phones (<a href="{{ path('phone_insurance') }}">get covered here instead</a>)
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Money
+                                </li>
+                                <li class="mb-3">
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Powered vehicles
+                                </li>
+                                <li>
+                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                                    Pets (coming soon!)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section class="vid-sure py-lg-5">
         <div class="container-large py-5">
@@ -277,88 +364,6 @@
                data-event-location="home-contents">
                 Get a quote
             </a>
-            <div class="cardbox no-box-shadow cardbox-100">
-                <div class="cardbox__body p-lg-5">
-                    <h3 class="text-primary mb-4">Who Is This For?</h3>
-                    <p class="mb-4">SO-SURE’s contents insurance has been designed for renters, but it’s ideal for homeowners, too.</p>
-                    <div class="row who-list">
-                        <div class="col-md-4">
-                            <div class="who-list-item">
-                                <img src="{{ cdn_url }}/images/onexone.png"
-                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_sole-occupant.jpg" class="lozad" alt="Sole Occupants" width="150px">
-                                <h4 class="h5 text-primary">Sole Occupants</h4>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="who-list-item">
-                                <img src="{{ cdn_url }}/images/onexone.png"
-                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_house-sharers-adj.jpg" class="lozad" alt="House Sharers" width="150px">
-                                <h4 class="h5 text-primary">House Sharers</h4>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="who-list-item">
-                                <img src="{{ cdn_url }}/images/onexone.png"
-                                data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_icon_families.jpg" class="lozad" alt="Families" width="150px">
-                                <h4 class="h5 text-primary">Families</h4>
-                            </div>
-                        </div>
-                    </div>
-                    <hr class="my-5">
-                    <div class="row text-left">
-                        <div class="col-lg-6">
-                            <h4 class="h3 mb-4">What's covered 👍</h4>
-                            <ul class="list-unstyled icn-fa-list">
-                                <li class="mb-3">
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    <strong>Almost everything</strong> in your home, apart from a few specifics (check “What’s not covered”)
-                                </li>
-                                <li class="mb-3">
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    <strong>Accidental Damage:</strong>  Drops, spills, scrapes and more; if it was an accident, we can cover it
-                                </li>
-                                <li class="mb-3">
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    <strong>Out of home:</strong> For extra peace of mind, your stuff can be covered for when you’re out and about, too
-                                </li>
-                                <li class="mb-3">
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    <strong>Business:</strong> WFH? Travelling to the office? We can protect the things you use for your business
-                                </li>
-                                <li class="mb-3">
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    <strong>Outdoors:</strong> The contents of your garden or outdoor space (and the space itself) can also be covered
-                                </li>
-                                <li>
-                                    <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                    <strong>Pet Damage:</strong> Got a clumsy four-legged friend or a suspiciously unruly fish? We can protect against damage caused by pets
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="col-lg-6">
-                            <h4 class="h3 mb-4">What's not covered 👎</h4>
-                            <ul class="list-unstyled icn-fa-list">
-                                <li class="mb-3">
-                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                    Mobile phones (<a href="{{ path('phone_insurance') }}">get covered here instead</a>)
-                                </li>
-                                <li class="mb-3">
-                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                    Money
-                                </li>
-                                <li class="mb-3">
-                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                    Powered vehicles
-                                </li>
-                                <li>
-                                    <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                    Pets (coming soon!)
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 
