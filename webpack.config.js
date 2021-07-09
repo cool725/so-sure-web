@@ -130,10 +130,17 @@ Encore
     .enableSassLoader()
 
     .splitEntryChunks()
-    // .configureSplitChunks(function(splitChunks) {
-    //     // change the configuration
-    //     splitChunks.minSize = 100;
-    // })
+
+    .configureImageRule({
+        // tell Webpack it should consider inlining
+        type: 'asset',
+        //maxSize: 4 * 1024, // 4 kb - the default is 8kb
+    })
+
+    .configureFontRule({
+        type: 'asset',
+        // maxSize: 4 * 1024
+    })
 
     .addPlugin(
         new webpack.ProvidePlugin({

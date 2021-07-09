@@ -1216,6 +1216,9 @@ nelmio_security:
                 - https://*.smct.co
                 - https://script.hotjar.com
                 - https://script.tapfiliate.com
+                - https://consent.dc-storm.com
+                - https://consent.jrs5.com
+                - https://consent.mediaforge.com
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
