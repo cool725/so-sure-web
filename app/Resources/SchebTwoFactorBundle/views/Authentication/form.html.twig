@@ -4,8 +4,8 @@
 {% set exclude_remote_scripts = true %}
 {% set body_class = 'login' %}
 
-{% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/login.css') }}">
+{% block stylesheets %}
+    {{ encore_entry_link_tags('login') }}
 {% endblock %}
 
 {% block body %}
@@ -58,6 +58,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/login.js') }}"></script>
+    {{ encore_entry_script_tags('login') }}
 {% endblock %}
-
