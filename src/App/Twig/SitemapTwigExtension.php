@@ -126,7 +126,6 @@ class SitemapTwigExtension extends \Twig_Extension
             '/phone-insurance/sony' => 'Sony Insurance',
             '/phone-insurance/wileyfox' => 'WileyFox Insurance',
             '/phone-insurance/xiaomi' => 'Xiaomi Insurance',
-            '/phone-insurance/blackberry' => 'Blackberry Insurance',
             '/phone-insurance/vodafone' => 'Vodafone Insurance',
             '/phone-insurance/cat' => 'Cat Insurance',
             '/phone-insurance/second-hand' => 'Second Hand',
