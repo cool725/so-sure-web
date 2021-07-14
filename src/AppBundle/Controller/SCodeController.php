@@ -171,6 +171,13 @@ class SCodeController extends BaseController
         $session = $this->get('session');
         $session->set('scode', $code);
 
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'referral',
+            'Step' => 'reward_pot',
+            'event_attribute_name' => 'scode',
+            'event_attribute_value' => $scode
+        ]);
+
         if ($scode && $this->getUser()) {
             // If valid log in session redirect to invite page
             return new RedirectResponse($this->generateUrl('user_invite'));
