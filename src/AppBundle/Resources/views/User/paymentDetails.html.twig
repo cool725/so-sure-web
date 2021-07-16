@@ -257,6 +257,6 @@
     {% else %}
         <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
     {% endif %}
-    {{ encore_entry_link_tags('user') }}
-    {{ encore_entry_link_tags('user-payment') }}
+    {{ encore_entry_script_tags('user') }}
+    {{ encore_entry_script_tags('user-payment') }}
 {% endblock %}
