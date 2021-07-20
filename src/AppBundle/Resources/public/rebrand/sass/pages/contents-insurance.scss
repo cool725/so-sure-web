@@ -202,3 +202,65 @@
     text-align: center;
   }
 }
+
+.more-information {
+  text-align: center;
+  max-width: 960px;
+  margin: 0 auto 2rem;
+  padding: 0 15px;
+
+  &-anchor {
+    color: $zaffre;
+    font-family: $g-medium;
+    text-decoration: none;
+  }
+
+  &-items {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  &-item {
+    text-align: center;
+    margin: 0 1rem 1.5rem;
+    width: 38%;
+
+    &-icon {
+      width: 56px;
+
+      @include media-breakpoint-up(lg) {
+        width: 80px;
+      }
+    }
+
+    span {
+      display: block;
+      padding: 0.5rem 0 0;
+      color: $zaffre;
+      font-family: $g-medium;
+    }
+
+    @include media-breakpoint-up(md) {
+      width: 26%;
+
+      &.optional {
+        width: 15%;
+      }
+    }
+  }
+
+  .card {
+    margin-top: 2rem;
+    box-shadow: 0 15px 20px 0 rgba(8, 27, 154, 0.04),
+      0 5px 15px 0 rgba(8, 27, 154, 0.04);
+
+    &-body {
+      padding: 2rem;
+
+      @include media-breakpoint-up(lg) {
+        padding: 2.5rem;
+      }
+    }
+  }
+}
