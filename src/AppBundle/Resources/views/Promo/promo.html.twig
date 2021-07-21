@@ -18,9 +18,9 @@
             <div class="row">
                 <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-2">
                     {% if amazon_voucher is defined and amazon_voucher is not null %}
-                        <h1 class="text-white mb-3">Protect your phone <span class="text-deep-sky-blue-d">and get a £15 Amazon voucher 💰</span></h1>
+                        <h1 class="text-white mb-3 mt-xl-5">Protect your phone <span class="text-deep-sky-blue-d">and get a £15 Amazon voucher 💰</span></h1>
                     {% else %}
-                        <h1 class="text-white">Mobile Phone Insurance</h1>
+                        <h1 class="text-white mt-xl-5">Mobile Phone Insurance</h1>
                         <div class="h2 text-white fit mb-3">
                             <span class="sub text-deep-sky-blue-d">
                                 Get money back if I don't claim? Yes Please!
@@ -88,6 +88,83 @@
 
     {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="cover">
+        <div class="container-large py-5">
+            <div class="row px-md-5 pt-5">
+                <div class="col-md-7">
+                    <h3 class="h2 my-4"><span class="text-primary">Welcome to peace of mind - </span><br class="d-none d-lg-inline">What's included in your policy</h3>
+                    <p class="lead">You get fully comprehensive cover. And we don’t try and wangle out of things with small print – what you see is what you get.</p>
+                </div>
+                <div class="col-md-5">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_hand_holding_phone_stars.jpg"
+                            alt="Hand holding mobile phone"
+                            class="lozad img-fluid">
+                </div>
+            </div>
+            <hr class="mt-0 mb-5 mb-md-3">
+            <div class="row p-md-5">
+                <div class="col-md-6">
+                    <h4 class="h3 mb-4">What's covered 👍</h4>
+                    <ul class="list-unstyled icn-fa-list">
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Theft and loss as standard
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Accidental damage, including water damage and cracked screens
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            New, <a href="{{ path('phone_insurance_second_hand') }}">used</a> or <a href="{{ path('phone_insurance_refurbished') }}">refurbished</a> phones up to 3 yrs old
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Accessories up to the value of &pound;100 including VAT
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Unauthorised network charges up to &pound;1000
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Out of warranty breakdown
+                        </li>
+                        <li class="mb-5 mb-md-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            90 days global travel
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="h3 mb-4">What's not covered 👎</h4>
+                    <ul class="list-unstyled icn-fa-list">
+                        <li class="mb-3">
+                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                            Any existing claims before you bought our insurance
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                            More than 2 claims for Loss and/or Theft in any policy year
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                            Claims where you’ve knowingly put your mobile phone at risk
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison">
+        <div class="container-large py-5">
+            <h3 class="h2 pt-5 text-center">Premium cover 💎</h3>
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
+        </div>
+    </section>
 
     {# Page Modals #}
     <div class="modal fade"

@@ -1,0 +1,88 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'seo-loss' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Phone Insurance Loss | so-sure{% endblock %}
+{% block meta %}
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/seo-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="intro py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="breadcrumbs">
+                        <ul class="list-inline"
+                            vocab="https://schema.org/"
+                            typeof="BreadcrumbList">
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('homepage') }}"
+                                   class="text-primary"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Home</span>
+                                </a>
+                                <meta property="position" content="1">
+                            </li>
+                            <li class="list-inline-item text-zaffre">
+                                <i class="fal fa-angle-right text-zaffre"></i>
+                            </li>
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('phone_insurance') }}"
+                                   class="text-primary"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Phone Insurance</span>
+                                </a>
+                                <meta property="position" content="2">
+                            </li>
+                            <li class="list-inline-item text-zaffre">
+                                <i class="fal fa-angle-right text-zaffre"></i>
+                            </li>
+                            <li class="list-inline-item text-zaffre"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <span property="name">Loss</span>
+                                <meta property="position" content="3">
+                            </li>
+                        </ul>
+                    </div>
+                    <h1 class="text-primary mb-4">Loss</h1>
+                    <p class="mb-4">We love our phones here at so-sure and it really bums us out when we end up losing them. Losing your phone can totally feel like the end of the world - sometimes things get so bad that you start feeling like Leo before he won an Oscar. </p>
+                    <h2 class="h3">Look after it with so-sure</h2>
+                    <p>We don’t mean to blow our own trumpets here but we do protect you against pretty much anything bad that’s going to happen to your phone. We do it for cheaper than anyone else and we replace your phone within days, not weeks. </p>
+                    <p>Waiting around for a replacement phone is no fun. so-sure get your phone back to you as soon as possible so that you can start getting back to enjoying your life.</p>
+                    <p class="mb-4">However, if you are careless enough to leave your pride and joy uninsured, then follow this quick and easy guide to keeping your phone.</p>
+                    <h2 class="h3">Don’t bring your phone to stupid places</h2>
+                    <p>More claims for lost mobile phones are made during July and August than at any other time of year. We think that this may have something to do with the fact that this coincides with festival season. </p>
+                    <p>Bringing your brand new smartphone to a festival or big gig means that you must have a fairly large appetite for destruction. There are so many bad things that can happen to a phone in this environment. You could cake it in mud, someone could stamp on it or you could accidentally leave it ‘by that burrito stall somewhere near Shangri-la’. </p>
+                    <p class="mb-4">Our top tip is to buy a ‘burner’ - a slightly outdated phone that is <a href="http://www.mirror.co.uk/news/weird-news/man-tries-destroy-indestructible-nokia-6266371" target="_blank" rel="noopener noreferrer">built like a tank</a> and has a battery life that lasts for seemingly forever. If something happens to this phone, you will still have your nice shiny one waiting for you when you get back home.</p>
+                    <a href="#"
+                       class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote disabled track-data"
+                       data-event="seo-pages-loss">
+                       Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+
+{% endblock %}

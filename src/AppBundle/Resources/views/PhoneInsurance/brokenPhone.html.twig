@@ -1,0 +1,80 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'seo-broken-phone' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Phone Insurance Broken Phone | so-sure{% endblock %}
+{% block meta %}
+    <meta name="description" content="Mobile Insurance that's Simply Better, 24-72 hour replace or repair, Low excess from just {{ lowest_excess }} - New, second hand & refurbished phones, Up to 80% money back"/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    <link rel="stylesheet" href="{{ asset('css-js/seo-pages.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <section class="intro py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="breadcrumbs">
+                        <ul class="list-inline"
+                            vocab="https://schema.org/"
+                            typeof="BreadcrumbList">
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('homepage') }}"
+                                   class="text-primary"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Home</span>
+                                </a>
+                                <meta property="position" content="1">
+                            </li>
+                            <li class="list-inline-item text-zaffre">
+                                <i class="fal fa-angle-right text-zaffre"></i>
+                            </li>
+                            <li class="list-inline-item"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <a href="{{ path('phone_insurance') }}"
+                                   class="text-primary"
+                                   property="item"
+                                   typeof="WebPage">
+                                   <span property="name">Phone Insurance</span>
+                                </a>
+                                <meta property="position" content="2">
+                            </li>
+                            <li class="list-inline-item text-zaffre">
+                                <i class="fal fa-angle-right text-zaffre"></i>
+                            </li>
+                            <li class="list-inline-item text-zaffre"
+                                property="itemListElement"
+                                typeof="ListItem">
+                                <span property="name">Broken Phone</span>
+                                <meta property="position" content="3">
+                            </li>
+                        </ul>
+                    </div>
+                    <h1 class="text-primary mb-4">Broken Phone</h1>
+                    <p class="mb-4">Breaking your phone is a serious drag and can happen either accidentally or by putting your phone at risk. If it's the former, we'll make sure that you are covered. Examples of damage include mechanical faults like broken buttons or when the phone simply won't turn on.</p>
+                    <a href="#"
+                       class="btn btn-success btn-shadow btn-block-xs mb-5 get-a-quote disabled track-data"
+                       data-event="seo-pages-broken-phone">
+                       Get a Quote</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+
+{% endblock %}
