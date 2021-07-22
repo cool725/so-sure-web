@@ -38,6 +38,8 @@ class HomeContentsController extends BaseController
         // Temp
         $promo = false;
         $partner = null;
+        $code = null;
+        $terms = false;
 
         // Is indexed?
         $noindex = false;
@@ -55,6 +57,8 @@ class HomeContentsController extends BaseController
             $noindex = true;
             $promo = true;
             $partner = 'creditspring';
+            $code = 'HCCRED15';
+            $terms = true;
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Contents Insurance - Creditspring']);
         } else {
@@ -102,6 +106,8 @@ class HomeContentsController extends BaseController
             'promo' => $promo,
             'partner' => $partner,
             'greeting' => $greeting,
+            'code' => $code,
+            'terms' => $terms,
         ];
 
         return $this->render($template, $data);
