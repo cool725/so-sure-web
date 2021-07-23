@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/make-a-claim.css') }}">
+    {{ encore_entry_link_tags('make-a-claim') }}
 {% endblock %}
 
 {% block body %}
@@ -89,5 +89,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/make-a-claim.js') }}"></script>
+    {{ encore_entry_script_tags('make-a-claim') }}
 {% endblock %}
