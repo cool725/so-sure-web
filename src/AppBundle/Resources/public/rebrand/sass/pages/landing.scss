@@ -47,11 +47,11 @@
     }
 
     // Height so table overlaps
-    height: 540px;
+    height: 600px;
 
-    @include media-breakpoint-up(sm) {
-        height: 600px;
-    }
+    // @include media-breakpoint-up(sm) {
+    //     height: 600px;
+    // }
 
     @include media-breakpoint-up(md) {
         padding-top: 8rem;

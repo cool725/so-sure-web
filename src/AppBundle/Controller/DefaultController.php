@@ -249,10 +249,9 @@ class DefaultController extends BaseController
     {
         $template = 'AppBundle:Default:indexAffiliateOld.html.twig';
         $competitorData = new Competitors();
+        $noindex = false;
 
-        $data = [
-
-        ];
+        $data = [];
 
         if ($request->get('_route') == 'topcashback') {
             $data = [
@@ -260,6 +259,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'topcashback',
                 'affiliate_company' => 'TopCashback',
                 'affiliate_company_logo' => 'so-sure_topcashback_logo.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'vouchercodes') {
             $data = [
@@ -267,6 +267,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'vouchercodes',
                 'affiliate_company' => 'VoucherCodes',
                 'affiliate_company_logo' => 'so-sure_vouchercodes_logo.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'quidco') {
             $data = [
@@ -274,6 +275,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'quidco',
                 'affiliate_company' => 'Quidco',
                 'affiliate_company_logo' => 'so-sure_quidco_logo.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'ivip') {
             $data = [
@@ -281,12 +283,14 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'ivip',
                 'affiliate_company' => 'iVIP',
                 'affiliate_company_logo' => 'so-sure_ivip_logo.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'reward_gateway') {
             $data = [
                 'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'reward-gateway',
                 'affiliate_company' => 'Reward Gateway',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'money') {
             $data = [
@@ -294,6 +298,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'money',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo_light.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'quotezone') {
             $data = [
@@ -301,6 +306,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'quotezone',
                 'affiliate_company' => 'quotezone',
                 'affiliate_company_logo' => 'so-sure_quotezone_logo-spaced.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'money_free_phone_case') {
             $data = [
@@ -308,6 +314,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'money-free-phone-case',
                 'affiliate_company' => 'money',
                 'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'starling_bank') {
             $data = [
@@ -315,7 +322,8 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'starling-bank',
                 'affiliate_company' => 'Starling Bank',
                 'affiliate_company_logo' => 'so-sure_starling_bank_logo.svg',
-                'modify_class' => 'starling'
+                'modify_class' => 'starling',
+                'is_noindex' => true,
             ];
             $template = 'AppBundle:Default:indexAffiliate.html.twig';
             $this->starlingOAuthSession($request);
@@ -323,6 +331,7 @@ class DefaultController extends BaseController
             $data = [
                 'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'starling-business',
+                'is_noindex' => true,
             ];
             // Ignore this
             $template = 'AppBundle:Default:starlingBusiness.html.twig';
@@ -336,6 +345,7 @@ class DefaultController extends BaseController
                 the <a href="#" class="text-white scroll-to"
                 data-scroll-to-anchor="#table-compare"
                 data-scroll-to-offset="50">competition</a> 👇',
+                'is_noindex' => false,
             ];
         } elseif ($request->get('_route') == 'vendi_app') {
             $data = [
@@ -343,6 +353,7 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'vendi-app',
                 'affiliate_company' => 'Vendi',
                 'affiliate_company_logo' => 'so-sure_vendi_logo.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'getmyslice') {
             $data = [
@@ -350,16 +361,19 @@ class DefaultController extends BaseController
                 'affiliate_page' => 'getmyslice',
                 'affiliate_company' => 'Get My Slice',
                 'affiliate_company_logo' => 'so-sure_getmyslice_logo.svg',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'so_sure_compared') {
             $data = [
                 'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'so-sure-compared',
+                'is_noindex' => true,
             ];
         } elseif ($request->get('_route') == 'moneyback') {
             $data = [
                 'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'moneyback',
+                'is_noindex' => true,
             ];
         }
 
