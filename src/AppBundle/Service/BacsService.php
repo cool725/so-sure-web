@@ -353,7 +353,7 @@ class BacsService
         if (count($files) > 0 && $errorCount == 0) {
             $date = new \DateTime(SoSure::TIMEZONE);
             $hour = $date->format("H");
-            if ($hour >= 8 && $hour <= 13) {
+            if ($hour >= 3 && $hour <= 13) {
                 $results['autoApprove'] = $this->autoApprovePaymentsAndMandates($date);
             }
         }
