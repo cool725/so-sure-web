@@ -74,9 +74,14 @@
                             Up to <strong>80% no claims cashback</strong>
                         </li>
                     </ul>
-                    <p class="text-white mb-2">Cover that's fair and fast when you need it - and gives you money back when you don't.</p>
-                    <p class="text-columbia-blue-e">affiliated with</p>
-                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="250px" class="d-block mb-3 mx-auto lozad">
+                    {% if affiliate_company_logo is defined %}
+                        <p class="text-white mb-2">Cover that's fair and fast when you need it - and gives you money back when you don't.</p>
+                        <p class="text-columbia-blue-e">affiliated with</p>
+                        <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/partnerships/{{ affiliate_company_logo }}" alt="{{ affiliate_company }}" title="{{ affiliate_company }}" width="250px" class="d-block mb-3 mx-auto lozad">
+                    {% else %}
+                        <h2 class="mb-2 text-white h4">What makes SO-SURE better than the rest?</h2>
+                        <p class="text-white mb-4">Sign-up and claims are fast and effortless because unlike competitors, we win when you win.<br class="d-none d-md-inline" /> And if great value floats your boat – premiums are up to 40% lower than mobile networks and you can earn 80% back every single year.</p>
+                    {% endif %}
                 {% endif %}
             </div>
             <div class="hero__controls mb-4">
