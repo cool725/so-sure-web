@@ -244,6 +244,7 @@ class DefaultController extends BaseController
      * @Route("/moneyback", name="moneyback")
      * @Route("/quotezone", name="quotezone")
      * @Route("/getmyslice", name="getmyslice")
+     * @Route("/phone-insurance/ppc", name="phone_insurance_ppc")
      */
     public function affiliateLanding(Request $request)
     {
@@ -373,6 +374,14 @@ class DefaultController extends BaseController
             $data = [
                 'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'moneyback',
+                'is_noindex' => true,
+            ];
+        } elseif ($request->get('_route') == 'phone_insurance_ppc') {
+            $data = [
+                'competitor' => $competitorData::$competitorComparisonData,
+                'affiliate_page' => 'phone-insurance-ppc',
+                'affiliate_company' => 'money',
+                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
                 'is_noindex' => true,
             ];
         }
