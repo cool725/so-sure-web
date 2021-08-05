@@ -332,7 +332,7 @@ class BacsService
             $finalFile = $this->sosureSftpService->moveSafely($file, SftpService::PROCESSED_FOLDER);
             if (!$finalFile) {
                 $this->logger->error(sprintf(
-                    'Could not move bacs report %s from failed to processed but it is processed so move it manually please',
+                    'Could not move bacs report %s from failed to processed but it is processed so move it manually',
                     $file
                 ));
             }
