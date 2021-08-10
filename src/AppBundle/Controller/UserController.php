@@ -1302,7 +1302,7 @@ class UserController extends BaseController
             'bacs_feature' => $bacsFeature,
             'unpaid_reason' => $unpaidReason,
             'card_provider' => SoSure::PAYMENT_PROVIDER_CHECKOUT,
-            'bacs_sftp' => $bacsService->getSftpLock()->check()
+            'bacs_sftp' => ($bacsService->sftpRunning() > 0)
         ];
     }
 
@@ -2376,7 +2376,7 @@ class UserController extends BaseController
             // We need to confirm if there is a claim on the user
             // If status is in pending/review/FNOL state redirect user
             if ($policy->isAnyLinkedClaimByReviewStatus()) {
-                $this->addFlash('warning', 'You have an open claim - please contact our customer service online 
+                $this->addFlash('warning', 'You have an open claim - please contact our customer service online
                 chat and we will be able to resolve this for you');
                 return $this->redirectToRoute('user_policy_list');
             }
