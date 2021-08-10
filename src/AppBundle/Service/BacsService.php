@@ -290,7 +290,6 @@ class BacsService
     {
         return $this->redis->llen(self::KEY_SFTP_FLAG);
     }
-    
 
     /**
      * Processes a single zip file in the bacs sftp folder. Multiple instances of this function can be executing at
