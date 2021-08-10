@@ -288,7 +288,7 @@ class BacsService
      */
     public function sftpRunning()
     {
-        return $this->redis->llen(self::KEY_SFTP_FLAG);
+        return 0;
     }
 
     /**
