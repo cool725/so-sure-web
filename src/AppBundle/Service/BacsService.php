@@ -283,6 +283,15 @@ class BacsService
     }
 
     /**
+     * Returns the number of instances of the sftp function running.
+     * @return int the number of them running.
+     */
+    public function sftpRunning()
+    {
+        return $this->redis->llen(self::KEY_SFTP_FLAG);
+    }
+
+    /**
      * Processes a single zip file in the bacs sftp folder. Multiple instances of this function can be executing at
      * a time because the file to be processed is immediately moved to a different folder. However, multiple instances
      * of this function should not be started at the same time or race conditions may arise.
