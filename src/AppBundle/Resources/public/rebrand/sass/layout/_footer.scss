@@ -20,12 +20,17 @@ body {
     &__links {
 
         a {
+            font-size: 90%;
             font-family: $g-regular;
             text-decoration: underline;
 
             &:hover {
                 text-decoration: none;
             }
+        }
+
+        address {
+            font-size: 90%;
         }
     }
 }
