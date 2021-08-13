@@ -969,4 +969,18 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/cost-of-living-in-fictional-homes",
+     * name="cost_of_living_in_fictional_homes", options={"sitemap" = true})
+     * @Template
+     */
+    public function costOfLivingInFictionalHomesAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/cost-of-living-in-fictional-homes.html.twig';
+
+        return $this->render($template, $data);
+    }
 }

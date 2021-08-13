@@ -1,0 +1,244 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}Cost of living in fictional homes | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Ever wondered how much it would cost to live in your favourite fictional home? We have priced up the Bat Cave, Monica’s Apartment, Bag End and more…"/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Cost of living in fictional homes | SO-SURE' %}
+{% set og_description = "Ever wondered how much it would cost to live in your favourite fictional home? We have priced up the Bat Cave, Monica’s Apartment, Bag End and more…" %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/so-sure_fictional_homes_5.jpg' %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com/blog/cost-of-living-in-fictional-homes"
+  },
+  "headline": "Cost of living in fictional homes | SO-SURE",
+  "description": "",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/so-sure_fictional_homes_5.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-04-01"
+}
+</script>
+{% endblock %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'home' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">How much would it cost to live in these famous fictional homes?</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">How much would it cost to live in these famous fictional homes?</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">SO-SURE</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>Aug 13, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure,contentsinsurance' } %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <p>Have you ever wondered how much it would cost to live in some of the most popular homes from movies or TV shows? Well, we’ve got the answer. We’ve taken 10 of the most iconic mansions, houses and flats from your screens and calculated the cost of rent, utilities, internet and more to help you price up the monthly cost of living in your favourite fictional home.</p>
+                                <p>Here’s what we found:</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_10.jpg"
+                                     alt="The Lord of the Rings – Bag End"
+                                     class="img-fluid lozad mb-5">
+                                <h2>10. The Lord of the Rings – Bag End</h2>
+                                <p>Address: Bag End, Bagshot Row, Hobbiton</p>
+                                <p>Size: Bag End is 4,500 square feet, featuring bedrooms, bathrooms, cellars, multiple pantries, wardrobes, kitchens and dining rooms.</p>
+                                <p><strong>Monthly Cost: £464.78</strong></p>
+                                <p>This famous hobbit hole from The Hobbit and The Lord of the Rings movies is the cheapest on our list. It would cost you just £464.78 to live in this cosy bungalow in The Shire, and you wouldn’t be short on space either with a whopping 4,500 square feet and multiple rooms to choose from.</p>
+                                <p>It won’t cost you a lot because of its remote location and the small size of The Shire, renting for just 574NZD (£287) a month. Utilities would cost you £95.02 a month, internet £41.22, and home and <a href="{{ path('contents_insurance') }}">contents insurance</a> come to £41.54. There is no property tax in New Zealand, so you’d be saving on another potentially expensive monthly cost.</p>
+                                <p>Bag End is known for its natural beauty. Couple that with the relaxed lifestyle of a hobbit that includes extravagant birthday parties and pipe smoking with wizards, and we think £464.78 per month is a seriously good deal.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_9.jpg"
+                                     alt="The Simpsons – 742 Evergreen Terrace"
+                                     class="img-fluid lozad mb-5">
+                                <h2>9. The Simpsons – 742 Evergreen Terrace</h2>
+                                <p>Address: 742 Evergreen Terrace, Springfield</p>
+                                <p>Size: 742 Evergreen Terrace is 2,200 square feet and has four bedrooms, two family rooms, a bathroom, a kitchen and more.</p>
+                                <p><strong>Monthly Cost: £1,719.86</strong></p>
+                                <p>This iconic home has been on our screens for over 30 years. The home of the Simpsons would cost you £1,719.86 per month, should you decide a move to Springfield is your heart’s desire. The town and home are quintessential American middle class, offering the same type of community you’d expect to find in a suburb in Texas, Montana and Colorado. Rent would cost you £1,219 a month to live in an area like this.</p>
+                                <p>742 Evergreen Terrace also has some of the cheapest bills on our list of fictional homes. Utilities will cost you £253, internet £45 and home and contents insurance £66.86. This four-bedroom house is the perfect family home, with plenty of space and a friendly community, meaning £1,719.86 is very reasonable.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_7.jpg"
+                                     alt="Harry Potter – The Burrow"
+                                     class="img-fluid lozad mb-5">
+                                <h2>8. Harry Potter – The Burrow</h2>
+                                <p>Address: The Burrow, Ottery St Catchpole, Devon</p>
+                                <p>Size: The Burrow is 1,467 square feet and has six bedrooms, a kitchen, living room and a garden.</p>
+                                <p><strong>Monthly Cost: £2,549.27</strong></p>
+                                <p>The famous residence of the Weasley family is one of the most magical fictional homes from our screens. If you want to sit by the fire at Christmas and make your way through an enormous plate of mince pies, The Burrow will cost you £2,549.27 each month.</p>
+                                <p>The Burrow is held up by magic so is likely to need fixing up once the Weasleys move out, so we estimate the rent to cost £2,000 a month. If you happen to know a wizard who can keep up the spell, it could bring the rent down to £1,000. Property tax will cost you £247, utilities £208, and internet £27. Insuring this iconic home from Harry Potter and its contents will complete your monthly outgoings at £67.27.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_8.jpg"
+                                     alt="Big Bang Theory – Leonard and Sheldon’s Apartment"
+                                     class="img-fluid lozad mb-5">
+                                <h2>7. Big Bang Theory – Leonard and Sheldon’s Apartment</h2>
+                                <p>Address: Apartment 4A, 2311 North Los Robles Avenue, Pasadena, California</p>
+                                <p>Size: Leanard and Sheldon’s Apartment features a living area and kitchen, two bedrooms and a shared bathroom.</p>
+                                <p><strong>Monthly Cost: £2,559.08</strong></p>
+                                <p>A choice location in Pasadena, California sees Sheldon Cooper and Leonard Hofstadter’s apartment costing a little more at £2,559.08 per month. Its small size means utilities will be cheaper at £145, but you’ll need fast internet to cope with regular games nights and movie streaming (£65 per month). We know, just like Sheldon, you would never go without home or contents insurance cover, which would cost you £113.08 a month. Property tax of £593 would complete your outgoings.</p>
+                                <p>In the show, Sheldon asks Leonard to move in because he cannot afford the rent alone, but could a senior theoretical physicist at Caltech (California Institute of Technology) really not afford a two-bedroom apartment? We had to put this to the test. According to <a href="https://data.chronicle.com/110404/California-Institute-of-Technology/faculty-salaries/" target="_blank" rel="noopener noreferrer">Chronicle Data</a>, even an assistant producer at Caltech would earn around $111,000 a year (£79,903). We estimate Sheldon would earn around 150,000 (£107,978), taking home £5,810 a month after tax. Sorry Big Bang Theory fans, but Sheldon could comfortably afford the £2,559.08 a month apartment.</p>
+                                <p>What about Leonard? Leonard doesn’t quite have the genius of his roommate, but he certainly wasn’t doing too bad for himself. <a href="https://www.glassdoor.com/Salaries/experimental-physicist-salary-SRCH_KO0,22.htm" target="_blank" rel="noopener noreferrer">Glassdoor</a> estimates an experimental physicist has an average annual salary of $102,000 (£73,445), with Leonard pocketing £4,274 a month. This means he could also afford the apartment solo, so maybe they really did enjoy each other’s company!</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_5.jpg"
+                                     alt="Friends – Monica’s Apartment"
+                                     class="img-fluid lozad mb-5">
+                                <h2>6. Friends – Monica’s Apartment</h2>
+                                <p>Address: 90 Bedford Street, Manhattan</p>
+                                <p>Size: Monica’s apartment is between 1,125 and 1,500 square feet, with two bedrooms, a kitchen and living area, and a shared bathroom.</p>
+                                <p><strong>Monthly Cost: £6,157.92</strong></p>
+                                <p>A fan favourite from one of the best TV shows of all time, but it comes with a price. It will cost you £6,157.92 a month to live in Monica’s apartment in Friends. Rent is £3,253, with property tax making up most of the remaining outgoings. Valued at a whopping £1,590,875, it’s no surprise property tax comes to a frightening £2,725 per month.</p>
+                                <p>Utilities will cost you £105 a month and internet £45. You will save on insurance because you’ll be covered by buildings insurance, but we estimate you’ll pay more than you expect on food with Joey living just over the hall! This lovely apartment makes a great place for you and your friends to hang out, but we estimate that this choice location in New York is what makes Monica’s apartment so expensive.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_4.jpg"
+                                     alt="Home Alone – The McCallister House"
+                                     class="img-fluid lozad mb-5">
+                                <h2>5. Home Alone – The McCallister House</h2>
+                                <p>Address: 671 Lincoln Avenue, Winnetka, Illinois</p>
+                                <p>Size: The McCallister house in Home Alone is 4,243 square-foot and has five bedrooms and four bathrooms.</p>
+                                <p><strong>Monthly Cost: £8,305.91</strong></p>
+                                <p>Who wouldn’t love to spend Christmas at the McCallister house? It would cost you £8,305.91 a month to live in this famous setting from Home Alone. On top of the £5,018 rent, property tax would cost you £2,767 and internet would come to £43. We estimate utilities to come to £276, unless Kevin is using your water and electricity to defend the house from burglars – this could add to your bill!</p>
+                                <p>Considering a holiday? Given what we know about the neighbourhood, theft cover is essential, so home and contents insurance would come to a total of £201.91.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_6.jpg"
+                                     alt="Sex and the City – Carrie’s Apartment"
+                                     class="img-fluid lozad mb-5">
+                                <h2>4. Sex and the City – Carrie’s Apartment</h2>
+                                <p>Address: 245 East 73rd Street</p>
+                                <p>Size: Carrie’s apartment is a sizeable 4,000 square feet and five floors, featuring five bedrooms, three bathrooms and an enormous south-facing backyard.</p>
+                                <p><strong>Monthly Cost: £9,902.75</strong></p>
+                                <p>If you’re interested in jumping in the shoes of Carrie Bradshaw and living a glamorous lifestyle on the Upper East Side, her apartment on 245 East 73rd Street will cost you £9,902.75 a month. With an estimated value of around £431,643, property tax would cost you a healthy £696 a month. On top of that, you can expect to pay £105 for utilities, £44.84 for internet and £83.91 for home and contents insurance.</p>
+                                <p>We can’t believe it’s been over 20 years since Sex and the City first hit our screens, and for £9,902.75 a month you could enjoy the busy social life of the Manhattan socialites and all the perks of Carrie’s iconic walk-in wardrobe.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_3.jpg"
+                                     alt="Fresh Prince of Bel-Air – Uncle Phil and Aunt Viv’s Mansion"
+                                     class="img-fluid lozad mb-5">
+                                <h2>3. Fresh Prince of Bel-Air – Uncle Phil and Aunt Viv’s Mansion</h2>
+                                <p>Address: Bristol Avenue in the Brentwood neighbourhood of L.A.</p>
+                                <p>Size: Uncle Phil and Aunt Viv’s LA Mansion is 6,438 square feet, with five bedrooms and five bathrooms.</p>
+                                <p><strong>Monthly Cost: £18,546.24</strong></p>
+                                <p>It doesn’t get more luxurious than a mansion in LA. This iconic setting for the Fresh Prince of Bel-Air would set you back a huge £18,546.24 a month. It has five bedrooms, a pool if you fancy a swim, and plenty of room if you plan on having relatives to stay like Uncle Phil and Aunt Viv did.</p>
+                                <p>Valued at £4,682,466, property tax doesn’t come cheap and would cost £2,820 a month. Utilities for a 6,438 square foot mansion would come to £477, with internet adding a further £43. Finally, home and contents insurance for a house like this would cost you an additional £869.24.</p>
+                                <p>Uncle Phil is an LA Superior Court Judge, and Aunt Viv is a retired doctor, but even they would have spent some time saving up for this iconic fictional home. On Uncle Phil’s salary alone (£126,698), the Banks family would even struggle to cover the living costs. We estimate he would earn £6,413 each month.</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_1.jpg"
+                                     alt="Batman/The Dark Knight – Wayne Manor"
+                                     class="img-fluid lozad mb-5">
+                                <h2>2. Batman/The Dark Knight – Wayne Manor</h2>
+                                <p>Address: Wollaton Hall & Deer Park, Nottingham, Nottinghamshire, NG8 2AE</p>
+                                <p>Size: Bruce Wayne’s country mansion is 42,500 square feet, with 150 acres of land, 11 bedrooms and 7 bathrooms.</p>
+                                <p><strong>Monthly Cost: £2,221,369.26</strong></p>
+                                <p>Also owned by an iconic businessman, entrepreneur, and philanthropist/superhero, Wayne Manor would cost £2,221,369.26 per month. That’s perhaps no surprise, as Batman’s mansion is 42,500 feet with 150 acres of land, not to mention the high-tech Bat Cave located beneath. The cost to rent Wayne Manor is a staggering £2,150,415, with an additional £33,741 each month on property tax, which is based on equivalent prices on the edge of Manhattan, with Gotham being based on New York City.</p>
+                                <p>Home insurance would be £1,666.67 per month, while contents insurance for Batman’s suit, weapons and wide variety of all-terrain vehicles would be £24,217.59 each month. You wouldn’t be living in Wayne Manor if you didn’t have a trusty butler by your side, and we estimate their wages would be around £9,038. That’s right, Alfred isn’t doing too badly for himself!</p>
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/so-sure_fictional_homes_2.jpg"
+                                     alt="Iron Man - Tony Stark’s Mansion"
+                                     class="img-fluid lozad mb-5">
+                                <h2>1. Iron Man - Tony Stark’s Mansion</h2>
+                                <p>Address: Point Dume, Malibu, CA</p>
+                                <p>Size: Tony Stark’s clifftop mansion is 25,000 square feet, with 8 bedrooms and 10 bathrooms.</p>
+                                <p><strong>Monthly Cost: £2,367,280.58</strong></p>
+                                <p>If you want to live the lavish lifestyle of tech billionaire Tony Stark, his Malibu mansion is top of our list and would cost a massive £2,367,280.58 every month. Rent alone would cost £71,1685, and with a valuation of £84,319,540, property tax adds £54,602 to your monthly outgoings.</p>
+                                <p>One of the biggest expenses is internet. If you’re looking to slip into the shoes of Iron Man himself, you’re going to need the fastest internet money can buy to run your own tech empire. An OC-768 connection capable of speeds of 40 Gigabits per second would cost you roughly £110,552 per month.</p>
+                                <p>Your utilities will come to £2,991 and insuring this impressive property would cost £4,032 a month, although if you’re making enemies at the rate Tony Stark does, you might get quoted a little more.</p>
+                                <p>All of this is dwarfed, however, by the cost of Iron Man’s contents insurance, which comes in at a whopping £2,123,418 per month – that represents 90% of his total monthly cost! With an estimated £5 billion of suits alone, as well as an incredible collection of supercars, an arc reactor, an AI system and a private plane, Tony Stark has more than his fair share of high value items to insure.</p>
+                                <br>
+                                <p>There you have it, all the living costs from some of the most iconic movies and TV shows. If you feel we have missed any, get in touch with us at ____ and we will see what we can do!</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'home', 'hashtags': 'wearesosure,contentsinsurance' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('content-pages') }}
+{% endblock %}
