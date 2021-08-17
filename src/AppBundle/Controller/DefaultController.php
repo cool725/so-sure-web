@@ -210,6 +210,10 @@ class DefaultController extends BaseController
                 throw new NotFoundHttpException();
             }
 
+            if (!$match) {
+                throw new NotFoundHttpException();
+            }
+
             if (null !== $rakutenURL) {
                 return new RedirectResponse($rakutenURL);
             }
@@ -244,7 +248,9 @@ class DefaultController extends BaseController
      * @Route("/moneyback", name="moneyback")
      * @Route("/quotezone", name="quotezone")
      * @Route("/getmyslice", name="getmyslice")
-     * @Route("/phone-insurance/ppc", name="phone_insurance_ppc")
+     * @Route("/kidstart", name="kidstart")
+     * @Route("/giveasyoulive", name="giveasyoulive")
+     * @Route("/core8", name="core8")
      */
     public function affiliateLanding(Request $request)
     {
@@ -381,7 +387,27 @@ class DefaultController extends BaseController
                 'competitor' => $competitorData::$competitorComparisonData,
                 'affiliate_page' => 'phone-insurance-ppc',
                 'affiliate_company' => 'money',
-                // 'affiliate_company_logo' => 'so-sure_money_logo.png',
+                'is_noindex' => true,
+            ];
+        } elseif ($request->get('_route') == 'kidstart') {
+            $data = [
+                'competitor' => $competitorData::$competitorComparisonData,
+                'affiliate_page' => 'rakuten',
+                'affiliate_company' => 'kidstart',
+                'is_noindex' => true,
+            ];
+        } elseif ($request->get('_route') == 'giveasyoulive') {
+            $data = [
+                'competitor' => $competitorData::$competitorComparisonData,
+                'affiliate_page' => 'rakuten',
+                'affiliate_company' => 'giveasyoulive',
+                'is_noindex' => true,
+            ];
+        } elseif ($request->get('_route') == 'core8') {
+            $data = [
+                'competitor' => $competitorData::$competitorComparisonData,
+                'affiliate_page' => 'rakuten',
+                'affiliate_company' => 'core8',
                 'is_noindex' => true,
             ];
         }
