@@ -414,8 +414,8 @@
         td {
             &:first-of-type {
                 border-left: none;
-                border-bottom: none;
-                border-top: none;
+                // border-bottom: none;bs-l
+                // border-top: none;
             }
             &:last-of-type {
                 border-right: none;
@@ -475,10 +475,20 @@
 
     @include media-breakpoint-up(md) {
         max-width: 760px;
+
+        &.table-700 {
+            max-width: none;
+            width: 900px;
+        }
     }
 
     @include media-breakpoint-up(lg) {
         max-width: 860px;
+
+        &.table-700 {
+            max-width: none;
+            width: 900px;
+        }
     }
 }
 

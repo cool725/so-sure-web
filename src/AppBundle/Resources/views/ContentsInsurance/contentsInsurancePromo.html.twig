@@ -238,6 +238,24 @@
         </div>
     </section>
 
+    <section class="home-contents-compare py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">How are we different?</h2>
+            {% include 'AppBundle::ContentsInsurance/_comparisonTableHome.html.twig' %}
+            <p class="text-muted"><small>*Based on a sample of UK insurance providers; these may not apply for every insurer</small></p>
+            <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                class="btn btn-success btn-block-xs track-data"
+                data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                data-event="get-a-quote"
+                data-event-type="click"
+                data-event-location="home-contents">
+                Get a quote
+            </a>
+        </div>
+    </section>
+
+    {% include 'AppBundle::Components/_reviews.html.twig' %}
+
     <section class="vid-sure py-lg-5">
         <div class="container-large py-5">
             <h2 class="h3 text-primary mb-4">Get covered in 3 simple steps</h2>
@@ -271,103 +289,6 @@
                     <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_website_phone_contents_large.png" alt="SO-SURE Home Contents Website" width="" class="img-fluid lozad">
                 </div>
             </div>
-            <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
-                class="btn btn-success btn-block-xs track-data"
-                data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
-                data-event="get-a-quote"
-                data-event-type="click"
-                data-event-location="home-contents">
-                Get a quote
-            </a>
-        </div>
-    </section>
-
-    {% include 'AppBundle::Components/_reviews.html.twig' %}
-
-    <section class="home-contents-compare py-lg-5">
-        <div class="container-large py-5">
-            <h2 class="h3 text-primary mb-4">How do we compare?</h2>
-            <div class="d-md-flex">
-                <div class="cardbox cardbox-100 mb-4 mr-md-3 mr-lg-4">
-                    <div class="cardbox__body text-left p-lg-5">
-                        <h3 class="h4 mb-4">SO-SURE 👍</h3>
-                        <ul class="list-unstyled icn-fa-list">
-                            <li class="mb-3">
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                Renewal price freeze promise
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                No hidden fees or costs (including cancellation fees)
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                No sneaky compulsory excess - just pay what you choose
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                No extra charges for expensive items - price transparency
-                            <li>
-                            <li class="mb-3">
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                Configure your policy to your needs
-                            <li>
-                            <li class="mb-3">
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                Super fast and easy to set up so you get insured In minutes
-                            <li>
-                            <li class="mb-3">
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                Cashback if you don’t claim
-                            <li>
-                            <li>
-                                <i class="far fa-check fa-lg fa-fw text-success"></i>
-                                Claims resolved quickly and easily
-                            <li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="cardbox cardbox-100 mb-4">
-                    <div class="cardbox__body text-left p-lg-5">
-                        <h3 class="h4 mb-4">Traditional insurer* 👎</h3>
-                        <ul class="list-unstyled icn-fa-list">
-                            <li class="mb-3">
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                Price increases every year, often more than 25%, even if you have never claim
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                Cancellation fees are common and are often £30 or more, while changing something on your policy is often £10 or more
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                Impose additional ‘compulsory excess’ above what you select and further excess for claims like escape of water (which can be a £400+ penalty)
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                Extra charges as soon as you add your laptop or jewellery
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                One size fits all policies that contain cover you don’t need
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                Ask irrelevant questions or questions you don’t know how to answer
-                            </li>
-                            <li class="mb-3">
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                Give you nothing if you don’t claim
-                            </li>
-                            <li>
-                                <i class="far fa-times fa-lg fa-fw text-danger"></i>
-                                Do everything they can not to pay claims
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <p class="text-muted"><small>*Based on a sample of UK insurance providers; these may not apply for every insurer</small></p>
             <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
                 class="btn btn-success btn-block-xs track-data"
                 data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
