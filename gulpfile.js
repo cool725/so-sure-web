@@ -1,7 +1,7 @@
 const gulp   = require('gulp'),
       concat = require('gulp-concat');
 
-gulp.task('default', function() {
+gulp.task('default', function(cb) {
     gulp.src('node_modules/viewerjs/dist/viewer.min.*')
         .pipe(gulp.dest('web/components/viewerjs'));
 
@@ -15,20 +15,8 @@ gulp.task('default', function() {
     gulp.src('node_modules/bootstrap/scss/**/**')
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor/bs4'));
 
-    // Cookies style > vendor
-    gulp.src('node_modules/cookieconsent/build/cookieconsent.min.css')
-        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
-
-    // Cookies style > vendor
-    gulp.src('node_modules/cookieconsent/src/styles/themes/classic.css')
-        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
-
     // Animate.css > vendor
     gulp.src('node_modules/animate.css/animate.css')
-        .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
-
-    // JSSocials
-    gulp.src(['node_modules/jssocials/dist/jssocials.css', 'node_modules/jssocials/dist/jssocials-theme-flat.css'])
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 
     // Fancybox.css
@@ -47,4 +35,5 @@ gulp.task('default', function() {
     gulp.src(['node_modules/datatables.net-dt/css/jquery.dataTables.css'])
         .pipe(gulp.dest('src/AppBundle/Resources/public/rebrand/sass/vendor'));
 
+    cb()
 });

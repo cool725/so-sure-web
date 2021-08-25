@@ -34,7 +34,7 @@
     "flickity": "^2.2.0",
     "fstream": "^1.0.12",
     "fuse.js": "^3.2.1",
-    "gulp": "^3.9.1",
+    "gulp": "4.0.2",
     "gulp-cli": "^2.0.1",
     "gulp-concat": "^2.6.1",
     "imports-loader": "^0.8.0",
