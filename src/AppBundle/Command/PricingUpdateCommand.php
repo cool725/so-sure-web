@@ -291,7 +291,7 @@ class PricingUpdateCommand extends ContainerAwareCommand
         }
 
         $monthlyGwp = $priceMonthly->getGwp();
-        $yearlyGwp = $priceMonthly->getGwp();
+        $yearlyGwp = $priceYearly->getGwp();
         $excess = $priceMonthly->getExcess();
         $picSureExcess = $priceMonthly->getPicSureExcess();
 
