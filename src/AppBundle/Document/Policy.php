@@ -4302,6 +4302,19 @@ abstract class Policy
         return $this->getStart()->diff($date)->days < 60;
     }
 
+    public function isPolicyWithin11Months($date = null)
+    {
+        if (!$this->getStart()) {
+            return null;
+        }
+
+        if ($date == null) {
+            $date = \DateTime::createFromFormat('U', time());
+        }
+
+        return $this->getStart()->diff($date)->m < 11;
+    }
+
     public function isBeforePolicyStarted($date = null)
     {
         if (!$this->getStart()) {
@@ -4327,10 +4340,10 @@ abstract class Policy
         // TODO: This needs removing so it's always just 60 days
         if ($pseudo) {
             // add 14 days
-            $cliffDate->add(new \DateInterval('P60D'));
+            $cliffDate->add(new \DateInterval('P11M'));
         } else {
             // add 60 days
-            $cliffDate->add(new \DateInterval('P60D'));
+            $cliffDate->add(new \DateInterval('P11M'));
         }
 
         return $cliffDate;
@@ -5683,6 +5696,7 @@ abstract class Policy
         $secondCliffDate = $this->getConnectionCliffDate(false);
         $afterSecondCliffDate = $this->addOneSecond($secondCliffDate);
 
+        // TODO: Needs updating
         $connectionValues[] = [
             'start_date' => $startDate ? $startDate->format($format) : null,
             'end_date' => $firstCliffDate ?
