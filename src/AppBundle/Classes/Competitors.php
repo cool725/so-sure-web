@@ -4,61 +4,39 @@ namespace AppBundle\Classes;
 class Competitors
 {
     public static $competitorComparisonData = [
-        'SS' => [
-            'oldPhones' => 'All used or refurbished',
-            'phoneage' => '<strong>36 months</strong> <div>from purchase</div>',
-            'lossAsStandard' => '<i class="far fa-check fa-2x"></i>',
-            'timeToRepair' => '<strong>1-2</strong> <div>working days</div>',
+        'sosure' => [
+            'cashback' => '<i class="far fa-check text-success fa-2x"></i>',
             'timeToReplace' => '<strong>24</strong> <div>hours</div>',
-            'repairVia' => 'Free courier',
-            'cashback' => '<i class="far fa-check fa-2x"></i>',
+            'timeToRepair' => '<small><div>free courier</div> <strong>1-2</strong> work days</small>',
+            'oldPhones' => '<small>Any new, used or refurbished</small>',
+            'phoneAge' => '<strong>36 months</strong>',
         ],
-        'PYB' => [
+        'protectyourbubble' => [
             'name' => 'Protect Your Bubble',
-            'oldPhones' => '<small>Only refurbished by the manufacturer or network provider</small>',
-            'phoneage' => '<strong>6 months</strong> <div>from purchase</div>',
-            'lossAsStandard' => '<i class="far fa-times fa-2x text-danger"></i> <br> <small>(extra charge)</small>',
-            'excessFrom' => '<strong>£50</strong>',
-            'timeToRepair' => 'Within <strong>6</strong> <div>working days</div>',
+            'cashback' => '<i class="far fa-times fa-2x text-danger"></i>',
+            'excess' => '<strong>£50</strong>',
             'timeToReplace' => 'Within <strong>48</strong> <div>hours</div>',
-            'repairVia' => 'Free courier',
-            'cashback' => '<i class="far fa-times fa-2x text-danger"></i>',
-        ],
-        'LICI' => [
-            'name' => 'loveit<br>coverit',
+            'timeToRepair' => '<small><div>free courier</div> Within <strong>6</strong> work days</small>',
             'oldPhones' => '<small>Only refurbished by the manufacturer or network provider</small>',
-            'phoneage' => '<strong>36 months</strong> <div>from purchase</div>',
-            'lossAsStandard' => '<i class="far fa-times fa-2x text-danger"></i> <br> <small>(extra charge)</small>',
-            'excessFrom' => '<strong>£30</strong>',
-            'timeToRepair' => 'Within <strong>3</strong> <div>working days</div>',
-            'timeToReplace' => 'Within <strong>24</strong> <div>hours</div>',
-            'repairVia' => 'Paid post / In Person',
-            'cashback' => '<i class="far fa-times fa-2x text-danger"></i>',
+            'phoneAge' => '<strong>6 months</strong>',
         ],
-        'LCANI' => [
-            'name' => 'insurance2go',
-            'oldPhones' => '<small>Refurbished only with 12 month warranty</small>',
-            'phoneage' => '<strong>36 months</strong> <div>from purchase</div>',
-            'lossAsStandard' => '<i class="far fa-times fa-2x text-danger"></i> <br> <small>(extra charge)</small>',
-            'excessFrom' => '<strong>£25</strong>',
-            'timeToRepair' => 'Within <strong>7</strong> <div>working days</div>',
-            'timeToReplace' => 'Within <strong>3-5</strong> <div>working days</div>',
-            'repairVia' => 'Paid post',
+        'loveitcoverit' => [
+            'name' => 'loveit<br>coverit',
             'cashback' => '<i class="far fa-times fa-2x text-danger"></i>',
+            'excess' => '<strong>£30</strong>',
+            'timeToReplace' => 'Within <strong>24</strong> <div>hours</div>',
+            'timeToRepair' => '<small><div>paid post/in person</div> Within <strong>3</strong> work days</small>',
+            'oldPhones' => '<small>Only refurbished by the manufacturer or network provider</small>',
+            'phoneAge' => '<strong>36 months</strong>',
+        ],
+        'insurance2go' => [
+            'name' => 'insurance2go',
+            'cashback' => '<i class="far fa-times fa-2x text-danger"></i>',
+            'excess' => '<strong>£25</strong>',
+            'timeToReplace' => 'Within <strong>3-5</strong> <div>working days</div>',
+            'timeToRepair' => '<small><div>paid post</div> Within <strong>7</strong>  work days</small>',
+            'oldPhones' => '<small>Refurbished only with 12 month warranty</small>',
+            'phoneAge' => '<strong>36 months</strong>',
         ],
     ];
-
-    // public static $exampleDataSet = [
-    //     'NAME' => [
-    //         'name' => '',
-    //         'oldPhones' => '',
-    //         'phoneage' => '',
-    //         'lossAsStandard' => '',
-    //         'excessFrom' => '',
-    //         'timeToRepair' => '',
-    //         'timeToReplace' => '',
-    //         'repairVia' => '',
-    //         'cashback' => '',
-    //     ],
-    // ];
 }
