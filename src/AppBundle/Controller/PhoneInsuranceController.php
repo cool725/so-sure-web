@@ -380,6 +380,7 @@ class PhoneInsuranceController extends BaseController
         $decodedModelHyph = Phone::decodedModelHyph($model);
         $noindex = false;
         $money = false;
+        $upcoming = false;
 
         $phones = $repo->findBy([
             'makeCanonical' => mb_strtolower($make),
@@ -454,7 +455,13 @@ class PhoneInsuranceController extends BaseController
         // Get the price service
         $priceService = $this->get('app.price');
 
-        $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        // Check if pricing or enable the upcoming feature
+        if (!$phone->getCurrentYearlyPhonePrice()) {
+            $upcoming = true;
+            $fromPrice = '9.49';
+        } else {
+            $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        }
 
         $competitorData = new Competitors();
 
@@ -481,6 +488,7 @@ class PhoneInsuranceController extends BaseController
             'competitor' => $competitorData::$competitorComparisonData,
             'money_version' => $money,
             'is_noindex' => $noindex,
+            'upcoming' => $upcoming,
         ];
 
         return $this->render($template, $data);
