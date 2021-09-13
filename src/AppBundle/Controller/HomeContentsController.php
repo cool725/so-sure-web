@@ -29,17 +29,19 @@ class HomeContentsController extends BaseController
      * @Route("/contents-insurance/m", name="contents_insurance_m")
      * @Route("/contents-insurance/getmyslice", name="contents_insurance_getmyslice")
      * @Route("/contents-insurance/creditspring", name="contents_insurance_creditspring")
+     * @Route("/contents-insurance/topcashback", name="contents_insurance_topcashback")
+     * @Route("/contents-insurance/quidco", name="contents_insurance_quidco")
      */
     public function contentsInsuranceAction(Request $request)
     {
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
-        // Temp
         $promo = false;
         $partner = null;
         $code = null;
         $terms = false;
+        $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
 
         // Is indexed?
         $noindex = false;
@@ -51,6 +53,7 @@ class HomeContentsController extends BaseController
             $noindex = true;
             $promo = true;
             $partner = 'getmyslice';
+            $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Contents Insurance - Get My Slice']);
         } elseif ($request->get('_route') == 'contents_insurance_creditspring') {
@@ -59,8 +62,23 @@ class HomeContentsController extends BaseController
             $partner = 'creditspring';
             $code = 'HCCRED15';
             $terms = true;
+            $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Contents Insurance - Creditspring']);
+        } elseif ($request->get('_route') == 'contents_insurance_topcashback') {
+            $noindex = true;
+            $promo = true;
+            $partner = 'topcashback';
+            $template = 'AppBundle:ContentsInsurance:contentsInsuranceComparison.html.twig';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Topcashback']);
+        } elseif ($request->get('_route') == 'contents_insurance_quidco') {
+            $noindex = true;
+            $promo = true;
+            $partner = 'quidco';
+            $template = 'AppBundle:ContentsInsurance:contentsInsuranceComparison.html.twig';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - Quidco']);
         } else {
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
@@ -81,11 +99,6 @@ class HomeContentsController extends BaseController
             $medium = urlencode($medium);
             $campaign = urlencode($campaign);
             $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
-        }
-
-        $template = 'AppBundle:ContentsInsurance:contentsInsurance.html.twig';
-        if ($promo) {
-            $template = 'AppBundle:ContentsInsurance:contentsInsurancePromo.html.twig';
         }
 
         // Set Greeting
