@@ -983,4 +983,32 @@ class BlogController extends BaseController
 
         return $this->render($template, $data);
     }
+
+    /**
+     * @Route("/what-does-phone-insurance-cover",
+     * name="what_does_phone_insurance_cover", options={"sitemap" = true})
+     * @Template
+     */
+    public function whatDoesPhoneInsuranceCoverAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/what-does-phone-insurance-cover.html.twig';
+
+        return $this->render($template, $data);
+    }
+
+    /**
+     * @Route("/how-to-make-a-successful-mobile-insurance-claim",
+     * name="how_to_make_a_successful_mobile_insurance_claim", options={"sitemap" = true})
+     * @Template
+     */
+    public function howToMakeASuccessfulMobileInsuranceClaimAction()
+    {
+        $data = [];
+
+        $template = 'AppBundle:Blog:Articles/how-to-make-a-successful-mobile-insurance-claim.html.twig';
+
+        return $this->render($template, $data);
+    }
 }
