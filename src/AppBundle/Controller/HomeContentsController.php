@@ -31,6 +31,7 @@ class HomeContentsController extends BaseController
      * @Route("/contents-insurance/creditspring", name="contents_insurance_creditspring")
      * @Route("/contents-insurance/topcashback", name="contents_insurance_topcashback")
      * @Route("/contents-insurance/quidco", name="contents_insurance_quidco")
+     * @Route("/contents-insurance/ppc", name="contents_insurance_ppc")
      */
     public function contentsInsuranceAction(Request $request)
     {
@@ -79,13 +80,22 @@ class HomeContentsController extends BaseController
             $template = 'AppBundle:ContentsInsurance:contentsInsuranceComparison.html.twig';
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
                 'page' => 'Contents Insurance - Quidco']);
+        } elseif ($request->get('_route') == 'contents_insurance_ppc') {
+            $noindex = true;
+            $promo = false;
+            $partner = 'ppc';
+            $template = 'AppBundle:ContentsInsurance:contentsInsuranceComparison.html.twig';
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+                'page' => 'Contents Insurance - PPC']);
         } else {
             $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CONTENTS_INSURANCE_HOME_PAGE);
-            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
-                'Page' => 'landing_page',
-                'Step' => 'contents_insurance'
-            ]);
         }
+
+        // Always use page load event
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'landing_page',
+            'Step' => 'contents_insurance'
+        ]);
 
         // Pass along UTM params to web app for Mixapanel
         $utms = null;

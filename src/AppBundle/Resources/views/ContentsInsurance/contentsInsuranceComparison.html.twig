@@ -41,11 +41,13 @@
                     </li>
                 </ul>
                 <p class="text-white">Cover that's fair and fast when you need it - and gives you money back when you don't.</p>
-                <p class="text-deep-sky-blue-d">affiliated with:</p>
-                <img src="{{ cdn_url }}/images/onexone.png"
-                    data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_{{ partner }}_logo.svg" alt="{{ partner }} Logo"
-                    title="{{ partner }}"
-                    width="260px" class="lozad">
+                {% if promo %}
+                    <p class="text-deep-sky-blue-d">affiliated with:</p>
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_{{ partner }}_logo.svg" alt="{{ partner }} Logo"
+                        title="{{ partner }}"
+                        width="260px" class="lozad">
+                {% endif %}
             </div>
             <div class="hero__controls mb-4">
                 <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
