@@ -335,6 +335,9 @@ class PolicyService
         $checkmend['imeiCertId'] = $this->imeiValidator->getCertId();
         $checkmend['imeiResponse'] = $this->imeiValidator->getResponseData();
 
+        // Get the model for 'iPhone SE Workaround'
+        $model = $phone->getModel();
+
         if (!$this->imeiValidator->checkSerial(
             $phone,
             $serialNumber,
@@ -342,9 +345,10 @@ class PolicyService
             $user,
             $identityLog,
             $this->warnMakeModelMismatch
-        )) {
+        ) && $model != 'iPhone SE (2020)') {
             throw new ImeiPhoneMismatchException();
         }
+
         $checkmend['serialResponse'] = $this->imeiValidator->getResponseData();
         $checkmend['makeModelValidatedStatus'] = $this->imeiValidator->getMakeModelValidatedStatus();
 
