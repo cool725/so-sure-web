@@ -940,6 +940,10 @@ class Phone
                     return 9.99 + 1.5; // 11.49
                 } elseif ($price <= 1500) {
                     return 10.99 + 1.5; // 12.49
+                } elseif ($price <= 1800) {
+                    return 11.99 + 1.5; // 12.49
+                } elseif ($price <= 2000) {
+                    return 12.99 + 1.5; // 12.49
                 }
             }
             return null;
