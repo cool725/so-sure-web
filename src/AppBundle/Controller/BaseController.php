@@ -79,6 +79,8 @@ abstract class BaseController extends Controller
     const MONGO_QUERY_TYPE_ID = 'id';
     const MONGO_QUERY_TYPE_DAY = 'day';
     const MONGO_QUERY_TYPE_MOBILE = 'mobile';
+    const CACHE_PHONES_KEY_FORMAT = 'Phones:%s';
+    const CACHE_PHONES_TIME = 3600; // 1 hour
 
     public function isDataStringPresent($data, $field)
     {
@@ -185,22 +187,37 @@ abstract class BaseController extends Controller
         $phones = [];
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $items = $repo->findActive()->getQuery()->execute();
-        foreach ($items as $phone) {
-            if (!in_array($phone->getMake(), $makes)) {
-                $makes[] = $phone->getMake();
-            }
-            $phones[$phone->getMake()][$phone->getModel()][$phone->getId()] = [
-                'memory' => $phone->getMemory(), 'featured' => $phone->isTopPhone()
-            ];
-            if ($phone->getAlternativeMake()) {
-                if (!in_array($phone->getAlternativeMake(), $makes)) {
-                    $makes[] = $phone->getAlternativeMake();
+
+        $redis = $this->get("snc_redis.default");
+        $environment = $this->getParameter('kernel.environment');
+        $redisKey = sprintf(
+            self::CACHE_PHONES_KEY_FORMAT,
+            $environment
+        );
+
+        if ($redis->exists($redisKey)) {
+            $phones = json_decode($redis->get($redisKey));
+        } else {
+            $items = $repo->findActive()->getQuery()->execute();
+            foreach ($items as $phone) {
+                if (!in_array($phone->getMake(), $makes)) {
+                    $makes[] = $phone->getMake();
                 }
-                $phones[$phone->getAlternativeMake()][$phone->getModel()][$phone->getId()] = [
+                $phones[$phone->getMake()][$phone->getModel()][$phone->getId()] = [
                     'memory' => $phone->getMemory(), 'featured' => $phone->isTopPhone()
                 ];
+                if ($phone->getAlternativeMake()) {
+                    if (!in_array($phone->getAlternativeMake(), $makes)) {
+                        $makes[] = $phone->getAlternativeMake();
+                    }
+                    $phones[$phone->getAlternativeMake()][$phone->getModel()][$phone->getId()] = [
+                        'memory' => $phone->getMemory(), 'featured' => $phone->isTopPhone()
+                    ];
+                }
             }
+
+            // save to redis cache
+            $redis->setex($redisKey, self::CACHE_PHONES_TIME, json_encode($phones));
         }
 
         return $phones;
