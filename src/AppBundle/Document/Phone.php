@@ -919,9 +919,9 @@ class Phone
             } elseif ($price <= 1500) {
                 return 10.99 + 1.5; // 12.49
             } elseif ($price <= 1800) {
-                return 11.99 + 1.5; // 12.49
+                return 11.99 + 1.5; // 13.49
             } elseif ($price <= 2000) {
-                return 12.99 + 1.5; // 12.49
+                return 12.99 + 1.5; // 14.49
             }
             return null;
         } else {
@@ -949,9 +949,9 @@ class Phone
             }
             if ($date >= $binder2021) {
                 if ($price <= 1800) {
-                    return 11.99 + 1.5; // 12.49
+                    return 11.99 + 1.5; // 13.49
                 } elseif ($price <= 2000) {
-                    return 12.99 + 1.5; // 12.49
+                    return 12.99 + 1.5; // 14.49
                 }
             }
             return null;
