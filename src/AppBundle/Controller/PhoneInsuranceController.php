@@ -436,6 +436,10 @@ class PhoneInsuranceController extends BaseController
             'galaxy-note-9',
             'pixel',
             'pixel-3-xl',
+            'iphone-13',
+            'iphone-13-min',
+            'iphone-13-pro',
+            'iphone-13-pro-max'
         ];
         // TODO: use make in template names
         $templateOverides = [
