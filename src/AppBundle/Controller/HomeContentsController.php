@@ -103,12 +103,20 @@ class HomeContentsController extends BaseController
         $medium = $request->query->get('utm_medium');
         $campaign = $request->query->get('utm_campaign');
         $sskey = $request->query->get('sskey');
+        $sosure = $request->cookies->get('sosure-tracking');
 
-        if ($source || $medium || $campaign) {
+        if ($source || $medium || $campaign || $sosure) {
             $source = urlencode($source);
             $medium = urlencode($medium);
             $campaign = urlencode($campaign);
-            $utms = sprintf('utm_source=%s&utm_medium=%s&utm_campaign=%s', $source, $medium, $campaign);
+            $sosure = urldecode($sosure);
+            $utms = sprintf(
+                'utm_source=%s&utm_medium=%s&utm_campaign=%s&sosure=%s',
+                $source,
+                $medium,
+                $campaign,
+                $sosure
+            );
         }
 
         // Set Greeting
