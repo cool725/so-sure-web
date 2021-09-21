@@ -489,6 +489,24 @@ trait DateTrait
         return $days;
     }
 
+    /**
+     * Gives you a list containing a string of the day for every day between start and end where start is inclusive and
+     * end is exclusive.
+     * @param \DateTime $start is the date to start the list on.
+     * @param \DateTime $end   is the date to not exceed.
+     * @return array containing strings of dates.
+     */
+    public static function listDays(\DateTime $start, \DateTime $end)
+    {
+        $start = clone $start;
+        $days = [];
+        while ($start < $end) {
+            $days[] = $start->format("Y-m-d");
+            $start->add(new \DateInterval("P1D"));
+        }
+        return $days;
+    }
+
     public function normalizeDate($date)
     {
         $date = trim($date);
