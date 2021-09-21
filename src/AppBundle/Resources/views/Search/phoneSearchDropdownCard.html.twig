@@ -2,20 +2,37 @@
     <div class="mb-3 h4 text-primary fit">
         Fair, Fast &amp; Easy 🇬🇧
     </div>
-    <ul class="list-unstyled icn-fa-list mb-4">
-        <li class="mb-2">
-            <i class="far fa-check fa-lg fa-fw text-success"></i>
-            24-72h repair or replace service
-        </li>
-        <li class="mb-2">
-            <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Up to 80% no claims cashback
-        </li>
-        <li class="mb-2">
-            <i class="far fa-check fa-lg fa-fw text-success"></i>
-            Low price and excess from {{ lowest_excess }}
-        </li>
-    </ul>
+    {% if type is defined and type == 'promo' %}
+        <ul class="list-unstyled icn-fa-list mb-4">
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Instant quote, speedy sign-up
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Up to 80% no claims cashback
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Use code <strong>{{ code }}</strong> at the checkout 😎
+            </li>
+        </ul>
+    {% else %}
+        <ul class="list-unstyled icn-fa-list mb-4">
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                24-72h repair or replace service
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Up to 80% no claims cashback
+            </li>
+            <li class="mb-2">
+                <i class="far fa-check fa-lg fa-fw text-success"></i>
+                Low price and excess from {{ lowest_excess }}
+            </li>
+        </ul>
+    {% endif %}
     {{ form_start(form_phone, { 'attr': {
         'data-toggle': 'validator',
         'class': 'phone-search-dropdown-card validate-form',
@@ -47,7 +64,7 @@
         <div class="form-group">
             <input type="email"
                    class="form-control phone-search-dropdown-card__text phone-search-email"
-                   placeholder="Enter Email for Quote"
+                   placeholder="Enter Email (Optional)"
                    disabled="disabled"
                    name="launch_phone[email]">
         </div>

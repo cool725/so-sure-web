@@ -141,6 +141,31 @@
                         {% if not phone.active %}
                             <p class="text-white my-4">Unfortunately we no longer insure this device as it's either over three years old or replacements/parts are hard to source. We aim to provide you the best possible claims experience and make sure we only cover devices with good replacement/parts availability.</p>
                             <a href="#" class="btn btn-success btn-block-xs btn-shadow get-a-quote disabled mb-5">Get a Quote</a>
+                        {% elseif upcoming %}
+                            <p class="text-white my-4 lead">Coming soon...</p>
+                            <ul class="list-unstyled icn-fa-list mb-4">
+                                <li class="mb-3 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    24-72h repair or replace service
+                                </li>
+                                <li class="mb-3 text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    Up to 80% no claims cashback
+                                </li>
+                                <li class="text-white">
+                                    <i class="far fa-check fa-lg fa-fw text-deep-sky-blue-d"></i>
+                                    Low price and excess from {{ lowest_excess }}
+                                </li>
+                            </ul>
+                            <a href="#"
+                               class="btn btn-outline-white watch-video btn-block-xs"
+                               data-event="watch-video-index-hero"
+                               data-toggle="modal"
+                               data-target="#sosure-video-modal"
+                               data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                                <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                                Watch our Video
+                            </a>
                         {% else %}
                             {% if phone is defined and phone %}
                                 {{ render(controller('AppBundle:Search:memorySearchDropdown', {
@@ -197,11 +222,14 @@
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_phone-qr.png" alt="so-sure - super quick cover" width="180px" class="lozad">
-                    <h3 class="h5 text-primary">Low excess from just &pound;{{ prices['monthly'].picsureexcess.damage }}</h3>
+                    {% if upcoming %}
+                        <h3 class="h5 text-primary">Low excess from just {{ lowest_excess }}</h3>
+                    {% else %}
+                        <h3 class="h5 text-primary">Low excess from just &pound;{{ prices['monthly'].picsureexcess.damage }}</h3>
+                    {% endif %}
                     <p class="mb-5">Download the so-sure app and validate your phone to reduce your excess</p>
                 </div>
             </div>
-            {# <a href="#" class="btn btn-success btn-block-xs get-a-quote disabled mb-5">Insure your phone in minutes</a> #}
         </div>
     </section>
 

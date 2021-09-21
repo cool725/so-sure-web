@@ -69,18 +69,19 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
         echo '"Payment ID","Policy Number","Policy ID","Payment Date","Policy Start Date",'
                 .'"Name","Email","Amount","Status"'."\n";
         foreach ($payments as $payment) {
-            echo $payment->getId().',';
-            echo $payment->getPolicy()->getPolicyNumber().',';
-            echo $payment->getPolicy()->getId().',';
-            echo $payment->getDate()->format('Y-m-d H:i').',';
-            echo $payment->getPolicy()->getStart()->format('Y-m-d H:i').',';
-            echo $payment->getPolicy()->getUser()->getFirstName()
-                .' '.$payment->getPolicy()->getUser()->getLastName().',';
-            echo $payment->getPolicy()->getUser()->getEmail().',';
-            echo $payment->getAmount().',';
-            echo $payment->getPolicy()->getBacsBankAccount()->getMandateSerialNumber().',';
-            echo $payment->getStatus();
-            echo "\n";
+            if ($payment->getPolicy() !== null) {
+                echo $payment->getId().',';
+                echo $payment->getPolicy()->getPolicyNumber().',';
+                echo $payment->getPolicy()->getId().',';
+                echo $payment->getDate()->format('Y-m-d H:i').',';
+                echo $payment->getPolicy()->getStart()->format('Y-m-d H:i').',';
+                echo $payment->getPolicy()->getUser()->getFirstName()
+                    .' '.$payment->getPolicy()->getUser()->getLastName().',';
+                echo $payment->getPolicy()->getUser()->getEmail().',';
+                echo $payment->getAmount().',';
+                echo $payment->getStatus();
+                echo "\n";
+            }
         }
     }
 }

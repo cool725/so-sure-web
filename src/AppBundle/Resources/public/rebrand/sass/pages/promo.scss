@@ -20,6 +20,15 @@
         z-index: 4;
     }
 
+    &-heading {
+        color: $white;
+        text-align: center;
+
+        .sub {
+            color: $deep-sky-blue-d;
+        }
+    }
+
     &-scroll-down {
         display: flex;
         text-align: center;

@@ -1,0 +1,297 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'contents-insurance' %}
+{% set robots_noindex = is_noindex %}
+
+{% block title %}Contents Insurance | SO-SURE{% endblock %}
+{% block meta %}
+    <meta name="description" content="Low cost contents insurance with up to 40% no claims cashback and price freeze. Claims sorted in 72hrs covering almost all contents, accidental, fire, damage and theft."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Contents Insurance | SO-SURE' %}
+{% set og_description = "Low cost contents insurance with up to 40% no claims cashback and price freeze. Claims sorted in 72hrs covering almost all contents, accidental, fire, damage and theft." %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('contents-insurance-comparison') }}
+{% endblock %}
+
+{% block body %}
+    <section class="hero">
+        <div class="container-large">
+            <div class="hero__intro">
+                <h1 class="mb-4 text-white h2">Premium Contents Insurance cover 💎 <br class="d-lg-none" />with SO-SURE</h1>
+                <ul class="list-unstyled mb-4">
+                    <li class="mb-3 lead text-white">
+                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                        No hidden fees
+                    </li>
+                    <li class="mb-3 lead text-white">
+                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                        Pay only for what you need
+                    </li>
+                    <li class="mb-3 lead text-white">
+                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                        Same price at renewal
+                    </li>
+                    <li class="lead text-white">
+                        <i class="far fa-check fa-lg fa-fw text-success"></i>
+                        1 month free when you pay yearly
+                    </li>
+                </ul>
+                <p class="text-white">Cover that's fair and fast when you need it - and gives you money back when you don't.</p>
+                {% if promo %}
+                    <p class="text-deep-sky-blue-d">affiliated with:</p>
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                        data-src="{{ cdn_url }}/images/rebrand/partnerships/so-sure_{{ partner }}_logo.svg" alt="{{ partner }} Logo"
+                        title="{{ partner }}"
+                        width="260px" class="lozad">
+                {% endif %}
+            </div>
+            <div class="hero__controls mb-4">
+                <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                    class="btn btn-success mb-5 mb-xl-0 btn-block-xs track-data"
+                    data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                    data-event="get-a-quote"
+                    data-event-type="click"
+                    data-event-location="home-contents">
+                    Get a quote
+                </a>
+            </div>
+        </div>
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 750 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <defs></defs>
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g transform="translate(0.000000, -72.000000)" fill="#ffffff">
+                    <g id="---BG---" transform="translate(-4700.000000, -8443.000000)">
+                        <path d="M4700,8515 C4824,8551 4948.66667,8569 5074,8569 C5199.33333,8569 5324.66667,8551 5450,8515 L5450,8592 L4700,8592 L4700,8515 Z" id="Rectangle"></path>
+                    </g>
+                </g>
+            </g>
+        </svg>
+    </section>
+
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="home-contents-compare py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">How are we different?</h2>
+            {% include 'AppBundle::ContentsInsurance/_comparisonTableHome.html.twig' %}
+            <p class="text-muted"><small>*Based on a sample of UK insurance providers; these may not apply for every insurer</small></p>
+            <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                class="btn btn-success btn-block-xs track-data"
+                data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                data-event="get-a-quote"
+                data-event-type="click"
+                data-event-location="home-contents">
+                Get a quote
+            </a>
+        </div>
+    </section>
+
+    <section class="home-contents pb-lg-5">
+        <div class="container-large py-5">
+            <div class="cardbox no-box-shadow cardbox-100">
+                <div class="cardbox__body p-lg-5">
+                    <h2 class="h3 text-primary text-center mb-5">Included in our standard cover</h2>
+                    <div class="more-information-items">
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/fire-and-smoke.svg"
+                                alt="Fire and smoke"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Fire and smoke</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/theft-and-vandalism.svg"
+                                alt="Theft and vandalism"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Theft and vandalism</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/storms-and-flood.svg"
+                                alt="Storms and flood"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Storms and flood</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/property-rent.svg"
+                                alt="Tenants liability"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Tenants liability</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/public-and-personal-liability.svg"
+                                alt="Public and personal liability"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Public and personal liability</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/property-flat.svg"
+                                alt="Alternative accomodation"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Alternative accommodation</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/items-in-gardens-and-shared-areas.svg"
+                                alt="Items in gardens and shared areas"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Items in gardens and shared areas</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/freezer-goods.svg"
+                                alt="Freezer goods"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Freezer goods</span>
+                        </div>
+                        <div class="more-information-item">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/household-leaks.svg"
+                                alt="Household leaks"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Household leaks</span>
+                        </div>
+                    </div>
+                    <hr class="my-5" />
+                    <div class="h4 text-zaffre text-center mb-5">Optional cover</div>
+                    <div class="more-information-items">
+                        <div class="more-information-item optional">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/accidental-damage.svg"
+                                alt="Accidental damage"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Accidental damage</span>
+                        </div>
+                        <div class="more-information-item optional">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/out-of-home.svg"
+                                alt="Out of home"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Out of home</span>
+                        </div>
+                        <div class="more-information-item optional">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/pet-insurance.svg"
+                                alt="Pet insurance"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Pet insurance</span>
+                        </div>
+                        <div class="more-information-item optional">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/business-equipment.svg"
+                                alt="Business equipment"
+                                class="more-information-item-icon lozad"
+                                loading="lazy"
+                            />
+                            <span>Business equipment</span>
+                        </div>
+                        <div class="more-information-item optional">
+                            <img
+                                src="{{ cdn_url }}/images/onexone.png"
+                                data-src="{{ cdn_url }}/images/rebrand/home-contents/funnel/bicycles.svg"
+                                alt="Bicycles"
+                                class="more-information-item-iconlozad"
+                                loading="lazy"
+                            />
+                            <span>Bicycles (coming soon)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="vid-sure py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4">Get covered in 3 simple steps</h2>
+            <div class="row align-items-lg-center mb-3">
+                <div class="col-lg-7">
+                    <div class="timeline">
+                        <div class="timeline-block timeline-block-white-blue">
+                            <div class="timeline-point">1</div>
+                            <div class="timeline-content">
+                                <div class="h5 text-primary">Give us a few details</div>
+                                <p>Tell us a bit about yourself, where you live and items you want to insure. We don’t waste your time with irrelevant questions and long forms so you can get insured in seconds.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-block timeline-block-white-blue">
+                            <div class="timeline-point">2</div>
+                            <div class="timeline-content">
+                                <div class="h5 text-primary">Personalise your package</div>
+                                <p>Completely configurable to your needs – don’t pay for what you don’t want!</p>
+                            </div>
+                        </div>
+                        <div class="timeline-block timeline-block-white-blue">
+                            <div class="timeline-point">3</div>
+                            <div class="timeline-content">
+                                <div class="h5 text-primary">That’s it. You’re covered</div>
+                                <p>You can change your policy at no charge and cancel any time for free.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 d-none d-lg-block">
+                    <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/home-contents/so-sure_website_phone_contents_large.png" alt="SO-SURE Home Contents Website" width="" class="img-fluid lozad">
+                </div>
+            </div>
+            <a href="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                class="btn btn-success btn-block-xs track-data"
+                data-event-url="{{ home_contents_funnel }}{% if utms %}?{{ utms }}{% endif %}"
+                data-event="get-a-quote"
+                data-event-type="click"
+                data-event-location="home-contents">
+                Get a quote
+            </a>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('contents-insurance-comparison') }}
+{% endblock %}

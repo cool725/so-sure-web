@@ -132,7 +132,8 @@ class SearchController extends BaseController
         Request $request,
         $type = null,
         $id = null,
-        $source = null
+        $source = null,
+        $code = null
     ) {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -222,6 +223,7 @@ class SearchController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
+            'code' => $code,
         ];
     }
 

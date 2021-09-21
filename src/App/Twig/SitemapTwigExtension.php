@@ -91,6 +91,8 @@ class SitemapTwigExtension extends \Twig_Extension
             '/blog/samsung-care-plus-vs-phone-insurance' => 'Samsung Care Plus vs Phone Insurance',
             '/blog/dog-damage-and-other-findings-from-our-new-research' => 'Dog Damage and Other Findings From Our New Research',
             '/blog/cost-of-living-in-fictional-homes' => 'How much would it cost to live in these famous fictional homes?',
+            '/blog/what-does-phone-insurance-cover' => 'What Does Mobile Phone Insurance Cover?',
+            '/blog/how-to-make-a-successful-mobile-insurance-claim' => 'How to Make a Successful Mobile Insurance Claim',
             '/about/social-insurance' => 'About so-sure',
             '/about/social-insurance/careers' => 'Careers',
             '/about/social-insurance/privacy' => 'Privacy Policy',

@@ -110,6 +110,7 @@ Encore
 
     .addEntry('contents-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance.js')
     .addEntry('phone-insurance-homepage', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-homepage.js')
+    .addEntry('contents-insurance-comparison', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance-comparison.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
