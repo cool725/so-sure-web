@@ -380,6 +380,7 @@ class PhoneInsuranceController extends BaseController
         $decodedModelHyph = Phone::decodedModelHyph($model);
         $noindex = false;
         $money = false;
+        $upcoming = false;
 
         $phones = $repo->findBy([
             'makeCanonical' => mb_strtolower($make),
@@ -394,6 +395,16 @@ class PhoneInsuranceController extends BaseController
                 'modelCanonical' => mb_strtolower($decodedModelHyph),
             ]);
         }
+
+        if (preg_match("/^[A-Z]/", $make) || preg_match("/^[A-Z]/", $model)) {
+            return $this->redirectToRoute('phone_insurance_make_model', [
+                'make' => mb_strtolower($make),
+                'model' => mb_strtolower($model),
+            ], 301);
+        }
+
+        // Model caps redirect
+        // Model hyp caps redirect
 
         if (!$phone) {
             $this->get('logger')->info(sprintf(
@@ -425,6 +436,10 @@ class PhoneInsuranceController extends BaseController
             'galaxy-note-9',
             'pixel',
             'pixel-3-xl',
+            'iphone-13',
+            'iphone-13-min',
+            'iphone-13-pro',
+            'iphone-13-pro-max'
         ];
         // TODO: use make in template names
         $templateOverides = [
@@ -444,7 +459,13 @@ class PhoneInsuranceController extends BaseController
         // Get the price service
         $priceService = $this->get('app.price');
 
-        $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        // Check if pricing or enable the upcoming feature
+        if (!$phone->getCurrentYearlyPhonePrice()) {
+            $upcoming = true;
+            $fromPrice = '9.49';
+        } else {
+            $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        }
 
         $competitorData = new Competitors();
 
@@ -471,6 +492,7 @@ class PhoneInsuranceController extends BaseController
             'competitor' => $competitorData::$competitorComparisonData,
             'money_version' => $money,
             'is_noindex' => $noindex,
+            'upcoming' => $upcoming,
         ];
 
         return $this->render($template, $data);

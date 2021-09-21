@@ -893,6 +893,7 @@ class Phone
         $binder2016 = new \DateTime('2016-09-01 00:00:00', SoSure::getSoSureTimezone());
         $binder2018 = new \DateTime('2018-01-01 00:00:00', SoSure::getSoSureTimezone());
         $binder2020 = new \DateTime('2019-12-31 00:00:00', SoSure::getSoSureTimezone());
+        $binder2021 = new \DateTime('2021-09-15 00:00:00', SoSure::getSoSureTimezone());
         if (!$date) {
             $date = new \DateTime('now', SoSure::getSoSureTimezone());
         }
@@ -917,6 +918,10 @@ class Phone
                 return 9.99 + 1.5; // 11.49
             } elseif ($price <= 1500) {
                 return 10.99 + 1.5; // 12.49
+            } elseif ($price <= 1800) {
+                return 11.99 + 1.5; // 13.49
+            } elseif ($price <= 2000) {
+                return 12.99 + 1.5; // 14.49
             }
             return null;
         } else {
@@ -940,6 +945,13 @@ class Phone
                     return 9.99 + 1.5; // 11.49
                 } elseif ($price <= 1500) {
                     return 10.99 + 1.5; // 12.49
+                }
+            }
+            if ($date >= $binder2021) {
+                if ($price <= 1800) {
+                    return 11.99 + 1.5; // 13.49
+                } elseif ($price <= 2000) {
+                    return 12.99 + 1.5; // 14.49
                 }
             }
             return null;

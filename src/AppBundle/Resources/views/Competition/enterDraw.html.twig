@@ -7,9 +7,8 @@
 
 {% block title %}Enter Draw | so-sure{% endblock %}
 
-{# Set Meta #}
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/competition.css') }}">
+    {{ encore_entry_link_tags('competition') }}
 {% endblock %}
 
 {% block body %}
@@ -47,5 +46,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/competition.js') }}"></script>
+    {{ encore_entry_script_tags('competition') }}
 {% endblock %}

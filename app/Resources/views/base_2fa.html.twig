@@ -9,9 +9,9 @@
         {% endif %}
 
         <title>{% block title %}so-sure{% endblock %}</title>
-
-        <link rel="stylesheet" href="{{ asset('css-js/global.css') }}">
-
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('global') }}
+        {% endblock %}
         {% block cssPage %}{% endblock %}
     </head>
     <body class="d-flex flex-column {% if body_class is defined %}{{ body_class }}{% endif %}">
@@ -34,14 +34,12 @@
 
         {% include '::footer_data.html.twig' %}
 
-        <script src="{{ asset('css-js/runtime.js') }}"></script>
-        <script src="{{ asset('css-js/vendor.js') }}"></script>
-        <script src="{{ asset('css-js/global.js') }}" async></script>
-
+        {% block javascripts %}
+            {{ encore_entry_script_tags('global') }}
+            {% if environment != 'prod' %}
+                 {{ encore_entry_script_tags('dev') }}
+            {% endif %}
+        {% endblock %}
         {% block javascriptsPage %}{% endblock %}
-
-        {% if environment != 'prod' %}
-            <script src="{{ asset('css-js/dev.js') }}"></script>
-        {% endif %}
     </body>
 </html>

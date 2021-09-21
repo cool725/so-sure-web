@@ -10,7 +10,7 @@
 {% set share_url = url('student_promo', {'code': scode.code})|replace({(api_base_url): web_base_url}) %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/signup.css') }}">
+    {{ encore_entry_link_tags('signup') }}
 {% endblock %}
 
 {% block body %}
@@ -33,5 +33,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-     <script src="{{ asset('css-js/signup.js') }}"></script>
+    {{ encore_entry_script_tags('signup') }}
 {% endblock %}

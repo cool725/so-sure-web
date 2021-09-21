@@ -10,7 +10,7 @@
 {% block meta %}{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/opt-out.css') }}">
+    {{ encore_entry_link_tags('opt-out') }}
 {% endblock %}
 
 {% block body %}
@@ -57,5 +57,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/opt-out.js') }}"></script>
+    {{ encore_entry_script_tags('opt-out') }}
 {% endblock %}

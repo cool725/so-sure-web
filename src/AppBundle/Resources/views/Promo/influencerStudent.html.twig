@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/invite-influencer.css') }}">
+    {{ encore_entry_link_tags('invite-influencer') }}
 {% endblock %}
 
 {% block body %}
@@ -226,5 +226,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/invite-influencer.js') }}"></script>
+    {{ encore_entry_script_tags('invite-influencer') }}
 {% endblock %}

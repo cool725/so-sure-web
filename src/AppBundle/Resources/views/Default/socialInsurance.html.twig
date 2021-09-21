@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/social-insurance.css') }}">
+    {{ encore_entry_link_tags('social-insurance') }}
 {% endblock %}
 
 {% block body %}
@@ -311,6 +311,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/social-insurance.js') }}"></script>
-    <script src="{{ asset('css-js/phone-insurance.js') }}"></script>
+    {{ encore_entry_script_tags('social-insurance') }}
+    {{ encore_entry_script_tags('phone-insurance') }}
 {% endblock %}

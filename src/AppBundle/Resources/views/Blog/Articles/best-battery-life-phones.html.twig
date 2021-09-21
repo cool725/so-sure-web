@@ -4,19 +4,49 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Best Battery Life Phones 2020 | so-sure{% endblock %}
+{% block title %}Best Battery Life Phones 2020 | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Why do we still put up with poor battery life on our smartphones? This 'best phone for battery life' list will help you to make the decision on which phone to buy."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Best Battery Life Phones 2020 | so-sure' %}
+{% set og_title = 'Best Battery Life Phones 2020 | SO-SURE' %}
 {% set og_description = "Why do we still put up with poor battery life on our smartphones? This 'best phone for battery life' list will help you to make the decision on which phone to buy." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/phone-insurance-guide-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com/blog/best-battery-life-phones"
+  },
+  "headline": "Best Battery Life Phones 2020 | so-sure",
+  "description": "Why do we still put up with poor battery life on our smartphones? This 'best phone for battery life' list will help you to make the decision on which phone to buy.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/phone-insurance-guide-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-02-03"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -146,5 +176,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

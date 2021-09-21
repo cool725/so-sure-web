@@ -8,8 +8,9 @@
 {% block title %}Welcome to Social Insurance | so-sure{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/pos.css') }}">
+    {{ encore_entry_link_tags('pos') }}
 {% endblock %}
+
 
 {% block body %}
 
@@ -143,5 +144,5 @@
 {% block footer %}{% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/pos.js') }}"></script>
+    {{ encore_entry_script_tags('pos') }}
 {% endblock %}

@@ -78,6 +78,7 @@ class PromoController extends BaseController
         if ($request->get('_route') == 'amazon_promo') {
             $custom = 'amazon';
             $amazonVoucher = 15;
+            $template = 'AppBundle:Promo:promoCard.html.twig';
         } elseif ($request->get('_route') == 'share_promo') {
             $template = 'AppBundle:Promo:influencer.html.twig';
         } elseif ($request->get('_route') == 'student_promo') {

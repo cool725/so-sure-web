@@ -17,7 +17,7 @@
 {% endif %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user-referral.css') }}">
+    {{ encore_entry_link_tags('user-referral') }}
 {% endblock %}
 
 {% if policy.getPremiumPlan == 'monthly'%}
@@ -197,5 +197,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/user-referral.js') }}"></script>
+    {{ encore_entry_script_tags('user-referral') }}
 {% endblock %}

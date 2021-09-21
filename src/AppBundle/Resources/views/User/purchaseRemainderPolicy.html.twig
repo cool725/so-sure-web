@@ -4,7 +4,7 @@
 {% set body_class = 'purchase-remainder-policy' %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user-unpaid.css') }}">
+    {{ encore_entry_link_tags('user-unpaid') }}
 {% endblock %}
 
 {% block body %}
@@ -89,6 +89,5 @@
     {% else %}
         <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
     {% endif %}
-    <script src="{{ asset('css-js/purchase-remainder.js') }}"></script>
-
+    {{ encore_entry_script_tags('purchase-remainder') }}
 {% endblock %}

@@ -184,6 +184,33 @@ class SftpService
         }
     }
 
+    /**
+     * Tries to move a file to some folder in the sftp, and if it fails it retries it ten times, and it doesn't throw
+     * exceptions.
+     * @param string $file   is the name of the file in the sftp root to move.
+     * @param string $folder is the folder to move the file to.
+     * @return string|null the new filename or null if it failed.
+     */
+    public function moveSafely($file, $folder)
+    {
+        for ($i = 0; $i < 10; $i++) {
+            try {
+                $this->moveSftpToFolder($file, $folder);
+                return $folder.'/'.$file;
+            } catch (\Exception $e) {
+                $this->logger->error(sprintf(
+                    'failed to move file %s to folder %s attempt %d with message: %s',
+                    $file,
+                    $folder,
+                    $i + 1,
+                    $e->getMessage()
+                ));
+                sleep(5);
+            }
+        }
+        return null;
+    }
+
     public function generateTempFile()
     {
         $tempFile = tempnam(sys_get_temp_dir(), "sftp-");

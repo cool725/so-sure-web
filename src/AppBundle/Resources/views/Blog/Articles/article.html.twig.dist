@@ -4,19 +4,22 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Title - Blog | SO-SURE{% endblock %}
+{% block title %}Title  | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content=""/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Title - Blog | SO-SURE' %}
+{% set og_title = 'Title  | SO-SURE' %}
 {% set og_description = "" %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/' %}
 
+{% block schema %}
+{% endblock %}
+
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -74,7 +77,7 @@
                                     <div class="blog__info_share">
                                         <ul class="list-inline">
                                             <li class="list-inline-item">
-                                                <div rel="author">so-sure</div>
+                                                <div rel="author">SO-SURE</div>
                                             </li>
                                             <li class="list-inline-item">|</li>
                                             <li class="list-inline-item">
@@ -106,5 +109,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

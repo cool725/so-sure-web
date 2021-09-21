@@ -36,7 +36,7 @@
 {% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user-unpaid.css') }}">
+    {{ encore_entry_link_tags('user-unpaid') }}
 {% endblock %}
 
 {% block body %}
@@ -283,5 +283,5 @@
     {% else %}
         <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
     {% endif %}
-    <script src="{{ asset('css-js/user-unpaid.js') }}"></script>
+    {{ encore_entry_script_tags('user-unpaid') }}
 {% endblock %}

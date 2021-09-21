@@ -132,5 +132,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
+    {{ encore_entry_script_tags('datepicker-month') }}
 {% endblock %}
+

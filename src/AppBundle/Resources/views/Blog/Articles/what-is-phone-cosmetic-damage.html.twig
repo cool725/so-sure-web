@@ -14,9 +14,39 @@
 {% set og_description = "Cosmetic damage usually applies to any appearance-related phone damage that doesn’t affect the functionality, such as scratches or chips to the exterior." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/what-is-phone-cosmetic-damage.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com/blog/what-is-phone-cosmetic-damage"
+  },
+  "headline": "What Is Phone Cosmetic Damage? | SO-SURE",
+  "description": "Cosmetic damage usually applies to any appearance-related phone damage that doesn’t affect the functionality, such as scratches or chips to the exterior.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/what-is-phone-cosmetic-damage.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-02-28"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -123,5 +153,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

@@ -88,6 +88,6 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/accounts.js') }}"></script>
-    <script src="{{ asset('css-js/datepicker-month.js') }}"></script>
+    {{ encore_entry_script_tags('datepicker-month') }}
+    {{ encore_entry_script_tags('accounts') }}
 {% endblock %}

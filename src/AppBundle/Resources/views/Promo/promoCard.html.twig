@@ -1,0 +1,174 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'promo' %}
+{% set robots_noindex = true %}
+{% set include_get_a_quote = true %}
+{% set h1 = 'Mobile Phone Insurance <br /> <span class="sub text-deep-sky-blue-d">Get money back if I don\'t claim? Yes Please!</span>' %}
+{% if amazon_voucher is defined and amazon_voucher is not null %}
+  {% set h1 = 'Protect your phone <span class="text-deep-sky-blue-d d-block d-md-inline">and get an Amazon voucher 💰</span>' %}
+{% endif %}
+
+{% block title %}SO-SURE | Insurance That’s a Win-Win!{% endblock %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('promo') }}
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <h1 class="hero-heading fit mb-4">
+              {{ h1|raw }}
+            </h1>
+            <div class="row">
+                <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-1 order-xl-2">
+                    {% if phone is defined and phone %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
+                            'type': 'promo',
+                            'code': scode.code,
+                            'source': 'phone',
+                            'id': phone.id }|merge(app.request.query.all)
+                        )) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
+                            'type': 'promo',
+                            'code': scode.code,
+                            'source': 'phone' }|merge(app.request.query.all)
+                        )) }}
+                    {% endif %}
+                    <p><small><a href="#terms_and_conditions" data-toggle="modal" data-target="#page_terms" class="terms-link text-white">Term &amp; Conditions</a></small></p>
+                </div>
+                <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
+                    <div class="hero-image">
+                        <picture class="lozad">
+                            {% if amazon_voucher is defined and amazon_voucher is not null %}
+                                <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_amazon.png" media="(min-width: 1200px)">
+                                <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_amazon.png" media="(min-width: 992px) and (max-width: 1199px)">
+                                <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_amazon.png" media="(min-width: 320px) and (max-width: 991px)">
+                            {% else %}
+                                <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_invite.png" media="(min-width: 1200px)">
+                                <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_invite.png" media="(min-width: 992px) and (max-width: 1199px)">
+                                <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_invite.png" media="(min-width: 320px) and (max-width: 991px)">
+                            {% endif %}
+                        </picture>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Cred #}
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="cover">
+        <div class="container-large py-5">
+            <div class="row px-md-5 pt-5">
+                <div class="col-md-7">
+                    <h3 class="h2 my-4"><span class="text-primary">Welcome to peace of mind - </span><br class="d-none d-lg-inline">What's included in your policy</h3>
+                    <p class="lead">You get fully comprehensive cover. And we don’t try and wangle out of things with small print – what you see is what you get.</p>
+                </div>
+                <div class="col-md-5">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                            data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_hand_holding_phone_stars.jpg"
+                            alt="Hand holding mobile phone"
+                            class="lozad img-fluid">
+                </div>
+            </div>
+            <hr class="mt-0 mb-5 mb-md-3">
+            <div class="row p-md-5">
+                <div class="col-md-6">
+                    <h4 class="h3 mb-4">What's covered 👍</h4>
+                    <ul class="list-unstyled icn-fa-list">
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Theft and loss as standard
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Accidental damage, including water damage and cracked screens
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            New, <a href="{{ path('phone_insurance_second_hand') }}">used</a> or <a href="{{ path('phone_insurance_refurbished') }}">refurbished</a> phones up to 3 yrs old
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Accessories up to the value of &pound;100 including VAT
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Unauthorised network charges up to &pound;1000
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            Out of warranty breakdown
+                        </li>
+                        <li class="mb-5 mb-md-3">
+                            <i class="far fa-check fa-lg fa-fw text-success"></i>
+                            90 days global travel
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4 class="h3 mb-4">What's not covered 👎</h4>
+                    <ul class="list-unstyled icn-fa-list">
+                        <li class="mb-3">
+                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                            Any existing claims before you bought our insurance
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                            More than 2 claims for Loss and/or Theft in any policy year
+                        </li>
+                        <li class="mb-3">
+                            <i class="far fa-times fa-lg fa-fw text-danger"></i>
+                            Claims where you’ve knowingly put your mobile phone at risk
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison">
+        <div class="container-large py-5">
+            <h3 class="h2 pt-5 text-center">Premium cover 💎</h3>
+            {% include 'AppBundle::Default/_comparisonTable.html.twig' %}
+        </div>
+    </section>
+
+    {# Page Modals #}
+    <div class="modal fade"
+         id="page_terms"
+         tabindex="-1" role="dialog"
+         aria-labelledby="page_terms"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Terms &amp; Conditions
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fal fa-times text-white"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if scode is defined and scode and scode.reward %}
+                        <p>{{ scode.reward.termsAndConditions|raw }}</p>
+                        {% if not custom %}
+                            <p>Code expires: <strong>{{ scode.reward.expiryDate|date('d/m/Y') }}</strong></p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('promo') }}
+{% endblock %}

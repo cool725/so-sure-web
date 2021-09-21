@@ -20,6 +20,15 @@
         z-index: 4;
     }
 
+    &-heading {
+        color: $white;
+        text-align: center;
+
+        .sub {
+            color: $deep-sky-blue-d;
+        }
+    }
+
     &-scroll-down {
         display: flex;
         text-align: center;
@@ -92,4 +101,8 @@
     @include media-breakpoint-up(fk) {
         background-position: 1400px 70px;
     }
+}
+
+.comparison {
+    background-color: $athens-gray;
 }

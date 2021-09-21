@@ -4,19 +4,49 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Samsung Galaxy Tips And Tricks | S8, S9, S10 | so-sure{% endblock %}
+{% block title %}Samsung Galaxy Tips And Tricks | S8, S9, S10 | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Focusing on the latest iterations, namely the S8, S9 and S10, our quickfire guide will ensure you get the most out of your Samsung smartphone."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Samsung Galaxy Tips And Tricks | S8, S9, S10 | so-sure' %}
+{% set og_title = 'Samsung Galaxy Tips And Tricks | S8, S9, S10 | SO-SURE' %}
 {% set og_description = "Focusing on the latest iterations, namely the S8, S9 and S10, our quickfire guide will ensure you get the most out of your Samsung smartphone." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/samsung-galaxy-tips-and-tricks-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com/blog/samsung-galaxy-tips-and-tricks"
+  },
+  "headline": "Samsung Galaxy Tips And Tricks | S8, S9, S10 | so-sure",
+  "description": "Focusing on the latest iterations, namely the S8, S9 and S10, our quickfire guide will ensure you get the most out of your Samsung smartphone.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/samsung-galaxy-tips-and-tricks-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-03-16"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -136,5 +166,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

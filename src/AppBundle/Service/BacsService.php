@@ -28,7 +28,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Classes\SoSure;
-use AppBundle\Classes\Lock;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\ScheduledPaymentEvent;
 use AppBundle\Exception\ValidationException;
@@ -61,7 +60,6 @@ class BacsService
     const KEY_BACS_CANCEL = 'bacs:cancel';
     const KEY_BACS_QUEUE = 'bacs:queue';
     const KEY_BACS_PROCESSED = 'bacs:processed';
-    const KEY_SFTP_FLAG = 'bacs:sftp-flag';
 
     // special key to use to adjust file date instead of storing in metadata
     const SPECIAL_METADATA_FILE_DATE = 'file-date';
@@ -285,22 +283,22 @@ class BacsService
     }
 
     /**
-     * Gives you a lock object for the bacs service processing sftp lock.
-     * @return Lock a new lock for that.
+     * Returns the number of instances of the sftp function running.
+     * @return int the number of them running.
      */
-    public function getSftpLock()
+    public function sftpRunning()
     {
-        return new Lock($this->redis, self::KEY_SFTP_FLAG);
+        return 0;
     }
 
     /**
-     * Processes all the bacs reports in the sftp folder.
+     * Processes a single zip file in the bacs sftp folder. Multiple instances of this function can be executing at
+     * a time because the file to be processed is immediately moved to a different folder. However, multiple instances
+     * of this function should not be started at the same time or race conditions may arise.
      * @return array containing some data about the results of the processing.
      */
     public function sftp()
     {
-        $results = [];
-        $errorCount = 0;
         $files = [];
         try {
             $files = $this->sosureSftpService->listSftp();
@@ -312,21 +310,21 @@ class BacsService
             return [];
         }
         if (count($files) == 0) {
-            goto end;
+            return [];
         }
-        foreach ($files as $file) {
-            $error = false;
-            $unzippedFile = null;
+        $file = $this->sosureSftpService->moveSafely($files[0], SftpService::FAILED_FOLDER);
+        if (!$file) {
+            return [];
+        }
+        $errors = 0;
+        $results = [];
+        $zip = $this->sosureSftpService->downloadFile($file);
+        $unzippedFiles = $this->unzipFile($zip);
+        foreach ($unzippedFiles as $unzippedFile) {
             try {
-                $zip = $this->sosureSftpService->downloadFile($file);
-                $unzippedFiles = $this->unzipFile($zip);
-                // print_r($unzippedFiles);
-                foreach ($unzippedFiles as $unzippedFile) {
-                    $results[$file][$unzippedFile] = $this->processFile($unzippedFile);
-                }
+                $results[$unzippedFile] = $this->processFile($unzippedFile);
             } catch (\Exception $e) {
-                $error = true;
-                $errorCount++;
+                $errors++;
                 $this->logger->error(
                     sprintf(
                         'Failed processing file %s in %s with error: %s, stack trace: %s',
@@ -338,34 +336,28 @@ class BacsService
                     ['exception' => $e]
                 );
             }
-            try {
-                $this->sosureSftpService->moveSftp($file, !$error);
-            } catch (\Exception $e) {
+        }
+        if ($errors == 0) {
+            $finalFile = $this->sosureSftpService->moveSafely($file, SftpService::PROCESSED_FOLDER);
+            if (!$finalFile) {
                 $this->logger->error(sprintf(
-                    'failed to move bacs report file %s with message: %s',
-                    $file,
-                    $e->getMessage()
+                    'Could not move bacs report %s from failed to processed but it is processed so move it manually',
+                    $file
                 ));
             }
-        }
-        // if files were present and no errors, the we should approve mandates and payments
-        // assuming during the time when we should have done the morning file import
-        if (count($files) > 0 && $errorCount == 0) {
             $date = new \DateTime(SoSure::TIMEZONE);
             $hour = $date->format("H");
-            if ($hour >= 8 && $hour <= 13) {
+            if ($hour >= 3 && $hour <= 13) {
                 $results['autoApprove'] = $this->autoApprovePaymentsAndMandates($date);
             }
         }
-        // State that bacs has been processed for the rest of the day.
-        end:
-            $time = new \DateTime(SoSure::TIMEZONE);
-            $this->redis->setex(
-                self::KEY_BACS_PROCESSED,
-                $this->endOfDay($time)->getTimestamp() - $time->getTimestamp(),
-                $time->format("d-m-Y H:i")
-            );
-            return $results;
+        $time = new \DateTime(SoSure::TIMEZONE);
+        $this->redis->setex(
+            self::KEY_BACS_PROCESSED,
+            $this->endOfDay($time)->getTimestamp() - $time->getTimestamp(),
+            $time->format("d-m-Y H:i")
+        );
+        return $results;
     }
 
     /**

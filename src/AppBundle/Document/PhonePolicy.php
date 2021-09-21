@@ -28,6 +28,7 @@ abstract class PhonePolicy extends Policy
     const NETWORK_CLAIM_VALUE = 2;
     const PROMO_LAUNCH_VALUE = 5;
     const CHRISTMAS_PROMO_VALUE = 20;
+    const ELEVENMONTHSPROMO = true;
 
     /**
      * non-pic-sure policy was renewed and so no need to pic-sure the phone, but should reduce the excess
@@ -546,13 +547,11 @@ abstract class PhonePolicy extends Policy
         if ($this->hasMonetaryClaimed()) {
             // should never occur, but just in case
             return 0;
-        } elseif (new DateTime() < new DateTime("2021-01-01 00:00:00") &&
-            !$this->isPolicyExpiredWithin30Days(false)
-        ) {
-            return self::CHRISTMAS_PROMO_VALUE;
         } elseif ($this->hasMonetaryNetworkClaim()) {
             return self::NETWORK_CLAIM_VALUE;
         } elseif ($this->isPolicyWithin60Days($date)) {
+            return self::STANDARD_VALUE;
+        } elseif ($this->isPolicyWithin11Months($date) && self::ELEVENMONTHSPROMO) {
             return self::STANDARD_VALUE;
         } elseif ($this->isBeforePolicyStarted($date)) {
             // Case for Salva's 10 minute buffer

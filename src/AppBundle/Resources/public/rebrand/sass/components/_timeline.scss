@@ -63,6 +63,20 @@
         }
     }
 
+    &-block-white-blue {
+        &:before {
+            background-color: $primary;
+        }
+
+        .timeline-point {
+            background-color: $white;
+            border-color: $primary;
+            color: $primary;
+            box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
+                        0 5px 15px 0 rgba(8,27,154,0.08);
+        }
+    }
+
     &-block-complete-green {
         &:before {
             background-color: $ufo-green;
@@ -80,6 +94,6 @@
 
     &-content {
         position: relative;
-        margin-left: 80px;
+        margin-left: 60px;
     }
 }

@@ -8,11 +8,9 @@
 
 {% block title %}Upgrade Phone Payment | so-sure{% endblock %}
 
-{# Set Meta #}
-
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/user-dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/upgrades.css') }}">
+    {{ encore_entry_link_tags('user-dashboard') }}
+    {{ encore_entry_link_tags('upgrades') }}
 {% endblock %}
 
 {% block body %}
@@ -51,5 +49,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/upgrades.js') }}"></script>
+    {{ encore_entry_script_tags('upgrades') }}
 {% endblock %}

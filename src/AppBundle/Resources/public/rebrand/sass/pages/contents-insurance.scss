@@ -47,6 +47,14 @@
       }
   }
 
+  &-image {
+    display: none;
+
+    @include media-breakpoint-up(md) {
+      display: block;
+    }
+  }
+
   // .badge {
   //     // font-size: 90%;
   //     padding: 0.6rem 1rem;
@@ -71,6 +79,10 @@
           transform: scaleX(-1);
       }
   }
+}
+
+.reviews {
+  text-align: center;
 }
 
 .hc-lead-form {
@@ -150,8 +162,13 @@
   }
 }
 
-.home-contents {
+.home-contents-compare {
   background-color: $athens-gray;
+  text-align: center;
+}
+
+.home-contents {
+  background-color: $white;
 
   @include media-breakpoint-up(lg) {
     text-align: center;
@@ -183,5 +200,67 @@
 
   @include media-breakpoint-up(lg) {
     text-align: center;
+  }
+}
+
+.more-information {
+  text-align: center;
+  max-width: 960px;
+  margin: 0 auto 2rem;
+  padding: 0 15px;
+
+  &-anchor {
+    color: $zaffre;
+    font-family: $g-medium;
+    text-decoration: none;
+  }
+
+  &-items {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  &-item {
+    text-align: center;
+    margin: 0 1rem 1.5rem;
+    width: 38%;
+
+    &-icon {
+      width: 56px;
+
+      @include media-breakpoint-up(lg) {
+        width: 80px;
+      }
+    }
+
+    span {
+      display: block;
+      padding: 0.5rem 0 0;
+      color: $zaffre;
+      font-family: $g-medium;
+    }
+
+    @include media-breakpoint-up(md) {
+      width: 26%;
+
+      &.optional {
+        width: 15%;
+      }
+    }
+  }
+
+  .card {
+    margin-top: 2rem;
+    box-shadow: 0 15px 20px 0 rgba(8, 27, 154, 0.04),
+      0 5px 15px 0 rgba(8, 27, 154, 0.04);
+
+    &-body {
+      padding: 2rem;
+
+      @include media-breakpoint-up(lg) {
+        padding: 2.5rem;
+      }
+    }
   }
 }

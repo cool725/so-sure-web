@@ -343,16 +343,30 @@
 
     .td-prev-btn,
     .td-next-btn {
+        display: flex;
+        align-items: center;
         position: absolute;
-        top: 24px;
+        top: 0;
+        height: 100%;
+        width: 50%;
+
+        &:hover,
+        &:focus {
+            outline: none;
+            text-decoration: none;
+        }
     }
 
     .td-prev-btn {
-        left: 10px;
+        left: 0;
+        justify-content: start;
+        padding-left: 10px;
     }
 
     .td-next-btn {
-        right: 10px;
+        right: 0;
+        justify-content: flex-end;
+        padding-right: 10px;
     }
 
     .td-info-btn {
@@ -414,8 +428,8 @@
         td {
             &:first-of-type {
                 border-left: none;
-                border-bottom: none;
-                border-top: none;
+                // border-bottom: none;bs-l
+                // border-top: none;
             }
             &:last-of-type {
                 border-right: none;
@@ -475,10 +489,20 @@
 
     @include media-breakpoint-up(md) {
         max-width: 760px;
+
+        &.table-700 {
+            max-width: none;
+            width: 900px;
+        }
     }
 
     @include media-breakpoint-up(lg) {
         max-width: 860px;
+
+        &.table-700 {
+            max-width: none;
+            width: 900px;
+        }
     }
 }
 

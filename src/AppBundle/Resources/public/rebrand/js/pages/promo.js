@@ -8,10 +8,13 @@ require('bootstrap/js/dist/carousel');
 require('bootstrap/js/dist/util');
 
 // Require components
+require('../components/phone-search-dropdown-card.js');
 
 let textFit = require('textfit');
 
 $(function() {
 
-    textFit($('.fit'), {detectMultiLine: false});
+    if ($('.fit').length) {
+        textFit($('.fit'), {detectMultiLine: false});
+    }
 });

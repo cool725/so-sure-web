@@ -9,11 +9,16 @@
 
 .hero {
     position: relative;
-    padding-top: 6rem;
+    padding-top: 5rem;
     padding-bottom: 8rem;
     text-align: center;
     background-color: $crayon-blue;
     @include blue-gradient-45;
+
+    .container-large {
+        position: relative;
+        z-index: 4;
+    }
 
     h1 {
         @include media-breakpoint-down(xs) {
@@ -47,11 +52,11 @@
     }
 
     // Height so table overlaps
-    height: 540px;
+    height: 610px;
 
-    @include media-breakpoint-up(sm) {
-        height: 600px;
-    }
+    // @include media-breakpoint-up(sm) {
+    //     height: 600px;
+    // }
 
     @include media-breakpoint-up(md) {
         padding-top: 8rem;
@@ -120,7 +125,7 @@
     position: relative;
 
     // Height so table overlaps
-    height: 1100px;
+    height: 980px;
 
     @include media-breakpoint-up(sm) {
         height: 600px;

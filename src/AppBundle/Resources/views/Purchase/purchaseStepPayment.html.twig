@@ -34,7 +34,7 @@
 {% block meta %}{% endblock %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/purchase.css') }}">
+    {{ encore_entry_link_tags('purchase') }}
 {% endblock %}
 
 {% block body %}
@@ -97,6 +97,6 @@
     {% else %}
         <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
     {% endif %}
-    <script src="{{ asset('css-js/purchase.js') }}"></script>
-    <script src="{{ asset('css-js/purchase-payment.js') }}"></script>
+    {{ encore_entry_script_tags('purchase') }}
+    {{ encore_entry_script_tags('purchase-payment') }}
 {% endblock %}

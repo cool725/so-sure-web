@@ -14,7 +14,6 @@ use AppBundle\Service\BacsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\SequenceService;
-use AppBundle\Classes\Lock;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -48,16 +47,7 @@ class BacsReportCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('sosure:bacs:report')
-            ->setDescription('Import bacs reports')
-            ->addOption('clear-flag', null, InputOption::VALUE_NONE, 'clears the lock flag and exits')
-            ->addOption(
-                'wait',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'wait for a given number of seconds and do nothing else',
-                10
-            );
+        $this->setName('sosure:bacs:report')->setDescription('Import bacs reports');
     }
 
     /**
@@ -65,34 +55,8 @@ class BacsReportCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $wait = $input->getOption('wait');
-        $clearFlag = $input->getOption('clear-flag');
-        if ($clearFlag) {
-            $this->bacsService->getSftpLock()->destroy();
-            return;
-        }
-        $result = null;
-        if ($wait) {
-            $result = static::waitSeconds($this->bacsService->getSftpLock(), intval($wait));
-        } else {
-            $result = static::processBacs($this->bacsService, $output, $this->mailerService);
-        }
-        if ($result !== null) {
-            $output->writeln($result);
-        }
-        $output->writeln('Finished');
-    }
-
-    /**
-     * Waits for a given number of seconds while holding a lock.
-     * @param Lock   $lock is the lock to hold.
-     * @param number $time is the number of seconds to wait.
-     */
-    private static function waitSeconds($lock, $time)
-    {
-        return $lock->with(function () use ($time) {
-            sleep($time);
-        });
+        $result = static::processBacs($this->bacsService, $output, $this->mailerService);
+        $output->writeln($result);
     }
 
     /**
@@ -103,19 +67,17 @@ class BacsReportCommand extends ContainerAwareCommand
      */
     private static function processBacs($bacsService, $output, $mailer)
     {
-        return $bacsService->getSftpLock()->with(function () use ($bacsService, $output, $mailer) {
-            $results = $bacsService->sftp();
-            if (count($results) > 0) {
-                $data = json_encode($results, JSON_PRETTY_PRINT);
-                $output->writeln($data);
-                $mailer->send(
-                    'Bacs Report Input',
-                    'tech+ops@so-sure.com',
-                    sprintf('Bacs Report Input Results:<br /> %s', nl2br($data))
-                );
-            } else {
-                $output->writeln('Nothing to process');
-            }
-        });
+        $results = $bacsService->sftp();
+        if (count($results) > 0) {
+            $data = json_encode($results, JSON_PRETTY_PRINT);
+            $output->writeln($data);
+            $mailer->send(
+                'Bacs Report Input',
+                'tech+ops@so-sure.com',
+                sprintf('Bacs Report Input Results:<br /> %s', nl2br($data))
+            );
+        } else {
+            $output->writeln('Nothing to process');
+        }
     }
 }

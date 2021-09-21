@@ -6,6 +6,10 @@
 {% set intercom_enabled = false %}
 {% set include_get_a_quote = true %}
 {% set robots_noindex = is_noindex %}
+{% set image = 'phone_insurance' %}
+{% if phone.make == 'Apple' or phone.make == 'Samsung' or phone.make == 'Google' or phone.make == 'Huawei'  %}
+    {% set image = phone.make|lower %}
+{% endif %}
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
@@ -27,16 +31,47 @@
     {% set with_phone = 'Vodafone Mobile' %}
 {% endif %}
 
+{# Meta #}
 {% block title %}{{ with_phone }} Insurance From &pound;{{ lowest_premium }} Monthly | SO-SURE{% endblock %}
+{% set canonical = url('phone_insurance_make', {'make': phone.makeCanonical })  %}
 {% block meta %}
     <meta name="description" content="{{ with_phone }} Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better."/>
+    <link rel="canonical" href="{{ canonical|url_decode }}" />
 {% endblock %}
+
+{# OG #}
 {% set og_title = with_phone ~ ' Insurance From £' ~ lowest_premium ~ ' Monthly | SO-SURE' %}
+{% set og_url = canonical|url_decode %}
 {% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
+{# Schema #}
+{% block schema %}
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": "{{ with_phone }} Insurance",
+        "image": "{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_{{ image }}.png",
+        "description": "{{ with_phone }} Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better.",
+        "brand": "{{ phone.make }}",
+        "offers": {
+            "@type": "AggregateOffer",
+            "url": "{{ canonical }}",
+            "priceCurrency": "GBP",
+            "lowPrice": "3.38"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.2",
+            "ratingCount": "1048"
+        }
+    }
+</script>
+{% endblock %}
+
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance-make.css') }}">
+    {{ encore_entry_link_tags('phone-insurance-make') }}
 {% endblock %}
 
 {% block body %}
@@ -102,10 +137,6 @@
                         )) }}
                     {% endif %}
                 </div>
-                {% set image = 'phone_insurance' %}
-                {% if phone.make == 'Apple' or phone.make == 'Samsung' or phone.make == 'Google' or phone.make == 'Huawei'  %}
-                    {% set image = phone.make|lower %}
-                {% endif %}
                 <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
                     <div class="hero-image">
                         <picture class="lozad">
@@ -242,5 +273,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/phone-insurance-make.js') }}"></script>
+    {{ encore_entry_script_tags('phone-insurance-make') }}
 {% endblock %}

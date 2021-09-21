@@ -413,7 +413,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
         $policyA->setStart(new \DateTime("2016-01-01"));
 
         $this->assertTrue($policyA->isPolicyWithin60Days(new \DateTime("2016-01-02")));
-        $this->assertTrue($policyA->isPolicyWithin60Days(new \DateTime("2016-02-29 23:59:59")));
+        $this->assertTrue($policyA->isPolicyWithin30Days(new \DateTime("2016-02-29 23:59:59")));
         $this->assertFalse($policyA->isPolicyWithin60Days(new \DateTime("2016-03-01")));
 
         $cliffDate = $policyA->getConnectionCliffDate();
@@ -1234,7 +1234,7 @@ class PhonePolicyFunctionalTest extends WebTestCase
 
         // Normal connections without PROMO's or launch users
         $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
-        $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-03-01')));
+        $this->assertEquals(2, $policy->getConnectionValue(new \DateTime('2016-12-25')));
 
         // Launch Promo Policy (first 1000 policies)
         $policy->setPromoCode(SalvaPhonePolicy::PROMO_LAUNCH);

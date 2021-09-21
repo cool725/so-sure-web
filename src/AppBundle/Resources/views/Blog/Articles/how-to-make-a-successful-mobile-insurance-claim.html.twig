@@ -1,0 +1,130 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'blog' %}
+{% set include_get_a_quote = true %}
+
+{% block title %}How to Make a Successful Mobile Insurance Claim | SO-SURE{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Learn how to make a successful mobile insurance claim here. Our tips will give you the best chance of a pay-out."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'How to Make a Successful Mobile Insurance Claim | SO-SURE' %}
+{% set og_description = "Learn how to make a successful mobile insurance claim here. Our tips will give you the best chance of a pay-out." %}
+{% set og_image = cdn_url ~ '/images/rebrand/blog/how-to-make-a-successful-mobile-insurance-claim.jpg' %}
+
+{% block schema %}
+{% endblock %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-8 offset-lg-2">
+                    <div class="cp__content blog__contents">
+                        <article>
+                            {% include 'AppBundle::Blog/Includes/blogFixedCta.html.twig' with { 'type': 'phone' } %}
+                            <header class="mb-5">
+                                <hgroup>
+                                    <div class="breadcrumbs">
+                                        <ul class="list-inline"
+                                            vocab="https://schema.org/"
+                                            typeof="BreadcrumbList">
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('homepage') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Home</span>
+                                                </a>
+                                                <meta property="position" content="1">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <a href="{{ path('blog_index') }}"
+                                                   class="text-primary"
+                                                   property="item"
+                                                   typeof="WebPage">
+                                                   <span property="name">Blog</span>
+                                                </a>
+                                                <meta property="position" content="2">
+                                            </li>
+                                            <li class="list-inline-item">
+                                                <i class="fal fa-angle-right"></i>
+                                            </li>
+                                            <li class="list-inline-item"
+                                                property="itemListElement"
+                                                typeof="ListItem">
+                                                <span property="name">How to Make a Successful Mobile Insurance Claim</span>
+                                                <meta property="position" content="3">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <h1 class="text-primary mb-4">How to Make a Successful Mobile Insurance Claim</h1>
+                                    <div class="blog__info_share">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <div rel="author">SO-SURE</div>
+                                            </li>
+                                            <li class="list-inline-item">|</li>
+                                            <li class="list-inline-item">
+                                                <time>September 14, 2021</time>
+                                            </li>
+                                        </ul>
+                                        {% include 'AppBundle::Blog/Includes/blogShareLinks.html.twig' with { 'hashtags': 'wearesosure' } %}
+                                    </div>
+                                </hgroup>
+                            </header>
+                            <div class="blog__contents">
+                                <img src="{{ cdn_url }}/images/onexone.png"
+                                     data-src="{{ cdn_url }}/images/rebrand/blog/how-to-make-a-successful-mobile-insurance-claim.jpg"
+                                     alt="How to Make a Successful Mobile Insurance Claim"
+                                     class="img-fluid lozad mb-5">
+                                <p>Many of us take our phones everywhere, meaning they can very easily be lost or broken. Replacing and repairing phones is expensive, which is why it’s a smart move to consider <a href="{{ path('phone_insurance') }}">mobile phone insurance</a>. Not only is it a money-saver but it’s also a comforting reassurance, stopping you from panicking every time you misplace or drop your phone screen down. Once you’ve opted to pay for a mobile insurance policy, it’s also important you understand how to make a successful mobile insurance claim. This will give you the best chance of getting your phone repaired or a new one sent out quickly. Following our tips will increase the chances of you getting your money...</p>
+                                <h2>Check that you have insurance</h2>
+                                <p>This might sound like an obvious one, but an important first step is to check that you have insurance. One of the most common reasons why claims are denied is because the customer hasn’t realised that they’re no longer insured. This can happen because often insurance policies are time-sensitive, with policies bought through mobile operators lasting for one or two years. Mobile phone insurance can also be product or model specific, meaning you may have been insured for your previous phone, but if you’ve recently upgraded then you may not be covered under your old policy. Before beginning any claims process, make sure that your mobile insurance is active and you’re covered for your current phone.</p>
+                                <h2>Understand your policy</h2>
+                                <p>Take your time to read and understand your mobile insurance policy, including the fine print. Most policies will include exclusions, which means they don’t cover certain things. Knowing <a href="{{ path('what_does_phone_insurance_cover') }}">what your phone insurance covers</a> will save you wasting your time on a claim that’s never going to be paid. It may also mean you discover you’re covered for something you didn’t realise, like a <a href="{{ path('how_to_fix_cracked_phone_screen') }}">cracked screen</a>.</p>
+                                <p>Read through your policy’s terms and conditions to make sure you know the exact procedures for filing a claim. This will cover what you need to provide when claiming. If you need a police report to make a claim for a stolen phone, you’ll be able to go to your local station and get the information you need. Understanding exactly what’s required before making a claim will save you stress and hassle and give you a better chance of getting your claim accepted.</p>
+                                <h2>Report it immediately</h2>
+                                <p>Don’t wait days or weeks after your phone is broken or stolen to claim, the sooner the process is started the sooner you’ll get your money. It will also be difficult to explain to your insurer that your phone is an essential item if you have waited a few weeks to even file the claim. Another reason to be punctual with your claim is some insurance policies cover you for incurred charges. This means if your phone is stolen and the thief uses it for calls abroad, your insurer will cover the cost. This isn’t the case if your phone isn’t reported as stolen though, so if you wait two weeks, you won’t be covered for those fourteen days. If your phone goes missing, call the police to report it as stolen (don’t call 999, get the regular station number) and then call your insurer to begin the claim process.</p>
+                                <h2>Be honest</h2>
+                                <p>It can be tempting to exaggerate, but this isn’t how to make a mobile insurance claim successful. Don’t be tempted to add any extra value to your claim, even if you’ve ended up paying a lot of premiums. Once you’ve made your claim, you’ll need to back it up with paperwork. Mobile insurance companies are pros and will easily pick up on any lies once the numbers don’t add up. Not being honest with your insurers can lead to your claim being denied, or worse, you could open yourself up to an investigation for insurance fraud. It just isn’t worth it.</p>
+                                <h2>Be Clear and Organised</h2>
+                                <p>When you make your claim, you’ll need to explain exactly what happened and provide any information required by the insurer. Explaining clearly and having documents on hand will speed up your claim. If you have any trouble explaining anything, you might want to write everything down so you can be logical and won’t miss any important details. In terms of records and documents, we recommend that you have the age of the phone and the receipt, Serial and IMEI number to hand. This is to ensure the phone meets the criteria of the insurer (insurers often have an age limit on phones being insured) and you can provide proof of ownership.</p>
+                                <p>We also recommend that you keep records of all correspondence between you and your insurer, so jot down who you spoke to, the dates and times and what was done. This will help you track the progress of your claim, should any mistakes occur along the way. These records can also be used to support you if you think your insurer has been unfair and want to make a claim against your insurer with the insurance ombudsman (a regulatory body).</p>
+                                <h2>Can you get phone insurance and claim straight away?</h2>
+                                <p>Some mobile phone insurance policies have instant cover, which means you’ll be able to claim right away and get your replacement within standard delivery times. This isn’t always the case though, some insurance policies have a deferral period which means you can’t claim for a set time after taking out cover. If you want to know how quickly you can claim on your phone insurance, your best bet is to read through your current policy or the policy you’re thinking about taking out.</p>
+                                <h2>What is an excess?</h2>
+                                <p>This is the sum of money you will need to pay for each claim you make on your insurance. For example, if you have an excess of £50 on your current policy and you claim £250, your insurer will pay you £200.</p>
+                                <p>Filing a mobile insurance claim is as straight forward as you make it. If you’re organised, honest and act quickly, you’ll increase your chances of getting a pay-out. For more information on phone insurance, visit our <a href="{{ path('phone_insurance') }}">website</a>.</p>
+                            </div>
+                            <nav><a href="{{ path('blog_index') }}" class="btn btn-outline-primary btn-sm"><i class="far fa-long-arrow-left fa-fw"></i> Back</a></nav>
+                            <footer class="my-4">
+                                {% include 'AppBundle::Blog/Includes/blogFooterCta.html.twig' with { 'type': 'phone', 'hashtags': 'wearesosure' } %}
+                            </footer>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('content-pages') }}
+{% endblock %}

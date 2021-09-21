@@ -2,6 +2,6 @@
     <h2>JS Error triggered</h2>
 {% endblock %}
 
-{% block javascripts %}
-    <script src="{{ asset('css-js/rollbar-js-error.js') }}"></script>
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('rollbar-js-error') }}
 {% endblock %}

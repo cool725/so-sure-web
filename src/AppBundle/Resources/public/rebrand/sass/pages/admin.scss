@@ -1,6 +1,10 @@
 // admin.scss
-//
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
 @import "../vendor/jquery.fancybox.css";
+@import "../vendor/tempusdominus-bootstrap-4.css";
+@import "../vendor/jquery.dataTables";
 
 body {
     padding-top: 5rem;

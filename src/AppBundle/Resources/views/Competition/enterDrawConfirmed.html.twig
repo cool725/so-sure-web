@@ -12,9 +12,8 @@
 {% set og_description = "Check out so-sure to win £20 and benefit from their excellent perks: one month free, up to 80% cash back, etc. It’s super easy to enter!" %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-amazon-voucher.jpg' %}
 
-{# Set Meta #}
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/competition-confirm.css') }}">
+    {{ encore_entry_link_tags('competition-confirm') }}
 {% endblock %}
 
 {% block body %}
@@ -121,5 +120,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/competition-confirm.js') }}"></script>
+    {{ encore_entry_script_tags('competition-confirm') }}
 {% endblock %}

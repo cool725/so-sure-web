@@ -24,7 +24,7 @@
 {% endif %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/onboarding.css') }}">
+    {{ encore_entry_link_tags('onboarding') }}
 {% endblock %}
 
 {% block gtm_data %}
@@ -543,5 +543,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/onboarding.js') }}"></script>
+    {{ encore_entry_script_tags('onboarding') }}
 {% endblock %}

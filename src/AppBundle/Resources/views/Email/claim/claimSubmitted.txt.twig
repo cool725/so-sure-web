@@ -1,0 +1,37 @@
+
+**
+------------------------------------------------------------
+Hi {% if user.name %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
+
+We've received your claim
+
+What happens now?
+
+Relax. We’re here to help and get your claim sorted as soon as possible!
+
+We will contact you by phone within 4 hours, unless it’s after 5pm, then we’ll try the next working day. Please don’t ignore a call from a withheld number – it’s probably us.
+
+If we can’t reach you by phone, we will email you. Look out for an email from:
+mbx.valid8@davies-group.com
+
+We do contact everyone, so if you think you haven’t heard from us, check your spam folder, voicemail or text messages.
+
+In case you really haven’t heard from us, give us a call on:
+03450744839
+
+Best,
+SO-SURE Team
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (https://www.instagram.com/wearesosure)
+** (http://wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+{{ business_address|replace({'\n':','}) }}

@@ -14,9 +14,39 @@
 {% set og_description = "There are a few tricky terms in the insurance world; fortunately, single article limit is one of the simpler ones. Learn what a single article limit is here." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/what-is-a-single-article-limit.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com/blog/what-is-a-single-article-limit"
+  },
+  "headline": "What Is A Single Article Limit? | SO-SURE",
+  "description": "There are a few tricky terms in the insurance world; fortunately, single article limit is one of the simpler ones. Learn what a single article limit is here.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/what-is-a-single-article-limit.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2021-03-28"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -131,5 +161,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

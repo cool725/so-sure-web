@@ -4,19 +4,49 @@
 {% set body_class = 'blog' %}
 {% set include_get_a_quote = true %}
 
-{% block title %}Best Car Phone Mounts | so-sure{% endblock %}
+{% block title %}Best Car Phone Mounts | SO-SURE{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Choose the car phone mount that suits you to get the hands-free experience in your car."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Best Car Phone Mounts | so-sure' %}
+{% set og_title = 'Best Car Phone Mounts | SO-SURE' %}
 {% set og_description = "Choose the car phone mount that suits you to get the hands-free experience in your car." %}
 {% set og_image = cdn_url ~ '/images/rebrand/blog/best-car-phone-mounts-1.jpg' %}
 
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id":
+        "https://wearesosure.com/blog/best-car-phone-mounts"
+  },
+  "headline": "Best Car Phone Mounts | so-sure",
+  "description": "Choose the car phone mount that suits you to get the hands-free experience in your car.",
+  "image": "https://cdn.so-sure.com/images/rebrand/blog/best-car-phone-mounts-1.jpg",
+  "author": {
+    "@type": "Organization",
+    "name": "SO-SURE"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SO-SURE",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://cdn.so-sure.com/images/rebrand/favicons/android-icon-192x192.png"
+    }
+  },
+  "datePublished": "2020-02-17"
+}
+</script>
+{% endblock %}
+
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/blog.css') }}">
-    <link rel="stylesheet" href="{{ asset('css-js/content-pages.css') }}">
+    {{ encore_entry_link_tags('blog') }}
+    {{ encore_entry_link_tags('content-pages') }}
 {% endblock %}
 
 {% block body %}
@@ -121,5 +151,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/content-pages.js') }}"></script>
+    {{ encore_entry_script_tags('content-pages') }}
 {% endblock %}

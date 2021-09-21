@@ -1,5 +1,6 @@
-var Encore = require('@symfony/webpack-encore');
-var webpack = require('webpack');
+const Encore = require('@symfony/webpack-encore');
+const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 Encore
     // Using runtime in it's own js
@@ -10,9 +11,6 @@ Encore
 
     // the public path used by the web server to access the previous directory
     .setPublicPath('/css-js')
-
-    // this creates a 'vendor.js' file with jquery and the bootstrap JS module plus popper
-    .createSharedEntry('vendor', './web/components/vendor.js')
 
     // List all files here
     .addEntry('global', './src/AppBundle/Resources/public/rebrand/js/global.js')
@@ -112,6 +110,7 @@ Encore
 
     .addEntry('contents-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance.js')
     .addEntry('phone-insurance-homepage', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-homepage.js')
+    .addEntry('contents-insurance-comparison', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance-comparison.js')
 
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
@@ -131,6 +130,19 @@ Encore
     // allow sass/scss files to be processed
     .enableSassLoader()
 
+    .splitEntryChunks()
+
+    .configureImageRule({
+        // tell Webpack it should consider inlining
+        type: 'asset',
+        //maxSize: 4 * 1024, // 4 kb - the default is 8kb
+    })
+
+    .configureFontRule({
+        type: 'asset',
+        // maxSize: 4 * 1024
+    })
+
     .addPlugin(
         new webpack.ProvidePlugin({
             $: "jquery",
@@ -139,9 +151,12 @@ Encore
             doT: "dot/doT.js",
             moment: "moment",
             fitText: "fitText",
-
         })
     )
+
+    .addPlugin(new BundleAnalyzerPlugin({
+        analyzerMode: 'disabled'
+    }))
 ;
 
 var config = Encore.getWebpackConfig();

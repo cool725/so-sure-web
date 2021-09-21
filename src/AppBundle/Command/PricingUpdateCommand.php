@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\PhonePrice;
+use AppBundle\Document\Subvariant;
 
 class PricingUpdateCommand extends ContainerAwareCommand
 {
@@ -29,6 +30,7 @@ class PricingUpdateCommand extends ContainerAwareCommand
     protected $output;
     protected $errors;
     protected $updates;
+    protected $subvariants;
 
     public function __construct(DocumentManager $dm)
     {
@@ -38,12 +40,9 @@ class PricingUpdateCommand extends ContainerAwareCommand
             'make',
             'model',
             'memory',
-            'mobMonthlyGwp',
-            'mobYearlyGwp',
-            'essMonthlyGwp',
-            'essYearlyGwp',
-            'damMonthlyGwp',
-            'damYearlyGwp',
+            'subvariant',
+            'monthlyGwp',
+            'yearlyGwp',
             'damage',
             'warranty',
             'extendedWarranty',
@@ -57,6 +56,7 @@ class PricingUpdateCommand extends ContainerAwareCommand
         ];
         $this->errors = [];
         $this->updates = [];
+        $this->subvariants = [];
     }
 
     protected function configure()
@@ -170,6 +170,9 @@ class PricingUpdateCommand extends ContainerAwareCommand
                 if ($update['memory'] == '') {
                     $this->errors[] = "memory is blank";
                 }
+                if ($update['subvariant'] == '') {
+                    $this->errors[] = "subvariant is blank";
+                }
 
                 if (!$this->ignoreMissing) {
                     $repo = $this->dm->getRepository(Phone::class);
@@ -191,15 +194,35 @@ class PricingUpdateCommand extends ContainerAwareCommand
                 }
 
                 $premiums = [
-                    'mobMonthlyGwp',
-                    'mobYearlyGwp',
-                    'essMonthlyGwp',
-                    'essYearlyGwp',
-                    'damMonthlyGwp',
-                    'damYearlyGwp'
+                    'monthlyGwp',
+                    'yearlyGwp'
                 ];
 
-                $excesses = [
+                foreach ($this->dm->getRepository(Subvariant::class)->findAll() as $subvariant) {
+                    $this->subvariants[$subvariant->getName()] = [];
+                    if ($subvariant->getLoss()) {
+                        $this->subvariants[$subvariant->getName()][] = 'loss';
+                        $this->subvariants[$subvariant->getName()][] = 'validatedLoss';
+                    }
+                    if ($subvariant->getTheft()) {
+                        $this->subvariants[$subvariant->getName()][] = 'theft';
+                        $this->subvariants[$subvariant->getName()][] = 'validatedTheft';
+                    }
+                    if ($subvariant->getDamage()) {
+                        $this->subvariants[$subvariant->getName()][] = 'damage';
+                        $this->subvariants[$subvariant->getName()][] = 'validatedDamage';
+                    }
+                    if ($subvariant->getWarranty()) {
+                        $this->subvariants[$subvariant->getName()][] = 'warranty';
+                        $this->subvariants[$subvariant->getName()][] = 'validatedWarranty';
+                    }
+                    if ($subvariant->getExtendedWarranty()) {
+                        $this->subvariants[$subvariant->getName()][] = 'extendedWarranty';
+                        $this->subvariants[$subvariant->getName()][] = 'validatedExtendedWarranty';
+                    }
+                }
+
+                $this->subvariants['standard'] = [
                     'damage',
                     'warranty',
                     'extendedWarranty',
@@ -211,6 +234,10 @@ class PricingUpdateCommand extends ContainerAwareCommand
                     'validatedLoss',
                     'validatedTheft'
                 ];
+
+                if (!array_key_exists($update["subvariant"], $this->subvariants)) {
+                    $this->errors[] = $update["subvariant"]." is invalid subvariant";
+                }
 
                 if ($this->premiumOnly || (!$this->premiumOnly && !$this->excessOnly)) {
                     // validate the premium values
@@ -227,13 +254,17 @@ class PricingUpdateCommand extends ContainerAwareCommand
 
                 if ($this->excessOnly || (!$this->premiumOnly && !$this->excessOnly)) {
                     // validate the excess values
-                    foreach ($excesses as $excess) {
+                    foreach ($this->subvariants[$update["subvariant"]] as $excess) {
+                        $details =  $update["make"] . " " .
+                                    $update["model"] . " " .
+                                    $update["memory"] . " " .
+                                    $update["subvariant"] . " ";
                         if ($update[$excess] == '') {
-                            $this->errors[] = "$excess is blank";
+                            $this->errors[] = $details."$excess is blank";
                         } elseif (!is_numeric($update[$excess])) {
-                            $this->errors[] = $update[$excess]." $excess not a number";
+                            $this->errors[] = $details.$update[$excess]." $excess not a number";
                         } elseif (!ctype_digit($update[$excess])) {
-                            $this->errors[] = $update[$excess]." $excess can only be an integer";
+                            $this->errors[] = $details.$update[$excess]." $excess can only be an integer";
                         }
                     }
                 }
@@ -250,21 +281,23 @@ class PricingUpdateCommand extends ContainerAwareCommand
 
     private function newValues($phone, $update)
     {
-        $mobMonthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getGwp();
-        $mobYearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY)->getGwp();
-        $essMonthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'essentials')->getGwp();
-        $essYearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'essentials')->getGwp();
-        $damMonthlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, 'damage')->getGwp();
-        $damYearlyGwp = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, 'damage')->getGwp();
-        $excess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getExcess();
-        $picSureExcess = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY)->getPicSureExcess();
+        if ($update["subvariant"] == "standard") {
+            // fix for the database not storing the subvariant name for standard
+            $priceMonthly = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, null);
+            $priceYearly = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, null);
+        } else {
+            $priceMonthly = $phone->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY, null, $update["subvariant"]);
+            $priceYearly = $phone->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY, null, $update["subvariant"]);
+        }
+
+        $monthlyGwp = $priceMonthly->getGwp();
+        $yearlyGwp = $priceYearly->getGwp();
+        $excess = $priceMonthly->getExcess();
+        $picSureExcess = $priceMonthly->getPicSureExcess();
+
         $currentValues = [
-            'mobMonthlyGwp' => $mobMonthlyGwp,
-            'mobYearlyGwp' => $mobYearlyGwp,
-            'essMonthlyGwp' => $essMonthlyGwp,
-            'essYearlyGwp' => $essYearlyGwp,
-            'damMonthlyGwp' => $damMonthlyGwp,
-            'damYearlyGwp' => $damYearlyGwp,
+            'monthlyGwp' => $monthlyGwp,
+            'yearlyGwp' => $yearlyGwp,
             'damage' => $excess->getDamage(),
             'warranty' => $excess->getWarranty(),
             'extendedWarranty' => $excess->getExtendedWarranty(),
@@ -277,38 +310,80 @@ class PricingUpdateCommand extends ContainerAwareCommand
             'validatedTheft' => $picSureExcess->getTheft()
         ];
         if ($this->premiumOnly || (!$this->premiumOnly && !$this->excessOnly)) {
-            $mobMonthlyGwp = $update["mobMonthlyGwp"];
-            $mobYearlyGwp = $update["mobYearlyGwp"];
-            $essMonthlyGwp = $update["essMonthlyGwp"];
-            $essYearlyGwp = $update["essYearlyGwp"];
-            $damMonthlyGwp = $update["damMonthlyGwp"];
-            $damYearlyGwp = $update["damYearlyGwp"];
+            $monthlyGwp = $update["monthlyGwp"];
+            $yearlyGwp = $update["yearlyGwp"];
         }
         if ($this->excessOnly || (!$this->premiumOnly && !$this->excessOnly)) {
-            $excess->setDamage((int) $update["damage"]);
-            $excess->setWarranty((int) $update["warranty"]);
-            $excess->setExtendedWarranty((int) $update["extendedWarranty"]);
-            $excess->setLoss((int) $update["loss"]);
-            $excess->setTheft((int) $update["theft"]);
-            $picSureExcess->setDamage((int) $update["validatedDamage"]);
-            $picSureExcess->setWarranty((int) $update["validatedWarranty"]);
-            $picSureExcess->setExtendedWarranty((int) $update["validatedExtendedWarranty"]);
-            $picSureExcess->setLoss((int) $update["validatedLoss"]);
-            $picSureExcess->setTheft((int) $update["validatedTheft"]);
+            foreach ($this->subvariants[$update["subvariant"]] as $risk) {
+                if ($risk == "loss") {
+                    $excess->setLoss((int) $update["loss"]);
+                    $picSureExcess->setLoss((int) $update["validatedLoss"]);
+                }
+                if ($risk == "theft") {
+                    $excess->setTheft((int) $update["theft"]);
+                    $picSureExcess->setTheft((int) $update["validatedTheft"]);
+                }
+                if ($risk == "damage") {
+                    $excess->setDamage((int) $update["damage"]);
+                    $picSureExcess->setDamage((int) $update["validatedDamage"]);
+                }
+                if ($risk == "warranty") {
+                    $excess->setWarranty((int) $update["warranty"]);
+                    $picSureExcess->setWarranty((int) $update["validatedWarranty"]);
+                }
+                if ($risk == "extendedWarranty") {
+                    $excess->setExtendedWarranty((int) $update["extendedWarranty"]);
+                    $picSureExcess->setExtendedWarranty((int) $update["validatedExtendedWarranty"]);
+                }
+            }
         }
         $this->outputChanges($phone, $currentValues, $update);
         if ($this->wet) {
-            $updateDate = new \DateTime('+2 hour', SoSure::getSoSureTimezone());
-            // TODO: subvariants are defined in the DB so would be better to handle any arbitrary subvariant names but
-            //       that is something for another day.
-            $dam = 'damage';
-            $ess = 'essentials';
-            $phone->changePrice($mobMonthlyGwp, $updateDate, $excess, $picSureExcess, null, "monthly");
-            $phone->changePrice($mobYearlyGwp, $updateDate, $excess, $picSureExcess, null, "yearly");
-            $phone->changePrice($essMonthlyGwp, $updateDate, $excess, $picSureExcess, null, "monthly", null, $ess);
-            $phone->changePrice($essYearlyGwp, $updateDate, $excess, $picSureExcess, null, "yearly", null, $ess);
-            $phone->changePrice($damMonthlyGwp, $updateDate, $excess, $picSureExcess, null, "monthly", null, $dam);
-            $phone->changePrice($damYearlyGwp, $updateDate, $excess, $picSureExcess, null, "yearly", null, $dam);
+            $updateDate = new \DateTime('+2 hours', SoSure::getSoSureTimezone());
+            if ($update["subvariant"] == "standard") {
+                // fix for the database not storing the subvariant name for standard
+                $phone->changePrice(
+                    $monthlyGwp,
+                    $updateDate,
+                    $excess,
+                    $picSureExcess,
+                    null,
+                    "monthly",
+                    null,
+                    null
+                );
+                $phone->changePrice(
+                    $yearlyGwp,
+                    $updateDate,
+                    $excess,
+                    $picSureExcess,
+                    null,
+                    "yearly",
+                    null,
+                    null
+                );
+            } else {
+                $phone->changePrice(
+                    $monthlyGwp,
+                    $updateDate,
+                    $excess,
+                    $picSureExcess,
+                    null,
+                    "monthly",
+                    null,
+                    $update["subvariant"]
+                );
+                $phone->changePrice(
+                    $yearlyGwp,
+                    $updateDate,
+                    $excess,
+                    $picSureExcess,
+                    null,
+                    "yearly",
+                    null,
+                    $update["subvariant"]
+                );
+            }
             $this->dm->flush();
         }
         return $phone;
@@ -319,12 +394,14 @@ class PricingUpdateCommand extends ContainerAwareCommand
         $overview = 'Update - "'.mb_strtolower(
             $update["make"].'" "'.
             $update["model"].'" "'.
-            $update["memory"]
+            $update["memory"].'" "'.
+            $update["subvariant"]
         ).'"'."\n";
         foreach ($this->headers as $header) {
             if ($header != "make"
                     && $header != "model"
                     && $header != "memory"
+                    && $header != "subvariant"
                     && $header != "monthlyPrice"
                     && $header != "annualPrice") {
                 $overview .= "$header: ".$currentValues[$header]." -> ".$update[$header]."\n";

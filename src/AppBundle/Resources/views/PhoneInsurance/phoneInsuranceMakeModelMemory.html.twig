@@ -60,7 +60,7 @@
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
-    <link rel="stylesheet" href="{{ asset('css-js/phone-insurance-quote.css') }}">
+    {{ encore_entry_link_tags('phone-insurance-quote') }}
 {% endblock %}
 
 {% block body %}
@@ -348,5 +348,5 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    <script src="{{ asset('css-js/phone-insurance-quote.js') }}"></script>
+    {{ encore_entry_script_tags('phone-insurance-quote') }}
 {% endblock %}
