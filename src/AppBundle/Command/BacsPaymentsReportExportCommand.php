@@ -14,23 +14,36 @@ use AppBundle\Repository\BacsPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\Subvariant;
+use AppBundle\Service\MailerService;
 
 /**
  * Commandline interface for payment related functionality.
  */
 class BacsPaymentsReportExportCommand extends ContainerAwareCommand
 {
+    const COMMAND_REPORT_NAME = 'Bacs Payment Report';
+    const DEFAULT_EMAIL_ADDRESS = 'tech+ops@so-sure.com';
+    const DEFAULT_REPORT_PERIOD_DAYS = '-31';
+    const FILE_NAME = 'bacs-payments';
+    const BUCKET_FOLDER = 'reports';
+
     /** @var DocumentManager $dm */
     protected $dm;
+
+    /** @var MailerService */
+    protected $mailerService;
 
     /**
      * Builds the command object.
      * @param DocumentManager $dm is used to access payment records.
      */
-    public function __construct(DocumentManager $dm)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        MailerService $mailerService
+    ) {
         parent::__construct();
         $this->dm = $dm;
+        $this->mailerService = $mailerService;
     }
 
     /**
@@ -43,14 +56,21 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
             ->addOption(
                 'start',
                 null,
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_OPTIONAL,
                 'The start date for the range of bacs payments to fetch e.g. 2021-01-01'
             )
             ->addOption(
                 'end',
                 null,
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_OPTIONAL,
                 'The start date for the range of bacs payments to fetch e.g. 2021-01-31'
+            )
+            ->addOption(
+                'email-accounts',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'What email address(es) to send to',
+                self::DEFAULT_EMAIL_ADDRESS
             );
     }
 
@@ -65,23 +85,88 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
         $bacsPaymentRepo = $this->dm->getRepository(BacsPayment::class);
         $start = $input->getOption('start');
         $end = $input->getOption('end');
+        $emailAccounts = $input->getOption('email-accounts');
+
+        if (!$start) {
+            // default start to 31 days in the past
+            $start = new \DateTime();
+            $start = $start->modify(self::DEFAULT_REPORT_PERIOD_DAYS . ' day')->format('Y-m-d');
+            $output->writeln("start: ".$start);
+        }
+        if (!$end) {
+            // default end of report up until today
+            $end = new \DateTime();
+            $end = $end->format('Y-m-d');
+            $output->writeln("end: ".$end);
+        }
+
+        $fileName = self::FILE_NAME.'-'.time().".csv";
+        $file = "/tmp/" . $fileName;
+
         $payments = $bacsPaymentRepo->getBacsDateRange(new \DateTime($start), new \DateTime($end));
-        echo '"Payment ID","Policy Number","Policy ID","Payment Date","Policy Start Date",'
-                .'"Name","Email","Amount","Status"'."\n";
+
+        $csv = fopen($file, "w");
+        $headers = [
+            "Payment ID",
+            "Policy Number",
+            "Policy ID",
+            "Payment Date",
+            "Policy Start Date",
+            "Name",
+            "Email",
+            "Amount",
+            "Status"
+        ];
+        fputcsv($csv, $headers);
+
+        $statusCount = [];
+        $count=0;
+        $output->writeln("Number of payments: ".count($payments));
         foreach ($payments as $payment) {
+            $count++;
+            if ($count % 100 == 0) {
+                $output->writeln(
+                    "Refining payments data... ".round(($count/count($payments))*100)."%"
+                );
+            }
             if ($payment->getPolicy() !== null) {
-                echo $payment->getId().',';
-                echo $payment->getPolicy()->getPolicyNumber().',';
-                echo $payment->getPolicy()->getId().',';
-                echo $payment->getDate()->format('Y-m-d H:i').',';
-                echo $payment->getPolicy()->getStart()->format('Y-m-d H:i').',';
-                echo $payment->getPolicy()->getUser()->getFirstName()
-                    .' '.$payment->getPolicy()->getUser()->getLastName().',';
-                echo $payment->getPolicy()->getUser()->getEmail().',';
-                echo $payment->getAmount().',';
-                echo $payment->getStatus();
-                echo "\n";
+                if (!array_key_exists($payment->getStatus(), $statusCount)) {
+                    $statusCount[$payment->getStatus()] = 0;
+                }
+                $statusCount[$payment->getStatus()]++;
+                $row = [
+                    $payment->getId(),
+                    $payment->getPolicy()->getPolicyNumber(),
+                    $payment->getPolicy()->getId(),
+                    $payment->getDate()->format('Y-m-d H:i'),
+                    $payment->getPolicy()->getStart()->format('Y-m-d H:i'),
+                    $payment->getPolicy()->getUser()->getFirstName(),
+                    $payment->getPolicy()->getUser()->getLastName(),
+                    $payment->getPolicy()->getUser()->getEmail(),
+                    $payment->getAmount(),
+                    $payment->getStatus()
+                ];
+                fputcsv($csv, $row);
             }
         }
+        fclose($csv);
+
+        $body = "Start Date: ".$start."<br />";
+        $body .= "End Date: ".$end."<br />";
+        $body .= "Statuses:<br >";
+        foreach ($statusCount as $status => $count) {
+            $output->writeln($status . ": " . $count);
+            $body .= $status . " - " . $count . "<br />";
+        }
+
+        $this->mailerService->send(
+            self::COMMAND_REPORT_NAME,
+            explode(",", $emailAccounts),
+            $body,
+            null,
+            [$file]
+        );
+
+        unset($file);
     }
 }
