@@ -1187,827 +1187,812 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function claimsPolicyAction(Request $request, $id)
     {
-        try {
-            /** @var PolicyService $policyService */
-            $policyService = $this->get('app.policy');
-            /** @var FraudService $fraudService */
-            $fraudService = $this->get('app.fraud');
-            /** @var ReceperioService $imeiService */
-            $imeiService = $this->get('app.imei');
-            $invitationService = $this->get('app.invitation');
-            $dm = $this->getManager();
-            /** @var PhonePolicyRepository $repo */
-            $repo = $dm->getRepository(PhonePolicy::class);
-            /** @var PhonePolicy $policy */
-            $policy = $repo->find($id);
-            if (!$policy) {
-                throw $this->createNotFoundException('Policy not found');
-            }
+        /** @var PolicyService $policyService */
+        $policyService = $this->get('app.policy');
+        /** @var FraudService $fraudService */
+        $fraudService = $this->get('app.fraud');
+        /** @var ReceperioService $imeiService */
+        $imeiService = $this->get('app.imei');
+        $invitationService = $this->get('app.invitation');
+        $dm = $this->getManager();
+        /** @var PhonePolicyRepository $repo */
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
 
-            /** @var BacsService $bacsService */
-            $bacsService = $this->get('app.bacs');
+        /** @var BacsService $bacsService */
+        $bacsService = $this->get('app.bacs');
 
-            $cancel = new Cancel();
-            $cancel->setPolicy($policy);
-            $cancelForm = $this->get('form.factory')
-                ->createNamedBuilder('cancel_form', CancelPolicyType::class, $cancel)
-                ->getForm();
-            $pendingCancelForm = $this->get('form.factory')
-                ->createNamedBuilder('pending_cancel_form', PendingPolicyCancellationType::class, $policy)
-                ->getForm();
-            $installmentsForm = $this->get('form.factory')
-                ->createNamedBuilder('installments_form', InstallmentsType::class)
-                ->getForm();
-            $noteForm = $this->get('form.factory')
-                ->createNamedBuilder('note_form', NoteType::class)
-                ->getForm();
-            $facebookForm = $this->get('form.factory')
-                ->createNamedBuilder('facebook_form', FacebookType::class, $policy)
-                ->getForm();
-            $receperioForm = $this->get('form.factory')
-                ->createNamedBuilder('receperio_form')->add('rerun', SubmitType::class)
-                ->getForm();
-            $chargebacks = new Chargebacks();
-            $chargebacks->setPolicy($policy);
-            $chargebacksForm = $this->get('form.factory')
-                ->createNamedBuilder('chargebacks_form', ChargebacksType::class, $chargebacks)
-                ->getForm();
-            $bacsPayment = new BacsPayment();
-            $bacsPayment->setSource(Payment::SOURCE_ADMIN);
-            $bacsPayment->setManual(true);
-            $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
-            $bacsPayment->setSuccess(true);
-            $bacsPayment->setDate(\DateTime::createFromFormat('U', time()));
-            if ($policy->getPremium()) {
-                $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
-            } else {
-                /** @var PhonePrice $price */
-                $price = $policy->getPhone()->getCurrentYearlyPhonePrice();
-                $bacsPayment->setAmount($price->getYearlyPremiumPrice());
-            }
-            $bacsPayment->setCommission(
-                $policy->getYearlyCoverholderCommission(),
-                $policy->getYearlyBrokerCommission()
-            );
-            if ($policy->getPolicyOrUserBacsBankAccount()) {
-                $bacsPayment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
-            }
+        $cancel = new Cancel();
+        $cancel->setPolicy($policy);
+        $cancelForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_form', CancelPolicyType::class, $cancel)
+            ->getForm();
+        $pendingCancelForm = $this->get('form.factory')
+            ->createNamedBuilder('pending_cancel_form', PendingPolicyCancellationType::class, $policy)
+            ->getForm();
+        $installmentsForm = $this->get('form.factory')
+            ->createNamedBuilder('installments_form', InstallmentsType::class)
+            ->getForm();
+        $noteForm = $this->get('form.factory')
+            ->createNamedBuilder('note_form', NoteType::class)
+            ->getForm();
+        $facebookForm = $this->get('form.factory')
+            ->createNamedBuilder('facebook_form', FacebookType::class, $policy)
+            ->getForm();
+        $receperioForm = $this->get('form.factory')
+            ->createNamedBuilder('receperio_form')->add('rerun', SubmitType::class)
+            ->getForm();
+        $chargebacks = new Chargebacks();
+        $chargebacks->setPolicy($policy);
+        $chargebacksForm = $this->get('form.factory')
+            ->createNamedBuilder('chargebacks_form', ChargebacksType::class, $chargebacks)
+            ->getForm();
+        $bacsPayment = new BacsPayment();
+        $bacsPayment->setSource(Payment::SOURCE_ADMIN);
+        $bacsPayment->setManual(true);
+        $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsPayment->setSuccess(true);
+        $bacsPayment->setDate(\DateTime::createFromFormat('U', time()));
+        if ($policy->getPremium()) {
+            $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        } else {
+            /** @var PhonePrice $price */
+            $price = $policy->getPhone()->getCurrentYearlyPhonePrice();
+            $bacsPayment->setAmount($price->getYearlyPremiumPrice());
+        }
+        $bacsPayment->setCommission(
+            $policy->getYearlyCoverholderCommission(),
+            $policy->getYearlyBrokerCommission()
+        );
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $bacsPayment->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
 
-            $bacsForm = $this->get('form.factory')
-                ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
-                ->getForm();
-            $createForm = $this->get('form.factory')
-                ->createNamedBuilder('create_form')
-                ->add('create', SubmitType::class)
-                ->getForm();
-            $connectForm = $this->get('form.factory') ->createNamedBuilder('connect_form')
-                ->add('email', EmailType::class)
-                ->add('connect', SubmitType::class)
-                ->getForm();
-            $imeiUploadFile = new ImeiUploadFile();
-            $imeiUploadForm = $this->get('form.factory')
-                ->createNamedBuilder('imei_upload', ImeiUploadFileType::class, $imeiUploadFile)
-                ->getForm();
-            $screenUploadFile = new ScreenUploadFile();
-            $screenUploadForm = $this->get('form.factory')
-                ->createNamedBuilder('screen_upload', ScreenUploadFileType::class, $screenUploadFile)
-                ->getForm();
-            $userTokenForm = $this->get('form.factory')
-                ->createNamedBuilder('usertoken_form')
-                ->add('regenerate', SubmitType::class)
-                ->getForm();
-            $billing = new BillingDay();
-            $billing->setPolicy($policy);
-            $billingForm = $this->get('form.factory')
-                ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
-                ->getForm();
-            $resendEmailForm = $this->get('form.factory')
-                ->createNamedBuilder('resend_email_form')->add('resend', SubmitType::class)
-                ->getForm();
-            $regeneratePolicyScheduleForm = $this->get('form.factory')
-                ->createNamedBuilder('regenerate_policy_schedule_form')->add('regenerate', SubmitType::class)
-                ->getForm();
-            $makeModel = new AdminMakeModel();
-            $makeModelForm = $this->get('form.factory')
-                ->createNamedBuilder('makemodel_form', AdminMakeModelType::class, $makeModel)
-                ->getForm();
-            $claim = new Claim();
-            $claim->setPolicy($policy);
-            $claimFlags = $this->get('form.factory')
-                ->createNamedBuilder('claimflags', ClaimFlagsType::class, $claim)
-                ->getForm();
-            $debtForm = $this->get('form.factory')
-                ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
-                ->getForm();
-            $swapPaymentPlanForm = $this->get('form.factory')
-                ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
-                ->getForm();
-            $payPolicyForm = $this->get('form.factory')
-                ->createNamedBuilder('pay_policy_form')
-                ->add('monthly', SubmitType::class)
-                ->add('yearly', SubmitType::class)
-                ->getForm();
-            $skipPaymentForm = $this->get('form.factory')
-                ->createNamedBuilder('skip_payment_form')
-                ->add('payment_id', HiddenType::class)
-                ->add('skip', SubmitType::class)
-                ->getForm();
-            $cancelDirectDebitForm = $this->get('form.factory')
-                ->createNamedBuilder('cancel_direct_debit_form')
-                ->add('cancel', SubmitType::class)
-                ->getForm();
-            $paymentRequestFile = new PaymentRequestUploadFile();
-            $paymentRequestFile->setPolicy($policy);
-            $runScheduledPaymentForm = $this->get('form.factory')
-                ->createNamedBuilder(
-                    'run_scheduled_payment_form',
-                    PaymentRequestUploadFileType::class,
-                    $paymentRequestFile
+        $bacsForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
+            ->getForm();
+        $createForm = $this->get('form.factory')
+            ->createNamedBuilder('create_form')
+            ->add('create', SubmitType::class)
+            ->getForm();
+        $connectForm = $this->get('form.factory') ->createNamedBuilder('connect_form')
+            ->add('email', EmailType::class)
+            ->add('connect', SubmitType::class)
+            ->getForm();
+        $imeiUploadFile = new ImeiUploadFile();
+        $imeiUploadForm = $this->get('form.factory')
+            ->createNamedBuilder('imei_upload', ImeiUploadFileType::class, $imeiUploadFile)
+            ->getForm();
+        $screenUploadFile = new ScreenUploadFile();
+        $screenUploadForm = $this->get('form.factory')
+            ->createNamedBuilder('screen_upload', ScreenUploadFileType::class, $screenUploadFile)
+            ->getForm();
+        $userTokenForm = $this->get('form.factory')
+            ->createNamedBuilder('usertoken_form')
+            ->add('regenerate', SubmitType::class)
+            ->getForm();
+        $billing = new BillingDay();
+        $billing->setPolicy($policy);
+        $billingForm = $this->get('form.factory')
+            ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
+            ->getForm();
+        $resendEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('resend_email_form')->add('resend', SubmitType::class)
+            ->getForm();
+        $regeneratePolicyScheduleForm = $this->get('form.factory')
+            ->createNamedBuilder('regenerate_policy_schedule_form')->add('regenerate', SubmitType::class)
+            ->getForm();
+        $makeModel = new AdminMakeModel();
+        $makeModelForm = $this->get('form.factory')
+            ->createNamedBuilder('makemodel_form', AdminMakeModelType::class, $makeModel)
+            ->getForm();
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claimFlags = $this->get('form.factory')
+            ->createNamedBuilder('claimflags', ClaimFlagsType::class, $claim)
+            ->getForm();
+        $debtForm = $this->get('form.factory')
+            ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
+            ->getForm();
+        $swapPaymentPlanForm = $this->get('form.factory')
+            ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
+            ->getForm();
+        $payPolicyForm = $this->get('form.factory')
+            ->createNamedBuilder('pay_policy_form')
+            ->add('monthly', SubmitType::class)
+            ->add('yearly', SubmitType::class)
+            ->getForm();
+        $skipPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder('skip_payment_form')
+            ->add('payment_id', HiddenType::class)
+            ->add('skip', SubmitType::class)
+            ->getForm();
+        $cancelDirectDebitForm = $this->get('form.factory')
+            ->createNamedBuilder('cancel_direct_debit_form')
+            ->add('cancel', SubmitType::class)
+            ->getForm();
+        $paymentRequestFile = new PaymentRequestUploadFile();
+        $paymentRequestFile->setPolicy($policy);
+        $runScheduledPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder('run_scheduled_payment_form', PaymentRequestUploadFileType::class, $paymentRequestFile)
+            ->getForm();
+        $bacsRefund = new BacsPayment();
+        $bacsRefund->setDate($this->getNextBusinessDay($this->now()));
+        $bacsRefund->setSource(Payment::SOURCE_ADMIN);
+        $bacsRefund->setPolicy($policy);
+        $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
+        $bacsRefund->setCommission(
+            $policy->getYearlyCoverholderCommission(),
+            $policy->getYearlyBrokerCommission()
+        );
+        $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
+        if ($policy->getPolicyOrUserBacsBankAccount()) {
+            $bacsRefund->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
+        }
+        $bacsRefundForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
+            ->getForm();
+        if ($policy->getDontCancelIfUnpaid()) {
+            $dontCancelForm = $this->get('form.factory')
+                ->createNamedBuilder('dont_cancel_form')
+                ->add(
+                    'allowCancellation',
+                    SubmitType::class,
+                    [
+                        "label" => 'Allow cancellation',
+                        'attr' => [
+                            'dontCancel' => false,
+                            'class' => 'btn btn-danger confirm-submit'
+                        ]
+                    ]
                 )
                 ->getForm();
-            $bacsRefund = new BacsPayment();
-            $bacsRefund->setDate($this->getNextBusinessDay($this->now()));
-            $bacsRefund->setSource(Payment::SOURCE_ADMIN);
-            $bacsRefund->setPolicy($policy);
-            $bacsRefund->setAmount($policy->getPremiumInstallmentPrice(true));
-            $bacsRefund->setCommission(
-                $policy->getYearlyCoverholderCommission(),
-                $policy->getYearlyBrokerCommission()
-            );
-            $bacsRefund->setStatus(BacsPayment::STATUS_PENDING);
-            if ($policy->getPolicyOrUserBacsBankAccount()) {
-                $bacsRefund->setDetails($policy->getPolicyOrUserBacsBankAccount()->__toString());
-            }
-            $bacsRefundForm = $this->get('form.factory')
-                ->createNamedBuilder('bacs_refund_form', BacsCreditType::class, $bacsRefund)
-                ->getForm();
-            if ($policy->getDontCancelIfUnpaid()) {
-                $dontCancelForm = $this->get('form.factory')
-                    ->createNamedBuilder('dont_cancel_form')
-                    ->add(
-                        'allowCancellation',
-                        SubmitType::class,
-                        [
-                            "label" => 'Allow cancellation',
-                            'attr' => [
-                                'dontCancel' => false,
-                                'class' => 'btn btn-danger confirm-submit'
-                            ]
+        } else {
+            $dontCancelForm = $this->get('form.factory')
+                ->createNamedBuilder('dont_cancel_form')
+                ->add(
+                    'dontCancel',
+                    SubmitType::class,
+                    [
+                        "label" => 'Prevent cancellation',
+                        'attr' => [
+                            'dontCancel' => true,
+                            'class' => 'btn btn-danger confirm-submit'
                         ]
-                    )
-                    ->getForm();
-            } else {
-                $dontCancelForm = $this->get('form.factory')
-                    ->createNamedBuilder('dont_cancel_form')
-                    ->add(
-                        'dontCancel',
-                        SubmitType::class,
-                        [
-                            "label" => 'Prevent cancellation',
-                            'attr' => [
-                                'dontCancel' => true,
-                                'class' => 'btn btn-danger confirm-submit'
-                            ]
-                        ]
-                    )
-                    ->getForm();
-            }
-            $salvaUpdateForm = $this->get('form.factory')
-                ->createNamedBuilder('salva_update_form')
-                ->add('update', SubmitType::class)
+                    ]
+                )
                 ->getForm();
+        }
+        $salvaUpdateForm = $this->get('form.factory')
+            ->createNamedBuilder('salva_update_form')
+            ->add('update', SubmitType::class)
+            ->getForm();
 
-            if ('POST' === $request->getMethod()) {
-                if ($request->request->has('cancel_form')) {
-                    $cancelForm->handleRequest($request);
-                    if ($cancelForm->isValid()) {
-                        $claimCancel = $policy->canCancel($cancel->getCancellationReason(), null, true);
-                        if ($policy->canCancel($cancel->getCancellationReason()) ||
-                            ($claimCancel && $cancel->getForce())) {
-                            if ($cancel->getRequestedCancellationReason()) {
-                                $policy->setRequestedCancellationReason($cancel->getRequestedCancellationReason());
-                            }
-                            $policyService->cancel(
-                                $policy,
-                                $cancel->getCancellationReason(),
-                                true,
-                                null,
-                                true,
-                                $cancel->getFullRefund()
-                            );
-                            $this->addFlash(
-                                'success',
-                                sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
-                            );
-                        } elseif ($claimCancel && !$cancel->getForce()) {
-                            $this->addFlash('error', sprintf(
-                                'Unable to cancel Policy %s due to %s as override was not enabled',
-                                $policy->getPolicyNumber(),
-                                $cancel->getCancellationReason()
-                            ));
-                        } else {
-                            $this->addFlash('error', sprintf(
-                                'Unable to cancel Policy %s due to %s',
-                                $policy->getPolicyNumber(),
-                                $cancel->getCancellationReason()
-                            ));
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('cancel_form')) {
+                $cancelForm->handleRequest($request);
+                if ($cancelForm->isValid()) {
+                    $claimCancel = $policy->canCancel($cancel->getCancellationReason(), null, true);
+                    if ($policy->canCancel($cancel->getCancellationReason()) ||
+                        ($claimCancel && $cancel->getForce())) {
+                        if ($cancel->getRequestedCancellationReason()) {
+                            $policy->setRequestedCancellationReason($cancel->getRequestedCancellationReason());
                         }
-
-                        return $this->redirectToRoute('admin_policies');
-                    }
-                } elseif ($request->request->has('pending_cancel_form')) {
-                    $pendingCancelForm->handleRequest($request);
-                    if ($pendingCancelForm->isValid()) {
-                        if ($pendingCancelForm->get('clear')->isClicked()) {
-                            $policy->setPendingCancellation(null);
-                            $this->addFlash(
-                                'success',
-                                sprintf('Policy %s is no longer scheduled to be cancelled', $policy->getPolicyNumber())
-                            );
-                        } else {
-                            $this->addFlash(
-                                'success',
-                                sprintf('Policy %s is scheduled to be cancelled', $policy->getPolicyNumber())
-                            );
-                        }
-                        $dm->flush();
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('installments_form')) {
-                    $installmentsForm->handleRequest($request);
-                    if ($installmentsForm->isValid()) {
-                        $policy->addNoteDetails(
-                            $this->conformAlphanumericSpaceDot($installmentsForm->getData()['notes'], 2500),
-                            $this->getUser()
-                        );
-                        $this->get('app.policy')->changeInstallments(
+                        $policyService->cancel(
                             $policy,
-                            $installmentsForm->getData()['installments']
-                        );
-                    }
-                } elseif ($request->request->has('note_form')) {
-                    $noteForm->handleRequest($request);
-                    if ($noteForm->isValid()) {
-                        $policy->addNoteDetails(
-                            $this->conformAlphanumericSpaceDot($noteForm->getData()['notes'], 2500),
-                            $this->getUser()
-                        );
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            sprintf('Added note to Policy %s.', $policy->getPolicyNumber())
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('facebook_form')) {
-                    $facebookForm->handleRequest($request);
-                    if ($facebookForm->isValid()) {
-                        $policy->getUser()->resetFacebook();
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            sprintf('Policy %s facebook cleared.', $policy->getPolicyNumber())
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('receperio_form')) {
-                    $receperioForm->handleRequest($request);
-                    if ($receperioForm->isValid()) {
-                        if ($policy->getImei()) {
-                            $imeiService->checkImei($policy->getPhone(), $policy->getImei(), $policy->getUser());
-                            $policy->addCheckmendCertData($imeiService->getCertId(), $imeiService->getResponseData());
-
-                            // clear out the cache - if we're re-checking it likely
-                            // means that recipero has updated their data
-                            $imeiService->clearMakeModelCheckCache($policy->getSerialNumber());
-                            $imeiService->clearMakeModelCheckCache($policy->getImei());
-
-                            $serialNumber = $policy->getSerialNumber();
-                            if (!$serialNumber) {
-                                $serialNumber = $policy->getImei();
-                            }
-                            $imeiService->checkSerial(
-                                $policy->getPhone(),
-                                $serialNumber,
-                                $policy->getImei(),
-                                $policy->getUser()
-                            );
-                            $policy->addCheckmendSerialData($imeiService->getResponseData());
-                            $dm->flush();
-                            $this->addFlash(
-                                'warning',
-                                '(Re)ran Receperio Checkes. Check results below.'
-                            );
-                        } else {
-                            $this->addFlash(
-                                'error',
-                                'Unable to run receperio checks (no imei number)'
-                            );
-                        }
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('resend_email_form')) {
-                    $resendEmailForm->handleRequest($request);
-                    if ($resendEmailForm->isValid()) {
-                        if ($policyService->resendPolicyEmail($policy)) {
-                            $this->addFlash(
-                                'success',
-                                'Resent the policy email.'
-                            );
-                        } else {
-                            $this->addFlash(
-                                'error',
-                                'Failed to resend the policy email.'
-                            );
-                        }
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('bacs_form')) {
-                    $bacsForm->handleRequest($request);
-                    if ($bacsForm->isValid()) {
-                        // non-manual payments should be scheduled
-                        if (!$bacsPayment->isManual()) {
-                            $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
-                            if (!$policy->hasPolicyOrUserBacsPaymentMethod()) {
-                                $this->get('logger')->warning(sprintf(
-                                    'Payment (Policy %s) is scheduled, however no bacs account for user',
-                                    $policy->getId()
-                                ));
-                            }
-                        } elseif (!$policy->getPremium()) {
-                            $priceService = $this->get("app.price");
-                            $priceService->phonePolicyDeterminePremium(
-                                $policy,
-                                $bacsPayment->getAmount(),
-                                new \DateTime()
-                            );
-                        }
-                        $policy->addPayment($bacsPayment);
-
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            'Added Payment'
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('create_form')) {
-                    $createForm->handleRequest($request);
-                    if ($createForm->isValid()) {
-                        $policyService->create($policy, null, true);
-                        $this->addFlash(
-                            'success',
-                            'Created Policy'
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('connect_form')) {
-                    $connectForm->handleRequest($request);
-                    if ($connectForm->isValid()) {
-                        $invitation = $invitationService->inviteByEmail(
-                            $policy,
-                            $connectForm->getData()['email'],
+                            $cancel->getCancellationReason(),
+                            true,
                             null,
-                            true
-                        );
-                        $invitationService->accept(
-                            $invitation,
-                            $invitation->getInvitee()->getFirstPolicy(),
-                            null,
-                            true
+                            true,
+                            $cancel->getFullRefund()
                         );
                         $this->addFlash(
                             'success',
-                            'Connected Users'
+                            sprintf('Policy %s was cancelled.', $policy->getPolicyNumber())
                         );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('imei_upload')) {
-                    $imeiUploadForm->handleRequest($request);
-                    if ($imeiUploadForm->isSubmitted() && $imeiUploadForm->isValid()) {
-                        $dm = $this->getManager();
-                        // we're assuming that a manaual check is done to verify
-                        $policy->setPhoneVerified(true);
-                        $imeiUploadFile->setPolicy($policy);
-                        $imeiUploadFile->setBucket(SoSure::S3_BUCKET_POLICY);
-                        $imeiUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
-
-                        $policy->addPolicyFile($imeiUploadFile);
-                        $dm->persist($imeiUploadFile);
-                        $dm->flush();
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('screen_upload')) {
-                    $screenUploadForm->handleRequest($request);
-                    if ($screenUploadForm->isSubmitted() && $screenUploadForm->isValid()) {
-                        $dm = $this->getManager();
-                        // we're assuming that a manaual check is done to verify
-                        $policy->setScreenVerified(true);
-                        $screenUploadFile->setPolicy($policy);
-                        $screenUploadFile->setBucket(SoSure::S3_BUCKET_POLICY);
-                        $screenUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
-
-                        $policy->addPolicyFile($screenUploadFile);
-                        $dm->persist($screenUploadFile);
-                        $dm->flush();
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('usertoken_form')) {
-                    $userTokenForm->handleRequest($request);
-                    if ($userTokenForm->isSubmitted() && $userTokenForm->isValid()) {
-                        $policy->getUser()->resetToken();
-                        $dm = $this->getManager();
-                        $dm->flush();
-
-                        $identity = $this->get('app.cognito.identity');
-                        if ($identity->deleteLastestMobileToken($policy->getUser())) {
-                            $this->addFlash(
-                                'success',
-                                'Reset user token & deleted cognito credentials'
-                            );
-                        } else {
-                            $this->addFlash(
-                                'success',
-                                'Reset user token. No cognito credentials present'
-                            );
-                        }
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('billing_form')) {
-                    $billingForm->handleRequest($request);
-                    if ($billingForm->isValid()) {
-                        $policyService->changeBillingDay($policy, $policy->getBilling()->format('d'));
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            'Updated billing date'
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('regenerate_policy_schedule_form')) {
-                    $regeneratePolicyScheduleForm->handleRequest($request);
-                    if ($regeneratePolicyScheduleForm->isValid()) {
-                        $policyService->generatePolicyTerms($policy);
-                        $policyService->generatePolicySchedule($policy);
-                        $dm->flush();
-                        $this->addFlash(
-                            'success',
-                            'Re-generated Policy Terms & Schedule'
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('makemodel_form')) {
-                    $makeModelForm->handleRequest($request);
-                    if ($makeModelForm->isValid()) {
-                        $imeiValidator = $this->get('app.imei');
-                        $phone = new Phone();
-                        $imeiValidator->checkSerial(
-                            $phone,
-                            $makeModel->getSerialNumberOrImei(),
-                            null,
-                            $policy->getUser(),
-                            null,
-                            false
-                        );
-                        $this->addFlash(
-                            'success',
-                            sprintf('%s', json_encode($imeiValidator->getResponseData()))
-                        );
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                    } elseif ($claimCancel && !$cancel->getForce()) {
+                        $this->addFlash('error', sprintf(
+                            'Unable to cancel Policy %s due to %s as override was not enabled',
+                            $policy->getPolicyNumber(),
+                            $cancel->getCancellationReason()
+                        ));
                     } else {
-                        $this->addFlash('error', 'Unable to run make/model check');
+                        $this->addFlash('error', sprintf(
+                            'Unable to cancel Policy %s due to %s',
+                            $policy->getPolicyNumber(),
+                            $cancel->getCancellationReason()
+                        ));
                     }
-                } elseif ($request->request->has('chargebacks_form')) {
-                    $chargebacksForm->handleRequest($request);
-                    if ($chargebacksForm->isValid()) {
-                        if ($chargeback = $chargebacks->getChargeback()) {
-                            // To appear for the correct account month, should be when we assign
-                            // the chargeback to the policy
-                            $chargeback->setDate(\DateTime::createFromFormat('U', time()));
 
-                            if ($this->areEqualToTwoDp(
-                                $chargeback->getAmount(),
-                                $policy->getPremiumInstallmentPrice(true)
-                            )) {
-                                $chargeback->setRefundTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-                            } else {
-                                $this->addFlash(
-                                    'error',
-                                    sprintf(
-                                        'Unable to determine commission to refund for chargeback %s',
-                                        $chargeback->getReference()
-                                    )
-                                );
-                            }
-
-                            $policy->addPayment($chargeback);
-                            $dm->flush();
-                            $this->addFlash(
-                                'success',
-                                sprintf('Added chargeback %s to policy', $chargeback->getReference())
-                            );
-                        } else {
-                            $this->addFlash(
-                                'error',
-                                'Unknown chargeback'
-                            );
-                        }
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('debt_form')) {
-                    $debtForm->handleRequest($request);
-                    if ($debtForm->isValid()) {
-                        $policy->setDebtCollector(Policy::DEBT_COLLECTOR_WISE);
-                        $dm->flush();
-                        $email = null;
-                        $customerSubject = null;
-
-                        if ($policy->getDebtCollector() == Policy::DEBT_COLLECTOR_WISE) {
-                            $email = 'debts@awise.demon.co.uk';
-                            $customerSubject = 'Wise has now been authorised to chase your debt to so-sure';
-                        }
-
-                        if ($email) {
-                            $mailer = $this->get('app.mailer');
-                            $mailer->sendTemplate(
-                                'Debt Collection Request',
-                                $email,
-                                'AppBundle:Email:policy/debtCollection.html.twig',
-                                ['policy' => $policy],
-                                'AppBundle:Email:policy/debtCollection.txt.twig',
-                                ['policy' => $policy],
-                                null,
-                                'bcc@so-sure.com'
-                            );
-
-                            $mailer->sendTemplateToUser(
-                                $customerSubject,
-                                $policy->getUser(),
-                                'AppBundle:Email:policy/debtCollectionCustomer.html.twig',
-                                ['policy' => $policy],
-                                'AppBundle:Email:policy/debtCollectionCustomer.txt.twig',
-                                ['policy' => $policy],
-                                null,
-                                'bcc@so-sure.com'
-                            );
-
-                            $this->addFlash(
-                                'success',
-                                sprintf('Emailed debt collector and set flag on policy')
-                            );
-                        }
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('swap_payment_plan_form')) {
-                    $swapPaymentPlanForm->handleRequest($request);
-                    if ($swapPaymentPlanForm->isValid()) {
-                        $policyService->swapPaymentPlan($policy);
-                        // @codingStandardsIgnoreStart
+                    return $this->redirectToRoute('admin_policies');
+                }
+            } elseif ($request->request->has('pending_cancel_form')) {
+                $pendingCancelForm->handleRequest($request);
+                if ($pendingCancelForm->isValid()) {
+                    if ($pendingCancelForm->get('clear')->isClicked()) {
+                        $policy->setPendingCancellation(null);
                         $this->addFlash(
                             'success',
-                            'Payment Plan has been swapped. For now, please manually adjust final scheduled payment to current date.'
+                            sprintf('Policy %s is no longer scheduled to be cancelled', $policy->getPolicyNumber())
                         );
-                        // @codingStandardsIgnoreEnd
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('pay_policy_form')) {
-                    $payPolicyForm->handleRequest($request);
-                    if ($payPolicyForm->isValid()) {
-                        $date = \DateTime::createFromFormat('U', time());
-                        $phone = $policy->getPhone();
-                        $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
-                        if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
-                            $amount = $currentPrice->getMonthlyPremiumPrice(null, $date);
-                        } elseif ($currentPrice && $payPolicyForm->get('yearly')->isClicked()) {
-                            $amount = $currentPrice->getYearlyPremiumPrice(null, $date);
-                        } else {
-                            throw new \Exception('1 or 12 payments only');
-                        }
-                        $premium = $policy->getPremium();
-                        if ($premium &&
-                            !$this->areEqualToTwoDp($amount, $premium->getAdjustedStandardMonthlyPremiumPrice()) &&
-                            !$this->areEqualToTwoDp($amount, $premium->getAdjustedYearlyPremiumPrice())) {
-                            throw new \Exception(sprintf(
-                                'Current price does not match policy price for %s',
-                                $policy->getId()
-                            ));
-                        }
-
-                        /** @var CheckoutService $checkout */
-                        $checkout = $this->get('app.checkout');
-                        $details = $checkout->runTokenPayment(
-                            $policy,
-                            $amount,
-                            $date->getTimestamp(),
-                            $policy->getId()
+                    } else {
+                        $this->addFlash(
+                            'success',
+                            sprintf('Policy %s is scheduled to be cancelled', $policy->getPolicyNumber())
                         );
-                        try {
-                            $checkout->add(
-                                $policy,
-                                $details['receiptId'],
-                                Payment::SOURCE_TOKEN,
-                                $date
-                            );
-                            // @codingStandardsIgnoreStart
-                            $this->addFlash(
-                                'success',
-                                'Policy is now paid for. Pdf generation may take a few minutes. Refresh the page to verify.'
-                            );
-                            // @codingStandardsIgnoreEnd
-                        } catch (PaymentDeclinedException $e) {
-                            if ($policy->getStatus() === Policy::STATUS_PENDING) {
-                                $policy->setStatus(null);
-                            }
-
-                            $this->addFlash(
-                                'danger',
-                                'Payment was declined'
-                            );
-                        }
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
                     }
-                } elseif ($request->request->has('cancel_direct_debit_form')) {
-                    $cancelDirectDebitForm->handleRequest($request);
-                    if ($cancelDirectDebitForm->isValid()) {
-                        $bacsService->queueCancelBankAccount(
-                            $policy->getPolicyOrUserBacsBankAccount(),
-                            $policy->hasBacsPaymentMethod() ? $policy->getId() : $policy->getPayerOrUser()->getId()
-                        );
-                        $this->addFlash('success', sprintf(
-                            'Direct Debit Cancellation has been queued.'
-                        ));
-                    }
-                } elseif ($request->request->has('skip_payment_form')) {
-                    $skipPaymentForm->handleRequest($request);
-                    if ($skipPaymentForm->isValid()) {
-                        $paymentId = $skipPaymentForm->getData()['payment_id'];
-                        $paymentRepo = $this->getManager()->getRepository(BacsPayment::class);
-                        /** @var BacsPayment $payment */
-                        $payment = $paymentRepo->find($paymentId);
-                        if (!$payment) {
-                            throw $this->createNotFoundException('Missing payment');
-                        }
+                    $dm->flush();
 
-                        $payment->setStatus(BacsPayment::STATUS_SKIPPED);
-                        $payment->setScheduledPayment(null);
-                        $this->getManager()->flush();
-                        $this->addFlash('success', sprintf(
-                            'Skipped payment'
-                        ));
-                    }
-                } elseif ($request->request->has('run_scheduled_payment_form')) {
-                    $runScheduledPaymentForm->handleRequest($request);
-                    if ($runScheduledPaymentForm->isValid()) {
-                        $scheduledPayment = $policy->getNextScheduledPayment();
-                        if ($scheduledPayment && $paymentRequestFile) {
-                            $paymentRequestFile->setBucket(SoSure::S3_BUCKET_POLICY);
-                            $paymentRequestFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
-
-                            $policy->addPolicyFile($paymentRequestFile);
-                            $scheduledPayment->adminReschedule();
-                            if ($scheduledPayment->getPreviousAttempt()) {
-                                $scheduledPayment->setPreviousAttempt(null);
-                            }
-                            if ($scheduledPayment->getPayment()) {
-                                $scheduledPayment->setPayment(null);
-                            }
-
-                            $this->getManager()->flush();
-
-                            $this->addFlash('success', sprintf(
-                                'Rescheduled scheduled payment for %s',
-                                $scheduledPayment->getScheduled() ?
-                                    $scheduledPayment->getScheduled()->format('d M Y') :
-                                    '?'
-                            ));
-                        }
-
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('bacs_refund_form')) {
-                    $bacsRefundForm->handleRequest($request);
-                    if ($bacsRefundForm->isValid()) {
-                        $bacsService->scheduleBacsPayment(
-                            $policy,
-                            0 - abs($bacsRefund->getAmount()),
-                            ScheduledPayment::TYPE_REFUND,
-                            $bacsRefund->getNotes()
-                        );
-                        $this->addFlash('success', sprintf(
-                            'Refund scheduled'
-                        ));
-                        return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                    }
-                } elseif ($request->request->has('dont_cancel_form')) {
-                    $form = $request->request->get('dont_cancel_form');
-                    $dontCancel = isset($form['dontCancel']);
-                    $allowCancellation = isset($form['allowCancellation']);
-                    $dontCancelForm->handleRequest($request);
-                    $policy->setDontCancelIfUnpaid($dontCancel);
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('installments_form')) {
+                $installmentsForm->handleRequest($request);
+                if ($installmentsForm->isValid()) {
+                    $policy->addNoteDetails(
+                        $this->conformAlphanumericSpaceDot($installmentsForm->getData()['notes'], 2500),
+                        $this->getUser()
+                    );
+                    $this->get('app.policy')->changeInstallments($policy, $installmentsForm->getData()['installments']);
+                }
+            } elseif ($request->request->has('note_form')) {
+                $noteForm->handleRequest($request);
+                if ($noteForm->isValid()) {
+                    $policy->addNoteDetails(
+                        $this->conformAlphanumericSpaceDot($noteForm->getData()['notes'], 2500),
+                        $this->getUser()
+                    );
                     $dm->flush();
                     $this->addFlash(
                         'success',
-                        $dontCancel ? 'Policy wont be cancelled if unpaid' : 'Policy will be cancelled if unpaid'
+                        sprintf('Added note to Policy %s.', $policy->getPolicyNumber())
                     );
-                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
-                } elseif ($request->request->has('salva_update_form')) {
-                    $salvaUpdateForm->handleRequest($request);
-                    if ($salvaUpdateForm->isValid()) {
-                        /** @var SalvaExportService $salvaService */
-                        $salvaService = $this->get('app.salva');
-                        $salvaService->queuePolicy($policy, SalvaExportService::QUEUE_UPDATED);
 
-                        $this->addFlash('success', 'Queued Salva Policy Update');
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('facebook_form')) {
+                $facebookForm->handleRequest($request);
+                if ($facebookForm->isValid()) {
+                    $policy->getUser()->resetFacebook();
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        sprintf('Policy %s facebook cleared.', $policy->getPolicyNumber())
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('receperio_form')) {
+                $receperioForm->handleRequest($request);
+                if ($receperioForm->isValid()) {
+                    if ($policy->getImei()) {
+                        $imeiService->checkImei($policy->getPhone(), $policy->getImei(), $policy->getUser());
+                        $policy->addCheckmendCertData($imeiService->getCertId(), $imeiService->getResponseData());
+
+                        // clear out the cache - if we're re-checking it likely
+                        // means that recipero has updated their data
+                        $imeiService->clearMakeModelCheckCache($policy->getSerialNumber());
+                        $imeiService->clearMakeModelCheckCache($policy->getImei());
+
+                        $serialNumber = $policy->getSerialNumber();
+                        if (!$serialNumber) {
+                            $serialNumber = $policy->getImei();
+                        }
+                        $imeiService->checkSerial(
+                            $policy->getPhone(),
+                            $serialNumber,
+                            $policy->getImei(),
+                            $policy->getUser()
+                        );
+                        $policy->addCheckmendSerialData($imeiService->getResponseData());
+                        $dm->flush();
+                        $this->addFlash(
+                            'warning',
+                            '(Re)ran Receperio Checkes. Check results below.'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to run receperio checks (no imei number)'
+                        );
                     }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('resend_email_form')) {
+                $resendEmailForm->handleRequest($request);
+                if ($resendEmailForm->isValid()) {
+                    if ($policyService->resendPolicyEmail($policy)) {
+                        $this->addFlash(
+                            'success',
+                            'Resent the policy email.'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Failed to resend the policy email.'
+                        );
+                    }
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('bacs_form')) {
+                $bacsForm->handleRequest($request);
+                if ($bacsForm->isValid()) {
+                    // non-manual payments should be scheduled
+                    if (!$bacsPayment->isManual()) {
+                        $bacsPayment->setStatus(BacsPayment::STATUS_PENDING);
+                        if (!$policy->hasPolicyOrUserBacsPaymentMethod()) {
+                            $this->get('logger')->warning(sprintf(
+                                'Payment (Policy %s) is scheduled, however no bacs account for user',
+                                $policy->getId()
+                            ));
+                        }
+                    } elseif (!$policy->getPremium()) {
+                        $priceService = $this->get("app.price");
+                        $priceService->phonePolicyDeterminePremium(
+                            $policy,
+                            $bacsPayment->getAmount(),
+                            new \DateTime()
+                        );
+                    }
+                    $policy->addPayment($bacsPayment);
+
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Added Payment'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('create_form')) {
+                $createForm->handleRequest($request);
+                if ($createForm->isValid()) {
+                    $policyService->create($policy, null, true);
+                    $this->addFlash(
+                        'success',
+                        'Created Policy'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('connect_form')) {
+                $connectForm->handleRequest($request);
+                if ($connectForm->isValid()) {
+                    $invitation = $invitationService->inviteByEmail(
+                        $policy,
+                        $connectForm->getData()['email'],
+                        null,
+                        true
+                    );
+                    $invitationService->accept(
+                        $invitation,
+                        $invitation->getInvitee()->getFirstPolicy(),
+                        null,
+                        true
+                    );
+                    $this->addFlash(
+                        'success',
+                        'Connected Users'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('imei_upload')) {
+                $imeiUploadForm->handleRequest($request);
+                if ($imeiUploadForm->isSubmitted() && $imeiUploadForm->isValid()) {
+                    $dm = $this->getManager();
+                    // we're assuming that a manaual check is done to verify
+                    $policy->setPhoneVerified(true);
+                    $imeiUploadFile->setPolicy($policy);
+                    $imeiUploadFile->setBucket(SoSure::S3_BUCKET_POLICY);
+                    $imeiUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $policy->addPolicyFile($imeiUploadFile);
+                    $dm->persist($imeiUploadFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('screen_upload')) {
+                $screenUploadForm->handleRequest($request);
+                if ($screenUploadForm->isSubmitted() && $screenUploadForm->isValid()) {
+                    $dm = $this->getManager();
+                    // we're assuming that a manaual check is done to verify
+                    $policy->setScreenVerified(true);
+                    $screenUploadFile->setPolicy($policy);
+                    $screenUploadFile->setBucket(SoSure::S3_BUCKET_POLICY);
+                    $screenUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                    $policy->addPolicyFile($screenUploadFile);
+                    $dm->persist($screenUploadFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('usertoken_form')) {
+                $userTokenForm->handleRequest($request);
+                if ($userTokenForm->isSubmitted() && $userTokenForm->isValid()) {
+                    $policy->getUser()->resetToken();
+                    $dm = $this->getManager();
+                    $dm->flush();
+
+                    $identity = $this->get('app.cognito.identity');
+                    if ($identity->deleteLastestMobileToken($policy->getUser())) {
+                        $this->addFlash(
+                            'success',
+                            'Reset user token & deleted cognito credentials'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'success',
+                            'Reset user token. No cognito credentials present'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('billing_form')) {
+                $billingForm->handleRequest($request);
+                if ($billingForm->isValid()) {
+                    $policyService->changeBillingDay($policy, $policy->getBilling()->format('d'));
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated billing date'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('regenerate_policy_schedule_form')) {
+                $regeneratePolicyScheduleForm->handleRequest($request);
+                if ($regeneratePolicyScheduleForm->isValid()) {
+                    $policyService->generatePolicyTerms($policy);
+                    $policyService->generatePolicySchedule($policy);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Re-generated Policy Terms & Schedule'
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('makemodel_form')) {
+                $makeModelForm->handleRequest($request);
+                if ($makeModelForm->isValid()) {
+                    $imeiValidator = $this->get('app.imei');
+                    $phone = new Phone();
+                    $imeiValidator->checkSerial(
+                        $phone,
+                        $makeModel->getSerialNumberOrImei(),
+                        null,
+                        $policy->getUser(),
+                        null,
+                        false
+                    );
+                    $this->addFlash(
+                        'success',
+                        sprintf('%s', json_encode($imeiValidator->getResponseData()))
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                } else {
+                    $this->addFlash('error', 'Unable to run make/model check');
+                }
+            } elseif ($request->request->has('chargebacks_form')) {
+                $chargebacksForm->handleRequest($request);
+                if ($chargebacksForm->isValid()) {
+                    if ($chargeback = $chargebacks->getChargeback()) {
+                        // To appear for the correct account month, should be when we assign
+                        // the chargeback to the policy
+                        $chargeback->setDate(\DateTime::createFromFormat('U', time()));
+
+                        if ($this->areEqualToTwoDp(
+                            $chargeback->getAmount(),
+                            $policy->getPremiumInstallmentPrice(true)
+                        )) {
+                            $chargeback->setRefundTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+                        } else {
+                            $this->addFlash(
+                                'error',
+                                sprintf(
+                                    'Unable to determine commission to refund for chargeback %s',
+                                    $chargeback->getReference()
+                                )
+                            );
+                        }
+
+                        $policy->addPayment($chargeback);
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            sprintf('Added chargeback %s to policy', $chargeback->getReference())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unknown chargeback'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('debt_form')) {
+                $debtForm->handleRequest($request);
+                if ($debtForm->isValid()) {
+                    $policy->setDebtCollector(Policy::DEBT_COLLECTOR_WISE);
+                    $dm->flush();
+                    $email = null;
+                    $customerSubject = null;
+
+                    if ($policy->getDebtCollector() == Policy::DEBT_COLLECTOR_WISE) {
+                        $email = 'debts@awise.demon.co.uk';
+                        $customerSubject = 'Wise has now been authorised to chase your debt to so-sure';
+                    }
+
+                    if ($email) {
+                        $mailer = $this->get('app.mailer');
+                        $mailer->sendTemplate(
+                            'Debt Collection Request',
+                            $email,
+                            'AppBundle:Email:policy/debtCollection.html.twig',
+                            ['policy' => $policy],
+                            'AppBundle:Email:policy/debtCollection.txt.twig',
+                            ['policy' => $policy],
+                            null,
+                            'bcc@so-sure.com'
+                        );
+
+                        $mailer->sendTemplateToUser(
+                            $customerSubject,
+                            $policy->getUser(),
+                            'AppBundle:Email:policy/debtCollectionCustomer.html.twig',
+                            ['policy' => $policy],
+                            'AppBundle:Email:policy/debtCollectionCustomer.txt.twig',
+                            ['policy' => $policy],
+                            null,
+                            'bcc@so-sure.com'
+                        );
+
+                        $this->addFlash(
+                            'success',
+                            sprintf('Emailed debt collector and set flag on policy')
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('swap_payment_plan_form')) {
+                $swapPaymentPlanForm->handleRequest($request);
+                if ($swapPaymentPlanForm->isValid()) {
+                    $policyService->swapPaymentPlan($policy);
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'success',
+                        'Payment Plan has been swapped. For now, please manually adjust final scheduled payment to current date.'
+                    );
+                    // @codingStandardsIgnoreEnd
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('pay_policy_form')) {
+                $payPolicyForm->handleRequest($request);
+                if ($payPolicyForm->isValid()) {
+                    $date = \DateTime::createFromFormat('U', time());
+                    $phone = $policy->getPhone();
+                    $currentPrice = $phone->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
+                    if ($currentPrice && $payPolicyForm->get('monthly')->isClicked()) {
+                        $amount = $currentPrice->getMonthlyPremiumPrice(null, $date);
+                    } elseif ($currentPrice && $payPolicyForm->get('yearly')->isClicked()) {
+                        $amount = $currentPrice->getYearlyPremiumPrice(null, $date);
+                    } else {
+                        throw new \Exception('1 or 12 payments only');
+                    }
+                    $premium = $policy->getPremium();
+                    if ($premium &&
+                        !$this->areEqualToTwoDp($amount, $premium->getAdjustedStandardMonthlyPremiumPrice()) &&
+                        !$this->areEqualToTwoDp($amount, $premium->getAdjustedYearlyPremiumPrice())) {
+                        throw new \Exception(sprintf(
+                            'Current price does not match policy price for %s',
+                            $policy->getId()
+                        ));
+                    }
+
+                    /** @var CheckoutService $checkout */
+                    $checkout = $this->get('app.checkout');
+                    $details = $checkout->runTokenPayment(
+                        $policy,
+                        $amount,
+                        $date->getTimestamp(),
+                        $policy->getId()
+                    );
+                    try {
+                        $checkout->add(
+                            $policy,
+                            $details['receiptId'],
+                            Payment::SOURCE_TOKEN,
+                            $date
+                        );
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'success',
+                            'Policy is now paid for. Pdf generation may take a few minutes. Refresh the page to verify.'
+                        );
+                        // @codingStandardsIgnoreEnd
+                    } catch (PaymentDeclinedException $e) {
+                        if ($policy->getStatus() === Policy::STATUS_PENDING) {
+                            $policy->setStatus(null);
+                        }
+
+                        $this->addFlash(
+                            'danger',
+                            'Payment was declined'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('cancel_direct_debit_form')) {
+                $cancelDirectDebitForm->handleRequest($request);
+                if ($cancelDirectDebitForm->isValid()) {
+                    $bacsService->queueCancelBankAccount(
+                        $policy->getPolicyOrUserBacsBankAccount(),
+                        $policy->hasBacsPaymentMethod() ? $policy->getId() : $policy->getPayerOrUser()->getId()
+                    );
+                    $this->addFlash('success', sprintf(
+                        'Direct Debit Cancellation has been queued.'
+                    ));
+                }
+            } elseif ($request->request->has('skip_payment_form')) {
+                $skipPaymentForm->handleRequest($request);
+                if ($skipPaymentForm->isValid()) {
+                    $paymentId = $skipPaymentForm->getData()['payment_id'];
+                    $paymentRepo = $this->getManager()->getRepository(BacsPayment::class);
+                    /** @var BacsPayment $payment */
+                    $payment = $paymentRepo->find($paymentId);
+                    if (!$payment) {
+                        throw $this->createNotFoundException('Missing payment');
+                    }
+
+                    $payment->setStatus(BacsPayment::STATUS_SKIPPED);
+                    $payment->setScheduledPayment(null);
+                    $this->getManager()->flush();
+                    $this->addFlash('success', sprintf(
+                        'Skipped payment'
+                    ));
+                }
+            } elseif ($request->request->has('run_scheduled_payment_form')) {
+                $runScheduledPaymentForm->handleRequest($request);
+                if ($runScheduledPaymentForm->isValid()) {
+                    $scheduledPayment = $policy->getNextScheduledPayment();
+                    if ($scheduledPayment && $paymentRequestFile) {
+                        $paymentRequestFile->setBucket(SoSure::S3_BUCKET_POLICY);
+                        $paymentRequestFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                        $policy->addPolicyFile($paymentRequestFile);
+                        $scheduledPayment->adminReschedule();
+                        if ($scheduledPayment->getPreviousAttempt()) {
+                            $scheduledPayment->setPreviousAttempt(null);
+                        }
+                        if ($scheduledPayment->getPayment()) {
+                            $scheduledPayment->setPayment(null);
+                        }
+
+                        $this->getManager()->flush();
+
+                        $this->addFlash('success', sprintf(
+                            'Rescheduled scheduled payment for %s',
+                            $scheduledPayment->getScheduled() ?
+                                $scheduledPayment->getScheduled()->format('d M Y') :
+                                '?'
+                        ));
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('bacs_refund_form')) {
+                $bacsRefundForm->handleRequest($request);
+                if ($bacsRefundForm->isValid()) {
+                    $bacsService->scheduleBacsPayment(
+                        $policy,
+                        0 - abs($bacsRefund->getAmount()),
+                        ScheduledPayment::TYPE_REFUND,
+                        $bacsRefund->getNotes()
+                    );
+                    $this->addFlash('success', sprintf(
+                        'Refund scheduled'
+                    ));
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
+            } elseif ($request->request->has('dont_cancel_form')) {
+                $form = $request->request->get('dont_cancel_form');
+                $dontCancel = isset($form['dontCancel']);
+                $allowCancellation = isset($form['allowCancellation']);
+                $dontCancelForm->handleRequest($request);
+                $policy->setDontCancelIfUnpaid($dontCancel);
+                $dm->flush();
+                $this->addFlash(
+                    'success',
+                    $dontCancel ? 'Policy wont be cancelled if unpaid' : 'Policy will be cancelled if unpaid'
+                );
+                return $this->redirectToRoute('admin_policy', ['id' => $id]);
+            } elseif ($request->request->has('salva_update_form')) {
+                $salvaUpdateForm->handleRequest($request);
+                if ($salvaUpdateForm->isValid()) {
+                    /** @var SalvaExportService $salvaService */
+                    $salvaService = $this->get('app.salva');
+                    $salvaService->queuePolicy($policy, SalvaExportService::QUEUE_UPDATED);
+
+                    $this->addFlash('success', 'Queued Salva Policy Update');
                 }
             }
-            $checks = $fraudService->runChecks($policy);
-            $now = \DateTime::createFromFormat('U', time());
-
-            /** @var LogEntryRepository $logRepo */
-            $logRepo = $this->getManager()->getRepository(LogEntry::class);
-            $previousPicSureStatuses = $logRepo->findBy([
-                'objectId' => $policy->getId(),
-                'data.picSureStatus' => ['$nin' => [null, PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED]],
-            ], ['loggedAt' => 'desc'], 1);
-            $previousPicSureStatus = null;
-            if (count($previousPicSureStatuses) > 0) {
-                $previousPicSureStatus = $previousPicSureStatuses[0];
-            }
-
-            $previousInvalidPicSureStatuses = $logRepo->findBy([
-                'objectId' => $policy->getId(),
-                'data.picSureStatus' => PhonePolicy::PICSURE_STATUS_INVALID
-            ]);
-            $hadInvalidPicSureStatus = false;
-            if (count($previousInvalidPicSureStatuses) > 0) {
-                $hadInvalidPicSureStatus = true;
-            }
-
-            return [
-                'policy' => $policy,
-                'cancel_form' => $cancelForm->createView(),
-                'pending_cancel_form' => $pendingCancelForm->createView(),
-                'installments_form' => $installmentsForm->createView(),
-                'note_form' => $noteForm->createView(),
-                'formClaimFlags' => $claimFlags->createView(),
-                'facebook_form' => $facebookForm->createView(),
-                'receperio_form' => $receperioForm->createView(),
-                'bacs_form' => $bacsForm->createView(),
-                'create_form' => $createForm->createView(),
-                'connect_form' => $connectForm->createView(),
-                'imei_upload_form' => $imeiUploadForm->createView(),
-                'screen_upload_form' => $screenUploadForm->createView(),
-                'usertoken_form' => $userTokenForm->createView(),
-                'billing_form' => $billingForm->createView(),
-                'resend_email_form' => $resendEmailForm->createView(),
-                'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
-                'makemodel_form' => $makeModelForm->createView(),
-                'chargebacks_form' => $chargebacksForm->createView(),
-                'debt_form' => $debtForm->createView(),
-                'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
-                'pay_policy_form' => $payPolicyForm->createView(),
-                'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
-                'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
-                'bacs_refund_form' => $bacsRefundForm->createView(),
-                'dont_cancel_form' => $dontCancelForm->createView(),
-                'salva_update_form' => $salvaUpdateForm->createView(),
-                'skip_payment_form' => $skipPaymentForm->createView(),
-                'fraud' => $checks,
-                'policy_route' => 'admin_policy',
-                'user_route' => 'admin_user',
-                'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
-                'user_history' => $this->getUserHistory($policy->getUser()->getId()),
-                'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
-                'claim_types' => Claim::$claimTypes,
-                'phones' => $dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
-                'now' => \DateTime::createFromFormat('U', time()),
-                'previousPicSureStatus' => $previousPicSureStatus,
-                'hadInvalidPicSureStatus' => $hadInvalidPicSureStatus,
-            ];
-        } catch (\Exception $e) {
-            $this->get('logger')->error(
-                sprintf("Error loading policy in admin."),
-                ['exception' => $e]
-            );
         }
+        $checks = $fraudService->runChecks($policy);
+        $now = \DateTime::createFromFormat('U', time());
+
+        /** @var LogEntryRepository $logRepo */
+        $logRepo = $this->getManager()->getRepository(LogEntry::class);
+        $previousPicSureStatuses = $logRepo->findBy([
+            'objectId' => $policy->getId(),
+            'data.picSureStatus' => ['$nin' => [null, PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED]],
+        ], ['loggedAt' => 'desc'], 1);
+        $previousPicSureStatus = null;
+        if (count($previousPicSureStatuses) > 0) {
+            $previousPicSureStatus = $previousPicSureStatuses[0];
+        }
+
+        $previousInvalidPicSureStatuses = $logRepo->findBy([
+            'objectId' => $policy->getId(),
+            'data.picSureStatus' => PhonePolicy::PICSURE_STATUS_INVALID
+        ]);
+        $hadInvalidPicSureStatus = false;
+        if (count($previousInvalidPicSureStatuses) > 0) {
+            $hadInvalidPicSureStatus = true;
+        }
+        return [
+            'policy' => $policy,
+            'cancel_form' => $cancelForm->createView(),
+            'pending_cancel_form' => $pendingCancelForm->createView(),
+            'installments_form' => $installmentsForm->createView(),
+            'note_form' => $noteForm->createView(),
+            'formClaimFlags' => $claimFlags->createView(),
+            'facebook_form' => $facebookForm->createView(),
+            'receperio_form' => $receperioForm->createView(),
+            'bacs_form' => $bacsForm->createView(),
+            'create_form' => $createForm->createView(),
+            'connect_form' => $connectForm->createView(),
+            'imei_upload_form' => $imeiUploadForm->createView(),
+            'screen_upload_form' => $screenUploadForm->createView(),
+            'usertoken_form' => $userTokenForm->createView(),
+            'billing_form' => $billingForm->createView(),
+            'resend_email_form' => $resendEmailForm->createView(),
+            'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
+            'makemodel_form' => $makeModelForm->createView(),
+            'chargebacks_form' => $chargebacksForm->createView(),
+            'debt_form' => $debtForm->createView(),
+            'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
+            'pay_policy_form' => $payPolicyForm->createView(),
+            'cancel_direct_debit_form' => $cancelDirectDebitForm->createView(),
+            'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
+            'bacs_refund_form' => $bacsRefundForm->createView(),
+            'dont_cancel_form' => $dontCancelForm->createView(),
+            'salva_update_form' => $salvaUpdateForm->createView(),
+            'skip_payment_form' => $skipPaymentForm->createView(),
+            'fraud' => $checks,
+            'policy_route' => 'admin_policy',
+            'user_route' => 'admin_user',
+            'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
+            'user_history' => $this->getUserHistory($policy->getUser()->getId()),
+            'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
+            'claim_types' => Claim::$claimTypes,
+            'phones' => $dm->getRepository(Phone::class)->findActiveInactive()->getQuery()->execute(),
+            'now' => \DateTime::createFromFormat('U', time()),
+            'previousPicSureStatus' => $previousPicSureStatus,
+            'hadInvalidPicSureStatus' => $hadInvalidPicSureStatus,
+        ];
     }
 
     /**
