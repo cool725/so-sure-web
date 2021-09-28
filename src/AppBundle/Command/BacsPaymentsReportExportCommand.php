@@ -71,6 +71,12 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'What email address(es) to send to',
                 self::DEFAULT_EMAIL_ADDRESS
+            )
+            ->addOption(
+                'output-to-file',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Optional output folder and file name'
             );
     }
 
@@ -85,6 +91,7 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
         $bacsPaymentRepo = $this->dm->getRepository(BacsPayment::class);
         $start = $input->getOption('start');
         $end = $input->getOption('end');
+        $outputToFile = $input->getOption('output-to-file');
         $emailAccounts = $input->getOption('email-accounts');
 
         if (!$start) {
@@ -100,8 +107,12 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
             $output->writeln("end: ".$end);
         }
 
-        $fileName = self::FILE_NAME.'-'.time().".csv";
-        $file = "/tmp/" . $fileName;
+        if ($outputToFile) {
+            $file = $outputToFile;
+        } else {
+            $fileName = self::FILE_NAME.'-'.time().".csv";
+            $file = "/tmp/" . $fileName;
+        }
 
         $payments = $bacsPaymentRepo->getBacsDateRange(new \DateTime($start), new \DateTime($end));
 
@@ -140,7 +151,7 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
                     $payment->getPolicy()->getId(),
                     $payment->getDate()->format('Y-m-d H:i'),
                     $payment->getPolicy()->getStart()->format('Y-m-d H:i'),
-                    $payment->getPolicy()->getUser()->getFirstName(),
+                    $payment->getPolicy()->getUser()->getFirstName()." ".
                     $payment->getPolicy()->getUser()->getLastName(),
                     $payment->getPolicy()->getUser()->getEmail(),
                     $payment->getAmount(),
