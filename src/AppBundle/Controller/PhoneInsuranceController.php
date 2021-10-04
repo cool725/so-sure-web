@@ -55,6 +55,9 @@ class PhoneInsuranceController extends BaseController
 {
     use PhoneTrait;
 
+    const CACHE_LIST_PHONES_KEY_FORMAT = 'ListPhones:%s:%s';
+    const CACHE_LIST_PHONES_TIME = 3600; // 1 hour
+
     /**
      * @Route("/phone-insurance/water-damage", name="phone_insurance_water_damage", options={"sitemap" = true})
      * @Route("/mobile-insurance/water-damage", name="mobile_insurance_water_damage")
@@ -866,81 +869,98 @@ class PhoneInsuranceController extends BaseController
         $phones = $repo->findActive()->getQuery()->execute();
         $list = [];
 
-        /** @var Phone $phone */
-        foreach ($phones as $phone) {
-            // Loop through each phone and make an array for the response
-            $aggregatorId = '';
-            $requester = 'requesterId';
-            if ($request->query->get('aggregator')) {
-                $requester = 'aggregatorId';
-                // If aggregator set, look for aggregator ID (if applicable)
-                if ($request->query->get('aggregator') == 'GoCompare') {
-                    $goCompare = new GoCompare();
-                    foreach ($goCompare::$models as $index => $model) {
-                        if ($model['make'] == $phone->getMake()
-                            && $model['model'] == $phone->getModel()
-                            && $model['memory'] == $phone->getMemory()
-                        ) {
-                            $aggregatorId = $index;
+        $redis = $this->get("snc_redis.default");
+        $environment = $this->getParameter('kernel.environment');
+        $redisKey = sprintf(
+            self::CACHE_LIST_PHONES_KEY_FORMAT,
+            $environment,
+            $request->query->get('aggregator')
+        );
+
+        if ($redis->exists($redisKey)) {
+            $list = json_decode($redis->get($redisKey));
+        } else {
+            /** @var Phone $phone */
+            foreach ($phones as $phone) {
+                // Loop through each phone and make an array for the response
+                $aggregatorId = '';
+                $requester = 'requesterId';
+                if ($request->query->get('aggregator')) {
+                    $requester = 'aggregatorId';
+                    // If aggregator set, look for aggregator ID (if applicable)
+                    if ($request->query->get('aggregator') == 'GoCompare') {
+                        $goCompare = new GoCompare();
+                        foreach ($goCompare::$models as $index => $model) {
+                            if ($model['make'] == $phone->getMake()
+                                && $model['model'] == $phone->getModel()
+                                && $model['memory'] == $phone->getMemory()
+                            ) {
+                                $aggregatorId = $index;
+                            }
                         }
                     }
-                }
-            } elseif ($request->query->get('requester')) {
-                // Placeholder for generic use with partners
-                $requester = 'requesterId';
-            }
-
-            $subVariantArr['standard'] = [
-                'subvariant' => 'standard',
-                'price' => [
-                    'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
-                    'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice(),
-                ],
-                'excesses' => [
-                    'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
-                        $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
-                        [],
-                    'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
-                        $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
-                        [],
-                ],
-            ];
-
-            foreach ($subvariants as $subvariant) {
-                $subvarName = $subvariant->getName();
-                $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvarName);
-                $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvarName);
-                $price = [];
-                if ($monthly && $yearly) {
-                    $price = [
-                        'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
-                        'yearlyPremium' => $yearly->getYearlyPremiumPrice(),
-                    ];
+                } elseif ($request->query->get('requester')) {
+                    // Placeholder for generic use with partners
+                    $requester = 'requesterId';
                 }
 
-                $subVariantArr[$subvarName] = [
-                    'subvariant' => $subvarName,
-                    'price' => $price,
+                $subVariantArr['standard'] = [
+                    'subvariant' => 'standard',
+                    'price' => [
+                        'monthlyPremium' => $phone->getCurrentMonthlyPhonePrice()->getMonthlyPremiumPrice(),
+                        'yearlyPremium' => $phone->getCurrentYearlyPhonePrice()->getYearlyPremiumPrice(),
+                    ],
                     'excesses' => [
-                        'defaultExcess' => $monthly->getExcess() ?
-                            $monthly->getExcess()->toApiArray($subvariant) :
+                        'defaultExcess' => $phone->getCurrentMonthlyPhonePrice()->getExcess() ?
+                            $phone->getCurrentMonthlyPhonePrice()->getExcess()->toApiArray() :
                             [],
-                        'validatedExcess' => $monthly->getPicSureExcess() ?
-                            $monthly->getPicSureExcess()->toApiArray($subvariant) :
+                        'validatedExcess' => $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess() ?
+                            $phone->getCurrentMonthlyPhonePrice()->getPicSureExcess()->toApiArray() :
                             [],
                     ],
                 ];
+
+                foreach ($subvariants as $subvariant) {
+                    $subvarName = $subvariant->getName();
+                    $yearly = $phone->getCurrentYearlyPhonePrice(null, $subvarName);
+                    $monthly = $phone->getCurrentMonthlyPhonePrice(null, $subvarName);
+                    $price = [];
+                    if ($monthly && $yearly) {
+                        $price = [
+                            'monthlyPremium' => $monthly->getMonthlyPremiumPrice(),
+                            'yearlyPremium' => $yearly->getYearlyPremiumPrice(),
+                        ];
+                    }
+
+                    $subVariantArr[$subvarName] = [
+                        'subvariant' => $subvarName,
+                        'price' => $price,
+                        'excesses' => [
+                            'defaultExcess' => $monthly->getExcess() ?
+                                $monthly->getExcess()->toApiArray($subvariant) :
+                                [],
+                            'validatedExcess' => $monthly->getPicSureExcess() ?
+                                $monthly->getPicSureExcess()->toApiArray($subvariant) :
+                                [],
+                        ],
+                    ];
+                }
+
+                $list[] = [
+                    'id'            => $phone->getId(),
+                    'make'          => $phone->getMake(),
+                    'model'         => $phone->getModel(),
+                    'memory'        => $phone->getMemory(),
+                    'devices'       => $phone->getDevices(),
+                    'subvariants'   => $subVariantArr,
+                    $requester      => $aggregatorId,
+                ];
+
+                // save to redis cache
+                $redis->setex($redisKey, self::CACHE_LIST_PHONES_TIME, json_encode($list));
             }
-            $list[] = [
-                'id'            => $phone->getId(),
-                'make'          => $phone->getMake(),
-                'model'         => $phone->getModel(),
-                'memory'        => $phone->getMemory(),
-                'devices'       => $phone->getDevices(),
-                'subvariants'   => $subVariantArr,
-                $requester      => $aggregatorId,
-            ];
         }
+
         if (true == $xmlOutput) {
             $xmlAdapter = new ArrayToXml();
             $result = $xmlAdapter->toXml($list);

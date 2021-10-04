@@ -63,10 +63,26 @@ class GoCompare
         1992 => ['make' => 'Apple', 'model' => 'iPhone 12 Pro Max', 'memory' => 128],
         1993 => ['make' => 'Apple', 'model' => 'iPhone 12 Pro Max', 'memory' => 256],
         1994 => ['make' => 'Apple', 'model' => 'iPhone 12 Pro Max', 'memory' => 512],
+        2409 => ['make' => 'Apple', 'model' => 'iPhone 13 Mini', 'memory' => 128],
+        2410 => ['make' => 'Apple', 'model' => 'iPhone 13 Mini', 'memory' => 256],
+        2411 => ['make' => 'Apple', 'model' => 'iPhone 13 Mini', 'memory' => 512],
+        2412 => ['make' => 'Apple', 'model' => 'iPhone 13', 'memory' => 128],
+        2413 => ['make' => 'Apple', 'model' => 'iPhone 13', 'memory' => 256],
+        2414 => ['make' => 'Apple', 'model' => 'iPhone 13', 'memory' => 512],
+        2415 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro', 'memory' => 128],
+        2416 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro', 'memory' => 256],
+        2417 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro', 'memory' => 512],
+        2418 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro', 'memory' => 1024],
+        2419 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro Max', 'memory' => 128],
+        2420 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro Max', 'memory' => 256],
+        2421 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro Max', 'memory' => 512],
+        2422 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro Max', 'memory' => 1024],
 
         1890 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 64],
         1891 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 128],
         1892 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 25],
+
+
         // no longer supported by gocompare.
         // 215 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 128],
         // 216 => ['make' => 'Samsung', 'model' => 'Galaxy S6', 'memory' => 32],
