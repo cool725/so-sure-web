@@ -144,6 +144,8 @@ class GoCompare
         1935 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 5G', 'memory' => 256],
         1936 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 256],
         1937 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 512],
+        1950 => ['make' => 'Samsung', 'model' => 'Galaxy Z Flip 5G', 'memory' => 256],
+        1954 => ['make' => 'Samsung', 'model' => 'Galaxy Z Fold2 5G', 'memory' => 256],
         2070 => ['make' => 'Samsung', 'model' => 'Galaxy S21 5G', 'memory' => 128],
         2071 => ['make' => 'Samsung', 'model' => 'Galaxy S21 5G', 'memory' => 256],
         2072 => ['make' => 'Samsung', 'model' => 'Galaxy S21+ 5G', 'memory' => 128],
@@ -152,6 +154,12 @@ class GoCompare
         2075 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 256],
         2076 => ['make' => 'Samsung', 'model' => 'Galaxy S21 Ultra 5G', 'memory' => 512],
         2356 => ['make' => 'Samsung', 'model' => 'Galaxy A72', 'memory' => 128],
+        2400 => ['make' => 'Samsung', 'model' => 'Galaxy Z Fold3 5G', 'memory' => 256],
+        2401 => ['make' => 'Samsung', 'model' => 'Galaxy Z Fold3 5G', 'memory' => 512],
+        2402 => ['make' => 'Samsung', 'model' => 'Galaxy Z Flip3 5G', 'memory' => 128],
+        2403 => ['make' => 'Samsung', 'model' => 'Galaxy Z Flip3 5G', 'memory' => 256],
+        1996 => ['make' => 'Samsung', 'model' => 'Galaxy A21s', 'memory' => 64],
+        1949 => ['make' => 'Samsung', 'model' => 'Galaxy A51 5G', 'memory' => 128],
 
         1412 => ['make' => 'Huawei', 'model' => 'P20', 'memory' => 128],
         1413 => ['make' => 'Huawei', 'model' => 'P20 Lite', 'memory' => 64],
@@ -189,6 +197,7 @@ class GoCompare
         1886 => ['make' => 'Motorola', 'model' => 'One Macro', 'memory' => 64],
         1895 => ['make' => 'Motorola', 'model' => 'Moto G8 Power', 'memory' => 64],
         2381 => ['make' => 'Motorola', 'model' => 'Moto G9 Play', 'memory' => 64],
+        2396 => ['make' => 'Motorola', 'model' => 'Moto G 5G Plus', 'memory' => 64],
 
         1428 => ['make' => 'LG', 'model' => 'G7 ThinQ', 'memory' => 64],
 
@@ -201,6 +210,8 @@ class GoCompare
         1870 => ['make' => 'Sony', 'model' => 'Xperia 1 II', 'memory' => 256],
         1882 => ['make' => 'Sony', 'model' => 'Xperia L4', 'memory' => 64],
         2335 => ['make' => 'Sony', 'model' => 'Xperia 10 Plus', 'memory' => 64],
+        2062 => ['make' => 'Sony', 'model' => 'Xperia 5 II', 'memory' => 128],
+        1995 => ['make' => 'Sony', 'model' => 'Xperia 10 II', 'memory' => 128],
 
         827 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 64],
         835 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 128],
@@ -218,6 +229,8 @@ class GoCompare
         2069 => ['make' => 'Google', 'model' => 'Pixel 5', 'memory' => 128],
 
         1477 => ['make' => 'Nokia', 'model' => '7.1', 'memory' => 32],
+        2067 => ['make' => 'Nokia', 'model' => '8.3 5G', 'memory' => 64],
+        2068 => ['make' => 'Nokia', 'model' => '8.3 5G', 'memory' => 128],
 
         182 => ['make' => 'OnePlus', 'model' => 'Three', 'memory' => 64],
         183 => ['make' => 'OnePlus', 'model' => 'Two', 'memory' => 16],
@@ -258,12 +271,17 @@ class GoCompare
         2346 => ['make' => 'Oppo', 'model' => 'A72', 'memory' => 128],
         1885 => ['make' => 'Oppo', 'model' => 'Reno 2', 'memory' => 256],
         2343 => ['make' => 'Oppo', 'model' => 'Find X3 Lite 5G', 'memory' => 128],
+        2397 => ['make' => 'Oppo', 'model' => 'Reno4 Pro 5G', 'memory' => 256],
+        2384 => ['make' => 'Oppo', 'model' => 'A54 5G', 'memory' => 64],
+        2342 => ['make' => 'Oppo', 'model' => 'Find X3 Neo', 'memory' => 256],
 
         1872 => ['make' => 'Realme', 'model' => '6', 'memory' => 64],
         1873 => ['make' => 'Realme', 'model' => '6', 'memory' => 128],
         2054 => ['make' => 'Realme', 'model' => '7 Pro', 'memory' => 128],
         2055 => ['make' => 'Realme', 'model' => '7', 'memory' => 64],
         2056 => ['make' => 'Realme', 'model' => '7', 'memory' => 64],
+        1930 => ['make' => 'Realme', 'model' => 'X50 Pro 5G', 'memory' => 128],
+        1931 => ['make' => 'Realme', 'model' => 'X50 Pro 5G', 'memory' => 256],
 
         1741 => ['make' => 'Xiaomi', 'model' => 'Redmi Note 7', 'memory' => 64],
         1742 => ['make' => 'Xiaomi', 'model' => 'Mi 9T', 'memory' => 64],
@@ -277,5 +295,12 @@ class GoCompare
         2385 => ['make' => 'Xiaomi', 'model' => 'Mi 11 Ultra', 'memory' => 256],
         2387 => ['make' => 'Xiaomi', 'model' => 'Mi 11', 'memory' => 128],
         2388 => ['make' => 'Xiaomi', 'model' => 'Mi 11', 'memory' => 256],
+        2389 => ['make' => 'Xiaomi', 'model' => 'Mi 10T Pro 5G', 'memory' => 256],
+
+        1893 => ['make' => 'TCL', 'model' => '10 pro', 'memory' => 128],
+        2398 => ['make' => 'TCL', 'model' => '10 5G', 'memory' => 128],
+
+        1998 => ['make' => 'Fairphone', 'model' => '3', 'memory' => 64],
+        1999 => ['make' => 'Fairphone', 'model' => '3+', 'memory' => 64],
     ];
 }
