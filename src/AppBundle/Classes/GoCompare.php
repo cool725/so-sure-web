@@ -145,6 +145,8 @@ class GoCompare
         1936 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 256],
         1937 => ['make' => 'Samsung', 'model' => 'Galaxy Note20 Ultra 5G', 'memory' => 512],
         1950 => ['make' => 'Samsung', 'model' => 'Galaxy Z Flip 5G', 'memory' => 256],
+        1952 => ['make' => 'Samsung', 'model' => 'Galaxy Fold', 'memory' => 512],
+        1953 => ['make' => 'Samsung', 'model' => 'Galaxy Fold 5G', 'memory' => 512],
         1954 => ['make' => 'Samsung', 'model' => 'Galaxy Z Fold2 5G', 'memory' => 256],
         2070 => ['make' => 'Samsung', 'model' => 'Galaxy S21 5G', 'memory' => 128],
         2071 => ['make' => 'Samsung', 'model' => 'Galaxy S21 5G', 'memory' => 256],
