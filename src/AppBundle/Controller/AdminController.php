@@ -1694,8 +1694,8 @@ class AdminController extends BaseController
             'checkout' => $bankingService->getCheckoutBanking($date, $year, $month),
             'cashflows' => $bankingService->getCashflowsBanking($date, $year, $month),
             'lloyds' => $bankingService->getLloydsBanking($date, $year, $month),
-            'bacsInputFiles' => $inputRepo->getMonthlyFiles($date),
-            'bacsAruddFiles' => $aruddRepo->getMonthlyFiles($date),
+            'bacsInputFiles' => $inputRepo->getMonthlyProcessedFiles($date),
+            'bacsAruddFiles' => $aruddRepo->getMonthlyProcessedFiles($date),
             'bacsDdicFiles' => $ddicRepo->getMonthlyFiles($date),
             'manualBacsPayments' => Payment::sumPayments($manualBacsPayments, false)
         ];

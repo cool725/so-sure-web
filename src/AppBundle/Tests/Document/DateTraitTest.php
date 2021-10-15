@@ -386,4 +386,44 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->isValidDate(' 30-12-1980'));
         $this->assertFalse($this->isValidDate(' abc '));
     }
+
+    public function testListDays()
+    {
+        $date = new \DateTime('2021-09-21');
+        $start = DateTrait::startOfMonth($date);
+        $end = DateTrait::endOfMonth($date);
+        $days = DateTrait::listDays($start, $end);
+        $this->assertEquals([
+            '2021-09-01',
+            '2021-09-02',
+            '2021-09-03',
+            '2021-09-04',
+            '2021-09-05',
+            '2021-09-06',
+            '2021-09-07',
+            '2021-09-08',
+            '2021-09-09',
+            '2021-09-10',
+            '2021-09-11',
+            '2021-09-12',
+            '2021-09-13',
+            '2021-09-14',
+            '2021-09-15',
+            '2021-09-16',
+            '2021-09-17',
+            '2021-09-18',
+            '2021-09-19',
+            '2021-09-20',
+            '2021-09-21',
+            '2021-09-22',
+            '2021-09-23',
+            '2021-09-24',
+            '2021-09-25',
+            '2021-09-26',
+            '2021-09-27',
+            '2021-09-28',
+            '2021-09-29',
+            '2021-09-30',
+        ], $days);
+    }
 }
