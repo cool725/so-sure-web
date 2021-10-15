@@ -172,7 +172,7 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
 
         $this->mailerService->send(
             self::COMMAND_REPORT_NAME,
-            explode(",", $emailAccounts),
+            $emailAccounts,
             $body,
             null,
             [$file]
