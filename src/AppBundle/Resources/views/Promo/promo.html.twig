@@ -23,7 +23,7 @@
                         <h1 class="text-white mt-xl-5 fit">Mobile Phone Insurance</h1>
                         <div class="h2 text-white fit mb-3">
                             <span class="sub text-deep-sky-blue-d">
-                                from just £{{ lowest_premium }} per month
+                                from just £{{ lowest_premium|number_format(2, '.', ',') }} per month
                             </span>
                         </div>
                     {% endif %}
