@@ -112,8 +112,8 @@ twig:
         policy_doc_version: 16,
         free_months: "two"
         lowest_excess: "£25"
-        lowest_premium: 3.38
-        trustpilot_rating: 4.5
+        lowest_premium: 2.20
+        trustpilot_rating: 4.2
         home_contents_funnel: https://home.wearesosure.com
 
 doctrine_mongodb:
