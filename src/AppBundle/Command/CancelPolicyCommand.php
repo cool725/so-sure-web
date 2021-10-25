@@ -87,6 +87,10 @@ class CancelPolicyCommand extends ContainerAwareCommand
             /** @var Policy $policy */
             $policy = $policyRepo->findOneBy(['_id' => $id]);
             if (!$policy) {
+                /** @var Policy $policy */
+                $policy = $policyRepo->findOneBy(['policyNumber' => $id]);
+            }
+            if (!$policy) {
                 $invalid[] = $id;
             } elseif (!$policy->canCancel($reason)) {
                 $impossible[] = $id;
