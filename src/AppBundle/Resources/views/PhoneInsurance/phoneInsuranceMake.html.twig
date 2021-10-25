@@ -32,7 +32,7 @@
 {% endif %}
 
 {# Meta #}
-{% block title %}{{ with_phone }} Insurance From &pound;{{ lowest_premium }} Monthly | SO-SURE{% endblock %}
+{% block title %}{{ with_phone }} Insurance From &pound;{{ lowest_premium|number_format(2, '.', ',') }} Monthly | SO-SURE{% endblock %}
 {% set canonical = url('phone_insurance_make', {'make': phone.makeCanonical })  %}
 {% block meta %}
     <meta name="description" content="{{ with_phone }} Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better."/>
@@ -40,7 +40,7 @@
 {% endblock %}
 
 {# OG #}
-{% set og_title = with_phone ~ ' Insurance From £' ~ lowest_premium ~ ' Monthly | SO-SURE' %}
+{% set og_title = with_phone ~ ' Insurance From £' ~ lowest_premium|number_format(2, '.', ',') ~ ' Monthly | SO-SURE' %}
 {% set og_url = canonical|url_decode %}
 {% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
@@ -120,7 +120,7 @@
             </div>
             <h1 class="hero-heading fit mb-4">
                 {{ with_phone }} Insurance<br class="d-md-none" />
-                <span class="sub">from just &pound;{{ lowest_premium }} per month</span>
+                <span class="sub">from just &pound;{{ lowest_premium|number_format(2, '.', ',') }} per month</span>
             </h1>
             <div class="row">
                 <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-1 order-xl-2">

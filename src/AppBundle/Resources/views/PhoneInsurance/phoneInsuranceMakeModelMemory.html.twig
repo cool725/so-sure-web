@@ -66,65 +66,10 @@
 {% block body %}
 
     <section class="hero">
-        {# <div class="alert-strip alert-strip-green h6 p-3 pt-0 mb-4">
-            <div class="container-large">🙂 During the lockdown we can still get your phone fixed in just 72 hours</div>
-        </div> #}
         <div class="container-large">
             <div class="row">
                 <div class="col-md-6 order-md-2">
                     <div class="hero__intro">
-                        {# <div class="breadcrumbs">
-                            <ul class="list-inline"
-                                vocab="https://schema.org/"
-                                typeof="BreadcrumbList">
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('phone_insurance') }}"
-                                       class="text-primary"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">Phone Insurance</span>
-                                    </a>
-                                    <meta property="position" content="1">
-                                </li>
-                                <li class="list-inline-item">
-                                    <i class="fal fa-angle-right"></i>
-                                </li>
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <a href="{{ path('phone_insurance_make', {'make': phone.makeCanonical}) }}"
-                                       class="text-primary"
-                                       property="item"
-                                       typeof="WebPage">
-                                       <span property="name">{{ phone.make }}</span>
-                                    </a>
-                                    <meta property="position" content="2">
-                                </li>
-                                <li class="list-inline-item">
-                                    <i class="fal fa-angle-right"></i>
-                                </li>
-                                <li class="list-inline-item"
-                                    property="itemListElement"
-                                    typeof="ListItem">
-                                    <span property="name">{{ phone.model }} ({{ phone.memory }}GB)</span>
-                                    <meta property="position" content="3">
-                                </li>
-                            </ul>
-                        </div> #}
-                        {# {% if ('now'|date('G') >= 5) and ('now'|date('G') <= 11) %}
-                            {% set greeting = 'Good morning' %}
-                        {% elseif ('now'|date('G') > 11) and ('now'|date('G') <= 18)  %}
-                            {% set greeting = 'Good afternoon' %}
-                        {% elseif ('now'|date('G') > 18) and ('now'|date('G') <= 0)  %}
-                            {% set greeting = 'Good evening' %}
-                        {% elseif ('now'|date('G') > 0) and ('now'|date('G') < 5)  %}
-                            {% set greeting = 'Hello night owl 🦉' %}
-                        {% endif %}
-                        <div class="personalised mb-2 lead">
-                            {{ greeting|raw }}{% if app.user is not null and app.user %} {{ app.user.firstName }}{% endif %}, here's your quote:
-                        </div> #}
                         <h1 class="h1b fit">
                             <a href="#mem_sizes"
                                class=""
@@ -201,7 +146,7 @@
                                  class="lozad img-fluid hero-generic">
                         {% endif %}
                         <div class="hero__badge animated tada">
-                            <div class="hero__badge-inner">{{ free_months|capitalize }}<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
+                            <div class="hero__badge-inner">{{ free_months|capitalize }} months<br><span class="h5 mb-0">FREE</span><br> when you pay <br>yearly</div>
                         </div>
                     </div>
                 </div>

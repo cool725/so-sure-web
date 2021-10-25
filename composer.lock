@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e620de144e9e7ac3f5579d6904c122a",
+    "content-hash": "3938ea922263b48e8cbd0f1c92e3d59b",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1614,16 +1614,16 @@
         },
         {
             "name": "dpn/xml-sitemap-bundle",
-            "version": "2.1.0.2",
+            "version": "v2.1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/DpnXmlSitemapBundle.git",
-                "reference": "2d091f99a8a536c85be70d4b86df3bb08d1e325a"
+                "reference": "0a6f417559e93b85c5f2dbcbb2bf55e56c8b1d5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/DpnXmlSitemapBundle/zipball/2d091f99a8a536c85be70d4b86df3bb08d1e325a",
-                "reference": "2d091f99a8a536c85be70d4b86df3bb08d1e325a",
+                "url": "https://api.github.com/repos/so-sure/DpnXmlSitemapBundle/zipball/0a6f417559e93b85c5f2dbcbb2bf55e56c8b1d5d",
+                "reference": "0a6f417559e93b85c5f2dbcbb2bf55e56c8b1d5d",
                 "shasum": ""
             },
             "require": {
@@ -1672,9 +1672,9 @@
                 "sitemap"
             ],
             "support": {
-                "source": "https://github.com/so-sure/DpnXmlSitemapBundle/tree/2.1.0.2"
+                "source": "https://github.com/so-sure/DpnXmlSitemapBundle/tree/v2.1.0.3"
             },
-            "time": "2019-10-26T13:39:02+00:00"
+            "time": "2021-10-04T11:07:51+00:00"
         },
         {
             "name": "drewm/mailchimp-api",

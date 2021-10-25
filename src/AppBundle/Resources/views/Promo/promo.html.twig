@@ -20,10 +20,10 @@
                     {% if amazon_voucher is defined and amazon_voucher is not null %}
                         <h1 class="text-white mb-3 mt-xl-5">Protect your phone <span class="text-deep-sky-blue-d">and get an Amazon voucher 💰</span></h1>
                     {% else %}
-                        <h1 class="text-white mt-xl-5">Mobile Phone Insurance</h1>
+                        <h1 class="text-white mt-xl-5 fit">Mobile Phone Insurance</h1>
                         <div class="h2 text-white fit mb-3">
                             <span class="sub text-deep-sky-blue-d">
-                                Get money back if I don't claim? Yes Please!
+                                from just £{{ lowest_premium|number_format(2, '.', ',') }} per month
                             </span>
                         </div>
                     {% endif %}

@@ -79,7 +79,7 @@
                 </a>
             </div>
             <span class="badge badge-pill badge-info text-zaffre">
-                1 month FREE if you pay yearly
+                Up to 2 months FREE if you pay yearly
             </span>
             <img src="{{ cdn_url }}/images/onexone.png" data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_hero-alt-mobile-image.png" alt="SO-SURE Happy Couple" width="" class="lozad hero-img-mobile">
         </div>
@@ -97,8 +97,8 @@
                          alt="SO-SURE Hand Holding Phone"
                          width="200px">
                     <h3 class="h4 products-item-heading">Mobile Phone Insurance</h3>
-                    <h4><span class="sub">From only £{{ lowest_premium }} monthly</span></h4>
-                    <p class="text-primary">FREE month when you buy yearly</p>
+                    <h4><span class="sub">From only £{{ lowest_premium|number_format(2, '.', ',') }} monthly</span></h4>
+                    <p class="text-primary">{{ free_months|capitalize }} months FREE when you buy yearly</p>
                     <a href="#" class="btn btn-success get-a-quote disabled mb-2">Get a quote</a><br>
                     <a href="{{ path('phone_insurance') }}" class="btn btn-link">Learn more</a>
                     <p>Get cover for top brands including Apple, Samsung, Google, HTC, Sony, and Huawei.</p>

@@ -1054,13 +1054,14 @@ class PurchaseController extends BaseController
 
         // Default to monthly payment
         if ('GET' === $request->getMethod()) {
-            $price = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_ANY);
+            $yearly = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_YEARLY);
+            $monthly = $policy->getPhone()->getCurrentPhonePrice(PhonePrice::STREAM_MONTHLY);
             /** @var PostcodeService $postcodeService */
             $postcodeService = $this->get('app.postcode');
-            if ($price && $user->allowedYearlyPayments($postcodeService)) {
-                $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
-            } elseif ($price && $user->allowedMonthlyPayments($postcodeService)) {
-                $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
+            if ($yearly && $user->allowedYearlyPayments($postcodeService)) {
+                $purchase->setAmount($yearly->getYearlyPremiumPrice($user->getAdditionalPremium()));
+            } elseif ($monthly && $user->allowedMonthlyPayments($postcodeService)) {
+                $purchase->setAmount($monthly->getMonthlyPremiumPrice($user->getAdditionalPremium()));
             }
         }
 
