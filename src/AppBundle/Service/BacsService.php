@@ -2078,13 +2078,10 @@ class BacsService
     ) {
         /** @var BacsPaymentRepository $bacsPaymentRepo */
         $bacsPaymentRepo = $this->dm->getRepository(BacsPayment::class);
+        $policies = [];
         $payments = [];
-        $policyIds = [];
-        // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
-        // time for the bacs cycle
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
-
         $this->warnings = [];
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
             $advanceDate,
@@ -2099,15 +2096,15 @@ class BacsService
                 continue;
             }
             $policy = $scheduledPayment->getPolicy();
-            $policyId = $policy->getId();
-            if (array_key_exists($policyId, $policyIds)) {
+            $policyId = ''.$policy->getId();
+            if (array_key_exists($policyId, $policies)) {
                 continue;
             } else {
-                $policyIds[$policyId] = true;
+                $policies[$policyId] = true;
             }
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
             // Reschedule if there are already positive payments pending.
-            if (count($bacsPaymentRepo->findPositivePendingBacsPayments($policy)) > 0) {
+            if (count($bacsPaymentRepo->findPositivePendingBacsPayments($policy, true)) > 0) {
                 $scheduledPayment->setNotes("Cancelling as BACs payment already in progress");
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
                 $rescheduled = $scheduledPayment->reschedule($scheduledDate, 4);
@@ -2118,9 +2115,7 @@ class BacsService
             }
             // If admin has rescheduled, then allow payment to go through, but should be manually approved
             $ignoreNotEnoughTime = $scheduledPayment->getType() == ScheduledPayment::TYPE_ADMIN ||
-                $policy->getDontCancelIfUnpaid() ||
-                $policy->hasBacsPaymentInProgress()
-            ;
+                $policy->getDontCancelIfUnpaid();
             $validate = $this->validateBacs(
                 $policy,
                 $scheduledDate,
@@ -2134,7 +2129,6 @@ class BacsService
                     $scheduledPayment->cancel('Cancelled by bacs debits validation');
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
-
                 continue;
             } elseif ($validate == self::VALIDATE_RESCHEDULE) {
                 if ($update) {
@@ -2143,10 +2137,8 @@ class BacsService
                     $policy->addScheduledPayment($rescheduled);
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
-
                 continue;
             }
-
             $payment = $this->bacsPayment(
                 $scheduledPayment->getPolicy(),
                 $scheduledPayment->getAmount(),
@@ -2166,7 +2158,6 @@ class BacsService
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         }
         $this->notifyWarnings();
-
         return $payments;
     }
 
