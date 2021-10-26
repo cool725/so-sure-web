@@ -33,11 +33,6 @@
                         {% elseif file.metadata['credit-accepted-value'] is defined and file.metadata['credit-accepted-value'] > 0 %}
                             {% set amount = 0 - file.metadata['credit-accepted-value'] %}
                         {% endif %}
-                        {% if file.metadata['debit-rejected-value'] is defined and file.metadata['debit-rejected-value'] > 0 %}
-                            {% set amount = amount + file.metadata['debit-rejected-value'] %}
-                        {% elseif file.metadata['credit-rejected-value'] is defined and file.metadata['credit-rejected-value'] > 0 %}
-                            {% set amount = amount - file.metadata['credit-rejected-value'] %}
-                        {% endif %}
                         {% set input_total = input_total + amount %}
                         {% set files = files|merge([file.metadata['serial-number']]) %}
                     {% endif %}
