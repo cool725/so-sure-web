@@ -785,7 +785,7 @@
                     {% if phone is defined and phone %}
                         <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get cover from &pound;{{ prices['monthly'].monthlyPremiumPrice }}</a>
                     {% else %}
-                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get cover from &pound;{{ lowest_premium }} a month</a>
+                        <a href="#" class="btn btn-success btn-block-xs mr-sm-2 get-a-quote disabled">Get cover from &pound;{{ lowest_premium|number_format(2, '.', ',') }} a month</a>
                     {% endif %}
                 </div>
             {% endif %}
