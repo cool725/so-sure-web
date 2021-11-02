@@ -64,6 +64,7 @@ class Claim
     // and very little usage envisioned
     const WARNING_FLAG_IGNORE_USER_DECLINED = 'ignore-user-declined';
     const WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT = 'ignore-policy-expire-claim-wait';
+    const WARNING_FLAG_MAKE_RISK_GREEN = 'make-risk-green';
 
     const NETWORK_ = "";
 
@@ -174,6 +175,7 @@ class Claim
         self::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE => self::WARNING_FLAG_CLAIMS_IMEI_UNOBTAINABLE,
         self::WARNING_FLAG_CLAIMS_HANDLING_TEAM => self::WARNING_FLAG_CLAIMS_HANDLING_TEAM,
         self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO => self::WARNING_FLAG_CLAIMS_ALLOW_PICSURE_REDO,
+        self::WARNING_FLAG_MAKE_RISK_GREEN => self::WARNING_FLAG_MAKE_RISK_GREEN
     ];
 
     public static $claimTypes = [
@@ -1709,16 +1711,17 @@ class Claim
 
     /**
      * Gives you the risk surrounding this claim.
-     * @param \DateTime|null $date the date for which the risk is being calculated. When left as null it will default
-     *                             to the current time and date.
      * @return string containing the name of the risk rating.
      */
-    public function getRisk(\DateTime $date = null)
+    public function getRisk()
     {
+        if ($this->isIgnoreWarningFlagSet(self::WARNING_FLAG_MAKE_RISK_GREEN)) {
+            return self::RISK_GREEN;
+        }
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $this->getPolicy();
-        $date = $date ?: new \DateTime();
-        $picsure = $phonePolicy->isPicSureValidated();
+        $date = $this->getNotificationDate();
+        $picsure = $this->getFnolPicSureValidated();
         $age = 0;
         $firstPolicy = $phonePolicy->getUser()->getEarliestPolicy();
         if ($firstPolicy) {

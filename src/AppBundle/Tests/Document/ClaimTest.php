@@ -58,36 +58,23 @@ class ClaimTest extends \PHPUnit\Framework\TestCase
         $policy = Create::policy($user, '2020-01-01', Policy::STATUS_ACTIVE, 12);
         $claim = Create::claim($policy, Claim::TYPE_LOSS, '2020-01-01', Claim::STATUS_FNOL);
         // less than 6 months old no picsure -> black
-        $this->assertEquals(
-            Claim::RISK_BLACK,
-            $claim->getRisk(new \DateTime('2020-01-01'))
-        );
+        $claim->setNotificationDate(new \DateTime('2020-01-01'));
+        $this->assertEquals(Claim::RISK_BLACK, $claim->getRisk());
         // less than 12 months old no picsure -> black
-        $this->assertEquals(
-            Claim::RISK_BLACK,
-            $claim->getRisk(new \DateTime('2020-06-02'))
-        );
+        $claim->setNotificationDate(new \DateTime('2020-06-02'));
+        $this->assertEquals(Claim::RISK_BLACK, $claim->getRisk());
         // more than 12 months old no picsure -> green
-        $this->assertEquals(
-            Claim::RISK_GREEN,
-            $claim->getRisk(new \DateTime('2021-01-02'))
-        );
+        $claim->setNotificationDate(new \DateTime('2021-01-02'));
+        $this->assertEquals(Claim::RISK_GREEN, $claim->getRisk());
         // less than 6 months old picsure -> red
-        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $this->assertEquals(
-            Claim::RISK_RED,
-            $claim->getRisk(new DateTime('2020-01-01'))
-        );
+        $claim->setFnolPicSureValidated(true);
+        $claim->setNotificationDate(new \DateTime('2020-01-01'));
+        $this->assertEquals(Claim::RISK_RED, $claim->getRisk());
         // less than 12 months old picsure -> amber
-        $this->assertEquals(
-            Claim::RISK_AMBER,
-            $claim->getRisk(new DateTime('2020-07-01'))
-        );
+        $claim->setNotificationDate(new \DateTime('2020-07-01'));
+        $this->assertEquals(Claim::RISK_AMBER, $claim->getRisk());
         // more than 12 months old picsure -> green
-        $this->assertEquals(
-            Claim::RISK_GREEN,
-            $claim->getRisk(new DateTime('2021-01-02'))
-        );
-
+        $claim->setNotificationDate(new \DateTime('2021-01-02'));
+        $this->assertEquals(Claim::RISK_GREEN, $claim->getRisk());
     }
 }
