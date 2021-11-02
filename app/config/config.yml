@@ -918,6 +918,9 @@ nelmio_security:
                 - http://*.linksynergy.com
                 - http://*.nxtck.com
                 - http://*.xg4ken.com
+                - https://rum-static.pingdom.net
+                - https://tag.rmp.rakuten.com
+                - https://www.clickcease.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
