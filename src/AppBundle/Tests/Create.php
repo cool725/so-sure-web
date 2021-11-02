@@ -419,6 +419,7 @@ class Create
         $claim = new Claim();
         $claim->setType($type);
         $claim->setCreatedDate(is_string($date) ? new \DateTime($date) : $date);
+        $claim->setNotificationDate($claim->getCreatedDate());
         $claim->setStatus($status);
         $policy->addClaim($claim);
         return $claim;
