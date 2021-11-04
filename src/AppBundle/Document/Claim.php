@@ -1720,7 +1720,7 @@ class Claim
         }
         /** @var PhonePolicy $phonePolicy */
         $phonePolicy = $this->getPolicy();
-        $date = $this->getNotificationDate();
+        $date = $this->getNotificationDate() ?: $this->getRecordedDate();
         $picsure = $this->getFnolPicSureValidated();
         $age = 0;
         $firstPolicy = $phonePolicy->getUser()->getEarliestPolicy();
