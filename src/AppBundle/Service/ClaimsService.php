@@ -554,12 +554,12 @@ class ClaimsService
         );
 
         $this->mailer->sendTemplateToUser(
-            'Your claim with so-sure',
+            'We\'ve received your claim',
             $claim->getPolicy()->getUser(),
-            'AppBundle:Email:claim/fnolResponse.html.twig',
-            ['data' => $claim],
-            'AppBundle:Email:claim/fnolResponse.txt.twig',
-            ['data' => $claim]
+            'AppBundle:Email:claim/claimSubmitted.html.twig',
+            ['user' => $claim->getPolicy()->getUser()],
+            'AppBundle:Email:claim/claimSubmitted.txt.twig',
+            ['user' => $claim->getPolicy()->getUser()]
         );
     }
 
