@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -105,6 +106,8 @@ class ClaimFnolDamageType extends AbstractType
             $form = $event->getForm();
             /** @var Claim $claim */
             $claim = $event->getData()->getClaim();
+            /** @var PhonePolicy $policy */
+            $policy = $claim->getPolicy();
 
             if ($claim->needProofOfUsage()) {
                 $form->add('proofOfUsage', FileType::class, ['required' => false]);
@@ -114,6 +117,9 @@ class ClaimFnolDamageType extends AbstractType
             }
             if ($claim->needPictureOfPhone()) {
                 $form->add('pictureOfPhone', FileType::class, ['required' => false]);
+            }
+            if ($policy->getPhone()->getMakeCanonical() == 'apple') {
+                $form->add('agreedAppleDamage', CheckboxType::class, ['required' => true]);
             }
         });
 

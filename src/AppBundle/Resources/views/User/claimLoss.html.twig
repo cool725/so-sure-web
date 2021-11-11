@@ -62,7 +62,7 @@
                                         {% if claim.network in matchNetworks %}
                                             <li>Request your <strong>Latest Bill</strong> from them.  This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).</li>
                                         {% else %}
-                                            <li>Request a <strong>Proof of Usage</strong> document from them.  This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</li>
+                                            <li>Request a <strong>Proof of Usage</strong> document from them. This is a standard PDF document and the network provider will easily able to email to you. This document has your IMEI number and the first and last time that IMEI was used on their network. IMPORTANT: upload the PDF the network sends you. We can't accept other formats or pictures of documents.</li>
                                         {% endif %}
                                     {% endif %}
                                 </ol>
@@ -113,7 +113,10 @@
                                     <div class="form-row {% if not showPOF %}d-none{% endif %}">
                                         <div class="col-md form-group">
                                             {{ form_label(claim_form.proofOfUsage, formLabel) }}
-                                            {{ form_widget(claim_form.proofOfUsage) }}
+                                            {{ form_widget(claim_form.proofOfUsage, { 'attr': {
+                                                'accept': 'application/pdf'
+                                            }}) }}
+                                            <small class="form-text">For all claims where the proof of usage is requested the ‘Proof of Usage’ must be a PDF document. We do not accept screenshots or photos, the document must be the PDF supplied by the network.</small>
                                             <small class="form-text">
                                                 <a href="#"
                                                    data-toggle="modal"

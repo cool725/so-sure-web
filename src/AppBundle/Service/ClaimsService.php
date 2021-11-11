@@ -537,10 +537,7 @@ class ClaimsService
             $claim->getPolicy()->getPolicyNumber()
         );
 
-        $email = 'new-claim@wearesosure.com';
-        if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
-            $email = 'SoSure@directgroup.co.uk';
-        }
+        $email = 'sosure@davies-group.com';
 
         $this->mailer->sendTemplate(
             $subject,
@@ -570,10 +567,8 @@ class ClaimsService
             $claim->getPolicy()->getPolicyNumber()
         );
 
-        $email = 'update-claim@wearesosure.com';
-        if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
-            $email = 'SoSure@directgroup.co.uk';
-        }
+        $email = 'sosure@davies-group.com';
+
         $this->mailer->sendTemplate(
             $subject,
             $email,
