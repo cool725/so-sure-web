@@ -302,7 +302,7 @@ trait DateTrait
         return $businessDays;
     }
 
-    public function subBusinessDays($date, $days)
+    public static function subBusinessDays($date, $days)
     {
         $businessDays = clone $date;
         while ($days > 0) {
