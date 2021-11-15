@@ -47,14 +47,14 @@ class S3FileRepository extends DocumentRepository
     }
 
     /**
-     * Gives all the files that have been processed this month.
+     * Gives all the files that have been processed this month and in the business day before this month started.
      * @param \DateTime $date is a date within the month of interest.
      * @return array of all the found files.
      */
     public function getMonthlyProcessedFiles(\DateTime $date)
     {
-        $start = $this->startOfMonth($date);
-        $end = $this->endOfMonth($date);
+        $start = DateTrait::subBusinessDays(DateTrait::startOfMonth($date), 1);
+        $end = DateTrait::endOfMonth($date);
         $days = DateTrait::listDays($start, $end);
         return $this->createQueryBuilder()
             ->field("metadata.processing-date")->in($days)
