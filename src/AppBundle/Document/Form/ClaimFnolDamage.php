@@ -53,6 +53,12 @@ class ClaimFnolDamage
 
     protected $pictureOfPhone;
 
+    /**
+     * @var boolean
+     * @Assert\IsTrue(message="You must confirm that you are a UK resident and over the age of 18")
+     */
+    protected $agreedAppleDamage;
+
     public function getTypeDetails()
     {
         return $this->typeDetails;
@@ -136,6 +142,16 @@ class ClaimFnolDamage
     public function getClaim()
     {
         return $this->claim;
+    }
+
+    public function setAgreedAppleDamage($agreedAppleDamage)
+    {
+        $this->agreedAppleDamage = $agreedAppleDamage;
+    }
+
+    public function getAgreedAppleDamage()
+    {
+        return $this->agreedAppleDamage;
     }
 
     // /**

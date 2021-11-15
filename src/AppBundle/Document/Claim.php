@@ -158,8 +158,8 @@ class Claim
     ];
 
     public static $handlingTeamEmail = [
-        self::TEAM_DAVIES => 'update-claim@so-sure.com',
-        self::TEAM_DIRECT_GROUP => 'SoSure@directgroup.co.uk',
+        self::TEAM_DAVIES => 'sosure@davies-group.com',
+        self::TEAM_DIRECT_GROUP => 'sosure@davies-group.com',
     ];
 
     public static $warningFlags = [
