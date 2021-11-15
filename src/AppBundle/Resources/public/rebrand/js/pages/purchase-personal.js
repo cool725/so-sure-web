@@ -7,8 +7,7 @@ require('bootstrap/js/dist/dropdown');
 
 // Require components
 require('dot');
-require('corejs-typeahead/dist/bloodhound.js');
-require('corejs-typeahead/dist/typeahead.jquery.js');
+require('corejs-typeahead/dist/typeahead.bundle.min.js');
 require('jquery-mask-plugin');
 require('fuse.js');
 require('jquery-validation');
@@ -222,7 +221,7 @@ sosure.purchaseStepAddress = (function() {
                     let data = {
                         name: $('#purchase_form_lastName').val(),
                         email: $('#purchase_form_email').val(),
-                        visitorID: Intercom('getVisitorId'),
+                        // visitorID: Intercom('getVisitorId'),
                         csrf: $('#step--validate').data('csrf')
                     };
                     let url = $('#step--validate').data('lead');
