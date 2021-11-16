@@ -1146,6 +1146,7 @@ nelmio_security:
                 - https://fonts.smct.co
                 - https://optimize.google.com
                 - https://www.googleoptimize.com
+                - https://cdn.iubenda.com
             img-src:
                 - 'self'
                 - https://wearesosure.com
@@ -1193,6 +1194,9 @@ nelmio_security:
                 - http://*.linksynergy.com
                 - http://*.nxtck.com
                 - http://*.xg4ken.com
+                - https://www.quote-link.net
+                - https://analytics.tiktok.com
+                - https://consent.linksynergy.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com
@@ -1227,6 +1231,7 @@ nelmio_security:
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
+                - https://www.google.com/*
                 - https://www.google.ac
                 - https://www.google.ad
                 - https://www.google.ae
