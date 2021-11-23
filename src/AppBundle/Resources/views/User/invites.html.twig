@@ -46,7 +46,7 @@
                    Invite Friends</a>
                 <a href="#"
                    class="btn btn-outline-deep-sky-blue-d btn-block-xs btn-copy"
-                   data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}">🔗 Copy link</a>
+                   data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}?utm_source=web-dashboard&utm_medium=referral">🔗 Copy link</a>
             </div>
             <div class="win-invite d-none d-lg-flex mb-4">
                 <form id="invite_form_one" autocomplete="nope" class="invite-form text-left flex-grow-1 mr-3">
@@ -60,13 +60,13 @@
                 </form>
                 <a href="#"
                    class="btn btn-outline-deep-sky-blue-d win-btn btn-copy mr-1"
-                   data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}">🔗 Copy link</a>
+                   data-clipboard-text="{% include 'AppBundle::SCode/share.txt.twig' %}?utm_source=web-dashboard&utm_medium=referral">🔗 Copy link</a>
                 <div class="d-flex align-items-center justify-content-between">
                     <a href="#"
                        class="track-data"
                        data-sharer="twitter"
                        data-title="{{ og_description }}"
-                       data-url="{{ og_url }}"
+                       data-url="{{ og_url }}?utm_source=web-dashboard&utm_medium=referral"
                        data-via="wearesosure"
                        data-hashtags="so-sure, phoneinsurance"
                        data-event="twitter"
@@ -80,7 +80,7 @@
                        class="track-data"
                        data-sharer="facebook"
                        data-title="{{ og_description }}"
-                       data-url="{{ og_url }}"
+                       data-url="{{ og_url }}?utm_source=web-dashboard&utm_medium=referral"
                        data-hashtags="so-sure, phoneinsurance"
                        data-event="facebook"
                        data-event-type="social"
@@ -93,7 +93,7 @@
                        class="track-data"
                        data-sharer="whatsapp"
                        data-web
-                       data-title="{{ og_description }}"
+                       data-title="{{ og_description }}?utm_source=web-dashboard&utm_medium=referral"
                        data-url="{{ og_url }}"
                        data-event="whatsapp"
                        data-event-type="social"
