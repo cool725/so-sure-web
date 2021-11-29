@@ -19,9 +19,7 @@ $(function() {
         formSMS = $('#login_sms_form'),
         subSMS = $('#sms_login_btn'),
         errorSMS = $('#sms_error'),
-        formCode = $('#verify_code_form'),
-        codeVerify = $('#verify_code'),
-        subVefify = $('#verify_code_btn');
+        formCode = $('#verify_code_form');
 
     const addValidationEmail = () => {
         formEmail.validate({
@@ -182,8 +180,48 @@ $(function() {
 
     // On show populate phone number and add validation
     $('#sms_code_modal').on('show.bs.modal', function (e) {
+        // Add timer to resend button
+        setTimeout(function() {
+            $('#resend_code').removeAttr('disabled');
+        }, 30000)
         let modal = $(this);
         modal.find('#mobile_number').val($('#phone_number').val());
         addValidationCode();
     });
+
+    $('#resend_code').on('click', function() {
+        // Disable again
+        $(this).attr('disabled', true);
+
+        // Add timer
+        setTimeout(function() {
+            $('#resend_code').removeAttr('disabled');
+        }, 30000)
+
+        let data = {
+            mobileNumber: $('#phone_number').val(),
+            csrf: formSMS.data('token')
+        },
+        url = formSMS.data('url');
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json"
+        })
+        .done(function(data) {
+            // Show modal to enter verify code
+            $('#sms_code_modal').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+        })
+        .fail(function(data) {
+            errorSMS.text(data.responseJSON.description);
+            subSMS.prop('disabled', '');
+        });
+    })
 });
