@@ -519,6 +519,18 @@
         }
     }
 
+    .nav-tabs-home {
+        justify-content: start;
+
+        .nav-item {
+            margin-right: 2rem;
+        }
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+
     .tab-content {
         position: relative;
         z-index: 4;

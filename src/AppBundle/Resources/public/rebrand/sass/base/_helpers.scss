@@ -117,4 +117,10 @@
      img {
          width: 100%;
      }
+
+     &.not-fluid {
+         img {
+             width: auto;
+         }
+     }
  }
