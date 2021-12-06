@@ -33,6 +33,9 @@ $(function() {
                 },
                 "claim_damage_form[phoneStatus]" : {
                     required: true
+                },
+                "claim_damage_form[agreedAppleDamage]" : {
+                    required: true
                 }
             },
             messages: {
@@ -47,6 +50,9 @@ $(function() {
                 },
                 "claim_damage_form[phoneStatus]" : {
                     required: 'Please select the condition of your phone'
+                },
+                "claim_damage_form[agreedAppleDamage]" : {
+                    required: 'Please make sure you have removed Apple lock or it could delay your claim being processed'
                 }
             },
 

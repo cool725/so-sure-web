@@ -1,0 +1,268 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'phone-insurance-homepage' %}
+{% set include_get_a_quote = true %}
+{% set robots_noindex = is_noindex %}
+
+{% block title %}SO-SURE | Insurance That’s a Win-Win!{% endblock %}
+{% block meta %}
+    <meta name="description" content="The future of insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from SO-SURE."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+    "@context" : "http://schema.org",
+    "@graph":
+    [
+        {
+            "@type" : "Organization",
+            "url": "https://wearesosure.com/",
+            "legalName": "SO-SURE Ltd",
+            "location": {
+                "@type": "Place",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "City of London",
+                  "addressRegion": "London",
+                  "postalCode": "EC3V 0EE",
+                  "streetAddress": "55 Gracechurch Street"
+                },
+                "name": "6th Floor"
+            },
+            "logo": "{{ cdn_url }}/images/rebrand/logo/so-sure_logo_square.png",
+            "description": "The future of insurance has arrived (and it's up to 80% cheaper when you connect with friends & don't claim). Available on hundreds of models from SO-SURE.",
+            "sameAs": [
+                "https://twitter.com/wearesosure",
+                "https://www.facebook.com/wearesosure",
+                "https://www.instagram.com/wearesosure"
+            ]
+        },
+        {
+            "@type" : "WebSite",
+            "url": "https://wearesosure.com/"
+        }
+    ]
+}
+</script>
+{% endblock %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('homepage') }}
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-md-10 offset-md-1 col-lg-6 offset-lg-6">
+                    <h1 class="text-white mb-3">With SO-SURE insurance you can have your cake and eat it!</h1>
+                    <p class="lead text-white mb-4">SO-SURE makes it fast and easy to claim when you need us. And when you don’t? We reward you with up to 80% of your premium back.</p>
+                    <div class="hero-controls">
+                        <a class="btn btn-secondary mr-2 scroll-to"
+                            href="#product_links"
+                            data-scroll-to-anchor="#product_links"
+                            data-scroll-to-offset="100">Get a quote</a>
+                        <a href="#"
+                            class="btn btn-white watch-video"
+                            data-event="watch-video-index-hero"
+                            data-toggle="modal"
+                            data-target="#sosure-video-modal"
+                            data-src="https://www.youtube.com/embed/dMHAe7Qih2Y">
+                            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                            Watch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="{{ cdn_url }}/images/rebrand/hero-images/so-sure_man-child-largest.png"
+                 class="lozad d-none d-xl-inline">
+            <img src="{{ cdn_url }}/images/rebrand/hero-images/so-sure_man-child-desktop.png"
+                 class="lozad d-lg-none">
+        </div>
+        <svg class="hero-swoop d-lg-none" viewBox="0 0 278 172" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M278.5 0.5V171H21.0235C13.4494 171.241 6.39547 171.227 0 171H21.0235C107.799 168.237 262.865 132.02 278.5 0.5Z" fill="white"/>
+        </svg>
+        <svg class="hero-swoop d-none d-lg-block" viewBox="0 0 1427 152" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1427 152V0C1115.5 152 426.5 147.5 0 152H1427Z" fill="white"/>
+        </svg>
+    </section>
+
+    {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
+
+    <section class="about pt-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-white text-center mb-5">Nobody trusts insurances so we’ve turned it upside down 🙃</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-white text-center text-md-left mb-5">Traditional insurance companies make it hard for you to get anything out of them (boo hiss). That’s because when you benefit, they lose out. We hate that, so we’ve reinvented insurance to align our interests with yours. </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="text-white text-center text-md-left mb-5">Inspired by the origins of insurance (<a href="{{ path('introducing_social_insurance') }}" class="text-white">a story for another time</a>), it is all powered by clever tech that makes it feel like magic while pushing away the pesky fraudsters. At last, insurance that works like a dream instead of a nightmare. </p>
+                </div>
+            </div>
+            <h2 class="h3 text-white text-center my-5">
+                What does that mean for you?
+            </h2>
+            <div class="lead text-white text-center">Fair prices, no fineprint, no hidden fees, faster claims <br> and even money back if you don’t claim.</div>
+            <div class="about-wink">
+                <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/homepage/so-sure_wink.svg"
+                     class="lozad"
+                     alt="SO-SURE Wink">
+            </div>
+            <h2 class="h3 text-white text-center mb-5">Reasons to choose us:</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="h5 text-white text-center mb-4">Fast and Easy ⚡️</div>
+                    <p class="text-white text-center text-md-left mb-4">Sign-up and claims are effortless because our system’s designed for you, not against you.</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="h5 text-white text-center mb-4">Cashback 🤑</div>
+                    <p class="text-white text-center text-md-left mb-4">You can earn up to 80% of your premium back, every year, when you and your friends don’t claim.</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="h5 text-white text-center mb-4">Fair and Transparent ️ ️✅ </div>
+                    <p class="text-white text-center text-md-left mb-4">You’ll never feel uncertain; we have your back and will explain what’s what in plain English.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="knowledge-base">
+        <div class="container-large">
+            {% include 'AppBundle::Components/_knowledgeBaseHome.html.twig' %}
+        </div>
+    </section>
+
+    <section id="product_links" class="products py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4 mb-md-2">Get Covered in Minutes</h2>
+            <p class="d-none d-md-block mb-4 lead">It only takes a moment to lose or break something. Don’t risk it. <br /> SO-SURE can have you covered in a flash. 🙌</p>
+            <div class="products-container">
+                <div class="products-item">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_holding-phone.png"
+                         alt="SO-SURE Hand Holding Phone"
+                         width="200px">
+                    <h3 class="h4 products-item-heading">Mobile Phone Insurance</h3>
+                    <h4><span class="sub">From only £{{ lowest_premium|number_format(2, '.', ',') }} monthly</span></h4>
+                    <p class="text-primary">{{ free_months|capitalize }} months FREE when you buy yearly</p>
+                    <a href="#" class="btn btn-success get-a-quote disabled mb-2">Get a quote</a><br>
+                    <a href="{{ path('phone_insurance') }}" class="btn btn-link">Learn more</a>
+                    <p>Get cover for top brands including Apple, Samsung, Google, HTC, Sony, and Huawei.</p>
+                </div>
+                <div class="products-item">
+                    <img src="{{ cdn_url }}/images/rebrand/icns/so-sure_icon_home_contents.png"
+                         alt="SO-SURE Home Contents"
+                         width="200px">
+                    <h3 class="h4 products-item-heading">Contents Insurance</h3>
+                    <h4><span class="sub">From only £2.80 monthly</span></h4>
+                    <p class="text-primary">FREE month when you buy yearly</p>
+                    <a href="{{ path('contents_insurance') }}" class="btn btn-success mb-2">Get a quote</a><br>
+                    <a href="{{ path('contents_insurance') }}" class="btn btn-link">Learn more</a>
+                    <p>Protect your belongings, from laptops and coffee machines to the food in your freezer.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="why-insure py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-4 mb-md-2 text-center">Why Insure with SO-SURE?</h2>
+            <div class="d-lg-flex justify-content-between p-5">
+                <div class="card box-shadow mr-5 mb-4 w-100">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_benefits_one.jpg"
+                         class="lozad card-img-top"
+                         alt="Phone being held">
+                    <div class="card-body py-4 text-center">
+                        <h4 class="h5 text-primary card-title">Fast, Fuss-Free Claims</h4>
+                        <p class="card-text">Our easy three-step process takes the pain out of claims. And once approved, we aim to have your item repaired or replaced within 24-72 hours.</p>
+                    </div>
+                </div>
+                <div class="card box-shadow mr-5 mb-4 w-100">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_benefits_two.jpg"
+                         class="lozad card-img-top"
+                         alt="Phone mirror selfie">
+                    <div class="card-body py-4 text-center">
+                        <h4 class="h5 text-primary card-title">Save £££ On Your Excess</h4>
+                        <p class="card-text">With the SO-SURE app, simply snap a photo of your phone or build your contents insurance inventory and save money on your excess.</p>
+                    </div>
+                </div>
+                <div class="card box-shadow mb-4 w-100">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                         data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_benefits_three.jpg"
+                         class="lozad card-img-top"
+                         alt="Reward jar money">
+                    <div class="card-body py-4 text-center">
+                        <h4 class="h5 text-primary card-title">Up to 80% Cashback</h4>
+                        <p class="card-text">When you connect your policy with your friends and family, you can earn up to 80% of your premium back each year if none of you make a claim.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'AppBundle::Components/_reviews.html.twig' %}
+
+    <section class="app py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-white mb-5">Unlock the Benefits of <span class="text-deep-sky-blue-d text-nowrap">SO-SURE</span> with Our App</h2>
+            <div class="app-buttons">
+                <div class="app-button">
+                    <a href="{{ apple_download('homepage-banner') }}"
+                    class="ga-outbound-click"
+                    data-clicklabel="iTunes"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                        <span class="sr-only">Download on the AppStore</span>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/homepage/app-store-btn.svg"
+                             alt="App Store Button">
+                    </a>
+                    <div class="app-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half"></i>
+                    </div>
+                </div>
+                <div class="app-button">
+                    <a href="{{ google_download('homepage-banner') }}"
+                    class="ga-outbound-click"
+                    data-clicklabel="PlayStore"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                        <span class="sr-only">Get it on Google Play</span>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/homepage/google-play-btn.svg"
+                             alt="Google Play Button">
+                    </a>
+                    <div class="app-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('homepage') }}
+{% endblock %}

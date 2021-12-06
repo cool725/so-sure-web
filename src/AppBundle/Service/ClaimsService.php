@@ -537,10 +537,7 @@ class ClaimsService
             $claim->getPolicy()->getPolicyNumber()
         );
 
-        $email = 'new-claim@wearesosure.com';
-        if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
-            $email = 'SoSure@directgroup.co.uk';
-        }
+        $email = 'sosure@davies-group.com';
 
         $this->mailer->sendTemplate(
             $subject,
@@ -554,12 +551,12 @@ class ClaimsService
         );
 
         $this->mailer->sendTemplateToUser(
-            'Your claim with so-sure',
+            'We\'ve received your claim',
             $claim->getPolicy()->getUser(),
-            'AppBundle:Email:claim/fnolResponse.html.twig',
-            ['data' => $claim],
-            'AppBundle:Email:claim/fnolResponse.txt.twig',
-            ['data' => $claim]
+            'AppBundle:Email:claim/claimSubmitted.html.twig',
+            ['user' => $claim->getPolicy()->getUser()],
+            'AppBundle:Email:claim/claimSubmitted.txt.twig',
+            ['user' => $claim->getPolicy()->getUser()]
         );
     }
 
@@ -570,10 +567,8 @@ class ClaimsService
             $claim->getPolicy()->getPolicyNumber()
         );
 
-        $email = 'update-claim@wearesosure.com';
-        if ($this->featureService->isEnabled(Feature::FEATURE_CLAIMS_DEFAULT_DIRECT_GROUP)) {
-            $email = 'SoSure@directgroup.co.uk';
-        }
+        $email = 'sosure@davies-group.com';
+
         $this->mailer->sendTemplate(
             $subject,
             $email,

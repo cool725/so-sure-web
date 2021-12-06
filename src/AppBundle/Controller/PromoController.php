@@ -39,6 +39,7 @@ class PromoController extends BaseController
      * @Route("/creditspring/{code}", name="creditspring_promo")
      * @Route("/ben/{code}", name="ben_promo")
      * @Route("/suitsme/{code}", name="suitsme_promo")
+     * @Route("/insurtech/{code}", name="insurtech_promo")
      * @Template
      */
     public function promoAction(Request $request, $code)
@@ -123,6 +124,10 @@ class PromoController extends BaseController
             $custom = 'suitsme';
             $logo = 'so-sure_suitsme_logo.svg';
             $logoWidth = '133px';
+        } elseif ($request->get('_route') == 'insurtech_promo') {
+            $custom = 'insurtech';
+            $logo = 'so-sure_insurtech_logo.svg';
+            $logoWidth = '200px';
         }
 
         $lead = new Lead();

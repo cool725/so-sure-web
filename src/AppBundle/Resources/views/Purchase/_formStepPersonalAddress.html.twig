@@ -55,8 +55,7 @@
             <div class="mobile-err with-errors">{{ form_errors(purchase_form.mobileNumber) }}</div>
         </div>
         {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
-        {# <div class="address-search" style="{% if showAddress %}display: none;{% endif %}"> #}
-        <div class="address-search" style="display: none;">
+        <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
             <div class="form-group {% if is_postback %}has-error{% endif %}">
                 <label class="">Address</label>
                 <input id="address-select" class="typeahead form-control" type="text" placeholder="Postcode (eg. 10, SW1A 2AA)" {% if not showAddress %} required="required" {% endif %} data-hj-suppress="">
@@ -90,8 +89,7 @@
                 }}) }}
             </div>
         </div>
-        {# <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}"> #}
-        <div class="address-show">
+        <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
             <div class="form-group form-group-fix address-show-error" style="display: none;">
                 <label class="text-danger address-show-error-text error"></label>
             </div>

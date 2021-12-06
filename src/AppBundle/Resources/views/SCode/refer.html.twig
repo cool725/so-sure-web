@@ -46,10 +46,10 @@
                     <div class="custom-input-with-btn mb-4">
                         <input type="text"
                                 class="form-control form-control-white form-control-shadow"
-                                value="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                                value="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}?utm_source=refer-page&utm_medium=referral"
                                 disabled />
                         <button class="btn btn-primary btn-copy btn-sm"
-                                data-clipboard-text="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}">Copy</button>
+                                data-clipboard-text="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}?utm_source=refer-page&utm_medium=referral">Copy</button>
                     </div>
                     <hr class="border-deep-sky-blue-d" />
                     <h2 class="h4 text-white">Share on social</h2>
@@ -58,7 +58,7 @@
                             class="track-data"
                             data-sharer="twitter"
                             data-title="{{ og_description }}"
-                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}?utm_source=refer-page&utm_medium=referral"
                             data-via="wearesosure"
                             data-hashtags="wearesosure,phoneinsurance"
                             data-event="twitter"
@@ -72,7 +72,7 @@
                             class="track-data"
                             data-sharer="facebook"
                             data-title="{{ og_description }}"
-                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}?utm_source=refer-page&utm_medium=referral"
                             data-hashtags="wearesosure,phoneinsurance"
                             data-event="facebook"
                             data-event-type="social"
@@ -86,7 +86,7 @@
                             data-sharer="whatsapp"
                             data-web
                             data-title="{{ og_description }}"
-                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}"
+                            data-url="{{ url('scode', {'code': scode.policy.standardSCode.code}) }}?utm_source=refer-page&utm_medium=referral"
                             data-event="whatsapp"
                             data-event-type="social"
                             data-event-location="refer-page">

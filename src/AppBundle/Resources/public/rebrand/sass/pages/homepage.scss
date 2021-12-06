@@ -11,147 +11,101 @@
 .hero {
     position: relative;
     overflow: hidden;
-    padding: 6rem 0 3rem;
+    padding: 7rem 0 0;
+
+    @include blue-gradient-hero-mobile;
+
+    .container-large {
+        position: relative;
+        z-index: 4;
+        text-align: center;
+
+        @include media-breakpoint-up(lg) {
+            text-align: left;
+        }
+    }
+
+    &-controls {
+        padding-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+
+        @include media-breakpoint-up(lg) {
+            display: block;
+        }
+    }
+
+    &-swoop {
+        position: relative;
+        z-index: 2;
+        transform: translateY(3px);
+    }
+
+    &-image {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        z-index: 1;
+
+        img {
+            max-width: 800px;
+            margin-left: -100px;
+        }
+
+        @include media-breakpoint-up(md) {
+            img {
+                max-width: 1200px;
+                margin-left: -50px;
+            }
+        }
+
+        @include media-breakpoint-up(lg) {
+            img {
+                max-width: 1000px;
+            }
+        }
+
+        @include media-breakpoint-up(xl) {
+            img {
+                max-width: 1400px;
+            }
+        }
+
+        @include media-breakpoint-up(fk) {
+            img {
+               margin-left: 200px;
+            }
+        }
+    }
+
+    @include media-breakpoint-up(lg) {
+        padding: 6rem 0 0;
+        @include blue-gradient-hero-desktop;
+    }
+
+    @include media-breakpoint-up(xl) {
+        padding: 8rem 0 0;
+    }
+}
+
+.about {
+    position: relative;
 
     @include blue-gradient-45;
 
     .container-large {
         position: relative;
         z-index: 4;
-
-        @include media-breakpoint-up(lg) {
-            &:before,
-            &:after {
-                display: block;
-                width: 420px;
-                height: 420px;
-                content: '';
-                position: absolute;
-                top: -50px;
-            }
-
-            &:before {
-                left: 0;
-                margin-left: -240px;
-                background-size: contain;
-                background-image: url('#{$cdn_url}/images/rebrand/homepage/so-sure_hero-alt-desktop-left-image.png');
-                background-repeat: no-repeat;
-                opacity: 0.9;
-            }
-
-            &:after {
-                right: 0;
-                margin-right: -240px;
-                background-size: contain;
-                background-image: url('#{$cdn_url}/images/rebrand/homepage/so-sure_hero-alt-desktop-right-image.png');
-                background-repeat: no-repeat;
-                opacity: 0.9;
-            }
-        }
-
-        @include media-breakpoint-up(fa) {
-            &:before {
-                margin-left: -340px;
-            }
-
-            &:after {
-                margin-right: -340px;
-            }
-        }
-
-        @include media-breakpoint-up(fk) {
-            &:before {
-                margin-left: -140px;
-            }
-
-            &:after {
-                margin-right: -140px;
-            }
-        }
     }
 
-    &-links {
-        margin-bottom: 1.5rem;
-
-        @include media-breakpoint-up(md) {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    }
-
-    &-link {
-        display: block;
-        background-color: $white;
-        @include border-radius($g-border-radius-large);
-        box-shadow: 0 15px 30px 0 rgba(8,27,154,0.08),
-        0 5px 15px 0 rgba(8,27,154,0.08);
-        transition: box-shadow 0.3s ease-in-out;
-
-        &-body {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            padding: 0.2rem 1rem;
-
-            .h5 {
-                color: $primary;
-                margin: 0;
-            }
-
-            .far {
-                margin-left: auto;
-            }
-        }
-
-        &:hover {
-            text-decoration: none;
-            box-shadow: 0 0 0 0.2rem rgba($color: $deep-sky-blue-d, $alpha: 0.5);
-        }
-
-        @include media-breakpoint-up(md) {
-            min-width: 320px;
-
-            &:first-of-type {
-                margin-right: 1rem;
-            }
-        }
-    }
-
-    &-link + &-link {
-        margin-top: 1rem;
-
-        @include media-breakpoint-up(md) {
-            margin: 0;
-        }
-    }
-
-    &-img-mobile {
-        display: block;
-        margin: 0 auto 1rem;
-        opacity: 0.9;
-
-        @include media-breakpoint-up(lg) {
-            display: none;
-        }
-    }
-
-    &-scroll-down {
-        display: flex;
+    &-wink {
+        margin: 5rem 0;
         text-align: center;
-        flex-direction: column;
-        margin: 0;
-        color: $white;
+        opacity: 0.35;
 
         @include media-breakpoint-up(lg) {
-            display: none;
+            margin: 8rem 0;
         }
-    }
-
-    .badge {
-        // font-size: 90%;
-        padding: 0.6rem 1rem;
-        text-transform: uppercase;
     }
 
     &:before {
@@ -160,27 +114,27 @@
         top: 0; left: 0; right: 0; bottom: 0;
         content: '';
         z-index: 1;
-        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background-mobile.svg');
+        background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-about-background-90.svg');
         background-size: cover;
-        opacity: 0.44;
-        transform: scaleX(-1);
-    }
-
-    @include media-breakpoint-up(md) {
-        text-align: center;
+        opacity: 0.08;
     }
 
     @include media-breakpoint-up(lg) {
-        padding: 7rem 0;
+        padding-bottom: 10rem;
+    }
+}
 
-        &:before {
-            background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
-            transform: scaleX(-1);
-        }
+.knowledge-base {
+    background-color: $athens-gray;
+    position: relative;
+    z-index: 4;
+
+    &__mobile {
+        position: relative;
     }
 
-    @include media-breakpoint-up(xl) {
-        padding: 8rem 0;
+    &__desktop {
+        position: relative;
     }
 }
 
@@ -233,20 +187,7 @@
 }
 
 .why-insure {
-    text-align: center;
     background-color: $white;
-
-    &-content {
-        @include media-breakpoint-up(sm) {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .card {
-                align-self: stretch;
-            }
-        }
-    }
 }
 
 .reviews {

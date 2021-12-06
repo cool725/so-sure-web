@@ -126,7 +126,8 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
             "Name",
             "Email",
             "Amount",
-            "Status"
+            "Status",
+            "Submission Serial Number"
         ];
         fputcsv($csv, $headers);
 
@@ -155,7 +156,8 @@ class BacsPaymentsReportExportCommand extends ContainerAwareCommand
                     $payment->getPolicy()->getUser()->getLastName(),
                     $payment->getPolicy()->getUser()->getEmail(),
                     $payment->getAmount(),
-                    $payment->getStatus()
+                    $payment->getStatus(),
+                    $payment->getSerialNumber()
                 ];
                 fputcsv($csv, $row);
             }

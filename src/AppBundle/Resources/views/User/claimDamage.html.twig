@@ -99,12 +99,15 @@
                                             <p>Contact your network to request a 'Proof of Usage' document to send directly to our claims team at the following email address <a href="matilto:ggpou@so-sure.com">ggpou@so-sure.com</a>. This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
                                         </div>
                                     {% else %}
-                                        <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard document and the network provider will easily able to email or post this document to you (ask for email for a quicker claim).  This document has your IMEI number and the first and last time that IMEI was used on their network.</p>
+                                        <p>Contact your network to request a 'Proof of Usage' document from them. This is a standard PDF document and the network provider will easily able to email to you. This document has your IMEI number and the first and last time that IMEI was used on their network. IMPORTANT: upload the PDF the network sends you. We can't accept other formats or pictures of documents.</p>
                                     {% endif %}
                                     <div class="form-row {% if not showPOF %}d-none{% endif %}">
                                         <div class="col-md form-group">
                                             {{ form_label(claim_form.proofOfUsage, formLabel) }}
-                                            {{ form_widget(claim_form.proofOfUsage) }}
+                                            {{ form_widget(claim_form.proofOfUsage, { 'attr': {
+                                                'accept': 'application/pdf'
+                                            }}) }}
+                                            <small class="form-text">For all claims where the proof of usage is requested the ‘Proof of Usage’ must be a PDF document. We do not accept screenshots or photos, the document must be the PDF supplied by the network.</small>
                                             <small class="form-text">
                                                 <a href="#"
                                                    data-toggle="modal"
@@ -128,6 +131,28 @@
                                         </div>
                                     </div>
                                 {% endif %}
+                                {% if claim.policy.phone.make == 'Apple' %}
+                                    <div class="alert-danger p-4 mb-4 rounded">
+                                        <p><strong>We need you to remove the Apple Lock from the phone. There are two ways to do this</strong></p>
+                                        <p>If you can still access the phone, you can do this in Settings. Go to Settings > [your name] > Find My > Find My iPhone. Tap the switch next to Find My iPhone, then enter your Apple ID password to disable the service.</p>
+                                        <p>If you cannot access the phone (for example the screen doesn't work or it won't switch on) then make the sure the phone is powered off. Then:</p>
+                                        <ol>
+                                            <li class="mb-2">From a computer with internet access, head to <a href="http://icloud.com/find" target="_blank" rel="noopener noreferrer">icloud.com/find</a>, or on an iPad download the "Find my iPhone" app.</li>
+                                            <li class="mb-2">Login using your apple ID and password, then allow a few moments for it to "locate" all your devices.</li>
+                                            <li class="mb-2">On the new screen, press "All Devices".</li>
+                                            <li class="mb-2">This will list all apple devices currently locked to your iCloud account. Find the one you wish to remove, and then select it.</li>
+                                            <li class="mb-2">Select 'Remove from Account' and then click 'Remove' to confirm your selection</li>
+                                            <li class="mb-2">Do not switch the phone back on once this has been done, or it will reactive the lock.</li>
+                                        </ol>
+                                        <div class="form-group bg-white p-3 m-0 rounded">
+                                            {{ form_widget(claim_form.agreedAppleDamage, {
+                                                'label': 'I confirm I have removed the Apple Lock from the phone',
+                                                'attr': {'class':'custom-control-input'}}
+                                            ) }}
+                                            <div class="with-errors">{{ form_errors(claim_form.agreedAppleDamage) }}</div>
+                                        </div>
+                                    </div>
+                                {% endif %}
                                 <p class="mt-4 mb-5">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</p>
                                 <div class="form-group d-md-flex justify-content-md-between">
                                     {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-outline-primary btn-block-xs mr-md-2'}}) }}
@@ -143,6 +168,7 @@
 
 
     {# Page Modals #}
+    {% include 'AppBundle:User:claimModals.html.twig' %}
 
 {% endblock %}
 
