@@ -522,6 +522,7 @@ class BICommand extends ContainerAwareCommand
             '"Invitation Date"',
             '"Invitation Method"',
             '"Accepted Date"',
+            '"Invitation ID"'
         ]);
         foreach ($invitations as $invitation) {
             /** @var Invitation $invitation */
@@ -530,6 +531,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $this->timezoneFormat($invitation->getCreated(), $timezone, 'Y-m-d H:i:s')),
                 sprintf('"%s"', $invitation->getChannel()),
                 sprintf('"%s"', $this->timezoneFormat($invitation->getAccepted(), $timezone, 'Y-m-d H:i:s')),
+                sprintf('"%s"', $invitation->getId())
             ]);
         }
         if (!$skipS3) {
