@@ -43,7 +43,7 @@
                 <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
                     <div class="hero-image">
                         <picture class="lozad">
-                            {% if amazon_voucher is defined and amazon_voucher is not null %}
+                            {# {% if amazon_voucher is defined and amazon_voucher is not null %}
                                 <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_amazon.png" media="(min-width: 1200px)">
                                 <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_amazon.png" media="(min-width: 992px) and (max-width: 1199px)">
                                 <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_amazon.png" media="(min-width: 320px) and (max-width: 991px)">
@@ -51,7 +51,9 @@
                                 <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_invite.png" media="(min-width: 1200px)">
                                 <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_invite.png" media="(min-width: 992px) and (max-width: 1199px)">
                                 <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_invite.png" media="(min-width: 320px) and (max-width: 991px)">
-                            {% endif %}
+                            {% endif %} #}
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_xmas.png" media="(min-width: 992px)">
+                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_xmas.png" media="(min-width: 320px) and (max-width: 991px)">
                         </picture>
                     </div>
                 </div>

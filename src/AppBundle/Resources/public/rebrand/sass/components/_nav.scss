@@ -108,6 +108,15 @@
         width: 120px; height: 30px;
         background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_logo-white-light.svg') no-repeat center center;
         background-size: 120px;
+        position: relative;
+
+        &:before {
+            content: '';
+            width: 30px; height: 30px;
+            background: transparent url('#{$cdn_url}/images/rebrand/logo/so-sure_santa_hat.svg') no-repeat center center;
+            position: absolute;
+            top: -9px; left: -13px;
+        }
     }
 }
 
