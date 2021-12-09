@@ -2576,7 +2576,7 @@ class PolicyService
                 sprintf(
                     "%s-%s-%s",
                     $startDate->format("Y"),
-                    $policy->getBilling()->format("m"),
+                    $startDate->format("m"),
                     $policy->getBilling()->format("d")
                 )
             );
