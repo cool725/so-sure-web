@@ -125,7 +125,6 @@ class DefaultController extends BaseController
             // 'from_price' => $fromPrice
         );
 
-        // return $this->render('AppBundle:Default:indexHomepage.html.twig', $data);
         return $this->render('AppBundle:Default:indexHomepageDec2020.html.twig', $data);
     }
 
@@ -146,7 +145,7 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $template = 'AppBundle:Default:indexHomepage.html.twig';
+        $template = 'AppBundle:Default:indexHomepageDec2020.html.twig';
 
         $competitorData = new Competitors();
 
