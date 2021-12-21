@@ -135,8 +135,6 @@ class PhoneInsuranceController extends BaseController
      */
     public function secondHandPhoneInsuranceAction(Request $request)
     {
-        // Select the lowest
-        $fromPrice = $this->getLowestPremium();
         // Is indexed?
         $noindex = false;
         if ($request->get('_route') == 'phone_insurance_second_hand_m') {
@@ -146,7 +144,6 @@ class PhoneInsuranceController extends BaseController
         }
 
         $data = [
-            'from_price' => $fromPrice,
             'is_noindex' => $noindex,
         ];
 
@@ -160,9 +157,6 @@ class PhoneInsuranceController extends BaseController
      */
     public function refurbishedPhoneInsuranceAction(Request $request)
     {
-        // Select the lowest
-        $fromPrice = $this->getLowestPremium();
-
         // Is indexed?
         $noindex = false;
         if ($request->get('_route') == 'phone_insurance_refurbished_m') {
@@ -172,7 +166,6 @@ class PhoneInsuranceController extends BaseController
         }
 
         $data = [
-            'from_price' => $fromPrice,
             'is_noindex' => $noindex,
         ];
 

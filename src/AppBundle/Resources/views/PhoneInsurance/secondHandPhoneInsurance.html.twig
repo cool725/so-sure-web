@@ -5,12 +5,12 @@
 {% set include_get_a_quote = true %}
 {% set robots_noindex = is_noindex %}
 
-{% block title %}Second Hand Phone Insurance From &pound;{{ from_price|number_format(2) }} Monthly | so-sure{% endblock %}
+{% block title %}Second Hand Phone Insurance From &pound;{{ lowest_premium|number_format(2, '.', ',') }} Monthly | so-sure{% endblock %}
 {% block meta %}
     <meta name="description" content="Even with cheap second hand phones, insurance can bring peace of mind. Get second hand phone insurance with 24-72 hour repair or replacement & money back if you don't claim."/>
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
 {% endblock %}
-{% set og_title = 'Second Hand Phone Insurance From £' ~ from_price|number_format(2) ~ ' Monthly | so-sure' %}
+{% set og_title = 'Second Hand Phone Insurance From £' ~ lowest_premium|number_format(2, '.', ',') ~ ' Monthly | so-sure' %}
 {% set og_description = "Even with cheap second hand phones, insurance can bring peace of mind. Get second hand phone insurance with 24-72 hour repair or replacement & money back if you don't claim." %}
 {% set og_image = cdn_url ~ '/images/rebrand/phones/generic/so-sure_hero-second-hand.png' %}
 
@@ -65,7 +65,7 @@
                             </li>
                         </ul>
                         </div>
-                        <h1 class="text-white fit text-center text-lg-left">Second Hand Phone <br class="d-lg-none"> Insurance <br class="d-none d-lg-inline"> from just <br class="d-lg-none"> <span class="text-deep-sky-blue-d">&pound;{{ from_price|number_format(2) }} per month</span></h1>
+                        <h1 class="text-white fit text-center text-lg-left">Second Hand Phone <br class="d-lg-none"> Insurance <br class="d-none d-lg-inline"> from just <br class="d-lg-none"> <span class="text-deep-sky-blue-d">&pound;{{ lowest_premium|number_format(2, '.', ',') }} per month</span></h1>
                         <p class="my-4 text-white text-center text-lg-left">Insure your second hand phone with so-sure for the same price as a new model – and still get full coverage, and access to our social insurance reward pot 💸</p>
                     </div>
                     <div class="hero__controls text-center text-lg-left mb-5">
