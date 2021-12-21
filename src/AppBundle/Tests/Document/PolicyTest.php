@@ -115,7 +115,7 @@ class PolicyTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotEquals($updatePremium->getAmount(), $policy->getPremium()->getMonthlyPremiumPrice());
         $policy->processPolicyPremium($updatePremium);
-        $this->assertEquals($updatePremium->getAmount(), $policy->getPremium()->getMonthlyPremiumPrice());
+        $this->assertEquals($updatePremium->getAmount(), $policy->getPremium()->getMonthlyPremiumPrice(), '', 0.0001);
 
         $scheduledPayment = new ScheduledPayment();
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
