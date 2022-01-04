@@ -53,15 +53,6 @@
         transform: scaleX(-1);
     }
 
-    &:after {
-        width: 100%; height: 100%;
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        content: '';
-        z-index: 2;
-        background-image: url('#{$cdn_url}/images/rebrand/hero-images/so-sure_hero_snow.svg');
-    }
-
     @include media-breakpoint-up(lg) {
         &:before {
             background-image: url('#{$cdn_url}/images/rebrand/misc/so-sure_swoosh-hero-background.svg');
