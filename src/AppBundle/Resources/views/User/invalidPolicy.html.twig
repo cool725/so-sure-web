@@ -33,10 +33,10 @@
                 {% endif %}
                 <p class="text-white lead">Head to the <a href="{{ path('homepage') }}" class="text-white"><u>homepage</u></a> to get a quote.</p>
             {% elseif app.user.canPurchasePolicy(false) %}
-                <h1 class="h2 mb-4">You've reached the maximum number of allowed policies.</h1>
+                <h1 class="h2 mb-4 text-white">You've reached the maximum number of allowed policies.</h1>
                 <p class="text-white lead"><a href="{{ path('about_how_to_contact_so_sure') }}" class="text-white"><u>Contact us</u></a> for more details.</p>
             {% else %}
-                <h1 class="h2 mb-4">Sorry, but you are not able to purchase a policy.</h1>
+                <h1 class="h2 mb-4 text-white">Sorry, but you are not able to purchase a policy.</h1>
                 <p class="text-white lead"><a href="{{ path('about_how_to_contact_so_sure') }}" class="text-white"><u>Contact us</u></a> for more details.</p>
             {% endif %}
         </div>
