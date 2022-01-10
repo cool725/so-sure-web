@@ -34,7 +34,7 @@
             {% elseif is_granted('ROLE_CLAIMS') %}
                 <a href="{{ path('claims_home') }}" class="nav-link user-link">Claims</a>
             {% else %}
-                <a href="{{ path('user_home') }}" class="nav-link user-link">Your account</a>
+                <a href="{{ path('user_policy_list_policy') }}" class="nav-link user-link">Your account</a>
             {% endif %}
         </li>
     {% endif %}

@@ -11,7 +11,7 @@
                 {% elseif is_granted('ROLE_PICSURE') %}
                     <a href="{{ path('picsure_index') }}" class="h5">Picsure</a>
                 {% else %}
-                    <a href="{{ path('user_home') }}" class="h5">Dashboard</a>
+                    <a href="{{ path('user_policy_list_policy') }}" class="h5">Dashboard</a>
                 {% endif %}
             </li>
          {% endif %}
