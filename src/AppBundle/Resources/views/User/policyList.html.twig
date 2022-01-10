@@ -10,7 +10,7 @@
     {% set pic_width = '150px' %}
 {% endif %}
 
-{% block title %}My Phones | so-sure{% endblock %}
+{% block title %}Policies | so-sure{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('user') }}
@@ -21,7 +21,7 @@
 
     <section class="hero">
         <div class="container-large">
-            <h1 class="h2 text-white mb-5 mb-lg-4">My Phones</h1>
+            <h1 class="h2 text-white mb-5 mb-lg-4">Policies</h1>
         </div>
     </section>
 
@@ -48,16 +48,17 @@
                         <div class="h5 mb-3"><i class="fal fa-calendar fa-lg fa-fw text-primary mr-2"></i> {{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }}</div>
                         {% if policy.getUnderwriterName == 'Salva' %}
                             <a href="#"
-                               class="btn btn-outline-primary btn-sm track-data"
+                               class="btn btn-outline-primary btn-sm mr-md-2 track-data"
                                data-toggle="modal"
                                data-target="#upgrade_salva_modal"
                                data-event="upgrade-current-policy-salva-dt">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
                         {% elseif policy.getUnderwriterName == 'Helvetia' %}
                             <a href="{{ path('user_upgrade', {'policyId': policy.id}) }}"
-                               class="btn btn-outline-primary btn-sm track-data"
+                               class="btn btn-outline-primary btn-sm mr-md-2 track-data"
                                data-event="upgrade-current-policy-helvetia-dt"
                                data-event-url="{{ path('user_upgrade', {'policyId': policy.id}) }}">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
                         {% endif %}
+                        <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="btn btn-success btn-sm btn-block-xs">View Policy</a>
                     </div>
                 </div>
                 <div class="cardbox-divider d-none d-lg-flex excess">
@@ -147,7 +148,7 @@
                         Excess for Theft <strong>&pound;{{ policy.getCurrentExcess.theft|number_format(0, '.', ',') }}</strong>
                     {% endif %}
                 </div>
-                <div class="cardbox__body cardbox-divider cardbox-flex d-lg-none">
+                <div class="cardbox__body cardbox-divider d-lg-none">
                     {% if (policy.hasOpenClaim or policy.hasMonetaryClaimed(true)) or policy.getUnderwriterName == 'Salva' %}
                         <a href="#"
                            class="btn btn-outline-primary btn-block-xs track-data"
@@ -160,6 +161,7 @@
                            data-event="upgrade-current-policy-helvetia-mb"
                            data-event-url="{{ path('user_upgrade', {'policyId': policy.id}) }}">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
                     {% endif %}
+                    <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="btn btn-success btn-sm btn-block-xs">View Policy</a>
                 </div>
             </div>
             {# End Current Policy #}
@@ -204,7 +206,7 @@
                                    data-event="upgrade-other-policy-helvetia-dt"
                                    data-event-url="{{ path('user_upgrade', {'policyId': policyItem.id}) }}">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
                             {% endif %}
-                            <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="btn btn-success btn-sm btn-block-xs">Go to Dashboard</a>
+                            <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="btn btn-success btn-sm btn-block-xs">View Policy</a>
                         </div>
                     </div>
                     <div class="cardbox-divider d-none d-lg-flex excess">
@@ -300,7 +302,7 @@
                                class="btn btn-outline-primary btn-block-xs track-data"
                                data-event="upgrade-other-policy-helvetia-mb">Upgrade Policy <i class="fal fa-mobile-android fa-fw"></i></a>
                         {% endif %}
-                        <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="btn btn-success btn-block-xs">Go to Dashboard</a>
+                        <a href="{{ path('user_policy', {'policyId': policyItem.id}) }}" class="btn btn-success btn-block-xs">View Policy</a>
                     </div>
                 </div>
             {% endfor %}

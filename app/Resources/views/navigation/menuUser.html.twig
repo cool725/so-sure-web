@@ -2,8 +2,8 @@
     <ul class="list-unstyled menu__links text-md-center">
         {% if policy is defined and policy %}
             <li>
-                <a href="{{ path('user_policy', {'policyId': policy.id}) }}" class="h5">
-                    Dashboard
+                <a href="{{ path('user_policy_list_policy', {'policyId': policy.id}) }}" class="h5">
+                    Policies
                 </a>
             </li>
             {% if policy.displayRenewal %}
@@ -28,15 +28,10 @@
                     Payments
                 </a>
             </li>
-            <li>
-                <a href="{{ path('user_policy_list_policy', {'policyId': policy.id}) }}" class="h5">
-                    My Phones
-                </a>
-            </li>
         {% else %}
             <li>
-                <a href="{{ path('user_home') }}" class="h5">
-                    Dashboard
+                <a href="{{ path('user_policy_list') }}" class="h5">
+                    Policies
                 </a>
             </li>
             <li>
@@ -52,11 +47,6 @@
             <li>
                 <a href="{{ path('user_payment_details') }}" class="h5">
                     Payments
-                </a>
-            </li>
-            <li>
-                <a href="{{ path('user_policy_list') }}" class="h5">
-                    My Phones
                 </a>
             </li>
         {% endif %}
