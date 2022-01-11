@@ -11,7 +11,7 @@ Download now: {{ url('download_google', {'medium': 'welcome-email-hero-text-veri
 
 Save £100 on your excess 🙌
 
-Your excess is currently &pound;{{ policy.premium.excess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.excess.loss }} for Theft/Loss){% endif %} but you can easily reduce it to &pound;{{ policy.premium.picSureExcess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss){% endif %} by just downloading our app and validating your phone.
+Your excess is currently &pound;{{ policy.premium.excess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.excess.loss }} for Theft{% if policy.subvariant.name is defined and policy.subvariant.name != 'both' %}/Loss{% endif %}){% endif %} but you can easily reduce it to &pound;{{ policy.premium.picSureExcess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss){% endif %} by just downloading our app and validating your phone.
 
 Validating your phone is so easy, and takes less that 3 minutes. What are you waiting for?
 
@@ -42,14 +42,14 @@ As you have a shiny new model, we wanted to let you know your repair or replacem
 Your cover includes:
 
 {% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %}
+- Loss
+- Theft
 - Accidental Damage
 - Out of Warranty Breakdown
-- Theft
 - Accessories
 - Global Travel
 {% else %}
-- Loss
-- Theft
+{% if policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}- Theft{% endif %}
 - Accidental Damage
 - Out of Warranty Breakdown
 - Accessories
