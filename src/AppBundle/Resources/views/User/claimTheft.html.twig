@@ -10,7 +10,7 @@
 {% set showPOF = true %}
 {% set formLabel = 'Proof of usage' %}
 
-{% block title %}Theft Claim | Claims | so-sure{% endblock %}
+{% block title %}Make a Claim - Theft | SO-SURE{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('user-claim') }}
@@ -58,7 +58,7 @@
                                 <p>You'll need to call or email your mobile network to:</p>
                                 <ol class="mb-4">
                                     <li class="mb-2">Let them know your phone has been stolen</li>
-                                    <li class="mb-2">Request that they block your phone and IMEI</li>
+                                    <li class="mb-2">Request that they blacklist your phone and IMEI</li>
                                     <li class="mb-2">Request a <u>Proof of Blacklisting</u> document from them.</li>
                                     {% if claim_form.proofOfUsage is defined %}
                                         {% if claim.network in matchNetworks %}
@@ -186,10 +186,9 @@
                                         </div>
                                     </div>
                                 {% endif %}
-                                <p class="mt-4 mb-5">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</p>
                                 <div class="form-group d-md-flex justify-content-md-between"">
                                     {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-outline-primary btn-block-xs mr-md-2'}}) }}
-                                    {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-success  btn-block-xs'}}) }}
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Next', 'attr': {'class': 'btn btn-success  btn-block-xs'}}) }}
                                 </div>
                             {{ form_end(claim_form) }}
                         </div>

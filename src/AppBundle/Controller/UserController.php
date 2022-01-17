@@ -1928,7 +1928,6 @@ class UserController extends BaseController
                     $claim = $claimsService->createClaim($claimConfirmForm->getData());
                     $claim->setPolicy($policy);
                     $policy->addClaim($claim);
-                    $claimsService->notifyFnolSubmission($claim);
                     $dm->flush();
                     $claimsService->uncacheFnol($user);
                     return $this->redirectToRoute('user_claim_policy', ['policyId' => $policy->getId()]);

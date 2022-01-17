@@ -495,18 +495,6 @@ class ClaimsService
         }
     }
 
-    public function notifyFnolSubmission(Claim $claim)
-    {
-        $this->mailer->sendTemplateToUser(
-            'ATTENTION: You have an unfinished claim with so-sure',
-            $claim->getPolicy()->getUser(),
-            'AppBundle:Email:claim/fnolInitialResponse.html.twig',
-            ['data' => $claim],
-            'AppBundle:Email:claim/fnolInitialResponse.txt.twig',
-            ['data' => $claim]
-        );
-    }
-
     private function downloadAttachmentFiles($attachments)
     {
         $files = [];

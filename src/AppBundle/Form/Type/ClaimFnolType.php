@@ -91,16 +91,20 @@ class ClaimFnolType extends AbstractType
             ]);
 
             $policies = array();
+            $attributes = [];
             $userPolicies = $data->getUser()->getValidPoliciesWithoutOpenedClaim(true);
             foreach ($userPolicies as $policy) {
-                $policies[$policy->getPolicyNumber()] = $policy->getId();
+                $name = sprintf('%s - %s', $policy->getPhone(), $policy->getPolicyNumber());
+                $policies[$name] = $policy->getId();
+                $attributes[$name] = ['data-policy-number' => $policy->getPolicyNumber()];
             }
 
             $form->add('policyNumber', ChoiceType::class, [
                 'required' => true,
                 'expanded' => false,
                 'multiple' => false,
-                'choices' => $policies
+                'choices' => $policies,
+                'choice_attr' => $attributes
             ]);
         });
     }

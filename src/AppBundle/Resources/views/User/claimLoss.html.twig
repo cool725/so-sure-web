@@ -10,7 +10,7 @@
 {% set showPOF = true %}
 {% set formLabel = 'Proof of usage' %}
 
-{% block title %}Loss Claim | Claims | so-sure{% endblock %}
+{% block title %}Make a Claim - Loss | SO-SURE{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('user-claim') }}
@@ -56,7 +56,7 @@
                                 <p>You'll need to call or email your mobile network to:</p>
                                 <ol class="mb-4">
                                     <li class="mb-2">Let them know your phone has been lost</li>
-                                    <li class="mb-2">Request that they block your phone and IMEI</li>
+                                    <li class="mb-2">Request that they blacklist your phone and IMEI</li>
                                     <li class="mb-2">Request a <u>Proof of Blacklisting</u> document from them.</li>
                                     {% if claim_form.proofOfUsage is defined %}
                                         {% if claim.network in matchNetworks %}
@@ -126,7 +126,7 @@
                                         </div>
                                     </div>
                                 {% endif %}
-                                <p>Reporting your loss to the authorities. Sadly in this day and age, there is little the police can initially do about this. However, occasionally, the police may come across your phone at a later date. Some police stations do not create loss reports and so you can file a report online at <a href="https://www.immobilise.com/" target="_blank" rel="noopener noreferrer">Immobilise.com <i class="far fa-external-link-alt"></i></a>.</p>
+                                <p>Obtain a loss report from your local police station. If the police are unable to create a loss report then please report online at <a href="https://www.immobilise.com/" target="_blank" rel="noopener noreferrer">Immobilise.com <i class="far fa-external-link-alt"></i></a>.</p>
                                 <div class="form-row">
                                     <div class="col-md form-group">
                                         {{ form_label(claim_form.reportedDate, 'When did you report the ' ~ claimType ~ '?') }}
@@ -205,10 +205,9 @@
                                         </div>
                                     </div>
                                 {% endif %}
-                                <p class="mt-4 mb-5">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</p>
                                 <div class="form-group d-md-flex justify-content-md-between">
                                     {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-outline-primary btn-block-xs mr-md-2'}}) }}
-                                    {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-success btn-block-xs '}}) }}
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Next', 'attr': {'class': 'btn btn-success btn-block-xs '}}) }}
                                 </div>
                             {{ form_end(claim_form) }}
                         </div>

@@ -4,6 +4,7 @@ require('../../../sass/pages/user/user-claim.scss');
 
 // Require BS component(s)
 require('bootstrap/js/dist/tooltip');
+require('bootstrap/js/dist/collapse');
 
 // Require components
 require('tempusdominus-bootstrap-4');
@@ -199,13 +200,58 @@ $(function() {
         return false;
     });
 
-    // Starling
-    if ($('#claim_warning_modal').length) {
-        $('#claim_warning_modal').modal({
-            backdrop: 'static',
-            keyboard: false,
-            show: true
-        });
-    }
+    // Get policy number for claim type
+    let policyNumber;
+
+    $('#phone-select-btn').on('click', function() {
+        policyNumber = $('#claim_form_policyNumber option:selected').data('policy-number');
+    });
+
+    // Enable button after claim type choice
+    $('#claim_form_type').on('change', function() {
+        let value = $('#claim_form_type option:selected').val();
+        console.log(value);
+        if (value) {
+            $('#form-step-two-btn').attr('disabled', false);
+        } else {
+            $('#form-step-two-btn').attr('disabled', true);
+        }
+        if (value != 'damage' && policyNumber.startsWith('Dam')) {
+            $('#damage-policies').removeClass('hideme');
+            $('#other-policies').addClass('hideme');
+        } else {
+            $('#damage-policies').addClass('hideme');
+            $('#other-policies').removeClass('hideme');
+        }
+    });
+
+    // Enable button after network type choice
+    $('#claim_form_network').on('change', function() {
+        let value = $('#claim_form_network option:selected').val();
+        if (value) {
+            $('#form-step-three-btn').attr('disabled', false);
+        } else {
+            $('#form-step-three-btn').attr('disabled', true);
+        }
+    });
+
+    $('#form-step-three-btn').on('click', function() {
+        if (!policyNumber.startsWith('Dam')) {
+            $('#claim_warning_modal').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+        }
+    });
+
+    // Warning Modal
+    // if ($('#claim_warning_modal').length) {
+    //     $('#claim_warning_modal').modal({
+    //         backdrop: 'static',
+    //         keyboard: false,
+    //         show: true
+    //     });
+    // }
 
 });

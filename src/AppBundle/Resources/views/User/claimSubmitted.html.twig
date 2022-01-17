@@ -10,7 +10,7 @@
 {% set showPOF = true %}
 {% set formLabel = 'Proof of usage' %}
 
-{% block title %}Submitted Claim | Claims | so-sure{% endblock %}
+{% block title %}Make a Claim - Submitted | SO-SURE{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('user-claim') }}
@@ -38,11 +38,11 @@
                         <div class="cardbox__body">
                             <div class="bg-selago p-4 mb-4 rounded">
                                 <h2 class="h3 mb-4">What happens now?</h2>
-                                <p>Relax. We’re here to help and get your claim sorted as soon as possible!</p>
                                 <p>We will contact you by phone within 4 hours, unless it’s after 5pm, then we’ll try the next working day. Please don’t ignore a call from a withheld number – it’s probably us.</p>
-                                <p>If we can’t reach you by phone, we will email you. Look out for an email from: <strong>mbx.valid8@davies-group.com</strong>.</p>
-                                <p>We do contact everyone, so if you think you haven’t heard from us, check your spam folder, voicemail or text messages.</p>
-                                <p>In case you really haven’t heard from us, give us a call on <strong>03450744839</strong></p>
+                                <p>We will contact you by phone within a few hours, unless it’s outside of our operating hours, then we shall try the next working day. Please do not ignore a telephone call from a withheld number - it’s probably us.</p>
+                                <p>If we can’t reach you by telephone, we will send you a text message and email. Look out for an email from <strong>mbx.valid8@davies-group.com</strong> (they are our friendly claims team).</p>
+                                <p>Operating hours: Mon - Fri 8:30 - 18:30 and Sat 8:30 - 13:00. Closed on Sundays.</p>
+                                <p><strong>Once your claim is approved we will send a courier to collect the phone and repair it at our authorised repair centre.</strong></p>
                             </div>
                            {% if is_in_review %}
                                 <p class="mb-4">Your claim for <strong>{{ claim.type }}</strong> for your <strong>{{ claim_phone }}</strong> with IMEI <strong>{{ claim.policy.imei }}</strong> is being processed by our claims team.</p>

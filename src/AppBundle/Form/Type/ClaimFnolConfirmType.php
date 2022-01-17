@@ -47,7 +47,6 @@ class ClaimFnolConfirmType extends AbstractType
             ->add('network', HiddenType::class, ['required' => true])
             ->add('message', HiddenType::class, ['required' => true])
             ->add('checkTruthful', CheckboxType::class, ['required' => true])
-            ->add('checkPermanent', CheckboxType::class, ['required' => true])
             ->add('submit', SubmitType::class)
         ;
 

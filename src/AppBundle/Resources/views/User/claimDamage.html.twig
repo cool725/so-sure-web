@@ -10,7 +10,7 @@
 {% set showPOF = true %}
 {% set formLabel = 'Proof of usage' %}
 
-{% block title %}Damage Claim | Claims | so-sure{% endblock %}
+{% block title %}Make a Claim - Damage | SO-SURE{% endblock %}
 
 {% block cssPage %}
     {{ encore_entry_link_tags('user-claim') }}
@@ -153,10 +153,9 @@
                                         </div>
                                     </div>
                                 {% endif %}
-                                <p class="mt-4 mb-5">I confirm that all of the above is true, and understand that if I fail to provide the requested documentation that my claim may be delayed.</p>
                                 <div class="form-group d-md-flex justify-content-md-between">
                                     {{ form_widget(claim_form.save, { 'label': 'Save my progress', 'attr': {'class': 'cancel btn btn-outline-primary btn-block-xs mr-md-2'}}) }}
-                                    {{ form_widget(claim_form.confirm, { 'label': 'Submit my claim', 'attr': {'class': 'btn btn-success  btn-block-xs'}}) }}
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Next', 'attr': {'class': 'btn btn-success  btn-block-xs'}}) }}
                                 </div>
                             {{ form_end(claim_form) }}
                         </div>
