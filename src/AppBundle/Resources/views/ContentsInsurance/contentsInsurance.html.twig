@@ -343,6 +343,14 @@
                     <div class="card-body py-4 text-center">
                         <h3 class="h5 text-primary card-title">Up to 40% Money Back</h3>
                         <p class="card-text">Connect with friends and get rewarded every year when you and your connections don't claim.</p>
+                        <a href="#"
+                           class="watch-video"
+                           data-event="watch-video-index-hero"
+                           data-toggle="modal"
+                           data-target="#sosure-video-modal"
+                           data-src="https://www.youtube.com/embed/dMHAe7Qih2Y">
+                            <u>See how</u>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -408,6 +416,9 @@
             </div>
         </div>
     </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/_modalVideo.html.twig' %}
 
 {% endblock %}
 
