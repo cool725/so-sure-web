@@ -17,7 +17,11 @@
         <div class="container-fluid">
             {# TODO: Heading area #}
             <div class="d-lg-flex align-items-lg-center justify-content-lg-between mb-3">
-                <h1 class="h2">Cashback for {{ month }} / {{ year }}</h1>
+                {% if year %}
+                    <h1 class="h2">Cashback for {{ month }} / {{ year }}</h1>
+                {% else %}
+                    <h1 class="h2">All Cashback</h1>
+                {% endif %}
             </div>
             {# TODO: Controls area #}
             <div class="card card-page-filter mb-5">
@@ -31,7 +35,7 @@
                             <div class="input-group date mr-2"
                                  id="date_time_picker"
                                  data-target-input="nearest"
-                                 data-url="{{ path('admin_cashback') }}">
+                                 data-url="{{ path('admin_cashback_date') }}">
                                 <input type="text"
                                        class="form-control datetimepicker-input"
                                        data-target="#date_time_picker"

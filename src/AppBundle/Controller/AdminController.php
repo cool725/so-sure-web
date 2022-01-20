@@ -1878,31 +1878,26 @@ class AdminController extends BaseController
     public function cashbackAction(Request $request, $year = null, $month = null)
     {
         $now = \DateTime::createFromFormat('U', time());
-        if (!$year) {
-            $year = $now->format('Y');
-        }
         if (!$month) {
             $month = $now->format('m');
         }
-        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
-        $date = $this->startOfDay($date);
-        $nextMonth = clone $date;
-        $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
-
         $dm = $this->getManager();
         $repo = $dm->getRepository(Cashback::class);
         $qb = $repo->createQueryBuilder();
-        $qb = $qb->field('date')->gte($date);
-        $qb = $qb->field('date')->lt($nextMonth);
-
+        if ($year) {
+            $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+            $date = $this->startOfDay($date);
+            $nextMonth = clone $date;
+            $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
+            $qb = $qb->field('date')->gte($date);
+            $qb = $qb->field('date')->lt($nextMonth);
+        }
         $cashbackSearchForm = $this->get('form.factory')
             ->createNamedBuilder('search_form', CashbackSearchType::class, null, ['method' => 'GET'])
             ->getForm();
         $cashbackSearchForm->handleRequest($request);
         $data = $cashbackSearchForm->get('status')->getData();
-
         $qb = $qb->field('status')->in($data);
-
         return [
             'year' => $year,
             'month' => $month,
