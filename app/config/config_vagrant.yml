@@ -89,4 +89,5 @@ nelmio_security:
 
 twig:
     globals:
-        home_contents_funnel: http://localhost:8000/
+        home_contents_funnel: https://localhost:8000
+        home_dashboard_login: https://localhost:4000

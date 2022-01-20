@@ -115,6 +115,7 @@ twig:
         lowest_premium: 2.20
         trustpilot_rating: 4.2
         home_contents_funnel: https://home.wearesosure.com
+        home_dashboard_login: https://dashboard.wearesosure.com
         claims_email: sosure@davies-group.com
 
 doctrine_mongodb:

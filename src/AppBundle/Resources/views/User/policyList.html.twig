@@ -165,6 +165,12 @@
                 </div>
             </div>
             {# End Current Policy #}
+            {# Home Link #}
+            <h2 class="h4 text-gun-powder mb-4">Contents Policies</h2>
+            <div class="mb-5">
+                <a href="{{ home_dashboard_login }}" class="btn btn-success btn-block-xs" target="_blank">Contents Dashboard <i class="far fa-long-arrow-right fa-fw"></i></a>
+            </div>
+            {# End Home Link #}
             {# Other Policies #}
             <h2 class="h4 text-gun-powder mb-4">Other Active Policies <span class="sub">({{ user.getOtherActivePoliciesCount(policy) }})</span></h2>
             {% if user.getOtherActivePoliciesCount(policy) < 1 %}

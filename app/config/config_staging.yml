@@ -113,4 +113,5 @@ nelmio_security:
 
 twig:
     globals:
-        home_contents_funnel: https://purchase.staging.home.wearesosure.com/
+        home_contents_funnel: https://purchase.staging.home.wearesosure.com
+        home_dashboard_login: https://dashboard.staging.home.wearesosure.com

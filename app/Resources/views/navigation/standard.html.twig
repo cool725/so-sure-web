@@ -165,8 +165,30 @@
                <i class="fas fa-user fa-fw"></i> Log out</i></a>
         {% endif %}
     {% else %}
-        <a href="{{ path('fos_user_security_login') }}"
-           class="btn btn-outline-deep-sky-blue-d btn-sm show-in-nav btn-swap hideme"><i class="fas fa-user fa-fw"></i> Customer login</a>
+        <div class="dropdown">
+            <button class="btn btn-outline-deep-sky-blue-d btn-sm show-in-nav btn-swap hideme dropdown-toggle"
+                    type="button" id="customer_login_nav_mobile"
+                    data-toggle="dropdown"
+                    aria-expanded="false">
+                Customer login <i class="fas fa-chevron-down ml-2"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu show-in-nav-dropdown" aria-labelledby="customer_login_nav_mobile">
+                <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                href="{{ path('fos_user_security_login') }}">
+                    <span>
+                        Phone Insurance 📱<br>
+                        <small class="sub text-zaffre">Customers</small>
+                    </span>
+                </a>
+                <a class="dropdown-item dropdown-item-nav h6 mb-0"
+                href="{{ home_dashboard_login }}" target="_blank">
+                    <span>
+                        Contents Insurance 🏠<br>
+                        <small class="sub text-zaffre">Customers</small>
+                    </span>
+                </a>
+            </div>
+        </div>
     {% endif %}
 </li>
 {# If Logged in #}
@@ -186,7 +208,7 @@
     </li>
 {% endif %}
 {# Desktop Login #}
-<li class="nav-item d-none {{ menu_breakpoint }}">
+<li class="nav-item dropdown d-none {{ menu_breakpoint }}">
     {% if app.user is not null and app.user %}
         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
             <a href="{{ path('admin_home', {'_impersonate': '_exit'}) }}" class="nav-link user-link">Exit <u>{{ app.user.email|truncate(10)~'.'  }}</u></a>
@@ -194,7 +216,30 @@
             <a href="{{ path('fos_user_security_logout') }}" class="nav-link user-link">Log out</i></a>
         {% endif %}
     {% else %}
-        <a href="{{ path('fos_user_security_login') }}"
-           class="nav-link user-link">Customer login <i class="far fa-arrow-right fa-fw"></i></a>
+        <a href="#"
+           class="nav-link dropdown-toggle"
+           id="customer_login_nav"
+           role="button"
+           data-toggle="dropdown"
+           aria-haspopup="true"
+           aria-expanded="false">
+            Customer login <i class="far fa-sm text-columbia-blue-f fa-chevron-down ml-2"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-nav" aria-labelledby="customer_login_nav">
+            <a class="dropdown-item dropdown-item-nav h6 mb-0"
+            href="{{ path('fos_user_security_login') }}">
+                <span>
+                    Phone Insurance 📱<br>
+                    <small class="sub text-zaffre">Customers</small>
+                </span>
+            </a>
+            <a class="dropdown-item dropdown-item-nav h6 mb-0"
+            href="{{ home_dashboard_login }}" target="_blank">
+                <span>
+                    Contents Insurance 🏠<br>
+                    <small class="sub text-zaffre">Customers</small>
+                </span>
+            </a>
+        </div>
     {% endif %}
 </li>
