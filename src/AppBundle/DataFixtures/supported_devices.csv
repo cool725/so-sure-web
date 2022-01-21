@@ -1148,6 +1148,8 @@ Aqua,AQUA Android TV DVB2K,broadway,AQUA Android TV DVB2K
 Aqua,AQUA Android TV FF Pro,daan,AQUA Android TV FF Pro
 Aqua,AQUA android TV,hanyang,AQUA Android TV
 Aqua,S1 Jazz,S1_Jazz,S1 Jazz
+Arcelik,Arcelik Android TV,kunyang,Arcelik Android TV
+Arcelik,Arcelik UHD Android TV,kunyang,Arcelik Android UHD TV
 Arcelik,B55L 9682 5AS,arcelik_eu,arcelik_uhd_powermax_at
 Archos,,A101S,ARCHOS 101G9
 Archos,,A101S,Archos 101 Internet Tablet
@@ -2690,8 +2692,10 @@ Beeline,Tab,Beeline_Tab,Beeline Tab
 Beeline,Tab 2,Tab_2,Tab_2
 Beeline,Tab IS,Beeline_Tab_IS,Beeline_Tab_IS
 Beeline,Tab_Fast,Beeline_Tab_Fast,Beeline_Tab_Fast
+Beko,Beko Android TV,kunyang,Beko Android TV
 Beko,Beko Android TV,shinagawa,Beko Android TV
 Beko,Beko Android TV,sinchon,Beko Android TV
+Beko,Beko UHD Android TV,kunyang,Beko Android UHD TV
 Bell Canada,Bell Streamer,sti6130d324,Bell Streamer
 Bell Canada,FibeTV,vip7802_bell,FibeTV
 BenQ,730,redwood,AI PONT
@@ -3182,6 +3186,7 @@ Blu,G51S,G0590WW,G51S
 Blu,G6,G0210,G6
 Blu,G60,G0270WW,G60
 Blu,G61,G0450WW,G61
+Blu,G61S,G0630WW,G61S
 Blu,G70,G0151WW,G70
 Blu,G70,G0250WW,G70
 Blu,G70,G0251WW,G70
@@ -5469,6 +5474,7 @@ Digma,Plane_1596_3G_PS1213PG,PS1213PG,Plane 1596 3G PS1213PG
 Digma,Plane_7548S_4G_PS7160PL,PS7160PL,Plane_7548S_4G_PS7160PL
 Digma,Plane_8548S_3G,PS8161PG,Plane_8548S_3G_PS8161PG
 Digma,Plane_8549S_4G,PS8162PL,Plane_8549S_4G_PS8162PL
+Digma,RS1253PL,RS1253PL,PRO 1400E 4G RS1253PL
 Digma,TS1221PL,TS1221PL,Optima 10 A501S 4G TS1221PL
 Digma,TS1229PL,TS1229PL,Optima 10 Z802 4G TS1229PL
 Digma,TS7225PL,TS7225PL,Optima 7 Z800 4G TS7225PL
@@ -7596,6 +7602,7 @@ Google,Emulator,generic_x86,Android SDK built for x86
 Google,Emulator,generic_x86_64,Android SDK built for x86_64
 Google,Galaxy S4 Google Play edition,jgedlte,GT-I9505G
 Google,Google Android Emulator,generic_x86_arm,sdk_gphone_x86
+Google,Google Play Games on PC,vsoc_kiwi_x86_64,HPE device
 Google,Intel Amber Lake Y Chromebook,rammus_cheets,rammus
 Google,Intel Apollo Lake Chromebook,coral_cheets,coral
 Google,Intel Apollo Lake Chromebook,reef_cheets,ASUS Chromebook C213NA
@@ -7691,8 +7698,10 @@ Grolier,GSR2,GSR2,GSR2
 Grundig,GTB1030,TA10CA2,TA10CA2
 Grundig,GTB1050,GTB1050,GTB 1050
 Grundig,GTB850,GTB850,GTB 850
+Grundig,Grundig Android TV,kunyang,Grundig Android TV
 Grundig,Grundig Android TV,shinagawa,Grundig Android TV
 Grundig,Grundig Android TV,sinchon,Grundig Android TV
+Grundig,Grundig UHD Android TV,kunyang,Grundig Android UHD TV
 Grundig,TC69CA2,GTB801,GTB 801
 Grunhelm,GT9HD32,ikebukuro,AI PONT
 Grunhelm,GT9UHD,samseong,AI PONT
@@ -9698,6 +9707,7 @@ Honeywell,CN80,CN80G-L0-N-B,CN80
 Honeywell,CN80,CN80G-L1-N,CN80
 Honeywell,CN85,CN85-L0-C,CN85
 Honeywell,CN85,CN85-L1-C,CN85
+Honeywell,CT30XP,CT30P,CT30P
 Honeywell,CT40,CT40-L0-C,CT40
 Honeywell,CT40,CT40-L0-CA,CT40
 Honeywell,CT40,CT40-L1-C,CT40
@@ -13382,6 +13392,7 @@ Kyocera,DIGNO Dual,WX04K,WX04K
 Kyocera,DIGNO L,KYV36,KYV36
 Kyocera,DIGNO R,202K,202K
 Kyocera,DIGNO S,KYL21,KYL21
+Kyocera,DIGNO SX2,KY21L-ST100,KC-S302
 Kyocera,DIGNO T,302KC,302KC
 Kyocera,DIGNO Tab,KYT34,KYT34
 Kyocera,DIGNO V,KYV42,KYV42_u
@@ -16547,6 +16558,7 @@ MDC Store,Prime_S,Prime_S,Prime_S
 MEDER,MEDER,smartguide210_eea,SmartGuide_2.10
 MEDER,SmartGuide210-464,SmartGuide210-464,SmartGuide210-464
 MEO(Portugal),MEO TV Box 4K,DV8555-MEO,MEO TV Box 4K
+MEO(Portugal),MEO TV Box 4K (DIW3930),DIW3930-MEO,MEO TV Box 4K (DIW3930)
 MEO(Portugal),MEOBox 4K,DIW3930-MEO,MEO TV Box 4K (DIW3930)
 MG Series,Any 302,TR10CS2_3,TR10CS2
 MG series,Any 302,TR10CS1_15,TR10CS1
@@ -18479,6 +18491,7 @@ Multilaser,M10 4G,ML-JI0A-M10-4G,M10-4G
 Multilaser,M10 4G,ML-WI0C-M10-4G,M10-4G
 Multilaser,M10 4G,ML_JI0B_M10_4G,M10_4G
 Multilaser,M10 4G,ML_SO0G_M10_4G,M10_4G
+Multilaser,M10 4G MON CLA,WI0C_M10_4G_MON_CLA,M10_4G_MON_CLA
 Multilaser,M10 4G PRO,ML_JI0B_M10_4G_PRO,M10_4G_PRO
 Multilaser,M10 4G PRO,ML_JI0F_M10_4G_PRO,M10_4G_PRO
 Multilaser,M10 4G PRO,ML_SO1G_M10_4G_PRO,M10_4G_PRO
@@ -18493,6 +18506,7 @@ Multilaser,M10_3G,ML_JI0H_M10_3G,M10_3G
 Multilaser,M10_4G_PRO,ML-SO0C_M10_4G_PRO_PLUS,M10_4G_PRO
 Multilaser,M10_4G_PRO,ML_SO0G_M10_4G_PRO_PLUS,M10_4G_PRO
 Multilaser,M7 3G,ML-WI1B-M7-3G,M7-3G
+Multilaser,M7 3G,ML_JI0N_M7_3G,M7_3G
 Multilaser,M7 3G,ML_JI1G_M7_3G,M7_3G
 Multilaser,M7 3G,ML_WI0B_M7_3G,M7_3G
 Multilaser,M7 3G A10,ML_WI4A_M7_3G_A10,M7_3G_A10
@@ -18504,6 +18518,7 @@ Multilaser,M7 3G Plus,ML_WI12_M7_3G_PLUS,M7_3G_PLUS
 Multilaser,M7 WIF,ML_JI1D_M7_WIFI,M7_WIFI
 Multilaser,M7 WIFI,ML_JI0O_M7_WIFI,M7_WIFI
 Multilaser,M7 WIFI,ML_JI2D_M7_WIFI,M7_WIFI
+Multilaser,M7 WIFI,ML_JI3D_M7_WIFI,M7_WIFI
 Multilaser,M7 WIFI,ML_SO0E_M7_WIFI,M7_WIFI
 Multilaser,M7 WIFI,ML_SO1E_M7_Wifi,M7_WIFI
 Multilaser,M7-3G PLUS,ML-JI21-M7-3G-PLUS,M7-3G-PLUS
@@ -18531,6 +18546,7 @@ Multilaser,M7_WIFI,ML_JI0D_M7_WIFI,M7_WIFI
 Multilaser,M7s Dual Core,NB116_NB117_NB118,M7s Dual ML03
 Multilaser,M7s Quad Core,astar-ococci,ML01-M7S-Quad-Core
 Multilaser,M7sLite,ML-SO06-M7sLite,M7sLite
+Multilaser,M8 4G,ML-WI0G-M8-4G,M8-4G
 Multilaser,M8 4G,ML_SO0J_M8_4G,M8_4G
 Multilaser,M8 4G,ML_SO1J_M8_4G,M8_4G
 Multilaser,M8 Wifi,ML_SO0F_M8_WIFI,M8_WIFI
@@ -19320,25 +19336,31 @@ Nokia,Nokia 9,AOP,Nokia 9
 Nokia,Nokia 9,AOP_sprout,Nokia 9
 Nokia,Nokia C01 Plus,IRS,Nokia C01 Plus
 Nokia,Nokia C1,RKU,Nokia C1
+Nokia,Nokia C1 2nd Edition,IRU,Nokia C1 2nd Edition
 Nokia,Nokia C1 Plus,YDU,Nokia C1 Plus
 Nokia,Nokia C10,MNT,Nokia C10
 Nokia,Nokia C2,NBL,Nebula
 Nokia,Nokia C2,NBL,Nokia C2
 Nokia,Nokia C2 Tennen,ARV_CUS,Nokia C2 Tennen
 Nokia,Nokia C20,COS,Nokia C20
+Nokia,Nokia C20 Plus,SUS,Nokia C20 Plus
 Nokia,Nokia C3,GMR,Nokia C3
+Nokia,Nokia C30,MNI,Nokia C30
+Nokia,Nokia C30,MNR,Nokia C30
 Nokia,Nokia C5 Endi,PMC_CUS,Nokia C5 Endi
 Nokia,Nokia G10,ROGA,Nokia G10
 Nokia,Nokia G10,ROGA_sprout,Nokia G10
 Nokia,Nokia G20,RNN,Nokia G20
 Nokia,Nokia G20,RNNA_sprout,Nokia G20
 Nokia,Nokia G20,RNN_sprout,Nokia G20
+Nokia,Nokia G300,AKT,N1374DL
 Nokia,Nokia G50,PHR,Nokia G50
 Nokia,Nokia G50,PHR_sprout,Nokia G50
 Nokia,Nokia Steaming Box 8000,HND,Nokia Streaming Box 8000
 Nokia,Nokia T20,RDD,Nokia T20
 Nokia,Nokia X10,SCW,Nokia X10
 Nokia,Nokia X10,SCW_sprout,Nokia X10
+Nokia,Nokia X100,DM5,Nokia X100
 Nokia,Nokia X20,QKS,Nokia X20
 Nokia,Nokia X20,QKS_sprout,Nokia X20
 Nokia,Nokia X5,PDA,Nokia X5
@@ -20004,6 +20026,7 @@ Oppo,OPPO Watch,orca,OPPO Watch
 Oppo,PDST00,OP4EA3,PDST00
 Oppo,PDYM20,OP4E21,PDYM20
 Oppo,PDYT20,OP4E21,PDYT20
+Oppo,PEAT00,OP4E6B,PEAT00
 Oppo,PEGM00,OP4E8F,PEGM00
 Oppo,PEGM10,OP4E59,PEGM10
 Oppo,PEGT10,OP4E59,PEGT10
@@ -22402,7 +22425,6 @@ Realme,realme C25,RMX3191,RMX3191
 Realme,realme C25,RMX3193,RMX3193
 Realme,realme C25Y,RE54D1,RMX3265
 Realme,realme C25s,RMX3195,RMX3195
-Realme,realme C25s,RMX3197,RMX3197
 Realme,realme C3,RMX2020,RMX2020
 Realme,realme C3,RMX2021,RMX2021
 Realme,realme C3,RMX2022,RMX2022
@@ -22560,6 +22582,7 @@ Redmi,Redmi Note 10,sunny,M2101K7AG
 Redmi,Redmi Note 10,sunny,M2101K7AI
 Redmi,Redmi Note 10 5G,camellian,M2103K19G
 Redmi,Redmi Note 10 JE,XIG02,XIG02
+Redmi,Redmi Note 10 Pro,chopin,21061110AG
 Redmi,Redmi Note 10 Pro,sweet,M2101K6G
 Redmi,Redmi Note 10 Pro,sweetin,M2101K6P
 Redmi,Redmi Note 10 Pro Max,sweetin,M2101K6I
@@ -26092,6 +26115,8 @@ Sharp,AQUOS sense6,Chara,SH-RM19
 Sharp,AQUOS sense6,SH-54B,SH-54B
 Sharp,AQUOS sense6,ZMJ,SHG05
 Sharp,AQUOS wish,SX1,A103SH
+Sharp,AQUOS wish,SX1,A104SH
+Sharp,AQUOS wish,SX1,SH-M20
 Sharp,AQUOS wish,SX1,SH-WS10
 Sharp,AQUOS wish,YLI,SHG06
 Sharp,AQUOS zero,SG801SH,801SH
@@ -26616,6 +26641,7 @@ Smart (BD),SQ811G,SQ811G,SQ811G
 Smart-Tech TV,France,tamachi,AiPlus2K
 Smart-Tech TV,Germany,yeongdeungpo,AiPlus4K
 Smart-Tech TV,SmartTech,yeongdeungpo,AiPlus4K
+SmartLabs,SML-5442TW,sml5442tw,SML-5442TW
 SmartPad,SM181301,SM181301,SM181301
 SmartPad,Smartpad V7,Smartpad-V7,Smartpad-V7
 SmartPad,Smartpad-V10,Smartpad-V10,Smartpad-V10
@@ -27540,14 +27566,17 @@ Sumitomo Electric Industries,ST4173,ST4173,ST4173
 Sumitomo Electric Industries,ST4500,ST4500,ST-4500
 Sumitomo Electric Networks,,dhe1100,Hikari-iFrame/WDPF-703SE
 Sunbio,SB-TM700,SB-TM700,SB-TM700
+Sunmi,Sunmi L2Ks,SUNMI-L2KsNFC,L2Ks_EEA
 Sunmi,Sunmi L2Ks,SUNMI-L2KsNFC,L2Ks_GL
 Sunmi,Sunmi V2s,V2s,V2s_EEA
 Sunmi,Sunmi V2s,V2s,V2s_GL
 Sunmi,V2sNC,V2sNC,V2sNC_EEA
 Sunmi,V2sNC,V2sNC,V2sNC_GL
 Sunmi,V2sNC,V2sNC,V2sNC_RU
+Sunmi,V2sNC,V2sNC,V2sNC_TR
 Sunmi,V2sPLUSNC,V2sPLUSNC,V2sPLUSNC_EEA
 Sunmi,V2sPLUSNC,V2sPLUSNC,V2sPLUSNC_GL
+Sunmi,V2sPLUSNC,V2sPLUSNC,V2sPLUSNC_TR
 Sunny,SN01DNGL300,YQB,SN01DNGL300
 Sunny,SN10016,SN10016,SN10016
 Sunny,SN10064,TABLET,SN10064
@@ -29939,6 +29968,7 @@ TeloSystems,TELO_TE610_O,TELO_TE610_O,TELO_TE610_O
 Telpo,M1,M1s,M1s
 Telus,HMB2213PW22TS,HMB2213PW22TS,HMB2213PW22TS
 Telus,Pik TV Media Box,HMB2213PW22TS,HMB2213PW22TS
+Telus,TELUSTV-21T,uiw4054tlu,TELUSTV-21T
 Teracube,Teracube 2e,Teracube_2e,Teracube 2e
 Teracube,Teracube_One,Teracube_One,Teracube One
 Tesco,Hudl 2,HTF8A4,Hudl 2
@@ -30476,6 +30506,8 @@ Umidigi,BISON X10 Pro,BISON_X10_Pro,RP01
 Umidigi,BISON X10 Pro EEA,BISON_X10_Pro,RP01
 Umidigi,BISON X10 Pro TR,BISON_X10_Pro,RP01
 Umidigi,BISON X10 RU,BISON_X10,RP01
+Umidigi,BISON X10G EEA,BISON_X10G,RP05
+Umidigi,BISON X10S EEA,BISON_X10S,RP05
 Umidigi,BISON X10S NFC,BISON_X10S_NFC,RP05
 Umidigi,BISON_GT,BISON_GT,BISON GT
 Umidigi,BISON_GT2_5G,BISON_GT2_5G,RP02
@@ -35118,6 +35150,7 @@ realme,realme 6Pro,RMX2063L1,RMX2063
 realme,realme 7,RMX2151L1,RMX2151
 realme,realme 7 Pro,RMX2170L1,RMX2170
 realme,realme 8,RMX3085L1,RMX3085
+realme,realme 8 5G	,RE513CL1,RMX3241
 realme,realme 8 Pro,RMX3081L1,RMX3081
 realme,realme C11 2021,RMX3231,RMX3231
 realme,realme C15 Qualcomm Edition,RMX2195L1,RMX2195
@@ -35128,6 +35161,7 @@ realme,realme C21-Y,RED8D1,RMX3263
 realme,realme C25,RMX3191,RMX3191
 realme,realme C25Y,RED8F6,RMX3269
 realme,realme C25s,RMX3195,RMX3195
+realme,realme C25s,RMX3197,RMX3197
 realme,realme GT 5G,RMX2202L1,RMX2202
 realme,realme GT Master Edition,RE507C,RMX3361
 realme,realme GT Master Edition	,RE54ABL1,RMX3360
@@ -35137,6 +35171,7 @@ realme,realme X50 Pro,RMX2076L1,RMX2076
 realme,realme X50 Pro Play,RMX2072CN,RMX2072
 realme,realme X7Pro Ultra,RMX3115CN,RMX3115
 realme,realme narzo 20 Pro,RMX2161L1,RMX2161
+realme,realme narzo 30 5G,RE513CL1,RMX3242
 realme,realme narzo 30A,RMX3171,RMX3171
 realme,realme narzo 50A,RED8AF,RMX3430
 realme,realme pad,RE54C1L1,RMP2103
