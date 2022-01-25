@@ -206,4 +206,135 @@ class PromoController extends BaseController
     {
         return $this->redirectToRoute('homepag', ['code'=>'IDEALW10'], 301);
     }
+
+    /**
+     * Phone Insurance > Make - Promo Page
+     * @Route("/phone-insurance-promo/{make}/{code}",
+     * name="phone_insurance_make_promo", requirements={"make":"[a-zA-Z]+"})
+     */
+    public function phoneInsuranceMakePromoAction(Request $request, $make, $code)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $repoScode = $dm->getRepository(Scode::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+        $noindex = true;
+        $scode = null;
+
+        $phones = $repo->findBy([
+            'active' => true,
+            'makeCanonical' => mb_strtolower($make),
+        ]);
+
+        if (count($phones) != 0) {
+            $phone = $phones[0];
+        } else {
+            $phone = $repo->findOneBy([
+                'active' => true,
+                'makeCanonical' => mb_strtolower($make),
+            ]);
+        }
+
+        if (!$phone) {
+            $this->get('logger')->info(sprintf(
+                'Failed to find make page for: %s',
+                $make
+            ));
+            return new RedirectResponse($this->generateUrl('phone_insurance'));
+        }
+
+        try {
+            if ($scode = $repoScode->findOneBy(['code' => $code, 'active' => true, 'type' => Scode::TYPE_REWARD])) {
+                $reward = $scode->getReward();
+                if (!$reward || !$reward->getUser() || !$reward->isOpen(new \DateTime())) {
+                    throw new \Exception('Unknown promo code');
+                }
+            }
+        } catch (\Exception $e) {
+            $scode = null;
+        }
+
+        // // Redirect to homepage if scode not found
+        if (!$scode) {
+            return $this->redirectToRoute('homepage');
+        }
+
+        $session = $this->get('session');
+        $session->set('scode', $code);
+
+        $lead = new Lead();
+        $lead->setSource(Lead::SOURCE_INVITE_NOT_READY);
+        $leadForm = $this->get('form.factory')
+            ->createNamedBuilder('lead_form', LeadEmailType::class, $lead)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('lead_form')) {
+                try {
+                    $leadForm->handleRequest($request);
+
+                    if ($leadForm->isValid()) {
+                        $leadRepo = $dm->getRepository(Lead::class);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
+                        if (!$existingLead) {
+                            $dm->persist($lead);
+                            $dm->flush();
+                        } else {
+                            $lead = $existingLead;
+                        }
+                        $days = \DateTime::createFromFormat('U', time());
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 14)));
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                        $this->get('app.mixpanel')->queuePersonProperties([
+                            '$email' => $lead->getEmail()
+                        ], true);
+
+                        $this->addFlash('success', sprintf(
+                            "Thanks for registering your interest in so-sure! We'll be in touch soon."
+                        ));
+                    } else {
+                        $this->addFlash('error', sprintf(
+                            "Sorry, didn't quite catch that email.  Please try again."
+                        ));
+                    }
+                } catch (InvalidEmailException $ex) {
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
+                    $this->addFlash('error', sprintf(
+                        "Sorry, didn't quite catch that email.  Please try again."
+                    ));
+                }
+            }
+        }
+
+        if ($scode && $request->getMethod() === "GET") {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PROMO_PAGE, [
+                'Promo code' => $scode,
+            ]);
+            $this->get('app.mixpanel')->queuePersonProperties([
+                'Attribution Invitation Method' => 'reward',
+            ], true);
+        }
+
+        // To display in Popular Models sections
+        $topPhones = $repo->findBy([
+            'active' => true,
+            'topPhone' => true,
+            'makeCanonical' => mb_strtolower($make),
+        ]);
+
+        $competitorData = new Competitors();
+
+        $data = [
+            'phone' => $phone,
+            'top_phones' => $topPhones,
+            'competitor' => $competitorData::$competitorComparisonData,
+            'is_noindex' => $noindex,
+            'scode' => $scode,
+            'use_code' => $code,
+            'lead_form' => $leadForm->createView(),
+        ];
+
+        return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakePromo.html.twig', $data);
+    }
 }
