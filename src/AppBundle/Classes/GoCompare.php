@@ -162,6 +162,8 @@ class GoCompare
         2403 => ['make' => 'Samsung', 'model' => 'Galaxy Z Flip3 5G', 'memory' => 256],
         1996 => ['make' => 'Samsung', 'model' => 'Galaxy A21s', 'memory' => 64],
         1949 => ['make' => 'Samsung', 'model' => 'Galaxy A51 5G', 'memory' => 128],
+        2605 => ['make' => 'Samsung', 'model' => 'Galaxy S21 FE 5G', 'memory' => 128],
+        2606 => ['make' => 'Samsung', 'model' => 'Galaxy S21 FE 5G', 'memory' => 256],
 
         1412 => ['make' => 'Huawei', 'model' => 'P20', 'memory' => 128],
         1413 => ['make' => 'Huawei', 'model' => 'P20 Lite', 'memory' => 64],
