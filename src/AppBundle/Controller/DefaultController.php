@@ -16,6 +16,7 @@ use AppBundle\Service\MailerService;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\RequestService;
 use AppBundle\Service\ClaimsService;
+use AppBundle\Service\MagicLinkService;
 use PHPStan\Rules\Arrays\AppendedArrayItemTypeRule;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -960,6 +961,40 @@ class DefaultController extends BaseController
         );
 
         return new RedirectResponse($this->generateUrl('user_home'));
+    }
+
+    /**
+     * @Route("/magic-login", name="magic_login_web")
+     */
+    public function magicLoginAction(Request $request)
+    {
+        $token = $request->query->get('token');
+        $email = $request->query->get('email');
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+
+        /** @var MagicLinkService $magicLinkService */
+        $magicLinkService = $this->get('app.magiclink');
+
+        $userId = $magicLinkService->verifyMagicLink($token, $email);
+
+        $user = $repo->find($userId);
+        if (!$user) {
+            $this->addFlash(
+                'error',
+                "Sorry, we can't seem to find your user account. Please contact us if you need help."
+            );
+
+            return new RedirectResponse($this->generateUrl('fos_user_security_login'));
+        }
+
+        $this->get('fos_user.security.login_manager')->loginUser(
+            $this->getParameter('fos_user.firewall_name'),
+            $user
+        );
+
+        return new RedirectResponse($this->generateUrl('user_welcome'));
     }
 
     /**

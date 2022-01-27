@@ -21,6 +21,7 @@ use AppBundle\Service\PCAService;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\PostcodeService;
 use AppBundle\Service\RouterService;
+use AppBundle\Service\MagicLinkService;
 use AppBundle\Validator\Constraints\BankAccountNameValidator;
 use Egulias\EmailValidator\Validation\RFCValidation;
 use Psr\Log\LoggerInterface;
@@ -2650,6 +2651,44 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api requestVerificationMobileNumberAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/user/{id}/magiclink", name="api_auth_user_request_magiclink")
+     * @Method({"GET"})
+     */
+    public function userRequestMagicLinkAction($id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find user',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+
+            /** @var MagicLinkService $magicLinkService */
+            $magicLinkService = $this->get('app.magiclink');
+
+            $token = $magicLinkService->setMagicLink($user);
+
+            return new JsonResponse(['token' => $token]);
+        } catch (AccessDeniedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in apimagic link request.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
