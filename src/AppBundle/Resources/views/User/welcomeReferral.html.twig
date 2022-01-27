@@ -6,11 +6,11 @@
 {% set small_footer = true %}
 {% set intercom_enabled = true %}
 
-{% block title %}Welcome to so-sure, {{ policy.user.firstname }} 🎉{% endblock %}
+{% block title %}Welcome to SO-SURE, {{ policy.user.firstname }} 🎉{% endblock %}
 
 {# Set Meta #}
-{% set og_title = '1 month free phone insurance thanks to' ~ policy.user.firstname %}
-{% set og_description = "Check out so-sure to get 1 month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!" %}
+{% set og_title = 'One month free phone insurance thanks to' ~ policy.user.firstname %}
+{% set og_description = "Check out SO-SURE to get one month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!" %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-referral.jpg' %}
 {% if policy.standardSCode %}
     {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
@@ -107,7 +107,7 @@
                                     Invite</button>
                             </div>
                         </form>
-                        {# <div class="text-center text-lg-left">
+                        <div class="text-center text-lg-left">
                             {% if policy.phone.iTunes %}
                                 <a href="{{ apple_download('user-required-account') }}"
                                    class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
@@ -124,7 +124,7 @@
                                    rel="noopener noreferrer">
                                     <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
                             {% endif %}
-                        </div> #}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -183,12 +183,12 @@
                 <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
                     <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline mt-lg-2 lozad" alt="so-sure App Icon">
                     <div class="banner__text text-center text-lg-left ml-lg-4">
-                        <h2 class="h4 text-white">Login online or download the app</h2>
+                        <h2 class="h4 text-white">Go to your dashboard or download the app</h2>
                         <p class="lead text-white">To earn cashback and rewards every month</p>
                     </div>
                 </div>
                 <div class="banner__controls text-center text-lg-left">
-                    <a href="{{ path('user_home') }}" class="btn btn-success btn-block-xs">Login to your dashboard</a>
+                    <a href="{{ path('user_home') }}" class="btn btn-success btn-block-xs">Go to your dashboard</a>
                 </div>
             </div>
         </div>
