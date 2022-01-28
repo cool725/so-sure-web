@@ -552,6 +552,7 @@ nelmio_security:
                 - https://www.bing.com
                 - https://tr.snapchat.com
                 - https://smct.co
+                - https://ipb.smct.io
                 - http://smct.co
                 - https://ep.smct.co
                 - https://*.eu-west-1.amazonaws.com
