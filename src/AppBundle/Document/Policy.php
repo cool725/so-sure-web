@@ -2058,14 +2058,7 @@ abstract class Policy
 
     public function isAdditionalClaimLostTheftApprovedAllowed()
     {
-        $count = 0;
-        foreach ($this->getClaims() as $claim) {
-            if ($claim->isLostTheftApproved()) {
-                $count++;
-            }
-        }
-
-        return $count < 2;
+        return true;
     }
 
     public function hasOpenClaim($onlyWithOutFees = false)

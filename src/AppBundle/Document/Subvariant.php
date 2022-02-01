@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use InvalidArgumentException;
+use AppBundle\Classes\NoOp;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
@@ -233,10 +234,7 @@ class Subvariant
      */
     public function allows($claimType, $policy)
     {
-        $n = count($policy->getApprovedClaims(true));
-        if ($n >= $this->getNClaims()) {
-            return false;
-        }
+        NoOp::ignore($policy);
         switch ($claimType) {
             case Claim::TYPE_LOSS:
                 return $this->getLoss();
