@@ -190,7 +190,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
         $ignoreLineCount++;
 
-        // Expire Policies - (Active/Unpaid)
+        // Expire Policies - (Active / Unpaid)
         $expired = $this->policyService->expireEndingPolicies($dryRun);
         $copy = 'Expire Policy';
         if ($dryRun) {
