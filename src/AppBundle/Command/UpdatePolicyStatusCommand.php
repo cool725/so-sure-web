@@ -124,48 +124,25 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $ignoreLineCount++;
 
         // Unpaid Policies - Cancel
-        $cancelled = $this->policyService->cancelUnpaidPolicies(
-            $dryRun || $dryUnpaid,
-            $skipUnpaidMinTimeframeCheck
-        );
-        $copy = 'Unpaid cancelled policy';
         if ($dryRun || $dryUnpaid) {
-            $copy = 'Dry Run - Should cancel Policy (unpaid)';
+            $lines[] = "Skipping unpaid cancellations";
+            $ignoreLineCount++;
+            $lines[] = '';
+            $ignoreLineCount++;
+        } else {
+            $cancelled = $this->policyService->cancelUnpaidPolicies(
+                $dryRun || $dryUnpaid,
+                $skipUnpaidMinTimeframeCheck
+            );
+            $copy = 'Unpaid cancelled policy';
+            foreach ($cancelled as $id => $number) {
+                $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+            }
+            $lines[] = sprintf('%s unpaid cancelled policies processed', count($cancelled));
+            $ignoreLineCount++;
+            $lines[] = '';
+            $ignoreLineCount++;
         }
-        foreach ($cancelled as $id => $number) {
-            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-        }
-        $lines[] = sprintf('%s unpaid cancelled policies processed', count($cancelled));
-        $ignoreLineCount++;
-        $lines[] = '';
-        $ignoreLineCount++;
-
-        // Picsure Required Policies - Cancel
-        $cancelled = $this->policyService->cancelOverduePicsurePolicies($dryRun);
-        $copy = 'Required Picsure overdue cancelled policy';
-        if ($dryRun) {
-            $copy = 'Dry Run - should cancel policy (picsure overdue)';
-        }
-        foreach ($cancelled as $id => $number) {
-            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-        }
-        $lines[] = sprintf('%d picsure required overdue policies processed', count($cancelled));
-        $ignoreLineCount += 2;
-        $lines[] = '';
-
-        // Pending Cancellation Policies - Cancel
-        $pendingCancellation = $this->policyService->cancelPoliciesPendingCancellation($dryRun);
-        $copy = 'User Requested Cancellation Policy';
-        if ($dryRun) {
-            $copy = 'Dry Run - Should cancel Policy (user requested [pending] cancellation)';
-        }
-        foreach ($pendingCancellation as $id => $number) {
-            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-        }
-        $lines[] = sprintf('%s user requested (pending) cancellation policies processed', count($pendingCancellation));
-        $ignoreLineCount++;
-        $lines[] = '';
-        $ignoreLineCount++;
 
         if ($policyId) {
             /** @var Policy $policy */
@@ -183,7 +160,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
                     );
                 }
             }
-        } elseif ($this->featureService->isEnabled(Feature::FEATURE_RENEWAL)) {
+        } else {
             // Create Polices - Pending Renewal
             $pendingRenewal = $this->policyService->createPendingRenewalPolicies($dryRun);
             $copy = 'Partial Renewal Policy';
@@ -194,11 +171,6 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
                 $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
             }
             $lines[] = sprintf('%s partial renewal policies processed', count($pendingRenewal));
-            $ignoreLineCount++;
-            $lines[] = '';
-            $ignoreLineCount++;
-        } else {
-            $lines[] = 'Renewal feature flag not enabled. Skipping pending renewal policy creation.';
             $ignoreLineCount++;
             $lines[] = '';
             $ignoreLineCount++;
