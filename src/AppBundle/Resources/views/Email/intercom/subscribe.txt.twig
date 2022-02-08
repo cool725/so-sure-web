@@ -1,0 +1,31 @@
+
+Welcome to SO-SURE, please verify your email address
+
+**
+------------------------------------------------------------
+Let’s verify your email address
+
+I’m ok with that: {{ intercom_subscribe }}
+
+We never share email addresses and we promise we won’t spam. Just top notch deals and offers from the smartest insurance in the UK!
+
+If you received this email by mistake, simply delete it. You won't be subscribed if you don't click the confirmation link above.
+
+Have a question or issue? contact us: {{ contact_us_url }}
+
+Best,
+SO-SURE Team
+
+============================================================
+** (http://www.twitter.com/wearesosure)
+** (https://www.facebook.com/wearesosure)
+** (https://www.instagram.com/wearesosure)
+** (http://wearesosure.com)
+** (mailto:hello@wearesosure.com)
+
+Copyright {{ 'now'|date('Y') }} so-sure Limited, All rights reserved.
+
+{% if unsubscribe_url is defined %}{{ unsubscribe_url }}{% endif %}
+
+Our mailing address is:
+{{ business_address|replace({'\n':','}) }}
