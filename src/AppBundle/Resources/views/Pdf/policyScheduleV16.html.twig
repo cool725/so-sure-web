@@ -98,6 +98,22 @@
             </li>
         </ul>
         <p>As defined in the policy terms and conditions.</p>
+    {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}
+        <ul>
+            <li>
+                Accidental Damage
+            </li>
+            <li>
+                Breakdown
+            </li>
+            <li>
+                Accessories: up to £50 (inc VAT)
+            </li>
+            <li>
+                Theft
+            </li>
+        </ul>
+        <p>As defined in the policy terms and conditions.</p>
     {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
         <ul>
             <li>
@@ -153,6 +169,16 @@
                 <li>
                     Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
+            {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                </li>
             {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
                 <li>
                     Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
@@ -189,6 +215,16 @@
                 </li>
                 <li>
                     Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+            {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
                 </li>
             {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
                 <li>
@@ -228,6 +264,16 @@
                 <li>
                     Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
                 </li>
+            {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}
+                <li>
+                    Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Breakdown: £{{ policy.premium.picSureExcess.extendedWarranty|number_format(0, '.', ',') }}
+                </li>
+                <li>
+                    Theft: £{{ policy.premium.picSureExcess.theft|number_format(0, '.', ',') }}
+                </li>
             {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
                 <li>
                     Accidental Damage: £{{ policy.premium.picSureExcess.damage|number_format(0, '.', ',') }}
@@ -266,6 +312,16 @@
                     </li>
                     <li>
                         Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}
+                    <li>
+                        Accidental Damage: £{{ policy.premium.excess.damage|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Breakdown: £{{ policy.premium.excess.extendedWarranty|number_format(0, '.', ',') }}
+                    </li>
+                    <li>
+                        Theft: £{{ policy.premium.excess.theft|number_format(0, '.', ',') }}
                     </li>
                 {% elseif policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
                     <li>
