@@ -207,6 +207,16 @@ $(function() {
         policyNumber = $('#claim_form_policyNumber option:selected').data('policy-number');
     });
 
+    // Check for value if page reloaded/or back button from proceed
+    if ($('#claim_form_type').val()) {
+        $('#form-step-two-btn').attr('disabled', false);
+    }
+
+    // Check for value if page reloaded/or back button from proceed
+    if ($('#claim_form_network').val()) {
+        $('#form-step-three-btn').attr('disabled', false);
+    }
+
     // Enable button after claim type choice
     $('#claim_form_type').on('change', function() {
         let value = $('#claim_form_type option:selected').val();
@@ -244,14 +254,4 @@ $(function() {
             });
         }
     });
-
-    // Warning Modal
-    // if ($('#claim_warning_modal').length) {
-    //     $('#claim_warning_modal').modal({
-    //         backdrop: 'static',
-    //         keyboard: false,
-    //         show: true
-    //     });
-    // }
-
 });

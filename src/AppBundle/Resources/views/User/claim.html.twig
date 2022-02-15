@@ -85,8 +85,8 @@
                                                 <div class="with-errors">{{ form_errors(claim_form.type) }}</div>
                                             </div>
                                             <div class="d-md-flex justify-content-md-between">
-                                                <button type="button" class="btn btn-outline-primary btn-block-xs" data-toggle="collapse" data-target=".multi-toggle">Back</button>
-                                                <button id="form-step-two-btn" type="button" class="btn btn-success btn-block-xs" data-toggle="collapse" data-target=".multi-toggle-two" disabled="disabled">Continue</button>
+                                                <button id="form-step-two-btn" type="button" class="btn btn-success btn-block-xs order-sm-2" data-toggle="collapse" data-target=".multi-toggle-two" disabled="disabled">Continue</button>
+                                                <button type="button" class="btn btn-outline-primary btn-block-xs order-sm-1" data-toggle="collapse" data-target=".multi-toggle">Back</button>
                                             </div>
                                         </div>
                                         <div id="form-step-three" class="collapse multi-toggle-two multi-toggle-three">
@@ -111,8 +111,8 @@
                                                     <div class="with-errors">{{ form_errors(claim_form.network) }}</div>
                                                 </div>
                                                 <div class="d-md-flex justify-content-md-between">
-                                                    <button type="button" class="btn btn-outline-primary btn-block-xs" data-toggle="collapse" data-target=".multi-toggle-two">Back</button>
-                                                    <button id="form-step-three-btn" type="button" class="btn btn-success btn-block-xs" data-toggle="collapse" data-target=".multi-toggle-three" disabled="disabled">Continue</button>
+                                                    <button id="form-step-three-btn" type="button" class="btn btn-success btn-block-xs order-sm-2" data-toggle="collapse" data-target=".multi-toggle-three" disabled="disabled">Continue</button>
+                                                    <button type="button" class="btn btn-outline-primary btn-block-xs order-sm-1" data-toggle="collapse" data-target=".multi-toggle-two">Back</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -225,8 +225,8 @@
                                                 </div>
                                             </div>
                                             <div class="d-md-flex justify-content-md-between">
-                                                <button type="button" class="btn btn-outline-primary btn-block-xs" data-toggle="collapse" data-target=".multi-toggle-three">Back</button>
-                                                {{ form_widget(claim_form.submit, { 'label': 'Start my claim', 'attr': {'class': 'btn btn-success  btn-block-xs'}}) }}
+                                                {{ form_widget(claim_form.submit, { 'label': 'Start my claim', 'attr': {'class': 'btn btn-success btn-block-xs order-sm-2'}}) }}
+                                                <button type="button" class="btn btn-outline-primary btn-block-xs order-sm-1" data-toggle="collapse" data-target=".multi-toggle-three">Back</button>
                                             </div>
                                         </div>
                                     {{ form_end(claim_form) }}
@@ -253,11 +253,11 @@
                                                 <div class="with-errors">{{ form_errors(claim_confirm_form.checkTruthful) }}</div>
                                             </div>
                                             <div class="form-group d-md-flex justify-content-md-between">
+                                                {{ form_widget(claim_confirm_form.submit, {'label': 'Proceed to next step', 'attr': {'class': 'btn btn-success btn-block-xs order-sm-2'}}) }}
                                                 <a id="claim_back_btn"
                                                    href="#"
                                                    data-tab-to="#claimfnol_tab"
-                                                   class="btn btn-outline-primary show-tab btn-block-xs mr-md-2">Back</a>
-                                                {{ form_widget(claim_confirm_form.submit, {'label': 'Proceed to next step', 'attr': {'class': 'btn btn-success   btn-block-xs'}}) }}
+                                                   class="btn btn-outline-primary show-tab btn-block-xs mr-md-2 order-sm-1">Back</a>
                                             </div>
                                         {{ form_end(claim_confirm_form) }}
                                     {% endif %}
