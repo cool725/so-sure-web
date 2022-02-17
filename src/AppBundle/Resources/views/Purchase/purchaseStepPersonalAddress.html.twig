@@ -47,16 +47,22 @@
 
 {% block gtm_data %}
     {% if phone %}
-        ,
-        'event': 'quote',
-        'quote': {
-            'id': '{{ phone.id }}',
-            'name': '{{ phone.make }} {{ phone.model }}',
-            'category': '{{ phone.make }}',
-            'price': '{{ prices['monthly'].monthlyPremiumPrice()|number_format(2, '.', ',') }}',
+    ,
+    'view_item': {
+        'currency': 'GBP',
+        'value': {{ monthly }},
+        'items': [{
+            'item_id': '{{ phone.id }}',
+            'item_name': '{{ phone.make }} {{ phone.model }}',
+            'currency': 'GBP',
+            'item_brand': '{{ phone.make }}',
+            'item_category': '{{ phone.make }}',
+            'item_category2': '{{ phone.model }}',
+            'item_variant': '{{ phone.memory }}GB',
+            'price': {{ monthly }},
             'quantity': 1
-        }
-
+        }]
+    },
     {% endif %}
 {% endblock %}
 
