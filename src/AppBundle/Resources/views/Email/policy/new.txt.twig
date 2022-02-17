@@ -40,21 +40,20 @@ As you have a shiny new model, we wanted to let you know your repair or replacem
 {% endif %}
 
 Your cover includes:
-
-{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %}
-- Loss
+- Accidental Damage
+- Out of Warranty Breakdown
+- Accessories
+- Global Travel
+{% if policy.subvariant.name is defined and policy.subvariant.name == 'essentials' %}
 - Theft
-- Accidental Damage
-- Out of Warranty Breakdown
-- Accessories
-- Global Travel
+- Loss
+{% elseif policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}
+- Theft
 {% else %}
-{% if policy.subvariant.name is defined and policy.subvariant.name == 'dat' %}- Theft{% endif %}
-- Accidental Damage
-- Out of Warranty Breakdown
-- Accessories
-- Global Travel
+- Theft
+- Loss
 {% endif %}
+
 
 If your phone is already broken 👮
 On a serious note, if your phone was already damaged before you purchased this policy, you should cancel it now or risk prosecution.
