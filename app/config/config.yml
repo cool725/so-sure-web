@@ -110,7 +110,7 @@ twig:
         support_number_home: "0330 174 2076"
         broker_name: "Shepherd Compello Ltd"
         policy_doc_version: 16,
-        free_months: "two"
+        free_months: "one"
         lowest_excess: "£25"
         lowest_premium: 2.20
         trustpilot_rating: 4.2
