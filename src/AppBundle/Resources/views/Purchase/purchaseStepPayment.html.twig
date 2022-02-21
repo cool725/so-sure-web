@@ -37,6 +37,26 @@
     {{ encore_entry_link_tags('purchase') }}
 {% endblock %}
 
+{% block gtm_data %}
+    {% if phone %}
+    ,
+    'add_payment_info': {
+        'currency': 'GBP',
+        'value': {{ monthly }},
+        'items': [{
+            'item_id': '{{ phone.id }}',
+            'item_name': '{{ phone.make }} {{ phone.model }}',
+            'currency': 'GBP',
+            'item_brand': '{{ phone.make }}',
+            'item_category': 'V1 Phone Insurance',
+            'item_variant': '{{ phone.memory }}GB',
+            'price': {{ monthly }},
+            'quantity': 1
+        }]
+    },
+    {% endif %}
+{% endblock %}
+
 {% block body %}
     <section class="qpw">
         <div class="d-lg-flex">
