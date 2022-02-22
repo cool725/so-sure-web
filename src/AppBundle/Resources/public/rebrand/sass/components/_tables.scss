@@ -330,15 +330,24 @@
     // Spacing
     th, td {
         height: 90px;
-        padding: 0 1.4rem;
+        padding: 0.2rem 1.4rem;
         text-align: center;
         position: relative;
         vertical-align: middle;
-        background-clip: padding-box;
     }
 
     td.td-30 {
         height: 30px;
+    }
+
+    td.icon {
+        padding-left: 3rem;
+
+        i {
+            position: absolute;
+            left: 20px;
+            top: 30px;
+        }
     }
 
     .td-prev-btn,
