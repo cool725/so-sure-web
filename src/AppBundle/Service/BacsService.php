@@ -749,7 +749,7 @@ class BacsService
             }
 
             if ($reason == self::ADDACS_REASON_TRANSFER) {
-                $results['transer']++;
+                $results['transfer']++;
                 $bacs->getBankAccount()->setAccountNumber($this->getNodeValue($element, 'payer-new-account-number'));
                 $bacs->getBankAccount()->setSortCode($this->getNodeValue($element, 'payer-new-sort-code'));
                 $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
