@@ -1311,6 +1311,7 @@ class UserController extends BaseController
      *   as these will impact Adwords
      *
      * @Route("/welcome", name="user_welcome")
+     * @Route("/welcome/b", name="user_welcome_two")
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Route("/complete", name="user_instore")
      * @Route("/complete/{id}", name="user_instore_id")
