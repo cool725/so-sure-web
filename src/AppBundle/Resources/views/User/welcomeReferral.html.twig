@@ -38,27 +38,25 @@
         'gwp': {{ premium }}
     },
     'event': 'purchase',
-    'ecommerce': {
-        'purchase': {
-            'transaction_id': '{{ policy.policyNumber }}',
+    'purchase': {
+        'transaction_id': '{{ policy.policyNumber }}',
+        'affiliation': '{{ policy.leadSourceDetails }}',
+        'value': {{ premium }},
+        'tax': {{ tax }},
+        'currency': 'GBP',
+        'coupon': '{{ used_scode }}',
+        'items': [{
+            'item_id': '{{ policy.phone.id }}',
+            'item_name': '{{ policy.phone.make }} {{ policy.phone.model }}',
             'affiliation': '{{ policy.leadSourceDetails }}',
-            'value': {{ premium }},
-            'tax': {{ tax }},
-            'currency': 'GBP',
             'coupon': '{{ used_scode }}',
-            'items': [{
-                'item_id': '{{ policy.phone.id }}',
-                'item_name': '{{ policy.phone.make }} {{ policy.phone.model }}',
-                'affiliation': '{{ policy.leadSourceDetails }}',
-                'coupon': '{{ used_scode }}',
-                'currency': 'GBP',
-                'item_brand': '{{ policy.phone.make }}',
-                'item_category': '{% if policy.subvariant is defined %}{{ policy.subvariant|capitalize }}{% else %}V1'{% endif %} Phone Insurance,
-                'item_variant': '{{ policy.phone.memory }}GB',
-                'price': {{ premium }},
-                'quantity': 1
-            }]
-        }
+            'currency': 'GBP',
+            'item_brand': '{{ policy.phone.make }}',
+            'item_category': '{% if policy.subvariant is defined %}{{ policy.subvariant|capitalize }}{% else %}V1'{% endif %} Phone Insurance,
+            'item_variant': '{{ policy.phone.memory }}GB',
+            'price': {{ premium }},
+            'quantity': 1
+        }]
     },
 {% endblock %}
 

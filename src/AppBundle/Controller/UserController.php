@@ -1370,15 +1370,11 @@ class UserController extends BaseController
         // In-store
         $instore = $this->get('session')->get('store');
 
-        $template = 'AppBundle:User:onboarding.html.twig';
+        // Template
+        $template = 'AppBundle:User:welcomeReferral.html.twig';
 
-        $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
-
-        // TODO: This should not be a feature
-        if ($referralFeature) {
-            $template = 'AppBundle:User:welcomeReferral.html.twig';
-        }
-
+        // Check route and show template
+        // TODO: legacy???
         if ($request->get('_route') == 'user_instore') {
             $template = 'AppBundle:User:complete.html.twig';
         } elseif ($request->get('_route') == 'user_validation_required') {
