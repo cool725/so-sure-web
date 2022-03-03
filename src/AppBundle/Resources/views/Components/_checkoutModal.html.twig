@@ -1,0 +1,100 @@
+<div class="modal fade"
+     id="checkout_modal"
+     data-backdrop="static"
+     data-keyboard="false"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="checkout_modal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% if card_details is defined %}{{ card_title }}{% else %}Pay via Card{% endif %}
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fal fa-times text-white"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="checkout-form"
+                      method="POST"
+                      data-cdn-url="{{ cdn_url }}/images/rebrand/checkout/"
+                      data-checkout-public-key="{{ checkoutApiKey(policy) }}"
+                      data-checkout-debug="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                      data-checkout-transaction-value="{{ transaction_value }}"
+                      data-checkout-csrf="{{ csrf_token }}"
+                      data-checkout-url={{ url }}
+                      data-checkout-redirect="{% if redirect_url is defined %}{{ redirect_url }}{% endif %}"
+                      data-scode="{% if scode is defined %}{{ scode }}{% endif %}">
+                    <div class="form-row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="card">Card number</label>
+                                <div class="input-container card-number">
+                                    <div class="icon-container">
+                                        <img id="icon-card-number" src="{{ cdn_url }}/images/rebrand/checkout/card.svg" width="24px" alt="PAN" />
+                                    </div>
+                                    <div class="card-number-frame"></div>
+                                    <div class="icon-container payment-method">
+                                        <img id="logo-payment-method" />
+                                    </div>
+                                    <div class="icon-container">
+                                        <img id="icon-card-number-error" src="{{ cdn_url }}/images/rebrand/checkout/error.svg" />
+                                    </div>
+                                </div>
+                                <div class="error-message error-message__card-number"></div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="form-group">
+                                <label for="expiry-date">Expiry date</label>
+                                <div class="input-container expiry-date">
+                                    <div class="icon-container">
+                                        <img id="icon-expiry-date" src="{{ cdn_url }}/images/rebrand/checkout/exp-date.svg" width="24px" alt="Expiry date"/>
+                                    </div>
+                                    <div class="expiry-date-frame"></div>
+                                    <div class="icon-container">
+                                        <img id="icon-expiry-date-error" src="{{ cdn_url }}/images/rebrand/checkout/error.svg" />
+                                    </div>
+                                </div>
+                                <div class="error-message error-message__expiry-date"></div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="form-group">
+                                <label for="cvv">Security code</label>
+                                <div class="input-container cvv">
+                                    <div class="icon-container">
+                                        <img id="icon-cvv" src="{{ cdn_url }}/images/rebrand/checkout/cvv.svg" width="24px" alt="CVV" />
+                                    </div>
+                                    <div class="cvv-frame"></div>
+                                    <div class="icon-container">
+                                        <img id="icon-cvv-error" src="{{ cdn_url }}/images/rebrand/checkout/error.svg" />
+                                    </div>
+                                </div>
+                                <div class="error-message error-message__cvv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-md-flex justify-content-md-between align-items-md-center">
+                        <button id="checkout-pay-btn"
+                            type="submit"
+                            class="btn btn-success btn-block-xs"
+                            disabled>
+                            <i class="fas fa-lock fa-lg mr-2"></i> Submit
+                        </button>
+                        <ul class="list-inline p-0 mt-4 mb-0 mt-md-0 mx-0">
+                            <li class="list-inline-item pl-0">
+                                <img id="icon-card-number" src="{{ cdn_url }}/images/rebrand/checkout/visa.svg" width="34px" alt="PAN" />
+                            </li>
+                            <li class="list-inline-item pl-0">
+                                <img id="icon-card-number" src="{{ cdn_url }}/images/rebrand/checkout/mastercard.svg" width="34px" alt="PAN" />
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

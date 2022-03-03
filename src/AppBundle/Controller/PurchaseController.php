@@ -1093,11 +1093,6 @@ class PurchaseController extends BaseController
         $checkoutFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_CHECKOUT);
         /** @var Form $toCardForm */
         $toCardForm = null;
-        if ($checkoutFeature) {
-            $toCardForm =  $this->get("form.factory")
-                ->createNamedBuilder('to_card_form', PurchaseStepToCardType::class)
-                ->getForm();
-        }        // bacs overrides any type of card payment
         if ($bacsFeature) {
             $paymentProvider = SoSure::PAYMENT_PROVIDER_BACS;
         } elseif ($checkoutFeature) {
@@ -1204,7 +1199,6 @@ class PurchaseController extends BaseController
         );
 
         if ($toCardForm) {
-            $data['to_card_form'] = $toCardForm->createView();
             $data['card_provider'] = $paymentProvider;
         }
         return $this->render($template, $data);
