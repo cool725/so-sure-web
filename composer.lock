@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db967bdba3474b86d98ec616c5a1338e",
+    "content-hash": "3938ea922263b48e8cbd0f1c92e3d59b",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -250,16 +250,16 @@
         },
         {
             "name": "checkout/checkout-php-api",
-            "version": "1.2.18",
+            "version": "1.2.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/checkout/checkout-php-library.git",
-                "reference": "c0cc174baf1e0b93388f58b27c6e35f6fa17ea83"
+                "reference": "cd70a25391eac2f0fdb52e70c9442a16e9d40d29"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/checkout/checkout-php-library/zipball/c0cc174baf1e0b93388f58b27c6e35f6fa17ea83",
-                "reference": "c0cc174baf1e0b93388f58b27c6e35f6fa17ea83",
+                "url": "https://api.github.com/repos/checkout/checkout-php-library/zipball/cd70a25391eac2f0fdb52e70c9442a16e9d40d29",
+                "reference": "cd70a25391eac2f0fdb52e70c9442a16e9d40d29",
                 "shasum": ""
             },
             "require": {
@@ -267,11 +267,11 @@
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "CheckoutApi_": "com/checkout/packages"
-                },
                 "psr-4": {
                     "com\\checkout\\": "com/checkout"
+                },
+                "psr-0": {
+                    "CheckoutApi_": "com/checkout/packages"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -296,31 +296,27 @@
                 "online payment",
                 "payment"
             ],
-            "support": {
-                "issues": "https://github.com/checkout/checkout-php-library/issues",
-                "source": "https://github.com/checkout/checkout-php-library/tree/v1.2.18"
-            },
-            "time": "2019-03-04T17:38:58+00:00"
+            "time": "2018-09-03T10:40:03+00:00"
         },
         {
             "name": "checkout/checkout-sdk-php",
-            "version": "1.0.19",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/checkout/checkout-sdk-php.git",
-                "reference": "c2c323ea2f95f74bff3055c42801e7ce22999791"
+                "reference": "2260afb51d32e3625522d9d1f27d0c2e654a82a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/checkout/checkout-sdk-php/zipball/c2c323ea2f95f74bff3055c42801e7ce22999791",
-                "reference": "c2c323ea2f95f74bff3055c42801e7ce22999791",
+                "url": "https://api.github.com/repos/checkout/checkout-sdk-php/zipball/2260afb51d32e3625522d9d1f27d0c2e654a82a9",
+                "reference": "2260afb51d32e3625522d9d1f27d0c2e654a82a9",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6"
+                "phpunit/phpunit": "^4.0"
             },
             "type": "library",
             "autoload": {
@@ -355,11 +351,7 @@
                 "php",
                 "sdk"
             ],
-            "support": {
-                "issues": "https://github.com/checkout/checkout-sdk-php/issues",
-                "source": "https://github.com/checkout/checkout-sdk-php/tree/1.0.19"
-            },
-            "time": "2021-11-19T15:08:38+00:00"
+            "time": "2019-03-05T15:45:30+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -10517,5 +10509,5 @@
     "platform-overrides": {
         "ext-mongo": "1.6.16"
     },
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.0.0"
 }

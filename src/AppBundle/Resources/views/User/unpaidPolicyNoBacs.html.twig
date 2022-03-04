@@ -37,7 +37,6 @@
 {% endblock %}
 
 {% block cssPage %}
-    {{ encore_entry_link_tags('checkoutV2') }}
     {{ encore_entry_link_tags('user-unpaid') }}
 {% endblock %}
 
@@ -203,11 +202,11 @@
                         <p>
                             {% if not policy.hasPolicyOrUserBacsPaymentMethod %}
                                 <p>To avoid your policy being cancelled update your card details and pay the outstanding balance now of <strong>&pound;{{ amount|number_format(2, '.', ',') }}</strong>.</p>
-                                <p><strong>Why not switch to Direct Debit?</strong></p>
+{#                                 <p><strong>Why not switch to Direct Debit?</strong></p>
                                 <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="120px" class="mb-4">
                                 <p>It helps avoid a lot of the problems with debit/credit card payments…</p>
                                 <p>…and only takes seconds to setup!</p>
-                                <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-success">Switch to Direct Debit</a>
+                                <a id="setup-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-success">Switch to Direct Debit</a> #}
                             {% else %}
                                 <a id="update-bacs-link" href="{{ path('user_payment_details_bacs') }}" class="btn btn-success">Update Direct Debit details</a>
                             {% endif %}
@@ -226,6 +225,7 @@
                             <div class="form-group">
                                 <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
                                 {% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}
+                                    {# <p class="mt-4 mb-0">Rather pay by card?</p> #}
                                     <p class="mt-4 mb-0">Pay by card</p>
                                 {% endif %}
                                 <input type="submit" class="{% if show_bacs_setup and policy.canBacsPaymentBeMadeInTime %}btn-simple-link{% else %}btn btn-success{% endif %}" value="{{ judo_btn_text }}">
@@ -233,12 +233,22 @@
                         </form>
                       {% endif %}
                     {% else %}
-                        <button type="button"
-                                class="btn btn-success btn-block-xs"
-                                data-toggle="modal"
-                                data-target="#checkout_modal">
-                            <i class="fas fa-lock fa-lg mr-2"></i> Pay Now
-                        </button>
+                        <form class="payment-form" method="POST"
+                              data-public-key="{{ checkoutApiKey(policy) }}"
+                              data-customer-email="{{ app.user.email }}"
+                              data-value="{{ convert_to_pennies(amount) }}"
+                              data-url="{{ url('purchase_checkout_unpaid', {'id': policy.id, 'pennies': convert_to_pennies(amount), 'save_bank': save_bank }) }}"
+                              data-csrf="{{ csrf_token('checkout') }}"
+                              data-currency="GBP"
+                              data-payment-mode="cards"
+                              data-card-form-mode="cardTokenisation"
+                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                              data-title="Pay outstanding balance"
+                              data-subtitle="Please enter your card details now">
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-success btn-card-pay" value="Pay now with card">
+                            </div>
+                        </form>
                     {% endif %}
                 {% endif %}
             </div>
@@ -247,19 +257,16 @@
 
     {# Components #}
     {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
-    {% include 'AppBundle::Components/_checkoutModal.html.twig' with {
-        'card_title': 'Pay via Card',
-        'transaction_value': convert_to_pennies(amount),
-        'csrf_token': csrf_token('checkout'),
-        'url': url('purchase_checkout_unpaid', {'id': policy.id, 'pennies': convert_to_pennies(amount), 'save_bank': save_bank })
-    } %}
 
     {# Page Modals #}
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    {# Checkout #}
-    <script src="https://cdn.checkout.com/js/framesv2.min.js"></script>
-    {{ encore_entry_script_tags('checkoutV2') }}
+    {% if environment == 'prod' %}
+        <script src="https://cdn.checkout.com/js/checkout.js"></script>
+    {% else %}
+        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+    {% endif %}
+    {{ encore_entry_script_tags('user-unpaid') }}
 {% endblock %}

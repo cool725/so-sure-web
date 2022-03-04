@@ -225,7 +225,7 @@ class CheckoutService
             $apiPublic = $this->helvetiaApiPublic;
         }
         if ($apiSecret && $apiPublic) {
-            return new CheckoutApi($apiSecret, false, $apiPublic);
+            return new CheckoutApi($apiSecret, -1, $apiPublic);
         }
         throw new \InvalidArgumentException("{$underwriter} is not the name of a valid underwriter");
     }

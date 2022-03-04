@@ -9,7 +9,6 @@
 {% block title %}Make a Claim - Pay | SO-SURE{% endblock %}
 
 {% block cssPage %}
-    {{ encore_entry_link_tags('checkoutV2') }}
     {{ encore_entry_link_tags('user-claim') }}
 {% endblock %}
 
@@ -37,12 +36,22 @@
                             <p class="mb-4">In order to proceed with your loss/theft claim you must pay for the remainder of your policy year in full before being able to continue.</p>
                             <div class="h4 mb-3 text-center"><span class="sub">Paid to date:</span> &pound;{{ policy.premiumPaid | number_format(2, '.', ',') }}</div>
                             <div class="h4 mb-5 text-center"><span class="sub">Amount left to pay:</span> &pound;{{ remainderTotal }}</div>
-                            <button type="button"
-                                    class="btn btn-success btn-block-xs"
-                                    data-toggle="modal"
-                                    data-target="#checkout_modal">
-                                <i class="fas fa-lock fa-lg mr-2"></i> Pay remainder now
-                            </button>
+                            <form class="payment-form" method="POST"
+                                  data-public-key="{{ checkoutApiKey(policy) }}"
+                                  data-customer-email="{{ app.user.email }}"
+                                  data-value="{{ convert_to_pennies(amount) }}"
+                                  data-url="{{ url('purchase_checkout_claim', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
+                                  data-csrf="{{ csrf_token('checkout') }}"
+                                  data-currency="GBP"
+                                  data-payment-mode="cards"
+                                  data-card-form-mode="cardTokenisation"
+                                  data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
+                                  data-title="Pay now"
+                                  data-subtitle="Please enter your card details now">
+                                <div class="form-group text-center">
+                                    <input type="submit" class="btn btn-success btn-block-xs btn-card-pay " value="Pay remainder now">
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -52,19 +61,16 @@
 
     {# Components #}
     {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
-    {% include 'AppBundle::Components/_checkoutModal.html.twig' with {
-        'card_title': 'Pay Policy Remainder',
-        'transaction_value': convert_to_pennies(amount),
-        'csrf_token': csrf_token('checkout'),
-        'redirect_url': url('purchase_checkout_claim', {'id': policy.id, 'pennies': convert_to_pennies(amount) })
-    } %}
 
     {# Page Modals #}
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    {# Checkout #}
-    <script src="https://cdn.checkout.com/js/framesv2.min.js"></script>
-    {{ encore_entry_script_tags('checkoutV2') }}
+    {% if environment == 'prod' %}
+        <script src="https://cdn.checkout.com/js/checkout.js"></script>
+    {% else %}
+        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
+    {% endif %}
+    {{ encore_entry_script_tags('purchase-remainder') }}
 {% endblock %}
