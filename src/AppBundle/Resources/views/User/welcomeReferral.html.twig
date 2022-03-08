@@ -30,19 +30,6 @@
 
 {% block gtm_data %}
     ,
-    'policy': {
-        'id': '{{ policy.id }}',
-        'product': '{{ policy.phone.make }} {{ policy.phone.model }}',
-        'category': '{% if policy.subvariant is defined %}{{ policy.subvariant|capitalize }}{% else %}V1'{% endif %} Phone Insurance',
-        'coupon': '{{ used_scode }}',
-        'sku': '{{ policy.phone.id }}',
-        'tax': {{ tax }},
-        'value': {{ premium }}
-    },
-    'affilinet': {
-        'rate': {% if policy.getPremiumPlan == 'monthly'%}1{% elseif policy.getPremiumPlan == 'yearly' %}2{% else %}-1{% endif %},
-        'gwp': {{ premium }}
-    },
     'event': 'purchase',
     'purchase': {
         'transaction_id': '{{ policy.policyNumber }}',
@@ -58,7 +45,11 @@
             'coupon': '{{ used_scode }}',
             'currency': 'GBP',
             'item_brand': '{{ policy.phone.make }}',
-            'item_category': '{% if policy.subvariant is defined %}{{ policy.subvariant|capitalize }}{% else %}V1'{% endif %} Phone Insurance,
+            {% if policy.subvariant is defined and policy.subvariant is not null %}
+            'item_category': '{{ policy.subvariant|capitalize }} Phone Insurance',
+            {% else %}
+            'item_category': 'V1 Phone Insurance',
+            {% endif %}
             'item_variant': '{{ policy.phone.memory }}GB',
             'price': {{ premium }},
             'quantity': 1

@@ -39,6 +39,7 @@
 {% block gtm_data %}
     {% if phone %}
     ,
+    'event': 'select_item',
     'select_item': {
         'currency': 'GBP',
         'value': {{ monthly }},
