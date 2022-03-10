@@ -10,6 +10,7 @@
 {% block title %}Payment Details | so-sure{% endblock %}
 
 {% block cssPage %}
+    {{ encore_entry_link_tags('checkoutV2') }}
     {{ encore_entry_link_tags('user') }}
     {{ encore_entry_link_tags('user-payment') }}
 {% endblock %}
@@ -122,23 +123,12 @@
                             {% if not bacs_last_payment_in_progress and policy.hasPolicyOrUserBacsPaymentMethod %}
                                 {% set button_text = 'Switch to card' %}
                             {% endif %}
-                            <form class="payment-form" method="POST"
-                                data-public-key="{{ checkoutApiKey(policy) }}"
-                                data-customer-email="{{ app.user.email }}"
-                                data-value="1"
-                                data-url="{{ url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 }) }}"
-                                data-csrf="{{ csrf_token('checkout') }}"
-                                data-currency="GBP"
-                                data-payment-mode="cards"
-                                data-card-form-mode="cardTokenisation"
-                                data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
-                                data-title="{{ button_text }}"
-                                data-subtitle="Please enter your new card details. You will NOT be charged the £0.01 transaction fee.">
-                                <input type="button"
-                                       {{ button_disabled }}
-                                       class="btn btn-outline-primary btn-block-xs btn-card-pay"
-                                       value="{{ button_text }}">
-                            </form>
+                            <button type="button"
+                                    class="btn btn-success btn-block-xs"
+                                    data-toggle="modal"
+                                    data-target="#checkout_modal">
+                                <i class="fas fa-lock fa-lg mr-2"></i> {{ button_text }}
+                            </button>
                         </div>
                         <div class="col-md-6 pb-3 text-center">
                             <h6 class="h5">Direct Debit</h6>
@@ -192,6 +182,12 @@
 
     {# Components #}
     {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
+    {% include 'AppBundle::Components/_checkoutModal.html.twig' with {
+        'card_title': 'Card Details',
+        'transaction_value': 1,
+        'csrf_token': csrf_token('checkout'),
+        'url': url('purchase_checkout_update', {'id': policy.id, 'pennies': 1 })
+    } %}
 
     {# Page Modals #}
     {% if policy and policy.premiumPlan == 'monthly' %}
@@ -252,11 +248,10 @@
 {% endblock %}
 
 {% block javascriptsPage %}
-    {% if environment == 'prod' %}
-        <script src="https://cdn.checkout.com/js/checkout.js"></script>
-    {% else %}
-        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
-    {% endif %}
     {{ encore_entry_script_tags('user') }}
     {{ encore_entry_script_tags('user-payment') }}
+
+    {# Checkout #}
+    <script src="https://cdn.checkout.com/js/framesv2.min.js"></script>
+    {{ encore_entry_script_tags('checkoutV2') }}
 {% endblock %}

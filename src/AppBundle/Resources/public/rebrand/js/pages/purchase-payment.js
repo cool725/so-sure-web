@@ -16,7 +16,7 @@ $(function(){
 
     let validateForm = $('.validate-form'),
         isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g),
-        paymentForm = $('.payment-form'),
+        checkoutForm = $('#checkout-form'),
         userCode = $('#purchase_form_promoCode');
 
     const addValidation = () => {
@@ -63,45 +63,8 @@ $(function(){
         addValidation();
     }
 
-    const configureCheckout = () => {
-        Checkout.configure({
-            publicKey: paymentForm.data('public-key'),
-            customerEmail: paymentForm.data('customer-email'),
-            value: paymentForm.data('value'),
-            currency: paymentForm.data('currency'),
-            debugMode: paymentForm.data('debug-mode'),
-            paymentMode: paymentForm.data('payment-mode'),
-            cardFormMode: paymentForm.data('card-form-mode'),
-            title: paymentForm.data('title'),
-            subtitle: paymentForm.data('subtitle'),
-            logoUrl: 'https://cdn.so-sure.com/images/rebrand/logo/so-sure_logo_checkout.svg',
-            themeColor: '#2593f3',
-            forceMobileRedirect: true,
-            redirectUrl: paymentForm.data('url'),
-            userCode: paymentForm.data('scode'),
-            cardTokenised: function(event) {
-                $('html, body').animate({ scrollTop: 0 }, 'fast');
-                $('.loading-screen').fadeIn();
-                let url = paymentForm.data('url'),
-                    csrf = paymentForm.data('csrf'),
-                    pennies = paymentForm.data('value'),
-                    scode = paymentForm.data('scode');
-                $.post(url, {'csrf': csrf, 'token': event.data.cardToken, 'pennies': pennies, 'scode': scode}, function(resp) {
-                    console.log(resp);
-                }).fail(function() {
-                    $('.loading-screen').fadeOut();
-                }).always(function() {
-                    let redirect = paymentForm.data('redirect-url');
-                    if (redirect) {
-                        window.location.href = redirect;
-                    } else {
-                        window.location.reload(false);
-                    }
-                });
-            }
-        });
-    }
 
+    // Set payment type
     const payCtaCC    = $('#payment-cta-credit-card'),
           payCtaDD    = $('#payment-cta-direct-debit');
 
@@ -120,6 +83,7 @@ $(function(){
         }
     });
 
+    // Set payment cycle
     $('.payment-card-cycle').on('click', function(e) {
         e.preventDefault();
 
@@ -127,59 +91,48 @@ $(function(){
         $(this).addClass('active');
 
         // Set the value for the form element
-        let val   = $(this).data('value'),
-            cycle = $(this).data('premium-type');
+        let val = $(this).data('value');
 
         // Set the linked radio
         $('input[name="purchase_form[amount]"][value="' + val + '"]').prop('checked', true);
 
-        let checkoutUrl = paymentForm.data('url'),
-            type = $(this).data('premium-param');
-            url = new URL(checkoutUrl);
-            amount = val * 100;
-        url.searchParams.set('pennies', amount);
-        url.searchParams.set('premium', type);
+        // Get the payment freq
+        let freq = $(this).data('premium-param');
 
+        // Update the checkout URL
+        let checkoutUrl = checkoutForm.data('checkout-url');
+        let url = new URL(checkoutUrl);
+        let amount = val * 100;
+        url.searchParams.set('pennies', amount);
+        url.searchParams.set('premium', freq);
         if (userCode.val()) {
             url.searchParams.set('scode', userCode.val());
         }
 
-        let newUrl = url.href;
-
-        // Clear payment data
-        paymentForm.removeData('value');
-        paymentForm.removeData('url');
-
-        // Update the checkout form
-        paymentForm.attr('data-value', amount);
-        paymentForm.attr('data-url', newUrl);
+        // Set the new URL
+        let newCheckoutUrl = url.href;
+        checkoutForm.removeData('checkout-transaction-value');
+        checkoutForm.removeData('checkout-url');
+        checkoutForm.attr('data-checkout-transaction-value', amount);
+        checkoutForm.attr('data-checkout-url', newCheckoutUrl);
     });
 
     userCode.on('blur', function(e) {
         if (validateForm.valid() == true) {
-            // Set scode if user adds one
-            if (!paymentForm.data('scode') && userCode.val()) {
-                paymentForm.attr('data-scode', userCode.val());
-                let checkoutUrl = paymentForm.data('url'),
-                    url = new URL(checkoutUrl);
+            checkoutForm.attr('data-scode', userCode.val())
+            let checkoutUrl = checkoutForm.data('checkout-url');
+            let url = new URL(checkoutUrl);
+
+            if (userCode.val()) {
                 url.searchParams.set('scode', userCode.val());
-                let newUrl = url.href;
-                paymentForm.removeData('url');
-                paymentForm.attr('data-url', newUrl);
+            } else {
+                url.searchParams.delete('scode')
             }
-        }
-    });
 
-    $('.btn-card-pay').on('click', function(e) {
-        e.preventDefault();
-
-        if (validateForm.valid() == true) {
-            // Ensurre that all previous configure event handlers are cleared before adding another
-            Checkout.removeAllEventHandlers(Checkout.Events.CARD_TOKENISED);
-            // Set configure
-            configureCheckout();
-            // Open the lightbox
-            Checkout.open();
+            // Set the new URL
+            let newCheckoutUrl = url.href;
+            checkoutForm.removeData('checkout-url');
+            checkoutForm.attr('data-checkout-url', newCheckoutUrl);
         }
     });
 });

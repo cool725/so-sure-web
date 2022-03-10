@@ -120,39 +120,11 @@
     </div>
 {{ form_end(purchase_form) }}
 
-<form class="payment-form"
-        method="POST"
-        data-public-key="{{ checkoutApiKey(policy) }}"
-        data-customer-email="{{ app.user.email }}"
-        data-value="{{ convert_to_pennies(purchase_form.amount.vars.value) }}"
-        data-currency="GBP"
-        data-csrf="{{ csrf_token('checkout') }}"
-        data-payment-mode="cards"
-        data-card-form-mode="cardTokenisation"
-        data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
-        data-url="{{ url('purchase_checkout', {'id': policy.id, 'pennies': convert_to_pennies(purchase_form.amount.vars.value), 'premium': premium }) }}"
-        data-redirect-url="
-        {% if instore is not null and instore == true %}
-        {{ path('user_instore', {id: policy.id}) }}
-        {% elseif validation_required is not null and validation_required is not null %}
-        {{ path('user_validation_required', {id: policy.id}) }}
-        {% else %}
-        {{ path('user_welcome', {id: policy.id}) }}
-        {% endif %}"
-        data-title="Pay now"
-        data-subtitle="Please enter your card details"
-        data-scode="{% if user_code is not null %}{{ user_code }}{% endif %}">
-</form>
-{% block to_card_form %}
-    {{ form_start(to_card_form, {'attr':{'class':'form-400 text-center'}}) }}
-        <div id="payment-cta-credit-card" class="form-group {{ cta_class }}">
-            {{ form_widget(to_card_form.submit, {
-                'label': 'Pay Now',
-                'fa': 'fas fa-lock fa-lg mr-2',
-                'left': true,
-                'attr': {
-                    'class': 'btn btn-success btn-block-xs btn-card-pay'
-        }}) }}
-        </div>
-    {{ form_end(to_card_form) }}
-{% endblock to_card_form %}
+<div id="payment-cta-credit-card" class="form-group text-center {{ cta_class }}">
+    <button type="button"
+            class="btn btn-success btn-block-xs"
+            data-toggle="modal"
+            data-target="#checkout_modal">
+        <i class="fas fa-lock fa-lg mr-2"></i> Pay Now
+    </button>
+</div>

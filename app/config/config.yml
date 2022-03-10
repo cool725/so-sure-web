@@ -499,6 +499,7 @@ nelmio_security:
                 - https://track.omguk.com
                 - https://www.qzzr.com/
                 - https://analytics.tiktok.com
+                - https://js.checkout.com/
                 - 'data:'
             connect-src:
                 - 'self'
@@ -569,6 +570,7 @@ nelmio_security:
                 - http://rum-collector-2.pingdom.net
                 - https://rum-collector-2.pingdom.net
                 - https://ipb.smct.io
+                - https://js.checkout.com/framesv2/
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -829,6 +831,7 @@ nelmio_security:
                 - https://optimize.google.com
                 - https://www.googleoptimize.com
                 - https://www.qzzr.com/
+                - https://js.checkout.com/
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -838,6 +841,7 @@ nelmio_security:
                 - https://*.twitter.com
                 - https://twitter.com
                 - https://*.ads-twitter.com
+                - http://*.ads-twitter.com
                 - https://*.digits.com # necessary?
                 - https://maxcdn.bootstrapcdn.com
                 - https://app.prodpad.com # necessary?
@@ -1184,6 +1188,7 @@ nelmio_security:
                 - https://intercom.help
                 - https://track.hubspot.com
                 - https://t.co
+                - http://t.co
                 - https://www.tagserve.com
                 - https://*.doubleclick.net
                 - https://*.fbcdn.net

@@ -112,6 +112,9 @@ Encore
     .addEntry('phone-insurance-homepage', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-homepage.js')
     .addEntry('contents-insurance-comparison', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance-comparison.js')
 
+    // Checkout
+    .addEntry('checkoutV2', './src/AppBundle/Resources/public/rebrand/js/common/checkoutV2.js')
+
     // allow legacy applications to use $/jQuery as a global variable
     .autoProvidejQuery()
 

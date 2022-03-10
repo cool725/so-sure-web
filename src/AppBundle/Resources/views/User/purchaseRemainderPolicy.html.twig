@@ -4,6 +4,7 @@
 {% set body_class = 'purchase-remainder-policy' %}
 
 {% block cssPage %}
+    {{ encore_entry_link_tags('checkoutV2') }}
     {{ encore_entry_link_tags('user-unpaid') }}
 {% endblock %}
 
@@ -41,33 +42,30 @@
                         </form>
                       {% endif %}
                     {% else %}
-                        <form class="payment-form" method="POST"
-                              data-public-key="{{ checkoutApiKey(policy) }}"
-                              data-customer-email="{{ app.user.email }}"
-                              data-value="{{ convert_to_pennies(amount) }}"
-                              data-url="{{ url('purchase_checkout_remainder', {'id': policy.id, 'pennies': convert_to_pennies(amount) }) }}"
-                              data-csrf="{{ csrf_token('checkout') }}"
-                              data-currency="GBP"
-                              data-payment-mode="cards"
-                              data-card-form-mode="cardTokenisation"
-                              data-debug-mode="{% if environment != 'prod' %}true{% else %}false{% endif %}"
-                              data-title="Pay now"
-                              data-subtitle="Please enter your card details now">
-                            {% if policy.displayRepurchase %}
-                                <div class="form-row">
-                                    <div class="col">
-                                        <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-primary btn-block-xs">Repurchase your policy</a>
-                                    </div>
-                                    <div class="col">
-                                        <input type="submit" class="btn btn-success btn-block-xs btn-card-pay" value="Pay remainder now">
-                                    </div>
+                        {% if policy.displayRepurchase %}
+                            <div class="form-row">
+                                <div class="col">
+                                    <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-primary btn-block-xs">Repurchase your policy</a>
                                 </div>
-                            {% else %}
-                                <div class="form-group">
-                                    <input type="submit" class="btn btn-success btn-block-xs btn-card-pay" value="Pay remainder now">
+                                <div class="col">
+                                    <button type="button"
+                                            class="btn btn-success btn-block-xs"
+                                            data-toggle="modal"
+                                            data-target="#checkout_modal">
+                                        <i class="fas fa-lock fa-lg mr-2"></i> Pay remainder now
+                                    </button>
                                 </div>
-                            {% endif %}
-                        </form>
+                            </div>
+                        {% else %}
+                            <div class="form-group">
+                                <button type="button"
+                                        class="btn btn-success btn-block-xs"
+                                        data-toggle="modal"
+                                        data-target="#checkout_modal">
+                                    <i class="fas fa-lock fa-lg mr-2"></i> Pay remainder now
+                                </button>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 {% elseif amount == 0 %}
                     <p class="mb-4">Your <strong>{{ policy.policyNumber }}</strong> policy for your <strong>{{ policy.phone }}</strong> has been fully paid.</p>
@@ -78,16 +76,18 @@
 
     {# Components #}
     {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
+    {% include 'AppBundle::Components/_checkoutModal.html.twig' with {
+        'card_title': 'Pay Policy Remainder',
+        'transaction_value': convert_to_pennies(amount),
+        'csrf_token': csrf_token('checkout'),
+        'url': url('purchase_checkout_remainder', {'id': policy.id, 'pennies': convert_to_pennies(amount) })
+    } %}
 
     {# Page Modals #}
 
 {% endblock %}
 
 {% block javascriptsPage %}
-    {% if environment == 'prod' %}
-        <script src="https://cdn.checkout.com/js/checkout.js"></script>
-    {% else %}
-        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
-    {% endif %}
-    {{ encore_entry_script_tags('purchase-remainder') }}
+    <script src="https://cdn.checkout.com/js/framesv2.min.js"></script>
+    {{ encore_entry_script_tags('checkoutV2') }}
 {% endblock %}

@@ -1,5 +1,4 @@
 {% extends 'base_rebrand.html.twig' %}
-{% form_theme to_card_form 'AppBundle:Form:submit.html.twig' %}
 {% form_theme purchase_form 'AppBundle:Form:submit.html.twig' %}
 
 {# Set vars #}
@@ -14,7 +13,11 @@
     {% set make_desc = phone.make %}
     {% if phone.make == 'Apple' %}
         {% set make_desc = '' %}
-        {# {% set device_is = 'so-sure_quote_device.png' %} #}
+    {% endif %}
+    {% if purchase_form.vars.value.amount == phone.currentMonthlyPhonePrice.monthlyPremiumPrice %}
+        {% set premium = 'monthly' %}
+    {% else %}
+        {% set premium = 'yearly' %}
     {% endif %}
     {% set yearly = phone.currentYearlyPhonePrice.yearlyPremiumPrice()|number_format(2, '.', ',') %}
     {% set yearlyMonthly = phone.currentYearlyPhonePrice.yearlyPremiumPrice()|number_format(2, '.', ',') / 12 %}
@@ -34,6 +37,7 @@
 {% block meta %}{% endblock %}
 
 {% block cssPage %}
+    {{ encore_entry_link_tags('checkoutV2') }}
     {{ encore_entry_link_tags('purchase') }}
 {% endblock %}
 
@@ -82,6 +86,14 @@
 
     {# Components #}
     {% include 'AppBundle::Components/_loadingScreen.html.twig' with { 'loading_term': 'Processing...' } %}
+    {% include 'AppBundle::Components/_checkoutModal.html.twig' with {
+        'card_title': 'Pay via Card',
+        'transaction_value': convert_to_pennies(purchase_form.amount.vars.value),
+        'csrf_token': csrf_token('checkout'),
+        'url': url('purchase_checkout', {'id': policy.id, 'pennies': convert_to_pennies(purchase_form.amount.vars.value), 'premium': premium }),
+        'redirect_url': path('user_welcome', {id: policy.id}),
+        'scode': user_code
+    } %}
 
     {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
@@ -92,11 +104,9 @@
     {# TODO: Fix footer #}
 {% endblock %}
 {% block javascriptsPage %}
-    {% if environment == 'prod' %}
-        <script src="https://cdn.checkout.com/js/checkout.js"></script>
-    {% else %}
-        <script src="https://cdn.checkout.com/sandbox/js/checkout.js"></script>
-    {% endif %}
     {{ encore_entry_script_tags('purchase') }}
+    {# Checkout #}
+    <script src="https://cdn.checkout.com/js/framesv2.min.js"></script>
+    {{ encore_entry_script_tags('checkoutV2') }}
     {{ encore_entry_script_tags('purchase-payment') }}
 {% endblock %}
