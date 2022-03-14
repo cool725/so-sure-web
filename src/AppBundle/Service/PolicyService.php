@@ -363,10 +363,9 @@ class PolicyService
         IdentityLog $identityLog = null,
         $phoneData = null,
         $modelNumber = null,
-        $aggregator = false,
+        $aggregatorAttribution = null,
         $subvariant = null
     ) {
-        NoOp::ignore($aggregator);
         try {
             $this->validateUser($user);
             if ($imei) {
@@ -405,6 +404,9 @@ class PolicyService
             $policy->setPhoneData($phoneData);
             if ($subvariant) {
                 $policy->setSubvariant($subvariant);
+            }
+            if ($aggregatorAttribution) {
+                $policy->setAggregatorAttribution($aggregatorAttribution);
             }
             /** @var PolicyTermsRepository $policyTermsRepo */
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);

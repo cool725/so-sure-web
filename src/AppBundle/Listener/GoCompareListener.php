@@ -43,11 +43,14 @@ class GoCompareListener
             return;
         }
 
-        $user = $event->getPolicy()->getUser();
-        if ($user->getAttribution() && $user->getAttribution()->getGoCompareQuote()) {
-            /** @var PhonePolicy $policy */
-            $policy = $event->getPolicy();
+        /** @var PhonePolicy $policy */
+        $policy = $event->getPolicy();
+        if ($policy->getAggregatorAttribution() && $policy->getAggregatorAttribution()->getGoCompareQuote()) {
             if (!$policy->hasPreviousPolicy()) {
+                $this->logger->error(sprintf(
+                    'Notify Gocompare: %s',
+                    $policy->getAggregatorAttribution()->getGoCompareQuote()
+                ));
                 return $this->notifyGoCompare($policy);
             }
         }
@@ -65,9 +68,25 @@ class GoCompareListener
         }
 
         $user = $event->getPolicy()->getUser();
+
         /** @var PhonePolicy $policy */
         $policy = $event->getPolicy();
-        if ($user->getAttribution() && $user->getAttribution()->getGoCompareQuote() && $policy->isCooloffCancelled()) {
+        if ($policy->getAggregatorAttribution()
+            && $policy->getAggregatorAttribution()->getGoCompareQuote()
+            && $policy->isCooloffCancelled()) {
+            $this->logger->error(sprintf(
+                'Notify Gocompare: %s',
+                $policy->getAggregatorAttribution()->getGoCompareQuote()
+            ));
+            return $this->notifyGoCompare($policy);
+        } elseif ($user->getAttribution()
+            && $user->getAttribution()->getGoCompareQuote()
+            && $policy->isCooloffCancelled()) {
+            $policy->setAggregatorAttribution($user->getAttribution());
+            $this->logger->error(sprintf(
+                'Notify Gocompare: %s',
+                $policy->getAggregatorAttribution()->getGoCompareQuote()
+            ));
             return $this->notifyGoCompare($policy);
         }
 
@@ -93,7 +112,7 @@ class GoCompareListener
 
     public function getGoCompareTrackingUrl(PhonePolicy $policy)
     {
-        $attribution = $policy->getUser()->getAttribution();
+        $attribution = $policy->getAggregatorAttribution();
         // 0 = Not a cancellation; 1 = Cancellation; This will cancel out the sale of the same quote ID.
         $cancellationParam = $policy->isCooloffCancelled() ? 1 : 0;
         // Your Premium ID’s are as follows; Monthly – 3; Annual – 2

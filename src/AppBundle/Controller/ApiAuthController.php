@@ -7,6 +7,7 @@ use AppBundle\Classes\NoOp;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Subvariant;
+use AppBundle\Document\Attribution;
 use AppBundle\Document\ValidatorTrait;
 use AppBundle\Exception\CannotApplyRewardException;
 use AppBundle\Exception\DirectDebitBankException;
@@ -32,6 +33,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use AppBundle\Form\Type\LaunchType;
+use AppBundle\Validator\Constraints\AlphanumericValidator;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Payment\Payment;
@@ -607,12 +609,21 @@ class ApiAuthController extends BaseController
 
             $subvariant = null;
             $subvariantString = $this->getDataString($phonePolicyData, 'subvariant');
-            $aggregator = ($subvariantString != null);
             if ($subvariantString) {
                 /** @var SubvariantRepository $subvariantRepo */
                 $subvariantRepo = $this->getManager()->getRepository(Subvariant::class);
                 $subvariant = $subvariantRepo->getSubvariantByName($subvariantString);
             }
+
+            $aggregatorAttributionData = $phonePolicyData['aggregator_attribution'];
+            $aggregatorAttribution = new Attribution();
+            $aggregatorAttribution->setCampaignName($this->getDataString($aggregatorAttributionData, 'utm_campaign'));
+            $aggregatorAttribution->setCampaignMedium($this->getDataString($aggregatorAttributionData, 'utm_medium'));
+            $aggregatorAttribution->setCampaignSource($this->getDataString($aggregatorAttributionData, 'utm_source'));
+            $alphaValidator = new AlphanumericValidator();
+            $aggregatorAttribution->setGoCompareQuote(
+                $alphaValidator->conform($this->getDataString($aggregatorAttributionData, 'quote_id'))
+            );
 
             $policyService = $this->get('app.policy');
             $policyService->setWarnMakeModelMismatch(false);
@@ -628,7 +639,7 @@ class ApiAuthController extends BaseController
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
                 ]),
                 $modelNumber,
-                $aggregator,
+                $aggregatorAttribution,
                 $subvariant
             );
             $policy->setName($this->conformAlphanumericSpaceDot($this->getDataString($phonePolicyData, 'name'), 100));

@@ -825,29 +825,7 @@ class ApiController extends BaseController
                 }
                 $scode->addAcceptor($user);
             }
-            if ($attributionData !== null) {
-                $attribution = new Attribution();
-                $attribution->setCampaignName($this->getDataString($attributionData, 'utm_campaign'));
-                $attribution->setCampaignMedium($this->getDataString($attributionData, 'utm_medium'));
-                $attribution->setCampaignSource($this->getDataString($attributionData, 'utm_source'));
-                $alphaValidator = new AlphanumericValidator();
-                $attribution->setGoCompareQuote(
-                    $alphaValidator->conform($this->getDataString($attributionData, 'quote_id'))
-                );
-                /** @var RequestService $requestService */
-                $requestService = $this->get('app.request');
-                $deviceCategory = null;
-                $deviceOS = null;
-                if ($userAgent = $requestService->getUserAgent()) {
-                    $parser = Parser::create();
-                    $userAgentDetails = $parser->parse($userAgent);
-                    $deviceCategory = $requestService->getDeviceCategory();
-                    $deviceOS = $requestService->getDeviceOS();
-                }
-                $attribution->setDeviceCategory($deviceCategory);
-                $attribution->setDeviceOS($deviceOS);
-                $user->setAttribution($attribution);
-            }
+            
             if ($marketingOptIn === true) {
                 $user->optInMarketing();
             }

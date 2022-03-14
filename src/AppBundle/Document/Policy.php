@@ -18,6 +18,7 @@ use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
 use AppBundle\Document\PaymentMethod\JudoPaymentMethod;
 use AppBundle\Document\PaymentMethod\PaymentMethod;
+use AppBundle\Document\Attribution;
 use AppBundle\Exception\DuplicatePaymentException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -678,6 +679,13 @@ abstract class Policy
      * @var Subvariant|null
      */
     protected $subvariant = null;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Attribution")
+     * @Gedmo\Versioned
+     * @var Attribution|null
+     */
+    protected $aggregatorAttribution = null;
 
     public function __construct()
     {
@@ -3288,6 +3296,25 @@ abstract class Policy
     public function setSubvariant($subvariant)
     {
         $this->subvariant = $subvariant;
+    }
+
+    /**
+     * gives you the policy's aggregator attribution if it has one.
+     * @return Attribution|null the policy's aggregator attribution should it have one.
+     */
+    public function getAggregatorAttribution()
+    {
+        return $this->aggregatorAttribution;
+    }
+
+    /**
+     * Sets the policy's aggregator attribution.
+     * @param Attribution|null $aggregatorAttribution is the aggregator attribution
+     * to set it to or null if you wish to blank it.
+     */
+    public function setAggregatorAttribution($aggregatorAttribution)
+    {
+        $this->aggregatorAttribution = $aggregatorAttribution;
     }
 
     public function init(User $user, PolicyTerms $terms, $validateExcess = true)
