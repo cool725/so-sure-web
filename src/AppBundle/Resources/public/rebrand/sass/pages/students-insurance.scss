@@ -1,0 +1,85 @@
+// students-insurance.scss
+
+@import "../vendor/bs4/functions";
+@import "../vendor/bs4/variables";
+@import "../vendor/bs4/mixins/breakpoints";
+@import "../abstracts/mixins";
+@import "../abstracts/palette";
+@import "../abstracts/variables";
+@import "../base/fonts";
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    padding: 6rem 0rem 27rem;
+
+    background-position: top center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('#{$cdn_url}/images/rebrand/students/students-hero-background-mobile-cropped.jpg');
+
+    .container-large {
+        position: relative;
+        z-index: 4;
+        text-align: center;
+    }
+
+    @include media-breakpoint-up(md) {
+        background-image: url('#{$cdn_url}/images/rebrand/students/students-hero-background-mid.jpg');
+    }
+
+    @include media-breakpoint-up(lg) {
+        background-image: url('#{$cdn_url}/images/rebrand/students/students-hero-background.jpg');
+
+        p {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    }
+
+    @include media-breakpoint-up(fa) {
+        padding: 10rem 0rem 47rem;
+    }
+}
+
+.available {
+    background-color: $athens-gray;
+    text-align: center;
+
+    .btn {
+        padding-top: 20px;
+        padding-bottom: 20px;
+
+        border-color: $zaffre;
+
+        img {
+            max-width: 200px;
+        }
+    }
+}
+
+.app {
+    text-align: center;
+    background-color: $crayon-blue;
+
+    &-buttons {
+        display: flex;
+        justify-content: center;
+    }
+
+    &-button {
+
+        a {
+            margin: 0 0.6rem;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+
+    &-rating {
+        color: $white;
+        margin: 0.5rem 0;
+    }
+}

@@ -1,0 +1,33 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set exclude_remote_scripts = true %}
+{% set full_width = true %}
+{% set login_mode = true %}
+{% set body_class = 'login' %}
+{% block meta %}
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('login') }}
+{% endblock %}
+
+{% block body %}
+    <div class="login  p-3 d-flex align-items-center">
+        <div class="login__inner">
+            <div class="student-beans-iframe">
+                <script data-iframe='https://connect.studentbeans.com/v4/so-sure/uk' data-load='connect' id='stb_root' src='https://cdn.studentbeans.com/third-party/all.js'></script>
+            </div>
+        </div>
+        <span class="login__phone__background lozad"
+              data-background-image="{{ cdn_url }}/images/rebrand/login/so-sure_login-phone-smile.png"></span>
+        <span class="login__money__background lozad"
+              data-background-image="{{ cdn_url }}/images/rebrand/login/so-sure_login-money.png"></span>
+    </div>
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('login') }}
+{% endblock %}

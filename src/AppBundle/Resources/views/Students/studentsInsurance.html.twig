@@ -1,0 +1,122 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'students-insurance' %}
+{% set robots_noindex = is_noindex %}
+
+{% block title %}Students Insurance From &pound;{{ lowest_premium|number_format(2, '.', ',') }} Monthly | SO-SURE{% endblock %}
+{% block meta %}
+    <meta name="description" content="Students phone insurance can bring peace of mind. Get refurbished phone insurance with 24-72 hour repair or replacement & money back if you don't claim."/>
+    <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />
+{% endblock %}
+{% set og_title = 'Students Insurance From £' ~ lowest_premium|number_format(2, '.', ',') ~ ' Monthly | SO-SURE' %}
+{% set og_description = "Students phone insurance can bring peace of mind. Get refurbished phone insurance with 24-72 hour repair or replacement & money back if you don't claim." %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('students-insurance') }}
+{% endblock %}
+
+{% block body %}
+
+    <section class="hero">
+        <div class="container-large">
+            <div class="breadcrumbs">
+                <ul class="list-inline"
+                    vocab="https://schema.org/"
+                    typeof="BreadcrumbList">
+                    <li class="list-inline-item"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <a href="{{ path('homepage') }}"
+                        class=""
+                        property="item"
+                        typeof="WebPage">
+                        <span property="name">Home</span>
+                        </a>
+                        <meta property="position" content="1">
+                    </li>
+                    <li class="list-inline-item">
+                        <i class="fal fa-angle-right"></i>
+                    </li>
+                    <li class="list-inline-item"
+                        property="itemListElement"
+                        typeof="ListItem">
+                        <span property="name">Students Insurance</span>
+                        <meta property="position" content="2">
+                    </li>
+                </ul>
+            </div>
+            <h1 class="fit display-4 mb-3">Calling all students!</h1>
+            <p class="lead">Protect what you love with SO-SURE. Whether it is your beloved phone, your super-useful laptop or a quirky and precious item that you can’t live without, insure it with us and get £10 back. Great for all students who live in Halls and want to protect their contents or anyone with a phone – what are you waiting for?</p>
+        </div>
+    </section>
+
+    <section class="available py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-primary mb-5">Student Discounts Available</h2>
+            <a href="{{ path('students_beans') }}" class="btn btn-white btn-shadow btn-lg" title="Student Beans">
+                <span class="sr-only">Student Beans</span>
+                <img src="{{ cdn_url }}/images/rebrand/students/student-beans-logo.svg" alt="Student Beans">
+            </a>
+        </div>
+    </section>
+
+    <section class="knowledge py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-center mb-5">Amazing When You Need Us - Get Rewarded If You Don’t</h2>
+            {% include 'AppBundle::Components/_knowledgeBaseStudent.html.twig' %}
+        </div>
+    </section>
+
+    <section class="app py-lg-5">
+        <div class="container-large py-5">
+            <h2 class="h3 text-white mb-5">Unlock the Benefits of <span class="text-deep-sky-blue-d text-nowrap">SO-SURE</span> with Our App</h2>
+            <div class="app-buttons">
+                <div class="app-button">
+                    <a href="{{ apple_download('students-banner') }}"
+                    class="ga-outbound-click"
+                    data-clicklabel="iTunes"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                        <span class="sr-only">Download on the AppStore</span>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/homepage/app-store-btn.svg"
+                             alt="App Store Button">
+                    </a>
+                    <div class="app-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half"></i>
+                    </div>
+                </div>
+                <div class="app-button">
+                    <a href="{{ google_download('students-banner') }}"
+                    class="ga-outbound-click"
+                    data-clicklabel="PlayStore"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                        <span class="sr-only">Get it on Google Play</span>
+                        <img src="{{ cdn_url }}/images/onexone.png"
+                             data-src="{{ cdn_url }}/images/rebrand/homepage/google-play-btn.svg"
+                             alt="Google Play Button">
+                    </a>
+                    <div class="app-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('students-insurance') }}
+{% endblock %}

@@ -108,9 +108,13 @@ Encore
     .addEntry('ops', './src/AppBundle/Resources/public/rebrand/js/pages/ops.js')
     .addEntry('rollbar-js-error', './src/AppBundle/Resources/public/rebrand/js/pages/rollbar-js-error.js')
 
+    // Home Contents
     .addEntry('contents-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance.js')
     .addEntry('phone-insurance-homepage', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-homepage.js')
     .addEntry('contents-insurance-comparison', './src/AppBundle/Resources/public/rebrand/js/pages/contents-insurance-comparison.js')
+
+    // Student
+    .addEntry('students-insurance', './src/AppBundle/Resources/public/rebrand/js/pages/students-insurance.js')
 
     // Checkout
     .addEntry('checkoutV2', './src/AppBundle/Resources/public/rebrand/js/common/checkoutV2.js')

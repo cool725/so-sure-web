@@ -3,7 +3,7 @@
 $(function() {
 
     const cardbox = $('.expanding-cardbox'),
-          title   = $('.expanding-cardbox__title'),
+          title   = $('.expanding-cardbox__title, .expanding-cardbox__student'),
           remote  = $('a[data-cardbox-target]');
 
     // Common action
