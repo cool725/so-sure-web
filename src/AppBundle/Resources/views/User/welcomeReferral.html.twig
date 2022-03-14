@@ -45,11 +45,7 @@
             'coupon': '{{ used_scode }}',
             'currency': 'GBP',
             'item_brand': '{{ policy.phone.make }}',
-            {% if policy.subvariant is defined and policy.subvariant is not null %}
-            'item_category': '{{ policy.subvariant|capitalize }} Phone Insurance',
-            {% else %}
             'item_category': 'V1 Phone Insurance',
-            {% endif %}
             'item_variant': '{{ policy.phone.memory }}GB',
             'price': {{ premium }},
             'quantity': 1
