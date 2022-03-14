@@ -77,6 +77,9 @@ class GoCompare
         2420 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro Max', 'memory' => 256],
         2421 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro Max', 'memory' => 512],
         2422 => ['make' => 'Apple', 'model' => 'iPhone 13 Pro Max', 'memory' => 1024],
+        2629 => ['make' => 'Apple', 'model' => 'iPhone SE (2022)', 'memory' => 64],
+        2630 => ['make' => 'Apple', 'model' => 'iPhone SE (2022)', 'memory' => 128],
+        2631 => ['make' => 'Apple', 'model' => 'iPhone SE (2022)', 'memory' => 256],
 
         1890 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 64],
         1891 => ['make' => 'Asus', 'model' => 'Zenfone 6', 'memory' => 128],
