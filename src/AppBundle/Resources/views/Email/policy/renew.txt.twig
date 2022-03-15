@@ -20,6 +20,12 @@ Earn no claims cash back/reward pot by sharing your personal so-sure scode link 
 
 Share this link now: {{ url('scode', {'code': policy.standardSCode.code}) }}
 
+{% if policy.getGeneration >= 5 %}
+You have been with us for a number of years. You may be able to get the insurance cover you want at a better price if you shop around.
+{% else %}
+You should check that the level of cover offered is still appropriate for your needs and if you wish may compare the prices and levels of cover offered by alternative providers.
+{% endif %}
+
 If you have any questions, please don't hesitate to contact us
 
 
