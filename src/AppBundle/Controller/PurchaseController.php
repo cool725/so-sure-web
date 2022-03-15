@@ -133,6 +133,12 @@ class PurchaseController extends BaseController
         $data = [
             'step' => 1,
         ];
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'purchase',
+            'Step' => 'nodevice'
+        ]);
+
         return $this->render($template, $data);
     }
 
@@ -172,6 +178,11 @@ class PurchaseController extends BaseController
 
         // TEMP - As using skip add extra event
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_QUOTE_PAGE_PURCHASE);
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'purchase',
+            'Step' => 'personal'
+        ]);
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
@@ -392,6 +403,11 @@ class PurchaseController extends BaseController
         if ($phone) {
             $purchase->setPhone($phone);
         }
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'purchase',
+            'Step' => 'phone'
+        ]);
 
         /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
@@ -674,6 +690,11 @@ class PurchaseController extends BaseController
             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
             ->getForm();
 
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'purchase',
+            'Step' => 'bacs'
+        ]);
+
         $template = null;
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('bacs_form')) {
@@ -932,6 +953,11 @@ class PurchaseController extends BaseController
             $purchaseForm->remove('userOptIn');
         }
 
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'purchase',
+            'Step' => 'pledge'
+        ]);
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
@@ -1101,6 +1127,11 @@ class PurchaseController extends BaseController
             $this->get('logger')->error('No payment methods available!');
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, "Payment method not defined", 403);
         }
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'purchase',
+            'Step' => 'payment'
+        ]);
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {

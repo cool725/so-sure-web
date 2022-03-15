@@ -1351,6 +1351,11 @@ class UserController extends BaseController
             $dm->flush($policy);
         }
 
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PAGE_LOAD, [
+            'Page' => 'purchase',
+            'Step' => 'welcome'
+        ]);
+
         /** @var RouterService $router */
         $router = $this->get('app.router');
         // TODO: Should this account for policy ID?
