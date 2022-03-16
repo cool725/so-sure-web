@@ -4,7 +4,7 @@
 {% set exclude_remote_scripts = true %}
 {% set full_width = true %}
 {% set login_mode = true %}
-{% set body_class = 'login' %}
+{% set body_class = 'login login-scroll' %}
 {% block meta %}
     <meta name="robots" content="noindex">
     <link rel="canonical" href="{{ url(app.request.attributes.get('_route'), app.request.attributes.get('_route_params')) }}" />

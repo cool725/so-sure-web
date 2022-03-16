@@ -438,7 +438,7 @@ nelmio_security:
                 enabled: true
             report-uri: "%router.request_context.base_url%/ops/csp"
             frame-ancestors:
-                - 'none'
+                - https://*.studentbeans.com
             default-src:
                 - 'self'
                 - https://maxcdn.bootstrapcdn.com
@@ -500,7 +500,7 @@ nelmio_security:
                 - https://www.qzzr.com/
                 - https://analytics.tiktok.com
                 - https://js.checkout.com/
-                - https://connect.studentbeans.com/
+                - https://*.studentbeans.com/
                 - 'data:'
             connect-src:
                 - 'self'
@@ -572,7 +572,7 @@ nelmio_security:
                 - https://rum-collector-2.pingdom.net
                 - https://ipb.smct.io
                 - https://js.checkout.com/framesv2/
-                - https://connect.studentbeans.com/
+                - https://*.studentbeans.com/
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -834,7 +834,7 @@ nelmio_security:
                 - https://www.googleoptimize.com
                 - https://www.qzzr.com/
                 - https://js.checkout.com/
-                - https://connect.studentbeans.com/
+                - https://*.studentbeans.com/
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -936,7 +936,7 @@ nelmio_security:
                 - https://rum-static.pingdom.net
                 - https://tag.rmp.rakuten.com
                 - https://www.clickcease.com
-                - https://cdn.studentbeans.com/
+                - https://*.studentbeans.com/
                 - http://cdn.studentbeans.com/third-party/connect_6-0-0.js
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
@@ -1164,6 +1164,7 @@ nelmio_security:
                 - https://www.googleoptimize.com
                 - https://cdn.iubenda.com
                 - https://www.googletagmanager.com
+                - https://*.studentbeans.com/
             img-src:
                 - 'self'
                 - https://wearesosure.com
@@ -1216,6 +1217,7 @@ nelmio_security:
                 - https://analytics.tiktok.com
                 - https://consent.linksynergy.com
                 - https://fonts.gstatic.com
+                - https://*.studentbeans.com/
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com
