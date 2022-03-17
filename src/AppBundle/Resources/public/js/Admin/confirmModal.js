@@ -14,7 +14,9 @@ $('.confirmModal').on('show.bs.modal', function (event) {
             premiumDiff;
 
         if($('#imei_form_phone option:selected').text() === $('#current_phone').text()) {
-            newPremium.text(oldPremiumPrice);
+            newPremium.text(newPremiumPrice);
+            // Uncomment to re-enable preferring highest premium of old vs new
+            // newPremium.text(oldPremiumPrice);
         } else {
             newPremium.text(newPremiumPrice);
         }
@@ -29,8 +31,11 @@ $('.confirmModal').on('show.bs.modal', function (event) {
             newPremiumPriceUpdate = $('#imei_form_phone option:selected').data('premium');
 
             if($('#imei_form_phone option:selected').text() === $('#current_phone').text()) {
-                newPremium.text(oldPremiumPrice);
-                premiumDiff = 0;
+                newPremium.text(newPremiumPriceUpdate);
+                premiumDiff = Math.abs(newPremiumPriceUpdate - oldPremiumPrice);
+                // Uncomment to re-enable preferring highest premium of old vs new
+                // newPremium.text(oldPremiumPrice);
+                // premiumDiff = 0;
             } else {
                 newPremium.text(newPremiumPriceUpdate);
                 premiumDiff = Math.abs(newPremiumPriceUpdate - oldPremiumPrice);

@@ -2370,9 +2370,12 @@ class UserController extends BaseController
         $stream = PhonePrice::installmentsStream($policy->getPremiumInstallments());
         $futurePayments = $policy->countFutureInvoiceSchedule();
         $oldPhonePremium = $policy->getPremium();
-
+        
+        $tPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
         if ($samePhone) {
-            $newPhonePremium = $oldPhonePremium;
+            $newPhonePremium = $tPhonePremium;
+            // Uncomment to re-enable preferring highest premium of old vs new
+            // $newPhonePremium = $oldPhonePremium;
         } else {
             // We need to confirm if there is a claim on the user
             // If status is in pending/review/FNOL state redirect user
@@ -2385,9 +2388,10 @@ class UserController extends BaseController
             if ($policy->isAnyLinkedClaimByApprovedStatus()) {
                 // Check if new premium is lower than existing
                 // set to original premium amount
-                $tPhonePremium = $priceService->getPhonePremium($policy, $newPhone, $stream, null, $now);
                 if ($tPhonePremium->getMonthlyPremiumPrice() < $oldPhonePremium->getMonthlyPremiumPrice()) {
-                    $newPhonePremium = $oldPhonePremium;
+                    $newPhonePremium = $tPhonePremium;
+                    // Uncomment to re-enable preferring highest premium of old vs new
+                    // $newPhonePremium = $oldPhonePremium;
                 } else {
                     $newPhonePremium = $tPhonePremium;
                 }
