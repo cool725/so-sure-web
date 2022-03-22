@@ -22,6 +22,12 @@ use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
+use Checkout\Models\Tokens\Card;
+use Checkout\Models\Payments\TokenSource;
+use Checkout\Models\Payments\Payment;
+use Checkout\Models\Payments\Customer;
+use Checkout\Models\Payments\ThreeDs;
+use Checkout\Models\Payments\Risk;
 use com\checkout\ApiClient;
 use com\checkout\ApiServices\Cards\RequestModels\BaseCardCreate;
 use com\checkout\ApiServices\Cards\RequestModels\CardCreate;
@@ -225,7 +231,7 @@ class CheckoutService
             $apiPublic = $this->helvetiaApiPublic;
         }
         if ($apiSecret && $apiPublic) {
-            return new CheckoutApi($apiSecret, -1, $apiPublic);
+            return new CheckoutApi($apiSecret, $this->production ? false : true, $apiPublic);
         }
         throw new \InvalidArgumentException("{$underwriter} is not the name of a valid underwriter");
     }
@@ -840,7 +846,7 @@ class CheckoutService
         $token,
         $amount = null
     ) {
-        $client = $this->getClientForPolicy($policy);
+        $api = $this->getApiForPolicy($policy);
         $user = $policy->getUser();
         $details = null;
         $payment = null;
@@ -852,26 +858,62 @@ class CheckoutService
         }
 
         try {
-            $service = $client->chargeService();
-
             $user = $policy->getUser();
 
-            $charge = new CardTokenChargeCreate();
-            if ($paymentMethod->hasPreviousChargeId()) {
-                $charge->setPreviousChargeId($paymentMethod->getPreviousChargeId());
-            }
-            $charge->setEmail($user->getEmail());
-            $charge->setAutoCapTime(0);
-            $charge->setAutoCapture('N');
-            $charge->setCurrency('GBP');
-            $charge->setMetadata(['policy_id' => $policy->getId()]);
-            $charge->setCardToken($token);
+            // Create a payment method instance with card details
+            $method = new TokenSource($token);
+
+            // Prepare the payment parameters
+            $payment = new Payment($method, 'GBP');
+
             if ($amount) {
-                $charge->setValue($this->convertToPennies($amount));
+                $payment->amount = $this->convertToPennies($amount);
             }
 
-            $details = $service->chargeWithCardToken($charge);
-            $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+            $customer = new Customer();
+            $customer->email = $user->getEmail();
+            $customer->name = $user->getName();
+
+            $payment->customer = $customer;
+
+            $payment->capture = true;
+            $payment->reference = 'CKO-' . $policy->getPolicyNumber . '-001';
+            $payment->threeDs = new ThreeDs(true);
+            $payment->risk = new Risk(true);
+
+            if ($paymentMethod->hasPreviousChargeId()) {
+                $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
+            }
+
+            // Send the request and retrieve the response
+            $details = $api->payments()->request($payment);
+
+            $redirection = $details->getRedirection();
+            if ($redirection) {
+                $this->logger->info(sprintf('3DS redirected : %s', json_encode($details)));
+                return $redirection;
+            }
+
+            $this->logger->info(sprintf('No 3DS: %s', json_encode($details)));
+
+            //OLD VERSION PRE 3DS
+            // $charge = new CardTokenChargeCreate();
+            // if ($paymentMethod->hasPreviousChargeId()) {
+            //     $charge->setPreviousChargeId($paymentMethod->getPreviousChargeId());
+            // }
+            // $charge->setEmail($user->getEmail());
+            // $charge->setAutoCapTime(0);
+            // $charge->setAutoCapture('N');
+            // $charge->setCurrency('GBP');
+            // $charge->setMetadata(['policy_id' => $policy->getId()]);
+            // $charge->setCardToken($token);
+            // if ($amount) {
+            //     $charge->setValue($this->convertToPennies($amount));
+            // }
+
+            //$details = $service->chargeWithCardToken($charge);
+
+            //TODO: Create payment and capture using the new API
 
             if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
                 /**
@@ -891,24 +933,24 @@ class CheckoutService
                 }
             }
 
-            if ($amount) {
-                $capture = new ChargeCapture();
-                $capture->setChargeId($details->getId());
+            // if ($amount) {
+            //     $capture = new ChargeCapture();
+            //     $capture->setChargeId($details->getId());
 
-                if (!$paymentMethod->hasPreviousChargeId()) {
-                    $paymentMethod->setPreviousChargeId($details->getId());
-                }
+            //     if (!$paymentMethod->hasPreviousChargeId()) {
+            //         $paymentMethod->setPreviousChargeId($details->getId());
+            //     }
 
-                $details = $service->CaptureCardCharge($capture);
-                $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
+            //     $details = $service->CaptureCardCharge($capture);
+            //     $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
 
-                if ($details) {
-                    $card = $details->getCard();
-                    if ($card) {
-                        $this->setCardToken($policy, $card);
-                    }
-                }
-            }
+            //     if ($details) {
+            //         $card = $details->getCard();
+            //         if ($card) {
+            //             $this->setCardToken($policy, $card);
+            //         }
+            //     }
+            // }
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
