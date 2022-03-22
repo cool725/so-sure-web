@@ -22,11 +22,11 @@ use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
-use Checkout\Models\Payments\TokenSource as CheckoutTokenSource;
-use Checkout\Models\Payments\Payment as CheckoutPayment;
-use Checkout\Models\Payments\Customer as CheckoutCustomer;
-use Checkout\Models\Payments\ThreeDs as CheckoutThreeDs;
-use Checkout\Models\Payments\Risk as CheckoutRisk;
+use Checkout\Models\Payments\TokenSource as CheckoutAPITokenSource;
+use Checkout\Models\Payments\Payment as CheckoutAPIPayment;
+use Checkout\Models\Payments\Customer as CheckoutAPICustomer;
+use Checkout\Models\Payments\ThreeDs as CheckoutAPIThreeDs;
+use Checkout\Models\Payments\Risk as CheckoutAPIRisk;
 use com\checkout\ApiClient;
 use com\checkout\ApiServices\Cards\RequestModels\BaseCardCreate;
 use com\checkout\ApiServices\Cards\RequestModels\CardCreate;
@@ -860,16 +860,16 @@ class CheckoutService
             $user = $policy->getUser();
 
             // Create a payment method instance with card details
-            $method = new CheckoutTokenSource($token);
+            $method = new CheckoutAPITokenSource($token);
 
             // Prepare the payment parameters
-            $payment = new CheckoutPayment($method, 'GBP');
+            $payment = new CheckoutAPIPayment($method, 'GBP');
 
             if ($amount) {
                 $payment->amount = $this->convertToPennies($amount);
             }
 
-            $customer = new CheckoutCustomer();
+            $customer = new CheckoutAPICustomer();
             $customer->email = $user->getEmail();
             $customer->name = $user->getName();
 
@@ -877,8 +877,8 @@ class CheckoutService
 
             $payment->capture = true;
             $payment->reference = 'CKO-' . $policy->getPolicyNumber . '-001';
-            $payment->threeDs = new CheckoutThreeDs(true);
-            $payment->risk = new CheckoutRisk(true);
+            $payment->threeDs = new CheckoutAPIThreeDs(true);
+            $payment->risk = new CheckoutAPIRisk(true);
 
             if ($paymentMethod->hasPreviousChargeId()) {
                 $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
