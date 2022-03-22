@@ -386,8 +386,15 @@ class CheckoutService
         \DateTime $date = null,
         IdentityLog $identityLog = null
     ) {
-        $charge = $this->capturePaymentMethod($policy, $token, $amount);
-        return $this->add($policy, $charge->getId(), $source, $date, $identityLog);
+        $details = $this->capturePaymentMethod($policy, $token, $amount);
+
+        $redirection = $details->getRedirection();
+        if ($redirection) {
+            $this->logger->info(sprintf('3DS redirected : %s', json_encode($details)));
+            return $details;
+        }
+        $this->add($policy, $charge->getId(), $source, $date, $identityLog);
+        return true
     }
 
     /**
@@ -887,32 +894,7 @@ class CheckoutService
             // Send the request and retrieve the response
             $details = $api->payments()->request($payment);
 
-            $redirection = $details->getRedirection();
-            if ($redirection) {
-                $this->logger->info(sprintf('3DS redirected : %s', json_encode($details)));
-                return $redirection;
-            }
-
-            $this->logger->info(sprintf('No 3DS: %s', json_encode($details)));
-
-            //OLD VERSION PRE 3DS
-            // $charge = new CardTokenChargeCreate();
-            // if ($paymentMethod->hasPreviousChargeId()) {
-            //     $charge->setPreviousChargeId($paymentMethod->getPreviousChargeId());
-            // }
-            // $charge->setEmail($user->getEmail());
-            // $charge->setAutoCapTime(0);
-            // $charge->setAutoCapture('N');
-            // $charge->setCurrency('GBP');
-            // $charge->setMetadata(['policy_id' => $policy->getId()]);
-            // $charge->setCardToken($token);
-            // if ($amount) {
-            //     $charge->setValue($this->convertToPennies($amount));
-            // }
-
-            //$details = $service->chargeWithCardToken($charge);
-
-            //TODO: Create payment and capture using the new API
+            $this->logger->info(sprintf('Payment Details: %s', json_encode($details)));
 
             if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
                 /**
@@ -925,11 +907,12 @@ class CheckoutService
                 throw new PaymentDeclinedException($details->getResponseMessage());
             }
 
-            if ($details) {
-                $card = $details->getCard();
-                if ($card) {
-                    $this->setCardToken($policy, $card);
-                }
+            if ($details && CheckoutPayment::isSuccessfulResult($details->getStatus(), true) ) {
+                $card = $details->getValue('source');
+                $this->logger->info(sprintf('Card details: %s', json_encode($card)));
+                // if ($card and $card["type"] == "card") {
+                //     $this->setCardToken($policy, $card);
+                // }
             }
 
             // if ($amount) {

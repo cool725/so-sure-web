@@ -1741,7 +1741,7 @@ class PurchaseController extends BaseController
             $checkout = $this->get('app.checkout');
 
             if ($request->get('_route') == 'purchase_checkout') {
-                $checkout->pay(
+                $checkoutCardPayment = $checkout->pay(
                     $policy,
                     $token,
                     $amount,
@@ -1749,114 +1749,119 @@ class PurchaseController extends BaseController
                     null,
                     $this->getIdentityLogWeb($request)
                 );
-                $scodeRepo = $dm->getRepository(SCode::class);
-                if ($this->get('session')->has('scode')) {
-                    $code = $this->get('session')->get('scode');
-                    $scode = $scodeRepo->findOneBy([
-                        'code' => $code
-                    ]);
-                }
-                $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
-                if ($referralFeature) {
-                    if ($scode && ($scode->getType() ===  SCode::TYPE_STANDARD)) {
-                        $referral = new ReferralBonus();
-                        $scode->getPolicy()->addInviterReferralBonus($referral);
-                        $policy->addInviteeReferralBonus($referral);
-                        $referral->setStatus(ReferralBonus::STATUS_PENDING);
-                        $dm->persist($referral);
-                        $dm->flush();
+                $redirection = $checkoutCardPayment->getRedirection();
+                if ($redirection) {
+                    return new RedirectResponse($redirection);
+                } else {
+                    $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
+                    if ($referralFeature) {
+                        if ($scode && ($scode->getType() ===  SCode::TYPE_STANDARD)) {
+                            $referral = new ReferralBonus();
+                            $scode->getPolicy()->addInviterReferralBonus($referral);
+                            $policy->addInviteeReferralBonus($referral);
+                            $referral->setStatus(ReferralBonus::STATUS_PENDING);
+                            $dm->persist($referral);
+                            $dm->flush();
+                        }
                     }
-                }
-                if ($scode) {
-                    $invitation = null;
-                    if ($scode->getType() ===  SCode::TYPE_STANDARD) {
-                        $invitationRepo = $dm->getRepository(Invitation::class);
-                        $invitation = $invitationRepo->findOneBy([
-                            'inviter' => $scode->getPolicy()->getUser(),
-                            'invitee' => $policy->getUser()
+                    $scodeRepo = $dm->getRepository(SCode::class);
+                    if ($this->get('session')->has('scode')) {
+                        $code = $this->get('session')->get('scode');
+                        $scode = $scodeRepo->findOneBy([
+                            'code' => $code
                         ]);
                     }
-                    if ($invitation) {
-                        if (!$invitation->isAccepted() && !$invitation->isCancelled()) {
-                            $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                    if ($scode) {
+                        $invitation = null;
+                        if ($scode->getType() ===  SCode::TYPE_STANDARD) {
+                            $invitationRepo = $dm->getRepository(Invitation::class);
+                            $invitation = $invitationRepo->findOneBy([
+                                'inviter' => $scode->getPolicy()->getUser(),
+                                'invitee' => $policy->getUser()
+                            ]);
+                        }
+                        if ($invitation) {
+                            if (!$invitation->isAccepted() && !$invitation->isCancelled()) {
+                                $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                                try {
+                                    $connection = $this->get('app.invitation')->accept($invitation, $policy);
+                                    $this->addFlash(
+                                        'success',
+                                        sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                                    );
+                                } catch (ClaimException $e) {
+                                    $this->addFlash(
+                                        'warning',
+                                        sprintf("Your inviter has a claim and is unable to connect.")
+                                    );
+                                }
+                            }
+                        } else {
                             try {
-                                $connection = $this->get('app.invitation')->accept($invitation, $policy);
+                                $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
+                                if ($invitation && !$scode->isReward()) {
+                                    $message = sprintf(
+                                        '%s has been invited  to connect with you',
+                                        $invitation->getInvitee()->getName()
+                                    );
+                                } else {
+                                    $message = 'Your bonus has been added';
+                                }
+                                $this->addFlash('success', $message);
+                            } catch (DuplicateInvitationException $e) {
+                                $message = sprintf("SCode %s has already been used by you", $code);
+                                if ($scode->isReward()) {
+                                    $message = sprintf("Promo Code %s has already been applied", $code);
+                                }
                                 $this->addFlash(
-                                    'success',
-                                    sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                                    'warning',
+                                    $message
+                                );
+                            } catch (ConnectedInvitationException $e) {
+                                $message = sprintf("You're already connected");
+                                if ($scode->isReward()) {
+                                    $message = sprintf("Promo Code %s has already been applied", $code);
+                                }
+                                $this->addFlash(
+                                    'warning',
+                                    $message
+                                );
+                            } catch (OptOutException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Sorry, but your friend has opted out of any more invitations")
+                                );
+                            } catch (InvalidPolicyException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Please make sure your policy is paid to date before connecting")
+                                );
+                            } catch (SelfInviteException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("You cannot invite yourself")
+                                );
+                            } catch (FullPotException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("You or your friend has a full pot!")
                                 );
                             } catch (ClaimException $e) {
                                 $this->addFlash(
                                     'warning',
-                                    sprintf("Your inviter has a claim and is unable to connect.")
+                                    sprintf("You or your friend has a claim.")
+                                );
+                            } catch (CannotApplyRewardException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Cannot apply Promo Code to policy.")
+                                );
+                            } catch (NotFoundHttpException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Not able to find this scode")
                                 );
                             }
-                        }
-                    } else {
-                        try {
-                            $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-                            if ($invitation && !$scode->isReward()) {
-                                $message = sprintf(
-                                    '%s has been invited  to connect with you',
-                                    $invitation->getInvitee()->getName()
-                                );
-                            } else {
-                                $message = 'Your bonus has been added';
-                            }
-                            $this->addFlash('success', $message);
-                        } catch (DuplicateInvitationException $e) {
-                            $message = sprintf("SCode %s has already been used by you", $code);
-                            if ($scode->isReward()) {
-                                $message = sprintf("Promo Code %s has already been applied", $code);
-                            }
-                            $this->addFlash(
-                                'warning',
-                                $message
-                            );
-                        } catch (ConnectedInvitationException $e) {
-                            $message = sprintf("You're already connected");
-                            if ($scode->isReward()) {
-                                $message = sprintf("Promo Code %s has already been applied", $code);
-                            }
-                            $this->addFlash(
-                                'warning',
-                                $message
-                            );
-                        } catch (OptOutException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Sorry, but your friend has opted out of any more invitations")
-                            );
-                        } catch (InvalidPolicyException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Please make sure your policy is paid to date before connecting")
-                            );
-                        } catch (SelfInviteException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You cannot invite yourself")
-                            );
-                        } catch (FullPotException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You or your friend has a full pot!")
-                            );
-                        } catch (ClaimException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You or your friend has a claim.")
-                            );
-                        } catch (CannotApplyRewardException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Cannot apply Promo Code to policy.")
-                            );
-                        } catch (NotFoundHttpException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Not able to find this scode")
-                            );
                         }
                     }
                 }
