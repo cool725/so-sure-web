@@ -896,7 +896,7 @@ class CheckoutService
 
             $this->logger->info(sprintf('Payment Details: %s', json_encode($details)));
 
-            if (!$details || !CheckoutPayment::isSuccessfulResult($details->getStatus(), true)) {
+            if (!$details || !$details->isApproved()) {
                 /**
                  * If the payment was not authorized, we will need to unset the
                  * previousChargeId so that on the next successful payment the
@@ -907,7 +907,7 @@ class CheckoutService
                 throw new PaymentDeclinedException($details->getResponseMessage());
             }
 
-            if ($details && CheckoutPayment::isSuccessfulResult($details->getStatus(), true) ) {
+            if ($details && $details->isApproved() ) {
                 $card = $details->getValue('source');
                 $this->logger->info(sprintf('Card details: %s', json_encode($card)));
                 // if ($card and $card["type"] == "card") {
