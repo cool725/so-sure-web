@@ -394,7 +394,7 @@ class CheckoutService
             return $details;
         }
         $this->add($policy, $charge->getId(), $source, $date, $identityLog);
-        return true
+        return true;
     }
 
     /**
