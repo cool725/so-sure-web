@@ -22,7 +22,6 @@ use AppBundle\Exception\IncorrectPriceException;
 use AppBundle\Repository\CheckoutPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Checkout\CheckoutApi;
-use Checkout\Models\Tokens\Card;
 use Checkout\Models\Payments\TokenSource;
 use Checkout\Models\Payments\Payment;
 use Checkout\Models\Payments\Customer;
