@@ -1751,8 +1751,11 @@ class PurchaseController extends BaseController
                 );
                 $redirection = $checkoutCardPayment->getRedirection();
                 if ($redirection) {
+                    $logger->info(sprintf('Redirection details: %s', $redirection));
+                    $logger->info(sprintf('Redirection  : %s', json_encode($checkoutCardPayment)));
                     return new RedirectResponse($redirection);
                 } else {
+                    $logger->info(sprintf('No redirection: %s', json_encode($checkoutCardPayment)));
                     $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
                     if ($referralFeature) {
                         if ($scode && ($scode->getType() ===  SCode::TYPE_STANDARD)) {
