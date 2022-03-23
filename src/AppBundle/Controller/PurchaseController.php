@@ -1884,7 +1884,7 @@ class PurchaseController extends BaseController
                 }
                 $this->getManager()->flush();
             }
-
+            $logger->info(sprintf('Success redirect ?'));
             $this->addFlash('success', $successMessage);
 
             if ($type == 'redirect') {
