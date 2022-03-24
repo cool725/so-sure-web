@@ -1753,6 +1753,11 @@ class PurchaseController extends BaseController
                 if ($redirection) {
                     $logger->info(sprintf('Redirection details: %s', $redirection));
                     $logger->info(sprintf('Redirection  : %s', json_encode($checkoutCardPayment)));
+                    if ($type == 'redirect') {
+                        return new RedirectResponse($redirection);
+                    } else {
+                        return $this->getRedirectJsonResponse($redirection);
+                    }
                     return new RedirectResponse($checkoutCardPayment->getRedirection());
                 } else {
                     $logger->info(sprintf('No redirection: %s', json_encode($checkoutCardPayment)));

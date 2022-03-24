@@ -180,7 +180,7 @@ function onCardTokenized(data) {
     }
   }
   $.post(url, paymentData, function(resp) {
-    // console.log(resp)
+    console.log(resp)
   }).fail(function() {
     $('.loading-screen').fadeOut();
   }).always(function() {
