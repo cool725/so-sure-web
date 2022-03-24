@@ -180,7 +180,10 @@ function onCardTokenized(data) {
     }
   }
   $.post(url, paymentData, function(resp) {
-    console.log(resp)
+    if (resp.code === 333) {
+      window.location.href = resp.description;
+      return;
+    }
   }).fail(function() {
     $('.loading-screen').fadeOut();
   }).always(function() {

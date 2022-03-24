@@ -401,7 +401,7 @@ abstract class BaseController extends Controller
 
     public function getRedirectJsonResponse($url)
     {
-        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, $url, 202);
+        return $this->getErrorJsonResponse(ApiErrorCode::REDIRECT, $url, 202);
     }
 
     /**
