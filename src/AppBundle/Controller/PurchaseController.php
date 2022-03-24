@@ -1753,7 +1753,8 @@ class PurchaseController extends BaseController
                 if ($redirection) {
                     $logger->info(sprintf('Redirection details: %s', $redirection));
                     $logger->info(sprintf('Redirection  : %s', json_encode($checkoutCardPayment)));
-                    return new RedirectResponse($redirection);
+                    $logger->info($this->getEnvironment());
+                    return new RedirectResponse($checkoutCardPayment->getRedirection());
                 } else {
                     $logger->info(sprintf('No redirection: %s', json_encode($checkoutCardPayment)));
                     $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
@@ -1884,10 +1885,10 @@ class PurchaseController extends BaseController
                 }
                 $this->getManager()->flush();
             }
-            $logger->info(sprintf('Success redirect ?'));
             $this->addFlash('success', $successMessage);
 
             if ($type == 'redirect') {
+                $logger->info(sprintf('Success redirect ?'));
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
@@ -1927,6 +1928,7 @@ class PurchaseController extends BaseController
             }
             $logger->warning(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_COMMISSION, $message));
             if ($type == 'redirect') {
+                $logger->info(sprintf('Success redirect ?'));
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);

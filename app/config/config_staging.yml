@@ -108,9 +108,9 @@ nelmio_security:
         hsts_subdomains: true
     external_redirects:
         abort: true
+        log: true
         whitelist:
             - purchase.staging.wearesosure.com
-            - 3ds2-sandbox.ckotech.co
 
 twig:
     globals:
