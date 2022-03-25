@@ -384,18 +384,31 @@ class CheckoutService
         $amount,
         $source,
         \DateTime $date = null,
-        IdentityLog $identityLog = null
+        IdentityLog $identityLog = null,
+        $is3ds = false
     ) {
-        $details = $this->capturePaymentMethod($policy, $token, $amount);
+        $details = $this->capturePaymentMethod($policy, $token, $amount, $is3ds);
 
         $redirection = $details->getRedirection();
         if ($redirection) {
             $this->logger->info(sprintf('3DS redirected : %s', json_encode($details)));
             return $details;
+        } else {
+            $this->add($policy, $details, $source, $date, $identityLog);
+            return null
         }
-        $this->add($policy, $charge->getId(), $source, $date, $identityLog);
-        return true;
     }
+
+    // public function confirm3ds(
+    //     Policy $policy,
+    //     $sessionToken,
+    //     \DateTime $date = null,
+    //     IdentityLog $identityLog = null
+    // ) {
+    //     $details = $this->confirm3dsPayment($policy, $sessionToken) {
+
+    //     }
+    // }
 
     /**
      * @param Policy      $policy
@@ -850,9 +863,9 @@ class CheckoutService
     public function capturePaymentMethod(
         Policy $policy,
         $token,
-        $amount = null
+        $amount = null,
+        $is3ds = false
     ) {
-        $api = $this->getApiForPolicy($policy);
         $user = $policy->getUser();
         $details = null;
         $payment = null;
@@ -864,75 +877,115 @@ class CheckoutService
         }
 
         try {
-            $user = $policy->getUser();
+            if ($is3ds) {
+                $api = $this->getApiForPolicy($policy);
+                 // Create a payment method instance with card details
+                $method = new CheckoutAPITokenSource($token);
 
-            // Create a payment method instance with card details
-            $method = new CheckoutAPITokenSource($token);
+                // Prepare the payment parameters
+                $payment = new CheckoutAPIPayment($method, 'GBP');
 
-            // Prepare the payment parameters
-            $payment = new CheckoutAPIPayment($method, 'GBP');
+                if ($amount) {
+                    $payment->amount = $this->convertToPennies($amount);
+                }
 
-            if ($amount) {
-                $payment->amount = $this->convertToPennies($amount);
-            }
+                $customer = new CheckoutAPICustomer();
+                $customer->email = $user->getEmail();
+                $customer->name = $user->getName();
 
-            $customer = new CheckoutAPICustomer();
-            $customer->email = $user->getEmail();
-            $customer->name = $user->getName();
+                $payment->customer = $customer;
 
-            $payment->customer = $customer;
+                $payment->capture = true;
+                $payment->reference = 'CKO-' . $policy->getPolicyNumber . '-001';
+                $payment->threeDs = new CheckoutAPIThreeDs(true);
+                $payment->risk = new CheckoutAPIRisk(true);
 
-            $payment->capture = true;
-            $payment->reference = 'CKO-' . $policy->getPolicyNumber . '-001';
-            $payment->threeDs = new CheckoutAPIThreeDs(true);
-            $payment->risk = new CheckoutAPIRisk(true);
+                if ($paymentMethod->hasPreviousChargeId()) {
+                    $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
+                }
 
-            if ($paymentMethod->hasPreviousChargeId()) {
-                $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
-            }
+                // Send the request and retrieve the response
+                $details = $api->payments()->request($payment);
 
-            // Send the request and retrieve the response
-            $details = $api->payments()->request($payment);
+                $this->logger->info(sprintf('3DS Payment Details: %s', json_encode($details)));
 
-            $this->logger->info(sprintf('Payment Details: %s', json_encode($details)));
+                if (!$details || !$details->isApproved()) {
+                    /**
+                     * If the payment was not authorized, we will need to unset the
+                     * previousChargeId so that on the next successful payment the
+                     * new chargeId is set as previousChargeId for future payments.
+                     */
+                    $paymentMethod->setPreviousChargeId('none');
+                    $this->dm->flush();
+                    throw new PaymentDeclinedException($details->getResponseMessage());
+                }
 
-            if (!$details || !$details->isApproved()) {
-                /**
-                 * If the payment was not authorized, we will need to unset the
-                 * previousChargeId so that on the next successful payment the
-                 * new chargeId is set as previousChargeId for future payments.
-                 */
-                $paymentMethod->setPreviousChargeId('none');
-                $this->dm->flush();
-                throw new PaymentDeclinedException($details->getResponseMessage());
-            }
-
-            if ($details && $details->isApproved() ) {
-                $card = $details->getValue('source');
-                $this->logger->info(sprintf('Card details: %s', json_encode($card)));
-                // if ($card and $card["type"] == "card") {
-                //     $this->setCardToken($policy, $card);
+                // if ($details) {
+                //     $card = $details->getCard();
+                //     if ($card) {
+                //         $this->setCardToken($policy, $card);
+                //     }
                 // }
+
+            } else {
+                // OLD api version with no 3ds
+                $client = $this->getClientForPolicy($policy);
+
+                $charge = new CardTokenChargeCreate();
+                if ($paymentMethod->hasPreviousChargeId()) {
+                    $charge->setPreviousChargeId($paymentMethod->getPreviousChargeId());
+                }
+                $charge->setEmail($user->getEmail());
+                $charge->setAutoCapTime(0);
+                $charge->setAutoCapture('N');
+                $charge->setCurrency('GBP');
+                $charge->setMetadata(['policy_id' => $policy->getId()]);
+                $charge->setCardToken($token);
+                if ($amount) {
+                    $charge->setValue($this->convertToPennies($amount));
+                }
+
+                $details = $service->chargeWithCardToken($charge);
+                $this->logger->info(sprintf('Update Payment Method Resp: %s', json_encode($details)));
+
+                if (!$details || !$details->isApproved()) {
+                    /**
+                     * If the payment was not authorized, we will need to unset the
+                     * previousChargeId so that on the next successful payment the
+                     * new chargeId is set as previousChargeId for future payments.
+                     */
+                    $paymentMethod->setPreviousChargeId('none');
+                    $this->dm->flush();
+                    throw new PaymentDeclinedException($details->getResponseMessage());
+                }
+
+                if ($details) {
+                    $card = $details->getCard();
+                    if ($card) {
+                        $this->setCardToken($policy, $card);
+                    }
+                }
+
+                if ($amount) {
+                    $capture = new ChargeCapture();
+                    $capture->setChargeId($details->getId());
+    
+                    if (!$paymentMethod->hasPreviousChargeId()) {
+                        $paymentMethod->setPreviousChargeId($details->getId());
+                    }
+    
+                    $details = $service->CaptureCardCharge($capture);
+                    $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
+    
+                    if ($details) {
+                        $card = $details->getCard();
+                        if ($card) {
+                            $this->setCardToken($policy, $card);
+                        }
+                    }
+                }
+                $this->logger->info(sprintf('Legacy Payment Details: %s', json_encode($details)));
             }
-
-            // if ($amount) {
-            //     $capture = new ChargeCapture();
-            //     $capture->setChargeId($details->getId());
-
-            //     if (!$paymentMethod->hasPreviousChargeId()) {
-            //         $paymentMethod->setPreviousChargeId($details->getId());
-            //     }
-
-            //     $details = $service->CaptureCardCharge($capture);
-            //     $this->logger->info(sprintf('Update Payment Method Charge Resp: %s', json_encode($details)));
-
-            //     if ($details) {
-            //         $card = $details->getCard();
-            //         if ($card) {
-            //             $this->setCardToken($policy, $card);
-            //         }
-            //     }
-            // }
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),

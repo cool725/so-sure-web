@@ -170,13 +170,15 @@ function onCardTokenized(data) {
       'csrf': csrf,
       'token': data.token,
       'pennies': amount,
-      'scode': scode
+      'scode': scode,
+      '3ds': true
     }
   } else {
     paymentData = {
       'csrf': csrf,
       'token': data.token,
-      'pennies': amount
+      'pennies': amount,
+      '3ds': true
     }
   }
   $.post(url, paymentData, function(resp) {

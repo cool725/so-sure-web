@@ -1638,6 +1638,7 @@ class PurchaseController extends BaseController
         $publicKey = null;
         $cardToken = null;
         $scode = null;
+        $is3ds = null;
         try {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
@@ -1651,6 +1652,7 @@ class PurchaseController extends BaseController
             $pennies = $request->get("pennies");
             $freq = $request->get('premium');
             $saveBacs = $request->get('save_bank') == '1';
+            $is3ds = $request->get("3ds");
             if ($request->get('_route') == 'purchase_checkout') {
                 $priceService = $this->get('app.price');
                 $additionalPremium = $policy->getUser()->getAdditionalPremium();
@@ -1747,7 +1749,8 @@ class PurchaseController extends BaseController
                     $amount,
                     Payment::SOURCE_WEB,
                     null,
-                    $this->getIdentityLogWeb($request)
+                    $this->getIdentityLogWeb($request),
+                    $is3ds
                 );
                 $redirection = $checkoutCardPayment->getRedirection();
                 if ($redirection) {
