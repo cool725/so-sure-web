@@ -1700,6 +1700,9 @@ class Claim
 
     public function isDuringPolicyPeriod(Policy $policy)
     {
+        if (!$policy->getStart() || !$policy->getEnd()) {
+            return false;
+        }
         $periodStart = clone $policy->getStart();
         $periodEnd = clone $policy->getEnd();
         if ($this->getLossDate() && $this->getLossDate() >= $periodStart && $this->getLossDate() < $periodEnd) {
