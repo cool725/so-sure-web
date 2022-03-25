@@ -182,11 +182,15 @@ function onCardTokenized(data) {
   $.post(url, paymentData, function(resp) {
     if (resp.code === 333) {
       window.location.href = resp.description;
-      return;
+    } else {
+      if (redirect) {
+        window.location.href = redirect;
+      } else {
+        window.location.reload(false);
+      }
     }
   }).fail(function() {
     $('.loading-screen').fadeOut();
-  }).always(function() {
     if (redirect) {
       window.location.href = redirect;
     } else {
