@@ -1591,6 +1591,7 @@ class PurchaseController extends BaseController
 
     /**
      * @Route("/checkout/{id}", name="purchase_checkout")
+     * @Route("/checkout/{id}/3ds", name="purchase_checkout_3ds")
      * @Route("/checkout/{id}/update", name="purchase_checkout_update")
      * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
      * @Route("/checkout/{id}/unpaid", name="purchase_checkout_unpaid")
@@ -1632,6 +1633,12 @@ class PurchaseController extends BaseController
             details are correct and try again or get in touch if you continue to have issues';
             $redirectSuccess = $this->generateUrl('user_claim');
             $redirectFailure = $this->generateUrl('user_claim_pay', ['policyId' => $id]);
+        } elseif ($request->get('_route') == 'purchase_checkout_3ds') {
+            $successMessage = 'Success! Your 3ds payment has been successfully completed';
+            $errorMessage = 'Oh no! There was a problem with your 3ds payment. Please check your card
+            details are correct and try again or get in touch if you continue to have issues';
+            $redirectSuccess = $this->generateUrl('user_welcome', ['id' => $id]);
+            $redirectFailure = $this->generateUrl('purchase_step_payment_id', ['id' => $id]);
         }
         $token = null;
         $pennies = null;
@@ -1742,16 +1749,26 @@ class PurchaseController extends BaseController
             /** @var CheckoutService $checkout */
             $checkout = $this->get('app.checkout');
 
-            if ($request->get('_route') == 'purchase_checkout') {
-                $checkoutCardPayment = $checkout->pay(
-                    $policy,
-                    $token,
-                    $amount,
-                    Payment::SOURCE_WEB,
-                    null,
-                    $this->getIdentityLogWeb($request),
-                    $is3ds
-                );
+            if ($request->get('_route') == 'purchase_checkout' || $request->get('_route') == 'purchase_checkout_3ds') {
+                if ($request->get('_route') == 'purchase_checkout_3ds') {
+                    $checkoutCardPayment = $checkout->verifyPayment(
+                        $policy,
+                        $token,
+                        Payment::SOURCE_WEB,
+                        null,
+                        $this->getIdentityLogWeb($request)
+                    );
+                } else {
+                    $checkoutCardPayment = $checkout->pay(
+                        $policy,
+                        $token,
+                        $amount,
+                        Payment::SOURCE_WEB,
+                        null,
+                        $this->getIdentityLogWeb($request),
+                        $is3ds
+                    );
+                }
                 $redirection = $checkoutCardPayment->getRedirection();
                 if ($redirection) {
                     $logger->info(sprintf('Redirection details: %s', $redirection));

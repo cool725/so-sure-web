@@ -133,6 +133,9 @@ class CheckoutService
     /** @var boolean */
     protected $production;
 
+    /** @var RouterService */
+    protected $routerService;
+
     /**
      * Injects the service's dependencies.
      * @param DocumentManager          $dm                is used for database access.
@@ -149,6 +152,7 @@ class CheckoutService
      * @param SmsService               $sms               is used to sms users in response to payment status.
      * @param FeatureService           $featureService    is used to check if features are enabled.
      * @param PriceService             $priceService      is used to verify paid sums.
+     * @param RouterService            $routerService     is used to generate urls
      */
     public function __construct(
         DocumentManager $dm,
@@ -164,7 +168,8 @@ class CheckoutService
         EventDispatcherInterface $dispatcher,
         SmsService $sms,
         FeatureService $featureService,
-        PriceService $priceService
+        PriceService $priceService,
+        RouterService $routerService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -181,6 +186,7 @@ class CheckoutService
         $this->helvetiaApiSecret = $helvetiaApiSecret;
         $this->helvetiaApiPublic = $helvetiaApiPublic;
         $this->production = $environment === 'prod';
+        $this->routerService = $routerService;
     }
 
     /**
@@ -399,16 +405,17 @@ class CheckoutService
         }
     }
 
-    // public function confirm3ds(
-    //     Policy $policy,
-    //     $sessionToken,
-    //     \DateTime $date = null,
-    //     IdentityLog $identityLog = null
-    // ) {
-    //     $details = $this->confirm3dsPayment($policy, $sessionToken) {
-
-    //     }
-    // }
+    public function verifyPayment(
+        Policy $policy,
+        $sessionToken,
+        $source,
+        \DateTime $date = null,
+        IdentityLog $identityLog = null
+    ) {
+        $details = $this->confirm3dsPayment($policy, $sessionToken);
+        //TODO: Adapt the add function to the 3ds formt of details
+        return $details 
+    }
 
     /**
      * @param Policy      $policy
@@ -900,12 +907,19 @@ class CheckoutService
                 $payment->threeDs = new CheckoutAPIThreeDs(true);
                 $payment->risk = new CheckoutAPIRisk(true);
 
+                $payment->success_url = $this->routerService->generateUrl('purchase_checkout_3ds');
+                $payment->failure_url = $this->routerService->generateUrl('purchase_step_payment_id', ['id' => $id]);
+
                 if ($paymentMethod->hasPreviousChargeId()) {
                     $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
                 }
 
                 // Send the request and retrieve the response
                 $details = $api->payments()->request($payment);
+
+                if (!$paymentMethod->hasPreviousChargeId()) {
+                    $paymentMethod->setPreviousChargeId($details->id);
+                }
 
                 $this->logger->info(sprintf('3DS Payment Details: %s', json_encode($details)));
 
@@ -1004,6 +1018,68 @@ class CheckoutService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         return $details;
+    }
+
+    /**
+     * @param Policy $policy
+     * @param string $sessionToken
+     */
+    public function confirm3dsPayment()
+    (
+        Policy $policy,
+        $sessionToken
+    ) {
+        $user = $policy->getUser();
+        $details = null;
+        $payment = null;
+
+        try {
+            $api = $this->getApiForPolicy($policy);
+            // Create a payment method instance with card details
+            $details = $api->payments()->details($token);
+
+            $this->logger->info(sprintf('3DS Payment Details: %s', json_encode($details)));
+
+            // if (!$paymentMethod->hasPreviousChargeId()) {
+            //     $paymentMethod->setPreviousChargeId($details->id);
+            // }
+
+            // if (!$details || !$details->isApproved()) {
+            //     /**
+            //      * If the payment was not authorized, we will need to unset the
+            //      * previousChargeId so that on the next successful payment the
+            //      * new chargeId is set as previousChargeId for future payments.
+            //      */
+            //     $paymentMethod->setPreviousChargeId('none');
+            //     $this->dm->flush();
+            //     throw new PaymentDeclinedException($details->getResponseMessage());
+            // }
+
+            // if ($details) {
+            //     $card = $details->getCard();
+            //     if ($card) {
+            //         $this->setCardToken($policy, $card);
+            //     }
+            // }
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
+                ['exception' => $e]
+            );
+
+            throw $e;
+        }
+
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy && $policy->isDifferentPayer()) {
+            // don't use $user as not validated that policy belongs to user
+            $policy->setPayer($policy->getUser());
+        }
+
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        return $details;
+
     }
 
     /**
