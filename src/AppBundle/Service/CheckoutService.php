@@ -401,7 +401,7 @@ class CheckoutService
             return $details;
         } else {
             $this->add($policy, $details, $source, $date, $identityLog);
-            return null
+            return null;
         }
     }
 
