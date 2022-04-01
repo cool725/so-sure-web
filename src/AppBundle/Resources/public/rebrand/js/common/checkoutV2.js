@@ -191,6 +191,7 @@ function onCardTokenized(data) {
     }
   }).fail(function() {
     $('.loading-screen').fadeOut();
+    // TODO: Show error to user???
     // if (redirect) {
     //   window.location.href = redirect;
     // } else {
