@@ -414,7 +414,7 @@ class CheckoutService
     ) {
         $details = $this->confirm3dsPayment($policy, $sessionToken);
         //TODO: Adapt the add function to the 3ds formt of details
-        return $details 
+        return $details;
     }
 
     /**
@@ -1024,8 +1024,7 @@ class CheckoutService
      * @param Policy $policy
      * @param string $sessionToken
      */
-    public function confirm3dsPayment()
-    (
+    public function confirm3dsPayment(
         Policy $policy,
         $sessionToken
     ) {
