@@ -182,6 +182,8 @@ function onCardTokenized(data) {
     }
   }
   $.post(url, paymentData, function(resp) {
+    // console.log(resp)
+  }).done(function() {
     if (resp.code === 333) {
       window.location.href = resp.description;
     } else if (redirect) {
@@ -190,14 +192,11 @@ function onCardTokenized(data) {
       window.location.reload(false);
     }
   }).fail(function() {
+    window.location.reload(false);
+  }).always(function() {
     $('.loading-screen').fadeOut();
-    // TODO: Show error to user???
-    // if (redirect) {
-    //   window.location.href = redirect;
-    // } else {
-    //   window.location.reload(false);
-    // }
-  })
+    console.log(resp)
+  });
 }
 
 Frames.addEventHandler(
