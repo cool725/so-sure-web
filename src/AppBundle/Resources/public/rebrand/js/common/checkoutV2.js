@@ -184,20 +184,18 @@ function onCardTokenized(data) {
   $.post(url, paymentData, function(resp) {
     if (resp.code === 333) {
       window.location.href = resp.description;
-    } else {
-      if (redirect) {
-        window.location.href = redirect;
-      } else {
-        window.location.reload(false);
-      }
-    }
-  }).fail(function() {
-    $('.loading-screen').fadeOut();
-    if (redirect) {
+    } else if (redirect) {
       window.location.href = redirect;
     } else {
       window.location.reload(false);
     }
+  }).fail(function() {
+    $('.loading-screen').fadeOut();
+    // if (redirect) {
+    //   window.location.href = redirect;
+    // } else {
+    //   window.location.reload(false);
+    // }
   })
 }
 
