@@ -452,6 +452,9 @@ class FOSUBUserProvider extends BaseClass
 
         if ($user->hasPartialPolicy()) {
             foreach ($user->getPartialPolicies() as $partialPolicy) {
+                foreach ($partialPolicy->getInvitations() as $invitation) {
+                    $invitation->setPolicy(null);
+                }
                 $this->dm->remove($partialPolicy);
             }
         }
