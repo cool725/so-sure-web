@@ -69,7 +69,7 @@
                     <a href="#"
                        class="btn btn-success btn-block-xs native-share track-data d-md-none"
                        data-native-title="{{ og_title }}"
-                       data-native-url="{{ og_url }}"
+                       data-native-url="{{ og_url }}?utm_source=welcome&utm_medium=referral&utm_campaign=mobile"
                        data-native-text="{{ og_description }}"
                        data-event="invite-competition-welcome-page-native">
                        Invite Friends</a>
@@ -79,9 +79,9 @@
                             <input type="text" 
                                    class="form-control form-control-white" 
                                    readonly="readonly"
-                                   value="{{ url('scode', {'code': policy.standardSCode.code}) }}" />
+                                   value="{{ url('scode', {'code': policy.standardSCode.code}) }}?utm_source=welcome&utm_medium=referral&utm_campaign=mobile" />
                             <button class="btn btn-success btn-sm btn-copy" 
-                                    data-clipboard-text="{{ url('scode', {'code': policy.standardSCode.code}) }}">
+                                    data-clipboard-text="{{ url('scode', {'code': policy.standardSCode.code}) }}?utm_source=welcome&utm_medium=referral&utm_campaign=mobile">
                                 Copy</button>
                         </div>
                         <div class="h6 text-deep-sky-blue-d">📨 or invite via email</div>
