@@ -908,8 +908,10 @@ class CheckoutService
                 $payment->threeDs = new CheckoutAPIThreeDs(true); /** @phpstan-ignore-line */
                 $payment->risk = new CheckoutAPIRisk(true); /** @phpstan-ignore-line */
 
-                $payment->success_url = $this->routerService->generateUrl('purchase_checkout_3ds', []); /** @phpstan-ignore-line */
-                $payment->failure_url = $this->routerService->generateUrl('purchase_step_payment_id', ['id' => $policy->getId()]); /** @phpstan-ignore-line */
+                $payment->success_url = 
+                    $this->routerService->generateUrl('purchase_checkout_3ds', []); /** @phpstan-ignore-line */
+                $payment->failure_url =
+                    $this->routerService->generateUrl('purchase_step_payment_id', ['id' => $policy->getId()]); /** @phpstan-ignore-line */
 
                 if ($paymentMethod->hasPreviousChargeId()) {
                     $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId()); /** @phpstan-ignore-line */
