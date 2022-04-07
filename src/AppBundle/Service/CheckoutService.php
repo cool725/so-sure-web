@@ -887,38 +887,40 @@ class CheckoutService
         try {
             if ($is3ds) {
                 $api = $this->getApiForPolicy($policy);
-                 // Create a payment method instance with card details
+                // @codingStandardsIgnoreStart
+                // We ignore standarda are they seem not compatible with checkout api
+                // Create a payment method instance with card details
                 $method = new CheckoutAPITokenSource($token);
 
                 // Prepare the payment parameters
                 $payment = new CheckoutAPIPayment($method, 'GBP');
 
                 if ($amount) {
-                    $payment->amount = $this->convertToPennies($amount); /** @phpstan-ignore-line */
+                    $payment->amount = $this->convertToPennies($amount);
                 }
 
                 $customer = new CheckoutAPICustomer();
-                $customer->email = $user->getEmail(); /** @phpstan-ignore-line */
-                $customer->name = $user->getName(); /** @phpstan-ignore-line */
+                $customer->email = $user->getEmail();
+                $customer->name = $user->getName();
 
-                $payment->customer = $customer; /** @phpstan-ignore-line */
+                $payment->customer = $customer;
 
-                $payment->capture = true; /** @phpstan-ignore-line */
+                $payment->capture = true;
                 $payment->reference = 'CKO-' . $policy->getPolicyNumber() . '-001';
-                $payment->threeDs = new CheckoutAPIThreeDs(true); /** @phpstan-ignore-line */
-                $payment->risk = new CheckoutAPIRisk(true); /** @phpstan-ignore-line */
+                $payment->threeDs = new CheckoutAPIThreeDs(true);
+                $payment->risk = new CheckoutAPIRisk(true);
 
                 $payment->success_url =
                     $this
                     ->routerService
-                    ->generateUrl('purchase_checkout_3ds', []); /** @phpstan-ignore-line */
+                    ->generateUrl('purchase_checkout_3ds', []);
                 $payment->failure_url =
                     $this
                     ->routerService
-                    ->generateUrl('purchase_step_payment_id', ['id' => $policy->getId()]); /** @phpstan-ignore-line */
+                    ->generateUrl('purchase_step_payment_id', ['id' => $policy->getId()]);
 
                 if ($paymentMethod->hasPreviousChargeId()) {
-                    $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId()); /** @phpstan-ignore-line */
+                    $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
                 }
 
                 // Send the request and retrieve the response
@@ -940,6 +942,7 @@ class CheckoutService
                     $this->dm->flush();
                     throw new PaymentDeclinedException($details->getResponseMessage());
                 }
+                // @codingStandardsIgnoreEnd
 
                 // if ($details) {
                 //     $card = $details->getCard();
