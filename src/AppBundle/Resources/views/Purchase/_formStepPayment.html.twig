@@ -18,6 +18,7 @@
     {% set hide_options = 'd-none' %}
     {% set dd_active = '' %}
     {% set cc_active = 'active' %}
+    {% set hide_options_card = 'd-none' %}
 
     {# Check for bacs allowed feature & if bascs allowed session through route #}
     {% if feature_enabled('allow-bacs-payment-method') and not bacsnotallowed %}
@@ -25,6 +26,10 @@
         {% set hide_options = '' %}
         {% set dd_active = 'active' %}
         {% set cc_active = '' %}
+    {% endif %}
+
+    {% if feature_enabled('allow-card-payment-method') %}
+        {% set hide_options_card = '' %}
     {% endif %}
 
     <div class="hideme">
@@ -47,7 +52,7 @@
                             &pound;{{ phone.currentYearlyPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}/year (&pound;{{ yearlyMonthly }}/month)
                         </small><br />
                         <small class="sub text-success">
-                            <strong>Best value:</strong> Includes 2 months FREE!
+                            <strong>Best value:</strong> Includes 1 month FREE!
                         </small>
                     </span>
                     <span class="h5">
@@ -89,7 +94,7 @@
         </div>
     </div>
 
-    <div id="payment-option-credit-card" class="form-group">
+    <div id="payment-option-credit-card" class="form-group {{ hide_options_card }}">
         <div class="payment-card payment-card-type"
              data-option="card">
             <div class="payment-card-body">

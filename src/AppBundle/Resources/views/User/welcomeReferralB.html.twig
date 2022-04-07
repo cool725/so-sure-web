@@ -1,0 +1,171 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'user-referral' %}
+{% set robots_noindex = true %}
+{% set small_footer = true %}
+{% set intercom_enabled = true %}
+
+{% block title %}Welcome to SO-SURE, {{ policy.user.firstname }} 🎉{% endblock %}
+
+{# Set Meta #}
+{% set og_title = '1 Month FREE Phone Insurance thanks to' ~ policy.user.firstname %}
+{% set og_description = "Check out SO-SURE to get one month free phone insurance immediately + excellent perks: low priced premium and excess, 2nd hand phone insurance, up to 80% cash back, and much more!" %}
+{% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-referral.jpg' %}
+{% if policy.standardSCode %}
+    {% set og_url = url('scode', {'code': policy.standardSCode.code}) %}
+{% endif %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('user-referral') }}
+{% endblock %}
+
+{% if policy.getPremiumPlan == 'monthly'%}
+    {% set premium = policy.premium.gwp %}
+    {% set tax = policy.premium.ipt %}
+{% elseif policy.getPremiumPlan == 'yearly' %}
+    {% set premium = policy.premium.gwp * 12 %}
+    {% set tax = policy.premium.ipt * 12 %}
+{% endif %}
+
+{% block gtm_data %}
+    ,
+    'event': 'purchase',
+    'purchase': {
+        'transaction_id': '{{ policy.policyNumber }}',
+        'affiliation': '{{ policy.leadSourceDetails }}',
+        'value': {{ premium }},
+        'tax': {{ tax }},
+        'currency': 'GBP',
+        'coupon': '{{ used_scode }}',
+        'items': [{
+            'item_id': '{{ policy.phone.id }}',
+            'item_name': '{{ policy.phone.make }} {{ policy.phone.model }}',
+            'affiliation': '{{ policy.leadSourceDetails }}',
+            'coupon': '{{ used_scode }}',
+            'currency': 'GBP',
+            'item_brand': '{{ policy.phone.make }}',
+            'item_category': 'V1 Phone Insurance',
+            'item_variant': '{{ policy.phone.memory }}GB',
+            'price': {{ premium }},
+            'quantity': 1
+        }]
+    },
+{% endblock %}
+
+{% block body %}
+    <section class="hero">
+        <div class="container-large">
+            <div class="row">
+                <div class="col-md-8 offset-md-2 offset-lg-0">
+                    <h1 class="text-white fit mt-lg-4 mb-4">{{ policy.user.firstname }}, you’re all covered! 🥳</h1>
+                    <p class="lead text-white">
+                        Shortly you will receive a confirmation email and a link to download our app to verify your <strong>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="excess py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-lg-4 d-none d-lg-block">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_phone_selfie_large.jpg"
+                     alt="Phone selfie mirror"
+                     class="lozad img-fluid">
+                </div>
+                <div class="col-md-8 offset-md-2 col-lg-7 offset-lg-1">
+                    <h2 class="h3 mb-3 text-primary">Save £100 on your excess 🙌</h2>
+                    <p>Your excess is currently &pound;{{ policy.premium.excess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.excess.loss }} for Theft{% if policy.subvariant.name is defined and policy.subvariant.name != 'both' %}/Loss{% endif %}){% endif %} but you can easily reduce it to &pound;{{ policy.premium.picSureExcess.damage }}{% if policy.subvariant.name is defined and policy.subvariant.name != 'damage' %} (&pound;{{ policy.premium.picSureExcess.loss }} for Theft/Loss){% endif %} by just downloading our app and validating your phone.</p>
+                    <p class="mb-5">Validating your phone is so easy, and takes less than 3 minutes.  What are you waiting for?</p>
+                    <div class="text-center text-lg-left">
+                        {% if policy.phone.iTunes %}
+                            <a href="{{ apple_download('user-required-account') }}"
+                                class="btn btn-success btn-shadow ga-outbound-click"
+                                data-clicklabel="iTunes"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                        {% endif %}
+                        {% if policy.phone.googlePlay %}
+                            <a href="{{ google_download('user-required-account') }}"
+                                class="btn btn-success btn-shadow ga-outbound-click"
+                                data-clicklabel="PlayStore"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="cashback py-lg-5">
+        <div class="container-large py-5">
+            <div class="row">
+                <div class="col-md-8 offset-md-2 col-lg-7 offset-lg-0">
+                    <h2 class="h3 mb-3 text-primary">Collect up to 80% cashback 💰</h2>
+                    <p>It’s super easy to do, just <strong>share your SO-SURE link</strong> with your most careful friends and family.</p>
+                    <p>When they join SO-SURE from your link and connect, each of you <strong>receives £10 into your Reward Pots</strong>. If none of you or your connections makes a claim, we will pay out the value of your reward pot at the end of the policy year.</p>
+                    <p class="mb-5">Not only that but we will give <strong>both of you a month FREE</strong>.</p>
+                    <a href="#"
+                       class="btn btn-success btn-block-xs native-share track-data d-md-none"
+                       data-native-title="{{ og_title }}"
+                       data-native-url="{{ og_url }}?utm_source=welcome&utm_medium=referral&utm_campaign=mobile"
+                       data-native-text="{{ og_description }}"
+                       data-event="invite-competition-welcome-page-native">
+                       Invite Friends</a>
+                    <div class="d-none d-md-block non-native-share">
+                        <div class="h6 text-zaffre">🔗 Copy this link to refer a friend</div>
+                        <div class="custom-input-with-btn mb-4">
+                            <input type="text"
+                                   class="form-control"
+                                   readonly="readonly"
+                                   value="{{ url('scode', {'code': policy.standardSCode.code}) }}?utm_source=welcome&utm_medium=referral&utm_campaign=mobile" />
+                            <button class="btn btn-success btn-sm btn-copy"
+                                    data-clipboard-text="{{ url('scode', {'code': policy.standardSCode.code}) }}?utm_source=welcome&utm_medium=referral&utm_campaign=mobile">
+                                Copy</button>
+                        </div>
+                        <div class="h6 text-zaffre">📨 or invite via email</div>
+                        <form id="invite_form" class="mb-5" autocomplete="nope">
+                            <input id="email-csrf" type="hidden" name="csrf" value="{{ csrf_token('invite-email') }}" />
+                            <div class="custom-input-with-btn mb-4">
+                                <input type="text" class="form-control input-invite" placeholder="Enter email address" name="email_invite" />
+                                <button class="btn btn-success btn-invite btn-sm" data-path="{{ path('json_invite_email') }}">
+                                    Invite</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-4 offset-lg-1 d-none d-lg-block">
+                    <img src="{{ cdn_url }}/images/onexone.png"
+                     data-src="{{ cdn_url }}/images/rebrand/knowledge-base/so-sure_knowledge_base_reward_pot_and_connections_alt.jpg"
+                     alt="Reward Pot Connections"
+                     class="lozad img-fluid">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="banner py-5">
+        <div class="container-large">
+            <div class="d-lg-flex justify-content-lg-between align-items-lg-center">
+                <div class="mb-4 mb-lg-0 d-lg-flex align-items-lg-center">
+                    <img data-src="{{ cdn_url }}/images/rebrand/icns/so-sure_app-icn.svg" class="d-none d-lg-inline mt-lg-2 lozad" alt="so-sure App Icon">
+                    <div class="banner__text text-center text-lg-left ml-lg-4">
+                        <h2 class="h4 text-white">Go to your dashboard or download the app</h2>
+                        <p class="lead text-white">To earn cashback and rewards every month</p>
+                    </div>
+                </div>
+                <div class="banner__controls text-center text-lg-left">
+                    <a href="{{ path('user_home') }}" class="btn btn-success btn-block-xs">Go to your dashboard</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('user-referral') }}
+{% endblock %}
