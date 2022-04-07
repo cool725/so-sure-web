@@ -894,25 +894,25 @@ class CheckoutService
                 $payment = new CheckoutAPIPayment($method, 'GBP');
 
                 if ($amount) {
-                    $payment->amount = $this->convertToPennies($amount);
+                    $payment->amount = $this->convertToPennies($amount); /** @phpstan-ignore-line */
                 }
 
                 $customer = new CheckoutAPICustomer();
-                $customer->email = $user->getEmail();
-                $customer->name = $user->getName();
+                $customer->email = $user->getEmail(); /** @phpstan-ignore-line */
+                $customer->name = $user->getName(); /** @phpstan-ignore-line */
 
-                $payment->customer = $customer;
+                $payment->customer = $customer; /** @phpstan-ignore-line */
 
-                $payment->capture = true;
-                $payment->reference = 'CKO-' . $policy->getPolicyNumber . '-001';
-                $payment->threeDs = new CheckoutAPIThreeDs(true);
-                $payment->risk = new CheckoutAPIRisk(true);
+                $payment->capture = true; /** @phpstan-ignore-line */
+                $payment->reference = 'CKO-' . $policy->getPolicyNumber() . '-001';
+                $payment->threeDs = new CheckoutAPIThreeDs(true); /** @phpstan-ignore-line */
+                $payment->risk = new CheckoutAPIRisk(true); /** @phpstan-ignore-line */
 
-                $payment->success_url = $this->routerService->generateUrl('purchase_checkout_3ds');
-                $payment->failure_url = $this->routerService->generateUrl('purchase_step_payment_id', ['id' => $id]);
+                $payment->success_url = $this->routerService->generateUrl('purchase_checkout_3ds', []); /** @phpstan-ignore-line */
+                $payment->failure_url = $this->routerService->generateUrl('purchase_step_payment_id', ['id' => $policy->getId()]); /** @phpstan-ignore-line */
 
                 if ($paymentMethod->hasPreviousChargeId()) {
-                    $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
+                    $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId()); /** @phpstan-ignore-line */
                 }
 
                 // Send the request and retrieve the response
@@ -944,6 +944,7 @@ class CheckoutService
             } else {
                 // OLD api version with no 3ds
                 $client = $this->getClientForPolicy($policy);
+                $service = $client->chargeService();
 
                 $charge = new CardTokenChargeCreate();
                 if ($paymentMethod->hasPreviousChargeId()) {
