@@ -414,7 +414,7 @@ class CheckoutService
     ) {
         $details = $this->confirm3dsPayment($policy, $sessionToken);
         //TODO: Adapt the add function to the 3ds formt of details
-        //$this->add($policy, $details, $source, $date, $identityLog);
+        $this->add($policy, $details, $source, $date, $identityLog);
         return $details;
     }
 
@@ -1035,7 +1035,7 @@ class CheckoutService
         try {
             $api = $this->getApiForPolicy($policy);
             // Create a payment method instance with card details
-            $details = $api->payments()->details($token);
+            $details = $api->payments()->details($sessionToken);
 
             $this->logger->info(sprintf('3DS Payment Details: %s', json_encode($details)));
 
