@@ -1379,11 +1379,12 @@ class UserController extends BaseController
         $template = 'AppBundle:User:welcomeReferral.html.twig';
 
         // Check route and show template
-        // TODO: legacy???
         if ($request->get('_route') == 'user_instore') {
             $template = 'AppBundle:User:complete.html.twig';
         } elseif ($request->get('_route') == 'user_validation_required') {
             $template = 'AppBundle:User:validationRequired.html.twig';
+        } elseif ($request->get('_route') == 'user_welcome_two') {
+            $template = 'AppBundle:User:welcomeReferralB.html.twig';
         }
 
         // Get scode
