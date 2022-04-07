@@ -414,6 +414,7 @@ class CheckoutService
     ) {
         $details = $this->confirm3dsPayment($policy, $sessionToken);
         //TODO: Adapt the add function to the 3ds formt of details
+        //$this->add($policy, $details, $source, $date, $identityLog);
         return $details;
     }
 
@@ -940,7 +941,6 @@ class CheckoutService
                 //         $this->setCardToken($policy, $card);
                 //     }
                 // }
-
             } else {
                 // OLD api version with no 3ds
                 $client = $this->getClientForPolicy($policy);
