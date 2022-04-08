@@ -887,7 +887,7 @@ class CheckoutService
         try {
             if ($is3ds) {
                 $api = $this->getApiForPolicy($policy);
-                // @codingStandardsIgnoreStart
+                // @codingStandard@sIgnoreStart
                 // We ignore standarda are they seem not compatible with checkout api
                 // Create a payment method instance with card details
                 $method = new CheckoutAPITokenSource($token);
@@ -913,7 +913,7 @@ class CheckoutService
                 $payment->success_url =
                     $this
                     ->routerService
-                    ->generateUrl('purchase_checkout_3ds', []);
+                    ->generateUrl('purchase_checkout_3ds', ['id' => $policy->getId()]);
                 $payment->failure_url =
                     $this
                     ->routerService
