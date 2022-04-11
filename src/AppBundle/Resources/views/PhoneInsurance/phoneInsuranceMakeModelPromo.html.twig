@@ -13,27 +13,15 @@
 
 {# SEO Adjustments #}
 {% set make_desc = phone.make %}
-{% set with_phone = phone.make ~ ' Phone' %}
+{% set with_phone = phone.make ~ ' ' ~ phone.model %}
 {% if phone.make == 'Apple' %}
-    {% set make_desc = 'iPhone' %}
-    {% set with_phone = 'iPhone' %}
-{% endif %}
-{% if phone.make == 'Asus' %}
-    {% set with_phone = 'Asus Mobile' %}
-{% endif %}
-{% if phone.make == 'BlackBerry' %}
-    {% set with_phone = 'BlackBerry' %}
-{% endif %}
-{% if phone.make == 'Razer' %}
-    {% set with_phone = 'Razer' %}
-{% endif %}
-{% if phone.make == 'Vodafone' %}
-    {% set with_phone = 'Vodafone Mobile' %}
+    {% set make_desc = phone.model %}
+    {% set with_phone = phone.model %}
 {% endif %}
 
 {# Meta #}
 {% block title %}{{ with_phone }} Insurance From &pound;{{ lowest_premium|number_format(2, '.', ',') }} Monthly | SO-SURE{% endblock %}
-{% set canonical = url('phone_insurance_make', {'make': phone.makeCanonical })  %}
+{% set canonical = url('phone_insurance_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical })  %}
 {% block meta %}
     <meta name="description" content="{{ with_phone }} Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better."/>
     <link rel="canonical" href="{{ canonical|url_decode }}" />
@@ -42,54 +30,58 @@
 {# OG #}
 {% set og_title = with_phone ~ ' Insurance From £' ~ lowest_premium|number_format(2, '.', ',') ~ ' Monthly | SO-SURE' %}
 {% set og_url = canonical|url_decode %}
-{% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
+{% set og_description = with_phone ~ ' Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
 {% block cssPage %}
+    {{ encore_entry_link_tags('phone-insurance') }}
     {{ encore_entry_link_tags('phone-insurance-make') }}
 {% endblock %}
 
 {% block body %}
-
     <section class="hero">
         <div class="container-large">
-            <h1 class="hero-heading fit mb-4">
-                {{ with_phone }} Insurance<br class="d-md-none" />
-                <span class="sub">from just &pound;{{ lowest_premium|number_format(2, '.', ',') }} per month</span>
-            </h1>
             <div class="row">
-                <div class="col-sm-8 offset-sm-2 col-xl-5 offset-xl-1 order-xl-2">
-                    {% if phone is defined and phone %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
-                            'type': 'promo',
-                            'source': 'phone',
-                            'code': scode.code,
-                            'id': phone.id }|merge(app.request.query.all)
-                        )) }}
-                    {% else %}
-                        {{ render(controller('AppBundle:Search:phoneSearchDropdownCard', {
-                            'type': 'promo',
-                            'code': scode.code,
-                            'source': 'phone' }|merge(app.request.query.all)
-                        )) }}
-                    {% endif %}
+                <div class="col-lg-6 order-lg-2">
+                    <div class="hero__intro">
+                        <h1 class="text-white h1m mb-0">
+                            {% if phone.model|length < 3 %}{{ phone.make }} {% endif %}{{ phone.model }} Insurance <br> from just &pound;{{ phone_price|number_format(2) }}/month
+                        </h1>
+                        {% if phone is defined and phone %}
+                            {{ render(controller('AppBundle:Search:memorySearchDropdown', {
+                                'id': phone.id,
+                                'source': 'phone',
+                                'type': 'promo',
+                                'code': scode.code,
+                            }|merge(app.request.query.all))) }}
+                        {% else %}
+                            {{ render(controller('AppBundle:Search:memorySearchDropdown', {
+                                'source': 'phone',
+                                'type': 'promo',
+                                'code': scode.code,
+                            }|merge(app.request.query.all))) }}
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="col-sm-8 offset-sm-2 col-xl-6 offset-xl-0 order-xl-1">
-                    <div class="hero-image">
-                        <picture class="lozad">
-                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_large_{{ image }}.png" media="(min-width: 1200px)" alt="{{ phone.make }} Insurance">
-                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_desktop_{{ image }}.png" media="(min-width: 992px) and (max-width: 1199px)" alt="{{ phone.make }} Insurance">
-                            <source srcset="{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_{{ image }}.png" media="(min-width: 320px) and (max-width: 991px)" alt="{{ phone.make }} Insurance">
-                        </picture>
+                <div class="col-lg-6 order-lg-1">
+                   <div class="hero__illustration hero__illustration-{{ img_url }} text-center">
+                        {% if img_url in available_images %}
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                 data-src="{{ cdn_url }}/images/rebrand/phones/{{ phone.make|lower }}/so-sure_hero-{{ img_url }}.png"
+                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
+                                 class="lozad img-fluid">
+                        {% else %}
+                            <img src="{{ cdn_url }}/images/onexone.png"
+                                 data-src="{{ cdn_url }}/images/rebrand/phones/generic/so-sure_hero-generic.png"
+                                 alt="{{ phone.make }} {{ phone.model }} - Phone Insurance"
+                                 class="lozad img-fluid hero-generic">
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
-    {# Cred #}
     {% include 'AppBundle::Default/CommonSections/_cred.html.twig' %}
-
     <section class="make py-lg-5">
         <div class="container-large py-5">
             <div class="row">
@@ -106,7 +98,6 @@
             </div>
         </div>
     </section>
-
     <section class="protect py-lg-5">
         <div class="container-large py-5">
             <div class="row">
@@ -125,10 +116,7 @@
             </div>
         </div>
     </section>
-
-    {# Reviews #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_reviews.html.twig' %}
-
     <section class="travel py-lg-5"
              data-background-image="{{ cdn_url }}/images/rebrand/product/so-sure_reviews-image-alt-flipped.jpg">
         <div class="container-large py-5">
@@ -148,10 +136,7 @@
             </div>
         </div>
     </section>
-
-    {# Comparison #}
     {% include 'AppBundle::PhoneInsurance/CommonSections/_comparison.html.twig' %}
-
     <section class="makes py-lg-5">
         <div class="container-large py-5">
             <h2 class="h3 mb-5 text-deep-sky-blue-d">Popular brands we cover</h2>
@@ -170,8 +155,6 @@
             </div>
         </div>
     </section>
-
-    {# Page Modals #}
     {% include 'AppBundle::PhoneInsurance/_policyInfoModals.html.twig' %}
     {% include 'AppBundle::Default/_modalVideo.html.twig' %}
     {% if money_version is defined and money_version == true  %}
@@ -203,9 +186,8 @@
             </div>
         </div>
     {% endif %}
-
 {% endblock %}
-
 {% block javascriptsPage %}
     {{ encore_entry_script_tags('phone-insurance-make') }}
+    {{ encore_entry_script_tags('phone-insurance') }}
 {% endblock %}

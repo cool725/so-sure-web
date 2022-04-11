@@ -255,7 +255,7 @@ class PromoController extends BaseController
             $scode = null;
         }
 
-        // // Redirect to homepage if scode not found
+        // Redirect to homepage if scode not found
         if (!$scode) {
             return $this->redirectToRoute('homepage');
         }
@@ -316,18 +316,10 @@ class PromoController extends BaseController
             ], true);
         }
 
-        // To display in Popular Models sections
-        $topPhones = $repo->findBy([
-            'active' => true,
-            'topPhone' => true,
-            'makeCanonical' => mb_strtolower($make),
-        ]);
-
         $competitorData = new Competitors();
 
         $data = [
             'phone' => $phone,
-            'top_phones' => $topPhones,
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex,
             'scode' => $scode,
@@ -336,5 +328,128 @@ class PromoController extends BaseController
         ];
 
         return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakePromo.html.twig', $data);
+    }
+
+    /**
+     * Phone Insurance > Make, Model - Promo Page
+     * @Route("/phone-insurance-promo/{make}/{model}/{code}",
+     * name="phone_insurance_make_model_promo", requirements={"make":"[a-zA-Z]+"})
+     */
+    public function phoneInsuranceMakeModelPromoAction(Request $request, $make, $model, $code)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $repoScode = $dm->getRepository(Scode::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $decodedModel = Phone::decodeModel($model);
+        $decodedModelHyph = Phone::decodedModelHyph($model);
+        $phone = null;
+        $noindex = true;
+        $scode = null;
+
+        $phones = $repo->findBy([
+            'makeCanonical' => mb_strtolower($make),
+            'modelCanonical' => mb_strtolower($decodedModel),
+        ]);
+
+        if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
+            $phone = $phones[0];
+        } else {
+            $phone = $repo->findOneBy([
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModelHyph),
+            ]);
+        }
+
+        if (preg_match("/^[A-Z]/", $make) || preg_match("/^[A-Z]/", $model)) {
+            return $this->redirectToRoute('phone_insurance_make_model_promo', [
+                'make' => mb_strtolower($make),
+                'model' => mb_strtolower($model),
+            ], 301);
+        }
+
+        if (!$phone) {
+            $this->get('logger')->info(sprintf(
+                'Failed to find phone for make/model page - make: %s model: %s',
+                $make,
+                $model
+            ));
+            return new RedirectResponse($this->generateUrl('phone_insurance'));
+        }
+
+        try {
+            if ($scode = $repoScode->findOneBy(['code' => $code, 'active' => true, 'type' => Scode::TYPE_REWARD])) {
+                $reward = $scode->getReward();
+                if (!$reward || !$reward->getUser() || !$reward->isOpen(new \DateTime())) {
+                    throw new \Exception('Unknown promo code');
+                }
+            }
+        } catch (\Exception $e) {
+            $scode = null;
+        }
+
+        // Redirect to homepage if scode not found
+        if (!$scode) {
+            return $this->redirectToRoute('homepage');
+        }
+
+        $session = $this->get('session');
+        $session->set('scode', $code);
+
+        if ($scode && $request->getMethod() === "GET") {
+            $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_PROMO_PAGE, [
+                'Promo code' => $scode,
+            ]);
+            $this->get('app.mixpanel')->queuePersonProperties([
+                'Attribution Invitation Method' => 'reward',
+            ], true);
+        }
+
+        $competitorData = new Competitors();
+
+        // Get the price service
+        $priceService = $this->get('app.price');
+
+        // Check if pricing or enable the upcoming feature
+        if (!$phone->getCurrentYearlyPhonePrice()) {
+            $upcoming = true;
+            $fromPrice = '9.49';
+        } else {
+            $fromPrice = $phone->getCurrentYearlyPhonePrice()->getMonthlyPremiumPrice();
+        }
+
+        // Model template control
+        // Hyphenate Model for images/template
+        $modelHyph = str_replace('+', '-', $model);
+        // List all available hero images otherwise switch to genric
+        $availableImages = [
+            'iphone-x',
+            'iphone-xr',
+            'iphone-xs',
+            'iphone-7',
+            'iphone-8',
+            'galaxy-s8',
+            'galaxy-s9',
+            'galaxy-note-9',
+            'pixel',
+            'pixel-3-xl',
+            'iphone-13',
+            'iphone-13-min',
+            'iphone-13-pro',
+            'iphone-13-pro-max'
+        ];
+
+        $data = [
+            'phone' => $phone,
+            'competitor' => $competitorData::$competitorComparisonData,
+            'is_noindex' => $noindex,
+            'scode' => $scode,
+            'use_code' => $code,
+            'phone_price' => $fromPrice,
+            'img_url' => $modelHyph,
+            'available_images' => $availableImages,
+        ];
+
+        return $this->render('AppBundle:PhoneInsurance:phoneInsuranceMakeModelPromo.html.twig', $data);
     }
 }

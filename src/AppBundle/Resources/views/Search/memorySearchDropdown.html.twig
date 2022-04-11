@@ -17,24 +17,47 @@
         'attr': {
             'class': 'mr-2 phone-search-dropdown__select memory-search-dropdown__memory sub',
     }}) }}
-
-    <span id="size_rule" class="sub text-white">get covered today!</span>
-
-    <div class="form-group my-5 mt-lg-5 my-lg-0">
+    {% if type is defined and type == 'promo' %}
+        <div class="form-group mt-4 mb-2">
+            <ul class="list-unstyled icn-fa-list mb-4">
+                  <li class="h5 text-white mb-3">
+                      <i class="far fa-check fa-lg fa-fw text-success"></i>
+                      <span class="sub">24-72h repair or replace service</span>
+                  </li>
+                  <li class="h5 text-white mb-3">
+                      <i class="far fa-check fa-lg fa-fw text-success"></i>
+                      <span class="sub">Low price and excess from {{ lowest_excess }}</span>
+                  </li>
+                  <li class="h5 text-white mb-3">
+                      <i class="far fa-check fa-lg fa-fw text-success"></i>
+                      <span class="sub">Up to 80% no claims cashback</span>
+                  </li>
+                  <li class="h5 text-white">
+                      <i class="far fa-check fa-lg fa-fw text-success"></i>
+                      <span class="sub">Use code <strong class="text-deep-sky-blue-d">{{ code }}</strong> at the checkout 😎</span>
+                  </li>
+            </ul>
+        </div>
+    {% else %}
+        <span id="size_rule" class="sub text-white">get covered today!</span>
+    {% endif %}
+    <div class="form-group {% if type is defined and type == 'normal' %}my-5 mt-lg-5 my-lg-0{% endif %}">
         {{ form_widget(form_phone.next, {
           'label': 'Get Insured',
           'attr': {
-            'class': 'btn btn-success btn-block-xs mr-sm-2 memory-search-dropdown__button',
+            'class': 'btn btn-success btn-block-xs memory-search-dropdown__button',
             'disabled': 'disabled'
         }}) }}
-        <a href="#"
-           class="btn btn-outline-white watch-video btn-block-xs"
-           data-event="watch-video-index-hero"
-           data-toggle="modal"
-           data-target="#sosure-video-modal"
-           data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
-            <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
-            Watch our Video
-        </a>
+        {% if type is defined and type == 'normal' %}
+            <a href="#"
+              class="btn btn-outline-white watch-video btn-block-xs ml-sm-2"
+              data-event="watch-video-index-hero"
+              data-toggle="modal"
+              data-target="#sosure-video-modal"
+              data-src="https://www.youtube.com/embed/QEskwqsNgrQ">
+                <i class="far fa-play-circle fa-lg opacity-50 mr-1"></i>
+                Watch our Video
+            </a>
+        {% endif %}
     </div>
 {{ form_end(form_phone) }}

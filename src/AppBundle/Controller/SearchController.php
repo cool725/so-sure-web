@@ -444,7 +444,7 @@ class SearchController extends BaseController
      * @Route("/memory-search-dropdown/{type}/{id}", name="memory_search_dropdown_type_id")
      * @Template()
      */
-    public function memorySearchDropdownAction(Request $request, $type = null, $id = null)
+    public function memorySearchDropdownAction(Request $request, $type = null, $id = null, $code = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -504,6 +504,7 @@ class SearchController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
+            'code' => $code,
         ];
     }
 
