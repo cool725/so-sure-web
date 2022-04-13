@@ -1057,13 +1057,6 @@ class CheckoutService
                     $payment->setInfo($details->getResponseAdvancedInfo());
                     $payment->setResponseCode($details->getResponseCode());
                     $payment->setRiskScore($details->getRiskCheck());
-                    // Make sure upcoming rescheduled scheduled payments are now cancelled.
-                    $rescheduledPayments = $scheduledPaymentRepo->findRescheduled($policy);
-                    foreach ($rescheduledPayments as $rescheduled) {
-                        if ($payment->getAmount() > 0) {
-                            $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
-                        }
-                    }
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 }
                 /**
