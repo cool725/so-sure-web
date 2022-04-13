@@ -1870,13 +1870,7 @@ class PurchaseController extends BaseController
                     $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
                 }
                 $bacsPaymentMethod = $policy->getBacsPaymentMethod();
-                $details = $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
-                if ($details && $amount > 0) {
-                    $rescheduledPayments = $scheduledPaymentRepo->getRescheduled($policy);
-                    foreach ($rescheduledPayments as $rescheduled) {
-                        $rescheduled->cancel('Cancelled rescheduled payment as web payment made');
-                    }
-                }
+                $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
                 if ($saveBacs && $bacsPaymentMethod) {
                     $policy->setPaymentMethod($bacsPaymentMethod);
                 }
