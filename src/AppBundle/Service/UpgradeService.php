@@ -17,12 +17,14 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\Feature;
 use AppBundle\Exception\CannotRefundException;
 use AppBundle\Exception\DuplicateImeiException;
 use AppBundle\Exception\LostStolenImeiException;
 use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Event\BacsEvent;
 use AppBundle\Event\PolicyEvent;
+use AppBundle\Service\FeatureService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -56,6 +58,9 @@ class UpgradeService
     /** @var LoggerInterface */
     private $logger;
 
+    /** @var FeatureService */
+    private $featureService;
+
     /**
      * Injects the dependencies.
      * @param DocumentManager          $dm              is the document manager for loading and saving stuff to the db.
@@ -65,6 +70,7 @@ class UpgradeService
      * @param ReceperioService         $imeiValidator   is used to check that the IMEIs that are sent are all good.
      * @param EventDispatcherInterface $dispatcher      is used for dispatching events.
      * @param LoggerInterface          $logger          is used to log developer messages.
+     * @param FeatureService           $featureService  is used to tell the listener what features should be used.
      */
     public function __construct(
         DocumentManager $dm,
@@ -73,7 +79,8 @@ class UpgradeService
         PolicyService $policyService,
         ReceperioService $imeiValidator,
         EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        FeatureService $featureService
     ) {
         $this->dm = $dm;
         $this->bacsService = $bacsService;
@@ -82,6 +89,7 @@ class UpgradeService
         $this->imeiValidator = $imeiValidator;
         $this->dispatcher = $dispatcher;
         $this->logger = $logger;
+        $this->featureService = $featureService;
     }
 
     /**
@@ -105,6 +113,9 @@ class UpgradeService
      */
     public function upgrade(HelvetiaPhonePolicy $policy, $phone, $imei, $serial, $date, $premium, $phoneData = null)
     {
+        if (!$this->featureService->isEnabled(Feature::FEAURE_UPDGRADE_POLICIES)) {
+            return false;
+        }
         if (!$this->imeiValidator->isImei($imei)) {
             throw new InvalidImeiException();
         }

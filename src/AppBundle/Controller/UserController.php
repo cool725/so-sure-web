@@ -1780,6 +1780,8 @@ class UserController extends BaseController
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         }
+        
+        $upgradePolicyFeature = $this->get('app.feature')->isEnabled(Feature::FEAURE_UPDGRADE_POLICIES);
 
         if ($user->hasPolicyCancelledAndPaymentOwed()) {
             foreach ($user->getAllPolicies() as $policy) {
@@ -1796,6 +1798,7 @@ class UserController extends BaseController
         return [
             'user' => $user,
             'policy' => $policy,
+            'ugrade_policy_feature' => $upgradePolicyFeature
         ];
     }
 
