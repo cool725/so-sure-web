@@ -43,7 +43,7 @@ class Feature
     const FEATURE_COMPETITOR_PRICING = 'competitor-prices';
     const FEATURE_BLOG_MOBILE_STICK = 'sticky-cta-blog';
     const FEATURE_CARD_OPTION_WITH_BACS = 'allow-card-payment-method';
-    const FEAURE_UPDGRADE_POLICIES = 'allow-policy-upgarde';
+    const FEATURE_UPDGRADE_POLICIES = 'allow-policy-upgarde';
 
     // All Features should be here
     public static $features = [
@@ -74,7 +74,7 @@ class Feature
         self::FEATURE_BACS_PAYMENT_OPTION,
         self::FEATURE_COMPETITOR_PRICING,
         self::FEATURE_BLOG_MOBILE_STICK,
-        self::FEAURE_UPDGRADE_POLICIES,
+        self::FEATURE_UPDGRADE_POLICIES,
     ];
 
     // @codingStandardsIgnoreStart
@@ -106,7 +106,7 @@ class Feature
         self::FEATURE_BACS_PAYMENT_OPTION => 'Allow user to pay via BACs in the funnel',
         self::FEATURE_COMPETITOR_PRICING => 'Show competitor pricing section in funnel if available',
         self::FEATURE_BLOG_MOBILE_STICK => 'Make sticky cta on blog stuck or not',
-        self::FEAURE_UPDGRADE_POLICIES => 'Allow users to upgrade policies',
+        self::FEATURE_UPDGRADE_POLICIES => 'Allow users to upgrade policies',
     ];
     // @codingStandardsIgnoreEnd
 
