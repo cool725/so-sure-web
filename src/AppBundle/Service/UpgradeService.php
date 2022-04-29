@@ -113,7 +113,7 @@ class UpgradeService
      */
     public function upgrade(HelvetiaPhonePolicy $policy, $phone, $imei, $serial, $date, $premium, $phoneData = null)
     {
-        if (!$this->featureService->isEnabled(Feature::FEATURE_UPDGRADE_POLICIES)) {
+        if (!$this->featureService->isEnabled(Feature::FEATURE_UPGRADE_POLICIES)) {
             return;
         }
         if (!$this->imeiValidator->isImei($imei)) {
