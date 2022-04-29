@@ -135,6 +135,7 @@ services:
             - "@app.imei"
             - "@event_dispatcher"
             - "@logger"
+            - "@app.feature"
 
     app.checkout:
         alias: AppBundle\Service\CheckoutService
