@@ -964,8 +964,8 @@ abstract class PhonePolicy extends Policy
      */
     public function fullPremiumToBePaidForClaim(\DateTime $date, $claimType)
     {
-        if (!in_array($claimType, [Claim::TYPE_THEFT, Claim::TYPE_LOSS]) || 
-            $this->getOutstandingPremium() <= 0 || 
+        if (!in_array($claimType, [Claim::TYPE_THEFT, Claim::TYPE_LOSS]) ||
+            $this->getOutstandingPremium() <= 0 ||
             $this->hasPreviousPolicy()
         ) {
             return false;
