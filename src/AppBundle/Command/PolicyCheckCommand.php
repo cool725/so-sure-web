@@ -22,9 +22,6 @@ class PolicyCheckCommand extends ContainerAwareCommand
     private $twig;
     private $fraudService;
 
-    /**
-     * @param DocumentManager $dm document manager to use in the command.
-     */
     public function __construct(DocumentManager $dm, Environment $twig, FraudService $fraudService)
     {
         parent::__construct();
@@ -33,9 +30,6 @@ class PolicyCheckCommand extends ContainerAwareCommand
         $this->fraudService = $fraudService;
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function configure()
     {
         $this->setName('sosure:policy:check')
@@ -43,9 +37,6 @@ class PolicyCheckCommand extends ContainerAwareCommand
             ->addArgument('id', InputArgument::REQUIRED, 'id of policy to check');
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $policyRepo = $this->dm->getRepository(Policy::class);
