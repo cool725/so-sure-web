@@ -177,19 +177,21 @@ class PaymentService
      * @param string|null    $policyType       is a policy type to limit the search to.
      * @param int            $limit            is a limit to put on the number of returned scheduled payments. If you
      *                                         give a value less than zero it doesn't use it.
+     * @param int            $polarity         controls the amount, with 0 allowing all.
      * @return array containing the selected scheduled payments.
      */
     public function getAllValidScheduledPaymentsForBacs(
         \DateTime $scheduledDate = null,
         $validateBillable = true,
         $policyType = null,
-        $limit = -1
+        $limit = -1,
+        $polarity = 0
     ) {
         $results = [];
         /** @var ScheduledPaymentRepository $repo */
         $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $this->labelBacs($scheduledDate, $policyType);
-        $scheduledPayments = $repo->findScheduledBacs($scheduledDate, $policyType, $limit);
+        $this->labelBacs($scheduledDate, $policyType, $polarity);
+        $scheduledPayments = $repo->findScheduledBacs($scheduledDate, $policyType, $limit, $polarity);
         /** @var ScheduledPayment $scheduledPayment */
         foreach ($scheduledPayments as $scheduledPayment) {
             if ($validateBillable && !$scheduledPayment->isBillable()) {
@@ -351,8 +353,9 @@ class PaymentService
      * Sets the field paymentType to bacs for all scheduled payments that reference a bacs payment.
      * @param \DateTime|null $date       is the date up to which to label scheduled payments.
      * @param string|null    $policyType is a type of policy to look for exclusively. If you give null it ignores.
+     * @param int            $polarity   determines whether to affect positive, negative, or all payments with 0.
      */
-    private function labelBacs($date = null, $policyType = null)
+    private function labelBacs($date = null, $policyType = null, $polarity = 0)
     {
         $date = $date ?: new \DateTime();
         // Delete existing paymentType field.
@@ -369,6 +372,11 @@ class PaymentService
             ->field('scheduled')->lt($date);
         if ($policyType) {
             $scheduledsQuery->field('policy.policy_type')->equals($policyType);
+        }
+        if ($polarity > 0) {
+            $scheduledsQuery->field('amount')->gt(0);
+        } elseif ($polarity < 0) {
+            $scheduledsQuery->field('amount')->lt(0);
         }
         $scheduleds = $scheduledsQuery->getQuery()->execute();
         foreach ($scheduleds as $scheduled) {

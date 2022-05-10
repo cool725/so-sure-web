@@ -54,10 +54,16 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
      * @param \DateTime|null $date       is the maximum date they can be scheduled for to be found.
      * @param string|null    $policyType is an optional type of policy to limit for.
      * @param int            $limit      is the maximum to return. If less than zero not used.
+     * @param int            $polarity   is whether to get >0 payments if it's positive, <0 payments if it's negative,
+     *                                   and all payments if it's 0.
      * @return Cursor over the found scheduled payments.
      */
-    public function findScheduledBacs(\DateTime $date = null, $policyType = null, $limit = -1)
-    {
+    public function findScheduledBacs(
+        \DateTime $date = null,
+        $policyType = null,
+        $limit = -1,
+        $polarity = 0
+    ) {
         $date = $date ?: new \DateTime();
         $query = $this->createQueryBuilder()
             ->field('payment')->equals(null)
@@ -66,6 +72,11 @@ class ScheduledPaymentRepository extends BaseDocumentRepository
             ->field('paymentType')->equals('bacs');
         if ($policyType) {
             $query->field('policy.policy_type')->equals($policyType);
+        }
+        if ($polarity > 0) {
+            $query->field('amount')->gt(0);
+        } elseif ($polarity < 0) {
+            $query->field('amount')->lt(0);
         }
         if ($limit > 0) {
             $query->limit($limit);
