@@ -390,7 +390,7 @@ class PaymentService
                 $scheduledIds[] = $scheduled['_id'];
             }
         }
-        // Sets paymentType: bacs for those found.
+        // Sets paymentType to bacs for those found.
         $this->dm->createQueryBuilder(ScheduledPayment::class)
             ->updateMany()
             ->field('_id')->in($scheduledIds)
