@@ -10,7 +10,7 @@ $('.confirmModal').on('show.bs.modal', function (event) {
             phones = $('#imei_form_phone'),
             validUpgrade = $('#valid_upgrade'),
             newPremiumPrice = $('#imei_form_phone option:selected').data('premium'),
-            limitDiff = 4,
+            limitDiff = 5,
             premiumDiff;
 
         if($('#imei_form_phone option:selected').text() === $('#current_phone').text()) {
