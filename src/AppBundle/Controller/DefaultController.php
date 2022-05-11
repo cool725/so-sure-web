@@ -88,6 +88,41 @@ class DefaultController extends BaseController
         $noindex = false;
         $referral = $request->get('referral');
         $session = $this->get('session');
+        $emailVerficiationCode = $request->get('evc');
+        $this->get('logger')->info(sprintf('evc: %s', $emailVerficiationCode));
+
+        // Validate email if coming from verification email
+        if ($emailVerficiationCode) {
+            $email = $this->get('app.mailer')->checkEmailValidationCode($emailVerficiationCode);
+            if ($email) {
+                $this->get('logger')->info(sprintf('Email validated %s', $email));
+                $dm = $this->getManager();
+                $userRepo = $dm->getRepository(User::class);
+                $user = $userRepo->findOneBy(['email' => mb_strtolower($email)]);
+                if ($user) {
+                    $user->setEmailVerified(true);
+                    $verified = true;
+                } else {
+                    $leadRepo = $dm->getRepository(Lead::class);
+                    $lead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
+                    if ($lead) {
+                        $lead->setEmailVerified(true);
+                        $verified = true;
+                    } else {
+                        $verified = false;
+                    }
+                }
+                $dm->flush();
+                if ($verified) {
+                    $this->addFlash(
+                        'success',
+                        sprintf('Your email %s has been validated', $email)
+                    );
+                }
+            } else {
+                $this->get('logger')->error('Problem finding email validation code');
+            }
+        }
 
         // For Referrals
         if ($referral) {

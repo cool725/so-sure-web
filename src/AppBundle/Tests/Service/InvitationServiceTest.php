@@ -87,6 +87,7 @@ class InvitationServiceTest extends WebTestCase
         $mixpanelService = self::$container->get('app.mixpanel');
         /** @var S3Client $s3Client */
         $s3Client = self::$container->get('aws.s3');
+        $redis = self::$container->get('snc_redis.default');
         $mailer = new MailerService(
             new \Swift_Mailer($transport),
             $transport,
@@ -98,7 +99,8 @@ class InvitationServiceTest extends WebTestCase
             $s3Client,
             self::$container->getParameter('kernel.environment'),
             $dm,
-            false
+            false,
+            $redis
         );
         /** @var InvitationService invitationService */
         $invitationService = self::$container->get('app.invitation');

@@ -830,6 +830,7 @@ services:
             - "%kernel.environment%"
             - "@doctrine_mongodb.odm.default_document_manager"
             - "%online%"
+            - "@snc_redis.default"
 
     app.router:
         alias: AppBundle\Service\RouterService

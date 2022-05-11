@@ -292,7 +292,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
-    protected $emailVerified;
+    protected $emailVerified = false;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="Company", inversedBy="user")
@@ -2506,7 +2506,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $policy->getPaymentMethod()->getType() :
                 null,
             'has_mobile_number_verified' => $this->getMobileNumberVerified(),
-            'is_optin' => $this->isOptedInForMarketing()
+            'is_optin' => $this->isOptedInForMarketing(),
+            'email_verified' => $this->getEmailVerified()
         ];
     }
 
