@@ -362,8 +362,7 @@ class MailerService
 
         $key = sprintf(self::VALIDATION_KEY, $code);
         $this->redis->setex($key, self::VALIDATION_TIMEOUT, $email);
-
-        $validationUrl = 'https://wearesosure.com/?evc=' . $code;
+        $validationUrl = $this->routerService->generateUrl('homepage', ['evc' => $code]);
 
         $this->sendTemplate(
             'Hi from SO-SURE, please verify your email address',

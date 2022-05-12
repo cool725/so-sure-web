@@ -114,10 +114,7 @@ class DefaultController extends BaseController
                 }
                 $dm->flush();
                 if ($verified) {
-                    $this->addFlash(
-                        'success',
-                        sprintf('Your email %s has been validated', $email)
-                    );
+                    return $this->redirectToRoute('subscribed_with_details', ['email' => $email, ]);
                 }
             } else {
                 $this->get('logger')->error('Problem finding email validation code');
@@ -141,24 +138,9 @@ class DefaultController extends BaseController
             'Step' => 'homepage'
         ]);
 
-        // $fromPrice = $this->getLowestPremium();
-
-        // Set Greeting
-        // if (date('H') >= 12 && date('H') <= 18) {
-        //     $greeting = 'afternoon';
-        // } elseif (date('H') > 18 && date('H') <= 22) {
-        //     $greeting = 'evening';
-        // } elseif (date('H') > 22 && date('H') <= 5) {
-        //     $greeting = 'night';
-        // } else {
-        //     $greeting = 'morning';
-        // }
-
         $data = array(
             'competitor' => $competitorData::$competitorComparisonData,
             'is_noindex' => $noindex,
-            // 'greeting' => $greeting,
-            // 'from_price' => $fromPrice
         );
 
         return $this->render('AppBundle:Default:indexHomepageDec2020.html.twig', $data);

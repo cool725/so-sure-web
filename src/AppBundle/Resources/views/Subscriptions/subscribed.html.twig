@@ -1,0 +1,33 @@
+{% extends 'base_rebrand.html.twig' %}
+
+{# Set vars #}
+{% set body_class = 'subscribed' %}
+{% set robots_noindex = true %}
+
+{% block title %}Subscribed | SO-SURE{% endblock %}
+{% block meta %}{% endblock %}
+
+{% block cssPage %}
+    {{ encore_entry_link_tags('content-pages') }}
+{% endblock %}
+
+{% block body %}
+
+    <section class="cp py-lg-5">
+        <div class="container-large text-center py-5">
+            <div class="cardbox cardbox-100 w-75 mx-auto p-5">
+                <h1 class="h4 mb-4">Your email has been successfully validated 🎉</h1>
+                {% if email is defined %}
+                    <p class="lead text-muted">{{ email }}</p>
+                {% endif %}
+                <p class="mb-5">Go to <a href="{{ path('homepage') }}">homepage</a> or <a href="{{ path('fos_user_security_login') }}">customer login</a></p>
+                <p class="text-muted"><small>If you think this could be a mistake please contact support</small></p>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascriptsPage %}
+    {{ encore_entry_script_tags('content-pages') }}
+{% endblock %}
