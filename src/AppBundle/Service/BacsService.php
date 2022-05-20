@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
