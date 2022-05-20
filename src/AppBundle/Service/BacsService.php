@@ -1911,9 +1911,9 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
             $policyType,
             -1,
             1
@@ -1937,9 +1937,9 @@ class BacsService
         }
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
             $policyType,
             -1,
             -1
@@ -2084,9 +2084,9 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
         $this->warnings = [];
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            true,
             $policyType,
             $limit,
             1
@@ -2183,9 +2183,9 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
             $policyType,
             $limit,
             -1
