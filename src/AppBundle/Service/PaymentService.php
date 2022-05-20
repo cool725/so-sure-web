@@ -314,7 +314,7 @@ class PaymentService
     {
         $this->dm->createQueryBuilder(ScheduledPayment::class)
             ->hydrate(false)
-            ->field('labels')->pop($label)
+            ->field('labels')->popFirst($label)
             ->getQuery()->execute();
     }
 
