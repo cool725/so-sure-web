@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
@@ -1911,9 +1912,9 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
             $policyType,
             -1,
             1
@@ -1937,9 +1938,9 @@ class BacsService
         }
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
             $policyType,
             -1,
             -1
@@ -2084,9 +2085,9 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
         $this->warnings = [];
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            true,
             $policyType,
             $limit,
             1
@@ -2183,9 +2184,9 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
             $policyType,
             $limit,
             -1
