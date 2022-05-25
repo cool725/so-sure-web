@@ -1229,6 +1229,7 @@ nelmio_security:
                 - https://tapjoy.go2cloud.org
                 - https://*.quantserve.com
                 - https://pixel.quantserve.com
+                - https://pixel.quantcount.com
                 - https://www.topcashback.co.uk
                 - https://csm.nl.eu.criteo.net
                 - https://*.criteo.com
