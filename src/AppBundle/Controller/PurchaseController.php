@@ -1475,22 +1475,18 @@ class PurchaseController extends BaseController
      */
     public function confirm3DS(Request $request, $id)
     {
-        try {
-            $checkout = $this->get('app.checkout');
-            $dm = $this->getManager();
-            $repo = $dm->getRepository(Policy::class);
-            $policy = $repo->find($id);
-            if (!$policy) {
-                $logger->info(sprintf('Missing policy'));
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
-            }
-            $session = $request->get("cko-session-id");
-            $checkout->confirm3DSPayment($policy, $session);
-            $this->addFlash('Success! Your payment has been successfully completed');
-            return new RedirectResponse($this->generateUrl('user_welcome', ['id' => $id]));
-        } catch (\Exception $e) {
-            die($e->getMessage());
+        $checkout = $this->get('app.checkout');
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            $logger->info(sprintf('Missing policy'));
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
         }
+        $session = $request->get("cko-session-id");
+        $checkout->confirm3DSPayment($policy, $session);
+        $this->addFlash('Success! Your payment has been successfully completed');
+        return new RedirectResponse($this->generateUrl('user_welcome', ['id' => $id]));
     }
 
     /**

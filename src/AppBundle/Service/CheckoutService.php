@@ -902,9 +902,6 @@ class CheckoutService
                 sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
                 ['exception' => $e]
             );
-
-            die($e->getMessage());
-
             throw $e;
         }
 
