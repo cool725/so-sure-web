@@ -597,6 +597,7 @@ class IntercomService
         if ($marketingOpt === true || $marketingOpt === false) {
             $data['custom_attributes']['Marketing OptIn'] = $marketingOpt;
         }
+        $data['custom_attributes']['Email Verified'] = $user->getEmailVerified() ? true : false;
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
             if ($user->getIdentityLog() && $user->getIdentityLog()->getIp()) {
@@ -683,6 +684,8 @@ class IntercomService
         } elseif ($lead->getIntercomUserId()) {
             $data['user_id'] = $lead->getIntercomUserId();
         }
+
+        $data['custom_attributes']['Email Verified'] = $lead->getEmailVerified() ? true : false;
 
         $this->checkRateLimit();
         try {

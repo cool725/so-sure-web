@@ -185,6 +185,7 @@ class SearchController extends BaseController
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
                         $mailer = $this->get('app.mailer');
+                        $mailer->setEmailValidationCode($email);
                         // @codingStandardsIgnoreStart
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),
@@ -281,6 +282,7 @@ class SearchController extends BaseController
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
                         $mailer = $this->get('app.mailer');
+                        $mailer->setEmailValidationCode($email);
                         // @codingStandardsIgnoreStart
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),
@@ -444,7 +446,7 @@ class SearchController extends BaseController
      * @Route("/memory-search-dropdown/{type}/{id}", name="memory_search_dropdown_type_id")
      * @Template()
      */
-    public function memorySearchDropdownAction(Request $request, $type = null, $id = null)
+    public function memorySearchDropdownAction(Request $request, $type = null, $id = null, $code = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
@@ -504,6 +506,7 @@ class SearchController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
+            'code' => $code,
         ];
     }
 
@@ -561,6 +564,7 @@ class SearchController extends BaseController
                         $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $utm = '?utm_source=quote_email_homepage&utm_medium=email&utm_content=email_required';
                         $mailer = $this->get('app.mailer');
+                        $mailer->setEmailValidationCode($email);
                         // @codingStandardsIgnoreStart
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),

@@ -75,8 +75,6 @@ class DoctrineUserListener extends BaseDoctrineListener
         // TODO: Figure out how to handle a manual process
         if ($this->hasDataChanged($eventArgs, User::class, ['confirmationToken'], DataChange::COMPARE_TO_NULL) &&
             $this->hasDataChanged($eventArgs, User::class, ['passwordRequestedAt'], DataChange::COMPARE_TO_NULL)) {
-            $user->setEmailVerified(true);
-
             // Email Verified probably isn't in the original changeset, so recalculate
             $this->recalulateChangeSet($eventArgs, $user);
         }

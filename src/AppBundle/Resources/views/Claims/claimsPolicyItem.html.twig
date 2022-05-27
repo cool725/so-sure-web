@@ -2172,27 +2172,29 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Add Note</h4>
             </div>
-            <div class="modal-body">
-                {{ form_start(note_form)}}
-                <div class="row">
-                    <div class="col-sm-12">
-                    {{ form_label(note_form.notes) }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="form-group">
-                            {{ form_widget(note_form.notes, {'attr': {'rows': 3, 'cols': '60'}}) }}
+            {% if note_form is defined %}
+                <div class="modal-body">
+                    {{ form_start(note_form)}}
+                    <div class="row">
+                        <div class="col-sm-12">
+                        {{ form_label(note_form.notes) }}
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        {{ form_widget(note_form.add, {'label': 'Add Note', 'attr': {'class': 'btn btn-success'}}) }}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                {{ form_widget(note_form.notes, {'attr': {'rows': 3, 'cols': '60'}}) }}
+                            </div>
+                        </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ form_widget(note_form.add, {'label': 'Add Note', 'attr': {'class': 'btn btn-success'}}) }}
+                        </div>
+                    </div>
+                    {{ form_end(note_form) }}
                 </div>
-                {{ form_end(note_form) }}
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>

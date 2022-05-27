@@ -41,13 +41,13 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('dylan@so-sure.com', self::DEFAULT_PASSWORD, 'Dylan', 'Bourguignon', [User::ROLE_ADMIN]);
         $this->newUser('julien@so-sure.com', self::DEFAULT_PASSWORD, 'Julien', 'Champagne', [User::ROLE_ADMIN]);
         $this->newUser('nick@so-sure.com', self::DEFAULT_PASSWORD, 'Nick', 'Waller', [User::ROLE_ADMIN]);
-        $this->newUser('kitti@so-sure.com', self::DEFAULT_PASSWORD, 'Kitti', 'Varga', [User::ROLE_CUSTOMER_SERVICES]);
         $this->newUser('daly@so-sure.com', self::DEFAULT_PASSWORD, 'Daly', 'Barron', [User::ROLE_ADMIN]);
         $this->newUser('rossella@so-sure.com', self::DEFAULT_PASSWORD, 'Rossella', 'Morgante', [User::ROLE_ADMIN]);
         $this->newUser('charles@so-sure.com', self::DEFAULT_PASSWORD, 'Charles', 'Roels', [User::ROLE_ADMIN]);
         $this->newUser('dev@so-sure.com', self::DEFAULT_PASSWORD, 'Robo', 'Bogdan', [User::ROLE_ADMIN]);
-        $this->newUser('elliot@so-sure.com', self::DEFAULT_PASSWORD, 'Elliot', 'Mitchell', [User::ROLE_ADMIN]);
         $this->newUser('etienne@so-sure.com', self::DEFAULT_PASSWORD, 'Etienne', 'Bourhis', [User::ROLE_ADMIN]);
+        $this->newUser('alexander.sips-avello@so-sure.com', self::DEFAULT_PASSWORD, 'Alexander', 'Sips-Avello', [User::ROLE_ADMIN]);
+        $this->newUser('clayton@so-sure.com', self::DEFAULT_PASSWORD, 'Clayton', 'Constant', [User::ROLE_ADMIN]);
         $manager->flush();
         // $this->valdiateGedmoLogging($manager);
     }

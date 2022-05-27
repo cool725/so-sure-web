@@ -135,6 +135,7 @@ services:
             - "@app.imei"
             - "@event_dispatcher"
             - "@logger"
+            - "@app.feature"
 
     app.checkout:
         alias: AppBundle\Service\CheckoutService
@@ -830,6 +831,7 @@ services:
             - "%kernel.environment%"
             - "@doctrine_mongodb.odm.default_document_manager"
             - "%online%"
+            - "@snc_redis.default"
 
     app.router:
         alias: AppBundle\Service\RouterService

@@ -328,7 +328,9 @@ class PurchaseController extends BaseController
             'postcode' => 'comma',
             'prices' => $phone ? $priceService->userPhonePriceStreams($user, $phone, new \DateTime()) : null,
             'instore' => $instore,
-            'validation_required' => $validationRequired
+            'validation_required' => $validationRequired,
+            'user_email' => $session->get('email'),
+            'quote_id' => $session->get('quote'),
         );
 
         return $this->render($template, $data);

@@ -157,6 +157,13 @@ class Lead
      */
     protected $opts = array();
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $emailVerified = false;
+
     public function __construct()
     {
         $this->created = \DateTime::createFromFormat('U', time());
@@ -303,6 +310,16 @@ class Lead
     public function getOpts()
     {
         return $this->opts;
+    }
+
+    public function getEmailVerified()
+    {
+        return $this->emailVerified;
+    }
+
+    public function setEmailVerified($emailVerified)
+    {
+        $this->emailVerified = $emailVerified;
     }
 
     public function populateUser(User $user, $setMobileNumber = false)

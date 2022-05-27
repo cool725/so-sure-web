@@ -51,6 +51,10 @@
             'quantity': 1
         }]
     },
+    'event': 'sosure_purchase',
+    'sosure' : {
+        'email': '{{ app.user.email }}'
+    },
 {% endblock %}
 
 {% block body %}
@@ -73,6 +77,22 @@
                        data-native-text="{{ og_description }}"
                        data-event="invite-competition-welcome-page-native">
                        Invite Friends</a>
+                    {% if policy.phone.iTunes %}
+                        <a href="{{ apple_download('user-required-account') }}"
+                            class="btn btn-success btn-shadow btn-block-xs ga-outbound-click d-md-none"
+                            data-clicklabel="iTunes"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                    {% endif %}
+                    {% if policy.phone.googlePlay %}
+                        <a href="{{ google_download('user-required-account') }}"
+                            class="btn btn-success btn-shadow btn-block-xs ga-outbound-click d-md-none"
+                            data-clicklabel="PlayStore"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                    {% endif %}
                     <div class="d-none d-md-block non-native-share">
                         <div class="h6 text-deep-sky-blue-d">🔗 Copy this link to refer a friend</div>
                         <div class="custom-input-with-btn mb-4">
@@ -93,25 +113,23 @@
                                     Invite</button>
                             </div>
                         </form>
-                        <div class="text-center text-lg-left">
-                            {% if policy.phone.iTunes %}
-                                <a href="{{ apple_download('user-required-account') }}"
-                                   class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
-                                   data-clicklabel="iTunes"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                    <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
-                            {% endif %}
-                            {% if policy.phone.googlePlay %}
-                                <a href="{{ google_download('user-required-account') }}"
-                                   class="btn btn-success btn-shadow btn-block-xs ga-outbound-click"
-                                   data-clicklabel="PlayStore"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                    <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
-                            {% endif %}
-                        </div>
                     </div>
+                    {% if policy.phone.iTunes %}
+                        <a href="{{ apple_download('user-required-account') }}"
+                            class="btn btn-success btn-shadow btn-block-xs ga-outbound-click d-none d-md-inline"
+                            data-clicklabel="iTunes"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fab fa-apple mr-2 fa-lg"></i> Download the App</a>
+                    {% endif %}
+                    {% if policy.phone.googlePlay %}
+                        <a href="{{ google_download('user-required-account') }}"
+                            class="btn btn-success btn-shadow btn-block-xs ga-outbound-click d-none d-md-inline"
+                            data-clicklabel="PlayStore"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <i class="fab fa-android mr-2 fa-lg"></i> Download the App</a>
+                    {% endif %}
                 </div>
             </div>
             <div class="hero__illustration d-block d-lg-none mt-4 text-center">

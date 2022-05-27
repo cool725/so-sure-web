@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\PaymentMethod\CheckoutPaymentMethod;
@@ -141,9 +142,11 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 $this->displayScheduledPayment($scheduledPayment, $output);
             }
         } else {
-            $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForTypes(
-                [CheckoutPaymentMethod::class],
-                $scheduledDate
+            $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+                PaymentMethod::TYPE_CHECKOUT,
+                $scheduledDate,
+                null,
+                2000
             );
             foreach ($scheduledPayments as $scheduledPayment) {
                 /** @var ScheduledPayment $scheduledPayment */

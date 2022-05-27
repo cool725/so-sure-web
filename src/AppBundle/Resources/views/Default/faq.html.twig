@@ -1060,45 +1060,67 @@
                         </div>
                     </div>
                     <h3 id="mobile-phone-upgrades" class="text-primary h4 mt-5 mb-4">Can I upgrade my phone?</h3>
-                    <div class="expanding-cardbox mb-4"
-                            itemscope
-                            itemprop="mainEntity"
-                            itemtype="https://schema.org/Question">
-                        <div class="expanding-cardbox__body">
-                            <h4 class="h5 expanding-cardbox__title"
-                                itemprop="name">
-                                I have a new phone, can I upgrade my policy? <i class="far fa-chevron-down fa-lg"></i>
-                            </h4>
-                            <div class="expanding-cardbox__expand"
-                                    itemscope
-                                    itemprop="acceptedAnswer"
-                                    itemtype="https://schema.org/Answer">
-                                <div itemprop="text">
-                                    <p>Yes! You can now upgrade automatically from your dashboard in the <span class="text-nowrap">SO-SURE</span> App.</p>
-                                    <p>If you have any issues with this, please contact our <a href="#" class="open-intercom">customer support chat</a> and we’ll sort this out manually.</p>
+                    {% if feature_enabled('allow-policy-upgrade') %}
+                        <div class="expanding-cardbox mb-4"
+                                itemscope
+                                itemprop="mainEntity"
+                                itemtype="https://schema.org/Question">
+                            <div class="expanding-cardbox__body">
+                                <h4 class="h5 expanding-cardbox__title"
+                                    itemprop="name">
+                                    I have a new phone, can I upgrade my policy? <i class="far fa-chevron-down fa-lg"></i>
+                                </h4>
+                                <div class="expanding-cardbox__expand"
+                                        itemscope
+                                        itemprop="acceptedAnswer"
+                                        itemtype="https://schema.org/Answer">
+                                    <div itemprop="text">
+                                        <p>Yes! You can now upgrade automatically from your dashboard in the <span class="text-nowrap">SO-SURE</span> App.</p>
+                                        <p>If you have any issues with this, please contact our <a href="#" class="open-intercom">customer support chat</a> and we’ll sort this out manually.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="expanding-cardbox mb-4"
-                            itemscope
-                            itemprop="mainEntity"
-                            itemtype="https://schema.org/Question">
-                        <div class="expanding-cardbox__body">
-                            <h4 class="h5 expanding-cardbox__title"
-                                itemprop="name">
-                                How much will it cost? <i class="far fa-chevron-down fa-lg"></i>
-                            </h4>
-                            <div class="expanding-cardbox__expand"
-                                    itemscope
-                                    itemprop="acceptedAnswer"
-                                    itemtype="https://schema.org/Answer">
-                                <div itemprop="text">
-                                    <p>When you upgrade your phone, we will provide a new quote and calculate the policy's remainder. A new policy and schedule will be sent to you. These documents will always be available to you in your dashboard as well.</p>
+                        <div class="expanding-cardbox mb-4"
+                                itemscope
+                                itemprop="mainEntity"
+                                itemtype="https://schema.org/Question">
+                            <div class="expanding-cardbox__body">
+                                <h4 class="h5 expanding-cardbox__title"
+                                    itemprop="name">
+                                    How much will it cost? <i class="far fa-chevron-down fa-lg"></i>
+                                </h4>
+                                <div class="expanding-cardbox__expand"
+                                        itemscope
+                                        itemprop="acceptedAnswer"
+                                        itemtype="https://schema.org/Answer">
+                                    <div itemprop="text">
+                                        <p>When you upgrade your phone, we will provide a new quote and calculate the policy's remainder. A new policy and schedule will be sent to you. These documents will always be available to you in your dashboard as well.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <div class="expanding-cardbox mb-4"
+                                itemscope
+                                itemprop="mainEntity"
+                                itemtype="https://schema.org/Question">
+                            <div class="expanding-cardbox__body">
+                                <h4 class="h5 expanding-cardbox__title"
+                                    itemprop="name">
+                                    I have a new phone, can I upgrade my policy? <i class="far fa-chevron-down fa-lg"></i>
+                                </h4>
+                                <div class="expanding-cardbox__expand"
+                                        itemscope
+                                        itemprop="acceptedAnswer"
+                                        itemtype="https://schema.org/Answer">
+                                    <div itemprop="text">
+                                        <p>Please contact our <a href="#" class="open-intercom">customer support chat</a> and we’ll sort this out for you.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                     <div class="expanding-cardbox mb-4"
                             itemscope
                             itemprop="mainEntity"

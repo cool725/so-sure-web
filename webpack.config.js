@@ -40,6 +40,7 @@ Encore
     .addEntry('phone-insurance-quote', './src/AppBundle/Resources/public/rebrand/js/pages/phone-insurance-quote.js')
     .addEntry('invite', './src/AppBundle/Resources/public/rebrand/js/pages/invite.js')
     .addEntry('company-phones', './src/AppBundle/Resources/public/rebrand/js/pages/company-phones.js')
+    .addEntry('starling-business', './src/AppBundle/Resources/public/rebrand/js/pages/starling-business.js')
     .addEntry('usa', './src/AppBundle/Resources/public/rebrand/js/pages/usa.js')
     .addEntry('promo', './src/AppBundle/Resources/public/rebrand/js/pages/promo.js')
     .addEntry('blog', './src/AppBundle/Resources/public/rebrand/js/pages/blog.js')

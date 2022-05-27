@@ -170,9 +170,12 @@
                             {% if phone is defined and phone %}
                                 {{ render(controller('AppBundle:Search:memorySearchDropdown', {
                                     'id': phone.id,
+                                    'type': 'normal',
                                 }|merge(app.request.query.all))) }}
                             {% else %}
-                                {{ render(controller('AppBundle:Search:memorySearchDropdown', { }|merge(app.request.query.all))) }}
+                                {{ render(controller('AppBundle:Search:memorySearchDropdown', {
+                                    'type': 'normal',
+                                }|merge(app.request.query.all))) }}
                             {% endif %}
                         {% endif %}
                     </div>

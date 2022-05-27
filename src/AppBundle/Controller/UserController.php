@@ -1792,7 +1792,7 @@ class UserController extends BaseController
         } elseif ($user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
-
+        
         return [
             'user' => $user,
             'policy' => $policy,

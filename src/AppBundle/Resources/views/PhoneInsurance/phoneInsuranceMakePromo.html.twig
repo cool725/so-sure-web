@@ -45,31 +45,6 @@
 {% set og_description = with_phone ~ ' Insurance from so-sure. 24-72 hour repair or replacement, low excess & up to 80% money back if you don\'t claim. This is ' ~ with_phone ~ ' Insurance that\'s simply better.' %}
 {% set og_image = cdn_url ~ '/images/rebrand/og/so-sure_og-image-1.png' %}
 
-{# Schema #}
-{% block schema %}
-<script type="application/ld+json">
-    {
-        "@context": "https://schema.org/",
-        "@type": "Product",
-        "name": "{{ with_phone }} Insurance",
-        "image": "{{ cdn_url }}/images/rebrand/hero-images/so-sure_hero_image_mobile_{{ image }}.png",
-        "description": "{{ with_phone }} Insurance from SO-SURE. 24-72 hour repair or replacement, low excess & up to 80% money back if you don't claim. This is {{ with_phone }} insurance that's simply better.",
-        "brand": "{{ phone.make }}",
-        "offers": {
-            "@type": "AggregateOffer",
-            "url": "{{ canonical }}",
-            "priceCurrency": "GBP",
-            "lowPrice": "3.38"
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.2",
-            "ratingCount": "1048"
-        }
-    }
-</script>
-{% endblock %}
-
 {% block cssPage %}
     {{ encore_entry_link_tags('phone-insurance-make') }}
 {% endblock %}
@@ -131,9 +106,6 @@
             </div>
         </div>
     </section>
-
-    {# Popular Models #}
-    {% include 'AppBundle::PhoneInsurance/CommonSections/_popularModels.html.twig' %}
 
     <section class="protect py-lg-5">
         <div class="container-large py-5">

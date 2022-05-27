@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use Predis\Client;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\File\EmailFile;
 use AppBundle\Document\Opt\OptOut;
@@ -18,6 +19,9 @@ class MailerService
     const TRUSTPILOT_PURCHASE = '5d528c380ad3270001214675';
 
     const EMAIL_WEEKLY = 'weekly';
+
+    const VALIDATION_KEY = 'Email:Validation:%s';
+    const VALIDATION_TIMEOUT = 60000; // A day
 
     /** @var \Swift_Mailer */
     protected $mailer;
@@ -53,6 +57,10 @@ class MailerService
 
     /** @var bool */
     protected $uploadEmail;
+
+    /** @var Client */
+    protected $redis;
+
 
     public function setMailer($mailer)
     {
@@ -106,6 +114,7 @@ class MailerService
      * @param string           $environment
      * @param DocumentManager  $dm
      * @param boolean          $uploadEmail
+     * @param Client           $redis
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -118,7 +127,8 @@ class MailerService
         S3Client $s3Client,
         $environment,
         DocumentManager $dm,
-        $uploadEmail
+        $uploadEmail,
+        Client $redis
     ) {
         $this->mailer = $mailer;
         $this->smtp = $smtp;
@@ -131,6 +141,7 @@ class MailerService
         $this->environment = $environment;
         $this->dm = $dm;
         $this->uploadEmail = $uploadEmail;
+        $this->redis = $redis;
     }
 
     public function sendTemplateToUser(
@@ -339,5 +350,45 @@ class MailerService
     {
         $date = \DateTime::createFromFormat('U', time());
         return sprintf('%s/email/user-%s/%s', $this->environment, $user->getId(), $filename);
+    }
+
+    public function setEmailValidationCode($email)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+        $code = '';
+        for ($i = 0; $i < 40; $i++) {
+            $code .= $characters[rand(0, 35)];
+        }
+
+        $key = sprintf(self::VALIDATION_KEY, $code);
+        $this->redis->setex($key, self::VALIDATION_TIMEOUT, $email);
+        $validationUrl = $this->routerService->generateUrl('homepage', ['evc' => $code]);
+
+        $this->sendTemplate(
+            'Hi from SO-SURE, please verify your email address',
+            $email,
+            'AppBundle:Email:intercom/subscribe.html.twig',
+            ['intercom_subscribe' => $validationUrl],
+            'AppBundle:Email:intercom/subscribe.txt.twig',
+            ['intercom_subscribe' => $validationUrl]
+        );
+    }
+
+    public function checkEmailValidationCode($code)
+    {
+        if (mb_strlen($code) != 40) {
+            return false;
+        }
+
+        $key = sprintf(self::VALIDATION_KEY, $code);
+        $foundEmail = $this->redis->get($key);
+        
+
+        if ($foundEmail) {
+            $this->redis->del($key);
+            return $foundEmail;
+        }
+
+        return false;
     }
 }

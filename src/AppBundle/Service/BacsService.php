@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\PaymentMethod\PaymentMethod;
 use AppBundle\Document\PaymentMethod\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\CurrencyTrait;
@@ -1912,9 +1913,11 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            BacsPaymentMethod::class,
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            $policyType
+            $policyType,
+            -1,
+            1
         );
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
@@ -1936,10 +1939,11 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            BacsPaymentMethod::class,
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
-            $policyType
+            $policyType,
+            -1,
+            -1
         );
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
@@ -1948,10 +1952,8 @@ class BacsService
             if (!$bacs || !$bacs->getBankAccount()) {
                 continue;
             }
-
             return true;
         }
-
         return false;
     }
 
@@ -2083,18 +2085,16 @@ class BacsService
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
         $this->warnings = [];
-        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForBacs(
+        $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            true,
             $policyType,
-            $limit
+            $limit,
+            1
         );
         $metadata['debit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
-            if ($scheduledPayment->getAmount() < 0) {
-                continue;
-            }
             $policy = $scheduledPayment->getPolicy();
             $policyId = ''.$policy->getId();
             if (array_key_exists($policyId, $policies)) {
@@ -2185,19 +2185,16 @@ class BacsService
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 
         $scheduledPayments = $this->paymentService->getAllValidScheduledPaymentsForType(
-            BacsPaymentMethod::class,
+            PaymentMethod::TYPE_BACS,
             $advanceDate,
-            false,
             $policyType,
-            $limit
+            $limit,
+            -1
         );
+
         $metadata['credit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
-            if ($scheduledPayment->getAmount() > 0) {
-                continue;
-            }
-
             $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
             $policy = $scheduledPayment->getPolicy();
 

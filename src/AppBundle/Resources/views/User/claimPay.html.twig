@@ -56,7 +56,7 @@
         'card_title': 'Pay Policy Remainder',
         'transaction_value': convert_to_pennies(amount),
         'csrf_token': csrf_token('checkout'),
-        'redirect_url': url('purchase_checkout_claim', {'id': policy.id, 'pennies': convert_to_pennies(amount) })
+        'url': url('purchase_checkout_claim', {'id': policy.id, 'pennies': convert_to_pennies(amount) })
     } %}
 
     {# Page Modals #}

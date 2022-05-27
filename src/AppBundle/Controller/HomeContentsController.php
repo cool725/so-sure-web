@@ -105,6 +105,7 @@ class HomeContentsController extends BaseController
         $sskey = $request->query->get('sskey');
         $sosure = $request->cookies->get('sosure-tracking');
 
+        // If utms defined
         if ($source || $medium || $campaign || $sosure) {
             $source = urlencode($source);
             $medium = urlencode($medium);
@@ -117,6 +118,9 @@ class HomeContentsController extends BaseController
                 $campaign,
                 $sosure
             );
+        } else {
+            // Set default utms
+            $utms = sprintf('utm_source=direct&utm_medium=direct&utm_campaign=direct&sosure=%s', $sosure);
         }
 
         // Set Greeting

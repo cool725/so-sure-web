@@ -95,6 +95,14 @@ class UserListener
     public function onUserCreatedEvent(UserEvent $event)
     {
         $this->onUserCreatedUpdated($event);
+        $leadRepo = $this->dm->getRepository(Lead::class);
+        /** @var Lead $lead */
+        $lead = $leadRepo->findOneBy(['email' => mb_strtolower($event->getUser()->getEmail())]);
+        if ($lead && $lead->getEmailVerified() === true) {
+            $event->getUser()->setEmailVerified(true);
+        } else {
+            $this->mailer->setEmailValidationCode($event->getUser()->getEmail());
+        }
     }
 
     /**

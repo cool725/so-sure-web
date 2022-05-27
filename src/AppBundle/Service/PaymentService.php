@@ -21,6 +21,7 @@ use AppBundle\Exception\InvalidPaymentMethodException;
 use AppBundle\Exception\SameDayPaymentException;
 use AppBundle\Exception\ScheduledPaymentException;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\PolicyRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Mailer\Mailer;
 use Psr\Log\LoggerInterface;
@@ -116,98 +117,17 @@ class PaymentService
     public function getAllValidScheduledPaymentsForType(
         $type,
         \DateTime $scheduledDate = null,
-        $validateBillable = true,
         $policyType = null,
-        $limit = -1
+        $limit = -1,
+        $polarity = 0
     ) {
-        return $this->getAllValidScheduledPaymentsForTypes(
-            [$type],
-            $scheduledDate,
-            $validateBillable,
-            $policyType,
-            $limit
-        );
-    }
-
-    public function getAllValidScheduledPaymentsForTypes(
-        $types,
-        \DateTime $scheduledDate = null,
-        $validateBillable = true,
-        $policyType = null,
-        $limit = -1
-    ) {
-        $results = [];
-
-        /** @var ScheduledPaymentRepository $repo */
-        $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $scheduledPayments = $repo->findScheduled($scheduledDate, $policyType, $limit);
-        foreach ($scheduledPayments as $scheduledPayment) {
-            /** @var ScheduledPayment $scheduledPayment */
-            $foundType = false;
-            foreach ($types as $type) {
-                if ($scheduledPayment->getPolicy()->getPaymentMethod() instanceof $type) {
-                    $foundType = true;
-                }
-            }
-            if (!$foundType) {
-                continue;
-            }
-            if ($validateBillable && !$scheduledPayment->isBillable()) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->isValidPolicy()) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {
-                $this->logger->info(sprintf(
-                    'Policy %s or User %s does not have a valid payment method',
-                    $scheduledPayment->getPolicy()->getId(),
-                    $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
-                ));
-            }
-            $results[] = $scheduledPayment;
+        $scheduledDate = $scheduledDate ?: new \DateTime();
+        $label = $this->labelType($type, $scheduledDate, $policyType, $polarity);
+        $query = $this->dm->createQueryBuilder(ScheduledPayment::class)->field('labels')->equals($label);
+        if ($limit > 0) {
+            $query->limit($limit);
         }
-        return $results;
-    }
-
-    /**
-     * Finds all scheduled bacs payments up to the given date and can check if they are billable or not.
-     * @param \DateTime|null $scheduledDate    is the date up to which the payments can be for.
-     * @param boolean        $validateBillable is whether to exclude those that cannot be charged.
-     * @param string|null    $policyType       is a policy type to limit the search to.
-     * @param int            $limit            is a limit to put on the number of returned scheduled payments. If you
-     *                                         give a value less than zero it doesn't use it.
-     * @return array containing the selected scheduled payments.
-     */
-    public function getAllValidScheduledPaymentsForBacs(
-        \DateTime $scheduledDate = null,
-        $validateBillable = true,
-        $policyType = null,
-        $limit = -1
-    ) {
-        $results = [];
-        /** @var ScheduledPaymentRepository $repo */
-        $repo = $this->dm->getRepository(ScheduledPayment::class);
-        $this->labelBacs($scheduledDate, $policyType);
-        $scheduledPayments = $repo->findScheduledBacs($scheduledDate, $policyType, $limit);
-        /** @var ScheduledPayment $scheduledPayment */
-        foreach ($scheduledPayments as $scheduledPayment) {
-            if ($validateBillable && !$scheduledPayment->isBillable()) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->isValidPolicy()) {
-                continue;
-            }
-            if (!$scheduledPayment->getPolicy()->hasPolicyOrPayerOrUserValidPaymentMethod()) {
-                $this->logger->info(sprintf(
-                    'Policy %s or User %s does not have a valid payment method',
-                    $scheduledPayment->getPolicy()->getId(),
-                    $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
-                ));
-            }
-            $results[] = $scheduledPayment;
-        }
-        return $results;
+        return $query->getQuery()->execute();
     }
 
     public function scheduledPayment(
@@ -348,47 +268,79 @@ class PaymentService
     }
 
     /**
-     * Sets the field paymentType to bacs for all scheduled payments that reference a bacs payment.
-     * @param \DateTime|null $date       is the date up to which to label scheduled payments.
-     * @param string|null    $policyType is a type of policy to look for exclusively. If you give null it ignores.
+     * Finds all matching scheduled payments that reference a valid policy of the given type and sets a unique random
+     * flag on them.
+     * @param string         $paymentMethod type of payment method policies should have (or null for all).
+     * @param \DateTime|null $before        only payments before the given date will be found and if it is null then
+     *                                      it's now.
+     * @param string|null    $policyType    only find payments referencing policies of the given type.
+     * @param int            $polarity      determines whether to affect positive, negative, or all payments with 0.
+     * @return string the label with which to find the labelled scheduled payments.
      */
-    private function labelBacs($date = null, $policyType = null)
+    private function labelType($paymentMethod, $before = null, $policyType = null, $polarity = 0)
     {
-        $date = $date ?: new \DateTime();
-        // Delete existing paymentType field.
-        $this->dm->createQueryBuilder(ScheduledPayment::class)
-            ->updateMany()
-            ->field('paymentType')->unsetField()->exists(true)
-            ->getQuery()
-            ->execute();
-        // Finds those with bacs policies.
-        $scheduledIds = [];
-        $scheduledsQuery = $this->dm->createQueryBuilder(ScheduledPayment::class)
+        $before = $before ?: new \DateTime();
+        $label = uniqid();
+        $policyQuery = $this->dm->createQueryBuilder(Policy::class)
             ->hydrate(false)
-            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
-            ->field('scheduled')->lt($date);
-        if ($policyType) {
-            $scheduledsQuery->field('policy.policy_type')->equals($policyType);
+            ->field('policyNumber')->equals(new \MongoRegex(PolicyRepository::VALID_REGEX))
+            ->field('paymentMethod.type')->equals($paymentMethod);
+        if ($policyType !== null) {
+            $policyQuery->field('policy_type')->equals($policyType);
         }
-        $scheduleds = $scheduledsQuery->getQuery()->execute();
-        foreach ($scheduleds as $scheduled) {
-            $policy = $this->dm->createQueryBuilder(Policy::class)
-                ->hydrate(false)
-                ->field('_id')->equals($scheduled['policy']['$id'])
-                ->field('paymentMethod.type')->equals('bacs')
-                ->getQuery()
-                ->getSingleResult();
-            if ($policy) {
-                $scheduledIds[] = $scheduled['_id'];
+        $policies = $policyQuery->getQuery()->execute();
+        $ids = [];
+        $i = 0;
+        foreach ($policies as $policy) {
+            $ids[] = $policy['_id'];
+            $i++;
+            if ($i == 10000) {
+                $ids = [];
+                $i = 0;
+                $this->labelAll($ids, $label, $before, $polarity);
             }
         }
-        // Sets paymentType: bacs for those found.
+        if ($i > 0) {
+            $this->labelAll($ids, $label, $before, $polarity);
+        }
+        return $label;
+    }
+
+    /**
+     * Removes the given label from all scheduled payments.
+     * @param string $label is the label to remove.
+     */
+    private function removeLabel($label)
+    {
         $this->dm->createQueryBuilder(ScheduledPayment::class)
+            ->hydrate(false)
+            ->field('labels')->pull($label)
+            ->getQuery()->execute();
+    }
+
+    /**
+     * Labels all scheduled payments belonging to the given payments as long as they are in status scheduled, before
+     * the given date and in accordance with the given polarity.
+     * @param array     $ids      is the list of policy ids.
+     * @param string    $label    is the label to give to them.
+     * @param \DateTime $before   is the date before to find them.
+     * @param int       $polarity means negative positive or both.
+     */
+    private function labelAll($ids, $label, $before, $polarity)
+    {
+        $query = $this->dm->createQueryBuilder(ScheduledPayment::class)
+            ->hydrate(false)
             ->updateMany()
-            ->field('_id')->in($scheduledIds)
-            ->field('paymentType')->set('bacs')
-            ->getQuery()
-            ->execute();
-        $this->dm->flush();
+            ->field('policy.$id')->in($ids)
+            ->field('scheduled')->lte($before)
+            ->field('status')->equals(ScheduledPayment::STATUS_SCHEDULED)
+            ->field('labels')->push($label);
+        if ($polarity < 0) {
+            $query->field('amount')->lt(0);
+        }
+        if ($polarity > 0) {
+            $query->field('amount')->gt(0);
+        }
+        $query->getQuery()->execute();
     }
 }
