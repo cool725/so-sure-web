@@ -400,12 +400,12 @@ class CheckoutService
 
     /**
      * Accepts a user initiated payment.
-     * @param Policy         $policy   is the paid for policy.
-     * @param string         $token    is the checkout token for the payment.
-     * @param number         $amount   is the amount the payment is supposed to be.
-     * @param string         $source   is the kind of payment.
-     * @param \DateTime|null $date     is the date and time of the payment.
-     * @param IdentityLog $identityLog does something.
+     * @param Policy         $policy      is the paid for policy.
+     * @param string         $token       is the checkout token for the payment.
+     * @param number         $amount      is the amount the payment is supposed to be.
+     * @param string         $source      is the kind of payment.
+     * @param \DateTime|null $date        is the date and time of the payment.
+     * @param IdentityLog    $identityLog does something.
      * @return string|null a redirect url if the payment requires 3ds interaction and null otherwise.
      */
     public function pay(
