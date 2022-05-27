@@ -74,12 +74,12 @@
         "rollbar/rollbar-php-symfony-bundle": "^3.1",
         "ryanwinchester/hubspot-php": "^1.2",
         "checkout/checkout-php-api": "^1.2",
-        "checkout/checkout-sdk-php": "^1.0",
         "aws/aws-sdk-php-symfony": "~2.0",
         "symfony/webpack-encore-bundle": "1.0.0",
         "composer/package-versions-deprecated": "1.11.99.2",
         "mtdowling/jmespath.php": "2.4.0",
-        "symfony/swiftmailer-bundle": "3.3.1"
+        "symfony/swiftmailer-bundle": "3.3.1",
+        "checkout/checkout-sdk-php": "^2.3"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

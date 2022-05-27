@@ -130,9 +130,6 @@ class PolicyService
     /** @var ShortLinkService */
     protected $shortLink;
 
-    /** @var JudopayService */
-    protected $judopay;
-
     /** @var \Domnikl\Statsd\Client */
     protected $statsd;
 

@@ -1,4 +1,4 @@
-// checkoutV2.js
+// checkoutV2.j
 
 require('../../sass/components/_checkoutV2.scss');
 
@@ -182,7 +182,7 @@ function onCardTokenized(data) {
     }
   }
   $.post(url, paymentData, function(resp) {
-    // console.log(resp)
+    self.resp = resp;
   }).done(function() {
     if (resp.code === 333) {
       window.location.href = resp.description;
