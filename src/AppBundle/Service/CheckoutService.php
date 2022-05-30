@@ -657,7 +657,7 @@ class CheckoutService
             if ($details) {
                 $card = $details->getCard();
                 if ($card) {
-                    $this->setCardToken($policy, $card->getCustomerId(), $card);
+                    $this->setCardTokenClient($policy, $card);
                 }
             }
 
@@ -971,7 +971,7 @@ class CheckoutService
             if ($details) {
                 $card = $details->getCard();
                 if ($card) {
-                    $this->setCardToken($policy, $card->getCustomerId(), $card);
+                    $this->setCardTokenClient($policy, $card);
                 }
             }
 
@@ -1036,7 +1036,7 @@ class CheckoutService
         if ($details) {
             $card = $details->getCard();
             if ($card) {
-                $this->setCardToken($policy, $card->getCustomerId(), $card);
+                $this->setCardTokenClient($policy, $card);
             }
         }
 
@@ -1760,6 +1760,41 @@ class CheckoutService
         }
         $smsTemplate = sprintf('AppBundle:Sms:card/failedPayment-%d.txt.twig', $failedPayments);
         $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy, 'next' => $next], Charge::TYPE_SMS_PAYMENT);
+    }
+
+    private function setCardTokenClient(Policy $policy, Card $card): void
+    {
+        /** @var CheckoutPaymentMethod $checkoutPaymentMethod */
+        $checkoutPaymentMethod = $policy->getCheckoutPaymentMethod();
+        if (!$checkoutPaymentMethod) {
+            $checkoutPaymentMethod = new CheckoutPaymentMethod();
+            $policy->setPaymentMethod($checkoutPaymentMethod);
+        }
+
+        /**
+         * The original token migration used fake emails and there are ways that
+         * a payment can be made using the customers email address rather than
+         * the existing customerId that we have in the db.
+         * If the returned customerId differs from what we have, then we will
+         * update it at the same time as setting the new token.
+         */
+        if (!$checkoutPaymentMethod->getCustomerId() ||
+            $checkoutPaymentMethod->getCustomerId() !== $card->getCustomerId()
+        ) {
+            $checkoutPaymentMethod->setCustomerId($card->getCustomerId());
+        }
+
+        $tokens = $checkoutPaymentMethod->getCardTokens();
+        $cardDetails = [
+            'cardLastFour' => $card->getLast4(),
+            'endDate' => sprintf('%02d%02d', $card->getExpiryMonth(), mb_substr($card->getExpiryYear(), 2, 2)),
+            'cardType' => $card->getPaymentMethod(),
+            'fingerprint' => $card->getFingerprint(),
+            'authCode' => $card->getAuthCode(),
+            'cvvCheck' => $card->getCvvCheck(),
+            'avsCheck' => $card->getAvsCheck(),
+        ];
+        $checkoutPaymentMethod->addCardToken($card->getId(), json_encode($cardDetails));
     }
 
     /**
