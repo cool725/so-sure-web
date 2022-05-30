@@ -657,7 +657,7 @@ class CheckoutService
             if ($details) {
                 $card = $details->getCard();
                 if ($card) {
-                    $this->setCardToken($policy, $card);
+                    $this->setCardToken($policy, $card->getCustomerId(), $card);
                 }
             }
 
@@ -971,7 +971,7 @@ class CheckoutService
             if ($details) {
                 $card = $details->getCard();
                 if ($card) {
-                    $this->setCardToken($policy, $card);
+                    $this->setCardToken($policy, $card->getCustomerId(), $card);
                 }
             }
 
@@ -1036,7 +1036,7 @@ class CheckoutService
         if ($details) {
             $card = $details->getCard();
             if ($card) {
-                $this->setCardToken($policy, $card);
+                $this->setCardToken($policy, $card->getCustomerId(), $card);
             }
         }
 
