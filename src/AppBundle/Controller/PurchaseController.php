@@ -1485,7 +1485,7 @@ class PurchaseController extends BaseController
         }
         $session = $request->get("cko-session-id");
         $checkout->confirm3DSPayment($policy, $session);
-        $this->addFlash('Success! Your payment has been successfully completed');
+        $this->addFlash('success', 'Success! Your payment has been successfully completed');
         return new RedirectResponse($this->generateUrl('user_welcome', ['id' => $id]));
     }
 
@@ -1647,7 +1647,8 @@ class PurchaseController extends BaseController
                     $amount,
                     Payment::SOURCE_WEB,
                     null,
-                    $this->getIdentityLogWeb($request)
+                    $this->getIdentityLogWeb($request),
+                    true
                 );
                 if ($redirect) {
                     if ($type == 'redirect') {

@@ -406,6 +406,7 @@ class CheckoutService
      * @param string         $source      is the kind of payment.
      * @param \DateTime|null $date        is the date and time of the payment.
      * @param IdentityLog    $identityLog does something.
+     * @param boolean        $threeDS     whether to use 3ds.
      * @return string|null a redirect url if the payment requires 3ds interaction and null otherwise.
      */
     public function pay(
@@ -414,9 +415,11 @@ class CheckoutService
         $amount,
         $source,
         \DateTime $date = null,
-        IdentityLog $identityLog = null
+        IdentityLog $identityLog = null,
+        $threeDS = false
     ) {
-        $details = $this->capturePaymentMethod($policy, $token, $amount);
+
+        $details = $this->capturePaymentMethod($policy, $token, $amount, $threeDS);
         if ($details['status'] === 'Pending') {
             $this->logger->info(sprintf('3DS redirected : %s', json_encode($details)));
             return $details['_links']['redirect']['href'];
@@ -742,7 +745,8 @@ class CheckoutService
     public function capturePaymentMethod(
         Policy $policy,
         $token,
-        $amount = null
+        $amount = null,
+        $threeDS = false
     ): array {
         $user = $policy->getUser();
         $details = null;
@@ -772,11 +776,13 @@ class CheckoutService
             $payment->customer = $customer;
             $payment->capture = true;
             $payment->reference = 'CKO-' . $policy->getPolicyNumber() . '-001';
-            $payment->three_ds = new ThreeDsRequest();
+            if ($threeDS) {
+                $payment->three_ds = new ThreeDsRequest();
+                $payment->success_url = $this->routerService
+                    ->generateUrl('confirm_3ds', ['id' => $policy->getId()]);
+            }
             $payment->risk = new RiskRequest();
             $payment->risk->enabled = true;
-            $payment->success_url = $this->routerService
-                ->generateUrl('confirm_3ds', ['id' => $policy->getId()]);
             $payment->failure_url = $this->routerService
                 ->generateUrl('purchase_step_payment_id', ['id' => $policy->getId()]);
 
@@ -823,11 +829,6 @@ class CheckoutService
         return $details;
     }
 
-    public function confirmPayment($policy, $chargeId)
-    {
-        return 1;
-    }
-
     /**
      * @param Policy $policy
      * @param string $sessionToken
@@ -842,18 +843,11 @@ class CheckoutService
         try {
             $api = $this->getApiForPolicy($policy);
             $details = $api->getPaymentsClient()->getPaymentDetails($sessionToken);
-            $payment = $paymentRepo->findBy(['receipt' => $details['id']]);
-            $payment->setResult($details['status']);
-            $this->dm->flush();
             if ($details['approved']) {
+                $this->add($policy, $details['id'], Payment::SOURCE_WEB);
                 if (!$paymentMethod->hasPreviousChargeId()) {
                     $paymentMethod->setPreviousChargeId($details['id']);
                 }
-                //if ($coveredBacsPayment) {
-                //    $coveredBacsPayment->setCoveredBy($payment);
-                //    $coveredBacsPayment->setCoveringPaymentRefunded(false);
-                //    $payment->setCovering($coveredBacsPayment);
-                //}
                 $card = $details['source'];
                 if ($card) {
                     $this->setCardToken($policy, $details['customer']['id'], $card);
@@ -863,40 +857,6 @@ class CheckoutService
                 $this->dm->flush();
                 throw new PaymentDeclinedException($details->getResponseMessage());
             }
-            //if ($details['approved']) {
-            //    $payment = new CheckoutPayment();
-            //    $payment->setUser($policy->getUser());
-            //    $payment->setSource(Payment::SOURCE_WEB);
-            //    $payment->setReceipt($details['id']);
-            //    $payment->setAmount($this->convertFromPennies($details['amount']));
-            //    $payment->setResult($details['status']);
-            //    $payment->setRiskScore($details['risk']['flagged']);
-            //    $policy->addPayment($payment);
-            //    $this->dm->persist($payment);
-            //    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-            //    if (!$paymentMethod->hasPreviousChargeId()) {
-            //        $paymentMethod->setPreviousChargeId($details['id']);
-            //    }
-            //    //if ($coveredBacsPayment) {
-            //    //    $coveredBacsPayment->setCoveredBy($payment);
-            //    //    $coveredBacsPayment->setCoveringPaymentRefunded(false);
-            //    //    $payment->setCovering($coveredBacsPayment);
-            //    //}
-            //    $card = $details['source'];
-            //    if ($card) {
-            //        $this->setCardToken($policy, $details['customer']['id'], $card);
-            //    }
-            //} else {
-            //    /**
-            //     * If the payment was not authorized, we will need to unset the
-            //     * previousChargeId so that on the next successful payment the
-            //     * new chargeId is set as previousChargeId for future payments.
-            //     */
-            //    $paymentMethod->setPreviousChargeId('none');
-            //    $this->dm->flush();
-            //    throw new PaymentDeclinedException($details->getResponseMessage());
-            //}
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed sending test payment. Msg: %s', $e->getMessage()),
@@ -904,7 +864,6 @@ class CheckoutService
             );
             throw $e;
         }
-
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         return $details;
@@ -922,7 +881,6 @@ class CheckoutService
      */
     public function updatePaymentMethod(Policy $policy, $token, $amount = null, $coveredBacsPayment = null)
     {
-        // TODO: new api
         $throwLater = false;
         $thingToThrow = null;
         $user = $policy->getUser();
@@ -1928,6 +1886,7 @@ class CheckoutService
         string $source,
         \DateTime $date = null
     ): CheckoutPayment {
+        $this->logger->error($chargeId);
         $user = $policy->getUser();
         $payment = $this->validateCharge($policy, $chargeId, $source, $date);
         $this->triggerPaymentEvent($payment);
