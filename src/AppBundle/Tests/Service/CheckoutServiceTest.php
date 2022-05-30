@@ -1916,7 +1916,7 @@ class CheckoutServiceTest extends WebTestCase
             self::$CHECKOUT_TEST_CARD2_PIN
         );
 
-        self::$checkout->updatePaymentMethod($policy, $token->token);
+        self::$checkout->updatePaymentMethod($policy, $token['token']);
         $this->assertEquals('none', $paymentMethod->getPreviousChargeId());
     }
 
@@ -1969,7 +1969,7 @@ class CheckoutServiceTest extends WebTestCase
             self::$CHECKOUT_TEST_CARD2_PIN
         );
 
-        self::$checkout->updatePaymentMethod($policy, $token->token, 9.71);
+        self::$checkout->updatePaymentMethod($policy, $token['token'], 9.71);
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
     }
 

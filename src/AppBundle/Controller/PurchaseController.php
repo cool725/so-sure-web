@@ -1480,7 +1480,6 @@ class PurchaseController extends BaseController
         $repo = $dm->getRepository(Policy::class);
         $policy = $repo->find($id);
         if (!$policy) {
-            $logger->info(sprintf('Missing policy'));
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
         }
         $session = $request->get("cko-session-id");
@@ -1779,17 +1778,14 @@ class PurchaseController extends BaseController
                     $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
                 }
                 $bacsPaymentMethod = $policy->getBacsPaymentMethod();
-                $checkoutCardPayment = $checkout->capturePaymentMethod($policy, $token, $amount, $bacsPayment);
-                $redirection = $checkoutCardPayment->getRedirection();
-                if ($redirection) {
-                    $logger->info(sprintf('Redirection details: %s', $redirection));
-                    $logger->info(sprintf('Redirection  : %s', json_encode($checkoutCardPayment)));
+                $details = $checkout->capturePaymentMethod($policy, $token, $amount, $bacsPayment);
+                if ($details['status'] === 'Pending') {
+                    $redirection = $details['_links']['redirect']['href'];
                     if ($type == 'redirect') {
                         return new RedirectResponse($redirection);
                     } else {
                         return $this->getRedirectJsonResponse($redirection);
                     }
-                    return new RedirectResponse($checkoutCardPayment->getRedirection());
                 }
                 if ($saveBacs && $bacsPaymentMethod) {
                     $policy->setPaymentMethod($bacsPaymentMethod);

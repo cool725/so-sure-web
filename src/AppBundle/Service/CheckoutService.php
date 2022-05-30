@@ -35,6 +35,7 @@ use Checkout\Payments\ThreeDsRequest;
 use Checkout\Payments\RiskRequest;
 use Checkout\Payments\Source\RequestCardSource;
 use Checkout\Payments\Source\RequestTokenSource;
+use Checkout\Tokens\CardTokenRequest;
 use com\checkout\ApiClient;
 use com\checkout\ApiServices\Cards\RequestModels\BaseCardCreate;
 use com\checkout\ApiServices\Cards\RequestModels\CardCreate;
@@ -838,6 +839,7 @@ class CheckoutService
         $sessionToken
     ) {
         $user = $policy->getUser();
+        /** @var CheckoutPaymentMethod */
         $paymentMethod = $policy->getPaymentMethod();
         $paymentRepo = $this->dm->getRepository(CheckoutPayment::class);
         try {
@@ -855,7 +857,7 @@ class CheckoutService
             } else {
                 $paymentMethod->setPreviousChargeId('none');
                 $this->dm->flush();
-                throw new PaymentDeclinedException($details->getResponseMessage());
+                throw new PaymentDeclinedException($details['responseMessage']);
             }
         } catch (\Exception $e) {
             $this->logger->error(
@@ -1424,7 +1426,7 @@ class CheckoutService
      * @param string $cardNumber is the number on the card the token is being created for.
      * @param string $expiryDate is the expiry date written on the card.
      * @param string $cv2        is the cv2 number on the card.
-     * @return \Checkout\Models\Tokens\Card the token which checkout sends back.
+     * @return array the data which checkout sends back.
      */
     public function createCardToken($policy, $cardNumber, $expiryDate, $cv2)
     {
@@ -1432,11 +1434,14 @@ class CheckoutService
         try {
             $exp = explode('/', $expiryDate);
             $cardNumber = str_replace(' ', '', $cardNumber);
-            $card = new \Checkout\Models\Tokens\Card($cardNumber, $exp[0], $exp[1]);
+            $card = new CardTokenRequest();
+            $card->number = $cardNumber;
+            $card->expiry_month = $exp[0];
+            $card->expiry_year = $exp[1];
             $card->cvv = $cv2;
             $api = $this->getApiForPolicy($policy);
-            $service = $api->tokens();
-            $token = $service->request($card);
+            $service = $api->getTokensClient();
+            $token = $service->requestCardToken($card);
         } catch (\Exception $e) {
             $this->logger->error(
                 sprintf('Failed creating card token. Msg: %s', $e->getMessage()),

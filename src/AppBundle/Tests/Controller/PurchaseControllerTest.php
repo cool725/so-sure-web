@@ -523,7 +523,7 @@ class PurchaseControllerTest extends BaseControllerTest
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_PIN
         );
         $crawler = self::$client->request('POST', $url, [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'pennies' => $this->convertToPennies($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
             'csrf' => $csrf,
         ]);
@@ -617,7 +617,7 @@ class PurchaseControllerTest extends BaseControllerTest
             CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_PIN
         );
         $crawler = self::$client->request('POST', $url, [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'pennies' => $this->convertToPennies(CheckoutServiceTest::$CHECKOUT_TEST_CARD_FAIL_AMOUNT),
             'csrf' => $csrf,
         ]);

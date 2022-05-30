@@ -659,7 +659,7 @@ class UserControllerTest extends BaseControllerTest
         );
         $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
         $crawler = self::$client->request('POST', $url, [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'pennies' => $pennies,
             'csrf' => $csrf,
         ]);
@@ -731,7 +731,7 @@ class UserControllerTest extends BaseControllerTest
         );
         $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
         $crawler = self::$client->request('POST', $url, [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'pennies' => $pennies,
             'csrf' => $csrf,
         ]);
@@ -753,7 +753,7 @@ class UserControllerTest extends BaseControllerTest
         );
         $url = sprintf('/purchase/checkout/%s/update', $policy->getId());
         $crawler = self::$client->request('POST', $url, [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'pennies' => $pennies,
             'csrf' => $csrf,
         ]);
@@ -1627,7 +1627,7 @@ class UserControllerTest extends BaseControllerTest
         );
         $url = sprintf('/purchase/checkout/%s/unpaid', $policy->getId());
         $crawler = self::$client->request('POST', $url, [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'pennies' => $pennies,
             'csrf' => $csrf,
         ]);
@@ -1744,7 +1744,7 @@ class UserControllerTest extends BaseControllerTest
         );
         $url = sprintf('/purchase/checkout/%s/remainder', $policy->getId());
         $crawler = self::$client->request('POST', $url, [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'pennies' => $pennies,
             'csrf' => $csrf,
         ]);
