@@ -6,9 +6,22 @@ fi
 
 cat > .git/hooks/pre-push << EOF
 #!/bin/bash
+
 set -e
+
+protected_branch='master'
+current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+
+if [ $protected_branch = $current_branch ]
+then
+    echo "${protected_branch} is a protected branch, create PR to merge"
+    exit 1 # push will not execute
+else
+    exit 0 # push will execute
+fi
+
 ./build/phing.sh force:cs
-./build/run-phpstan.sh 
+./build/run-phpstan.sh
 EOF
 
 chmod 755 .git/hooks/pre-push
