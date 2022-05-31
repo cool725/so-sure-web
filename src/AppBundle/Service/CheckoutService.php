@@ -846,6 +846,7 @@ class CheckoutService
             $api = $this->getApiForPolicy($policy);
             $details = $api->getPaymentsClient()->getPaymentDetails($sessionToken);
             if ($details['approved']) {
+                sleep(1);
                 $this->add($policy, $details['id'], Payment::SOURCE_WEB);
                 if (!$paymentMethod->hasPreviousChargeId()) {
                     $paymentMethod->setPreviousChargeId($details['id']);
