@@ -1,4 +1,4 @@
-// checkoutV2.j
+// checkoutV2.js
 
 require('../../sass/components/_checkoutV2.scss');
 
