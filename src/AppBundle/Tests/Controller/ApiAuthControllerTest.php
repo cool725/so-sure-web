@@ -2718,7 +2718,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
-            'token' => $token->getId(),
+            'token' => $token['id'],
             'amount' => $updatedPolicy->getPremium()->getMonthlyPremiumPrice()
         ]]);
         $policyData = $this->verifyResponse(200);
@@ -2872,7 +2872,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
-            'token' => $token->getId(),
+            'token' => $token['id'],
         ]]);
         $data = $this->verifyResponse(200);
 
@@ -2894,7 +2894,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
-            'token' => $token->getId(),
+            'token' => $token['id'],
         ]]);
         $data = $this->verifyResponse(200);
 
@@ -2915,7 +2915,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
         $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
-            'token' => $token->getId(),
+            'token' => $token['id'],
         ]]);
         $data = $this->verifyResponse(200);
 
@@ -3268,7 +3268,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $cognitoIdentityId = $this->getAuthUser($userB);
         $url = sprintf("/api/v1/auth/policy/%s/payment", $updatedPolicy->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['checkout' => [
-            'token' => $token->getId(),
+            'token' => $token['id'],
         ]]);
         $data = $this->verifyResponse(403, ApiErrorCode::ERROR_ACCESS_DENIED);
     }

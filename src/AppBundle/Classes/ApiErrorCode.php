@@ -66,6 +66,8 @@ class ApiErrorCode
     const EX_PAYMENT_DECLINED = 601;
     const EX_ACCESS_DENIED = 602;
     const EX_COMMISSION = 603;
+    // Redirections
+    const REDIRECT = 333;
 
     /**
      * Writes an error message of the format location:errorcode:message.

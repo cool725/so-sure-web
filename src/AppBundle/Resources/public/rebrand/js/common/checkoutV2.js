@@ -170,26 +170,33 @@ function onCardTokenized(data) {
       'csrf': csrf,
       'token': data.token,
       'pennies': amount,
-      'scode': scode
+      'scode': scode,
+      '3ds': true
     }
   } else {
     paymentData = {
       'csrf': csrf,
       'token': data.token,
-      'pennies': amount
+      'pennies': amount,
+      '3ds': true
     }
   }
   $.post(url, paymentData, function(resp) {
-    // console.log(resp)
-  }).fail(function() {
-    $('.loading-screen').fadeOut();
-  }).always(function() {
-    if (redirect) {
+    self.resp = resp;
+  }).done(function() {
+    if (resp.code === 333) {
+      window.location.href = resp.description;
+    } else if (redirect) {
       window.location.href = redirect;
     } else {
       window.location.reload(false);
     }
-  })
+  }).fail(function() {
+    window.location.reload(false);
+  }).always(function() {
+    $('.loading-screen').fadeOut();
+    console.log(resp)
+  });
 }
 
 Frames.addEventHandler(

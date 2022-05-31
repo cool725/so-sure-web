@@ -1271,127 +1271,6 @@ class PurchaseController extends BaseController
         );
     }
 
-    /**
-     * @Route("/cc/success", name="purchase_judopay_receive_success")
-     * @Route("/cc/success/", name="purchase_judopay_receive_success_slash")
-     * @Method({"POST"})
-     */
-    public function purchaseJudoPayReceiveSuccessAction(Request $request)
-    {
-        $this->get('logger')->alert('JudoPay used!');
-        $this->get('logger')->alert(sprintf(
-            'Payment successful against JudoPay for user %s',
-            $this->getUser()->getId()
-        ));
-        $this->get('logger')->info(sprintf(
-            'Judo Web Success ReceiptId: %s Ref: %s',
-            $request->get('ReceiptId'),
-            $request->get('Reference')
-        ));
-        $user = $this->getUser();
-        $dm = $this->getManager();
-        $judo = $this->get('app.judopay');
-        /** @var PaymentRepository $repo */
-        $repo = $dm->getRepository(Payment::class);
-        /** @var JudoPayment $payment */
-        $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
-        if (!$payment) {
-            throw new \Exception('Unable to locate payment');
-        }
-        $policy = $payment->getPolicy();
-
-        // Payment should have the webtype so no need to query judopay
-        $webType = $payment->getWebType();
-        if (!$webType) {
-            // Just in case payment record doesn't have, see if judo has in metadata
-            $webType = $judo->getTransactionWebType($request->get('ReceiptId'));
-        }
-        // Metadata should be present, but if not, use older logic to guess at what type to use
-        if (!$webType) {
-            if (!$user) {
-                // If there's not a user, it may be a payment for the remainder of the policy - go ahead and credit
-                $webType = JudopayService::WEB_TYPE_REMAINDER;
-            } elseif (!$policy) {
-                $webType = JudopayService::WEB_TYPE_CARD_DETAILS;
-            } else {
-                $webType = JudopayService::WEB_TYPE_STANDARD;
-            }
-
-            $this->get('logger')->warning(sprintf(
-                'Unable to find web_type metadata for receipt %s. Falling back to %s',
-                $request->get('ReceiptId'),
-                $webType
-            ));
-        }
-
-        if (in_array($webType, [
-            JudopayService::WEB_TYPE_REMAINDER,
-            JudopayService::WEB_TYPE_STANDARD,
-            JudopayService::WEB_TYPE_UNPAID,
-        ])) {
-            try {
-                $judo->add(
-                    $policy,
-                    $request->get('ReceiptId'),
-                    null,
-                    $request->get('CardToken'),
-                    Payment::SOURCE_WEB,
-                    JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
-                );
-            } catch (ProcessedException $e) {
-                if (!$policy->isValidPolicy()) {
-                    throw $e;
-                }
-                $this->get('logger')->warning(
-                    'Duplicate re-use of judo receipt. Possible refresh issue, so ignoring and continuing',
-                    ['exception' => $e]
-                );
-            }
-
-            if ($webType == JudopayService::WEB_TYPE_REMAINDER) {
-                $this->notifyRemainderRecevied($policy);
-
-                return $this->getRouteForPostCC($policy, $webType);
-            } elseif ($policy->isInitialPayment()) {
-                return $this->getRouteForPostCC($policy, $webType);
-            } elseif ($policy->getLastSuccessfulUserPaymentCredit()) {
-                // unpaid policy - outstanding payment
-                $this->addFlash(
-                    'success',
-                    sprintf(
-                        'Thanks for your payment of £%0.2f',
-                        $policy->getLastSuccessfulUserPaymentCredit()->getAmount()
-                    )
-                );
-                return $this->getRouteForPostCC($policy, $webType);
-            } else {
-                // should never occur - but assume success
-                return $this->getRouteForPostCC($policy, $webType);
-            }
-        } elseif ($webType == JudopayService::WEB_TYPE_CARD_DETAILS) {
-            $payment->setReceipt($request->get('ReceiptId'));
-            $dm->flush();
-
-            $judo->updatePaymentMethod(
-                $payment->getUser(),
-                $request->get('ReceiptId'),
-                null,
-                $request->get('CardToken'),
-                null,
-                $policy
-            );
-
-            $this->addFlash(
-                'success',
-                sprintf('Your card has been updated')
-            );
-
-            return $this->getRouteForPostCC($policy, $webType);
-        }
-
-        return $this->getRouteForPostCC($policy, $webType);
-    }
-
     private function getRouteForPostCC($policy, $webType)
     {
         if ($webType == JudopayService::WEB_TYPE_CARD_DETAILS) {
@@ -1592,6 +1471,24 @@ class PurchaseController extends BaseController
     }
 
     /**
+     * @Route("/confirm_3ds/{id}", name="confirm_3ds")
+     */
+    public function confirm3DS(Request $request, $id)
+    {
+        $checkout = $this->get('app.checkout');
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, "Policy not found");
+        }
+        $session = $request->get("cko-session-id");
+        $checkout->confirm3DSPayment($policy, $session);
+        $this->addFlash('success', 'Success! Your payment has been successfully completed');
+        return new RedirectResponse($this->generateUrl('user_welcome', ['id' => $id]));
+    }
+
+    /**
      * @Route("/checkout/{id}", name="purchase_checkout")
      * @Route("/checkout/{id}/update", name="purchase_checkout_update")
      * @Route("/checkout/{id}/remainder", name="purchase_checkout_remainder")
@@ -1743,122 +1640,131 @@ class PurchaseController extends BaseController
             $checkout = $this->get('app.checkout');
 
             if ($request->get('_route') == 'purchase_checkout') {
-                $checkout->pay(
+                $redirect = $checkout->pay(
                     $policy,
                     $token,
                     $amount,
                     Payment::SOURCE_WEB,
                     null,
-                    $this->getIdentityLogWeb($request)
+                    $this->getIdentityLogWeb($request),
+                    true
                 );
-                $scodeRepo = $dm->getRepository(SCode::class);
-                if ($this->get('session')->has('scode')) {
-                    $code = $this->get('session')->get('scode');
-                    $scode = $scodeRepo->findOneBy([
-                        'code' => $code
-                    ]);
-                }
-                $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
-                if ($referralFeature) {
-                    if ($scode && ($scode->getType() ===  SCode::TYPE_STANDARD)) {
-                        $referral = new ReferralBonus();
-                        $scode->getPolicy()->addInviterReferralBonus($referral);
-                        $policy->addInviteeReferralBonus($referral);
-                        $referral->setStatus(ReferralBonus::STATUS_PENDING);
-                        $dm->persist($referral);
-                        $dm->flush();
+                if ($redirect) {
+                    if ($type == 'redirect') {
+                        return new RedirectResponse($redirect);
+                    } else {
+                        return $this->getRedirectJsonResponse($redirect);
                     }
-                }
-                if ($scode) {
-                    $invitation = null;
-                    if ($scode->getType() ===  SCode::TYPE_STANDARD) {
-                        $invitationRepo = $dm->getRepository(Invitation::class);
-                        $invitation = $invitationRepo->findOneBy([
-                            'inviter' => $scode->getPolicy()->getUser(),
-                            'invitee' => $policy->getUser()
+                } else {
+                    $referralFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_REFERRAL);
+                    if ($referralFeature) {
+                        if ($scode && ($scode->getType() ===  SCode::TYPE_STANDARD)) {
+                            $referral = new ReferralBonus();
+                            $scode->getPolicy()->addInviterReferralBonus($referral);
+                            $policy->addInviteeReferralBonus($referral);
+                            $referral->setStatus(ReferralBonus::STATUS_PENDING);
+                            $dm->persist($referral);
+                            $dm->flush();
+                        }
+                    }
+                    $scodeRepo = $dm->getRepository(SCode::class);
+                    if ($this->get('session')->has('scode')) {
+                        $code = $this->get('session')->get('scode');
+                        $scode = $scodeRepo->findOneBy([
+                            'code' => $code
                         ]);
                     }
-                    if ($invitation) {
-                        if (!$invitation->isAccepted() && !$invitation->isCancelled()) {
-                            $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                    if ($scode) {
+                        $invitation = null;
+                        if ($scode->getType() ===  SCode::TYPE_STANDARD) {
+                            $invitationRepo = $dm->getRepository(Invitation::class);
+                            $invitation = $invitationRepo->findOneBy([
+                                'inviter' => $scode->getPolicy()->getUser(),
+                                'invitee' => $policy->getUser()
+                            ]);
+                        }
+                        if ($invitation) {
+                            if (!$invitation->isAccepted() && !$invitation->isCancelled()) {
+                                $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
+                                try {
+                                    $connection = $this->get('app.invitation')->accept($invitation, $policy);
+                                    $this->addFlash(
+                                        'success',
+                                        sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                                    );
+                                } catch (ClaimException $e) {
+                                    $this->addFlash(
+                                        'warning',
+                                        sprintf("Your inviter has a claim and is unable to connect.")
+                                    );
+                                }
+                            }
+                        } else {
                             try {
-                                $connection = $this->get('app.invitation')->accept($invitation, $policy);
+                                $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
+                                if ($invitation && !$scode->isReward()) {
+                                    $message = sprintf(
+                                        '%s has been invited  to connect with you',
+                                        $invitation->getInvitee()->getName()
+                                    );
+                                } else {
+                                    $message = 'Your bonus has been added';
+                                }
+                                $this->addFlash('success', $message);
+                            } catch (DuplicateInvitationException $e) {
+                                $message = sprintf("SCode %s has already been used by you", $code);
+                                if ($scode->isReward()) {
+                                    $message = sprintf("Promo Code %s has already been applied", $code);
+                                }
                                 $this->addFlash(
-                                    'success',
-                                    sprintf("You're now connected with %s", $invitation->getInviter()->getName())
+                                    'warning',
+                                    $message
+                                );
+                            } catch (ConnectedInvitationException $e) {
+                                $message = sprintf("You're already connected");
+                                if ($scode->isReward()) {
+                                    $message = sprintf("Promo Code %s has already been applied", $code);
+                                }
+                                $this->addFlash(
+                                    'warning',
+                                    $message
+                                );
+                            } catch (OptOutException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Sorry, but your friend has opted out of any more invitations")
+                                );
+                            } catch (InvalidPolicyException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Please make sure your policy is paid to date before connecting")
+                                );
+                            } catch (SelfInviteException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("You cannot invite yourself")
+                                );
+                            } catch (FullPotException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("You or your friend has a full pot!")
                                 );
                             } catch (ClaimException $e) {
                                 $this->addFlash(
                                     'warning',
-                                    sprintf("Your inviter has a claim and is unable to connect.")
+                                    sprintf("You or your friend has a claim.")
+                                );
+                            } catch (CannotApplyRewardException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Cannot apply Promo Code to policy.")
+                                );
+                            } catch (NotFoundHttpException $e) {
+                                $this->addFlash(
+                                    'warning',
+                                    sprintf("Not able to find this scode")
                                 );
                             }
-                        }
-                    } else {
-                        try {
-                            $invitation = $this->get('app.invitation')->inviteBySCode($policy, $code);
-                            if ($invitation && !$scode->isReward()) {
-                                $message = sprintf(
-                                    '%s has been invited  to connect with you',
-                                    $invitation->getInvitee()->getName()
-                                );
-                            } else {
-                                $message = 'Your bonus has been added';
-                            }
-                            $this->addFlash('success', $message);
-                        } catch (DuplicateInvitationException $e) {
-                            $message = sprintf("SCode %s has already been used by you", $code);
-                            if ($scode->isReward()) {
-                                $message = sprintf("Promo Code %s has already been applied", $code);
-                            }
-                            $this->addFlash(
-                                'warning',
-                                $message
-                            );
-                        } catch (ConnectedInvitationException $e) {
-                            $message = sprintf("You're already connected");
-                            if ($scode->isReward()) {
-                                $message = sprintf("Promo Code %s has already been applied", $code);
-                            }
-                            $this->addFlash(
-                                'warning',
-                                $message
-                            );
-                        } catch (OptOutException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Sorry, but your friend has opted out of any more invitations")
-                            );
-                        } catch (InvalidPolicyException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Please make sure your policy is paid to date before connecting")
-                            );
-                        } catch (SelfInviteException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You cannot invite yourself")
-                            );
-                        } catch (FullPotException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You or your friend has a full pot!")
-                            );
-                        } catch (ClaimException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("You or your friend has a claim.")
-                            );
-                        } catch (CannotApplyRewardException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Cannot apply Promo Code to policy.")
-                            );
-                        } catch (NotFoundHttpException $e) {
-                            $this->addFlash(
-                                'warning',
-                                sprintf("Not able to find this scode")
-                            );
                         }
                     }
                 }
@@ -1872,13 +1778,20 @@ class PurchaseController extends BaseController
                     $bacsPayment = $policy->findPendingBacsPaymentWithAmount(new \DateTime(), $amount);
                 }
                 $bacsPaymentMethod = $policy->getBacsPaymentMethod();
-                $checkout->updatePaymentMethod($policy, $token, $amount, $bacsPayment);
+                $details = $checkout->capturePaymentMethod($policy, $token, $amount, $bacsPayment);
+                if ($details['status'] === 'Pending') {
+                    $redirection = $details['_links']['redirect']['href'];
+                    if ($type == 'redirect') {
+                        return new RedirectResponse($redirection);
+                    } else {
+                        return $this->getRedirectJsonResponse($redirection);
+                    }
+                }
                 if ($saveBacs && $bacsPaymentMethod) {
                     $policy->setPaymentMethod($bacsPaymentMethod);
                 }
                 $this->getManager()->flush();
             }
-
             $this->addFlash('success', $successMessage);
 
             if ($type == 'redirect') {
@@ -1921,6 +1834,7 @@ class PurchaseController extends BaseController
             }
             $logger->warning(ApiErrorCode::errorMessage("checkoutAction", ApiErrorCode::EX_COMMISSION, $message));
             if ($type == 'redirect') {
+                $logger->info(sprintf('Success redirect ?'));
                 return new RedirectResponse($redirectSuccess);
             } else {
                 return $this->getSuccessJsonResponse($successMessage);
@@ -1935,6 +1849,7 @@ class PurchaseController extends BaseController
             if ($type == 'redirect') {
                 return new RedirectResponse($redirectFailure);
             } else {
+                throw $e;
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Unknown Error');
             }
         }

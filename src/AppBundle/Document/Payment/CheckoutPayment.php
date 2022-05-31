@@ -14,8 +14,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class CheckoutPayment extends Payment
 {
-    const RESULT_AUTHORIZED = "Authorised";
-    const RESULT_AUTHORIZED_3D = "Authorised 3-D";
+    const RESULT_AUTHORIZED = "Authorized";
+    const RESULT_AUTHORIZED_3D = "Authorized 3-D";
     const RESULT_CARD_VERIFIED = 'Card Verified';
     const RESULT_CAPTURED = "Captured";
     const RESULT_REFUNDED = "Refunded";
@@ -27,13 +27,11 @@ class CheckoutPayment extends Payment
     const RESULT_PENDING = "Pending";
     const RESULT_TIMEOUT = "Timeout";
     const RESULT_VOID = "Voided";
-
     const RESULT_SKIPPED = "Skipped";
 
-    // TODO
     const TYPE_PAYMENT = 'Payment';
-    // TODO
     const TYPE_REFUND = 'Refund';
+    const TYPE_CAPTURED = 'Capture';
 
     const RESPONSE_CODE_SUCCESS = 10000;
     const RESPONSE_CODE_DECLINED = 20005;

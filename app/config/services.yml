@@ -157,6 +157,7 @@ services:
             - "@app.sms"
             - "@app.feature"
             - "@app.price"
+            - "@app.router"
 
     app.payment:
         alias: AppBundle\Service\PaymentService

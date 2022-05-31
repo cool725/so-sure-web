@@ -1513,85 +1513,6 @@ class CheckoutServiceTest extends WebTestCase
         }
     }
 
-    public function testCheckoutExisting()
-    {
-        $user = $this->createValidUser(static::generateEmail('testCheckoutExisting', $this, true));
-        $phone = static::getRandomPhone(static::$dm);
-        $policy1 = static::initPolicy($user, static::$dm, $phone, null, false, false);
-        $policy2 = static::initPolicy($user, static::$dm, $phone);
-        $policy3 = static::initPolicy($user, static::$dm, $phone);
-        $policy1->setPaymentMethod(new CheckoutPaymentMethod());
-        $policy2->setPaymentMethod(new CheckoutPaymentMethod());
-        $policy3->setPaymentMethod(new CheckoutPaymentMethod());
-
-        $details = self::$checkout->testPayDetails(
-            $policy1,
-            $policy1->getId(),
-            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-            self::$CHECKOUT_TEST_CARD_NUM,
-            self::$CHECKOUT_TEST_CARD_EXP,
-            self::$CHECKOUT_TEST_CARD_PIN,
-            $policy1->getId()
-        );
-        $this->assertNotNull($details);
-        if (!$details) {
-            return;
-        }
-        $this->assertEquals(CheckoutPayment::RESULT_CAPTURED, $details->getStatus());
-
-        static::$policyService->setEnvironment('prod');
-        self::$checkout->add(
-            $policy1,
-            $details->getId(),
-            Payment::SOURCE_WEB_API
-        );
-        static::$policyService->setEnvironment('test');
-
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $updatedPolicy1 = $this->assertPolicyExists(self::$container, $policy1);
-
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy1->getStatus());
-        $this->assertGreaterThan(5, mb_strlen($updatedPolicy1->getPolicyNumber()));
-
-        $policy2->setPaymentMethod($policy1->getPaymentMethod());
-
-        static::$policyService->setEnvironment('prod');
-        self::$checkout->existing($policy2, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        static::$policyService->setEnvironment('test');
-
-        $updatedPolicy2 = $this->assertPolicyExists(self::$container, $policy2);
-
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy2->getStatus());
-        $this->assertGreaterThan(5, mb_strlen($updatedPolicy2->getPolicyNumber()));
-
-        $policy3->setPaymentMethod($policy1->getPaymentMethod());
-
-        static::$policyService->setEnvironment('prod');
-        $invalidPremium = false;
-        try {
-            self::$checkout->existing($policy3, 0.01);
-        } catch (InvalidPremiumException $e) {
-            $invalidPremium = true;
-        }
-        $this->assertTrue($invalidPremium);
-
-        $invalidPremium = false;
-        try {
-            self::$checkout->existing($policy3, $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() + 0.01);
-        } catch (InvalidPremiumException $e) {
-            $invalidPremium = true;
-        }
-        $this->assertTrue($invalidPremium);
-
-        self::$checkout->existing($policy3, $phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        static::$policyService->setEnvironment('test');
-
-        $updatedPolicy3 = $this->assertPolicyExists(self::$container, $policy3);
-
-        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy3->getStatus());
-        $this->assertGreaterThan(5, mb_strlen($updatedPolicy3->getPolicyNumber()));
-    }
-
     public function testCheckoutCommissionAmounts()
     {
         $user = $this->createValidUser(static::generateEmail('testCheckoutCommissionAmounts', $this, true));
@@ -1995,7 +1916,7 @@ class CheckoutServiceTest extends WebTestCase
             self::$CHECKOUT_TEST_CARD2_PIN
         );
 
-        self::$checkout->updatePaymentMethod($policy, $token->token);
+        self::$checkout->updatePaymentMethod($policy, $token['token']);
         $this->assertEquals('none', $paymentMethod->getPreviousChargeId());
     }
 
@@ -2048,7 +1969,7 @@ class CheckoutServiceTest extends WebTestCase
             self::$CHECKOUT_TEST_CARD2_PIN
         );
 
-        self::$checkout->updatePaymentMethod($policy, $token->token, 9.71);
+        self::$checkout->updatePaymentMethod($policy, $token['token'], 9.71);
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
     }
 

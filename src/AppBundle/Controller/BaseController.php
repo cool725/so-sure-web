@@ -399,6 +399,11 @@ abstract class BaseController extends Controller
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, $description, 200);
     }
 
+    public function getRedirectJsonResponse($url)
+    {
+        return $this->getErrorJsonResponse(ApiErrorCode::REDIRECT, $url, 202);
+    }
+
     /**
      * Return a standard json error message
      *
