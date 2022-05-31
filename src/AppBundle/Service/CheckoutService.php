@@ -791,7 +791,7 @@ class CheckoutService
                 $payment->previous_payment_id = ($paymentMethod->getPreviousChargeId());
             }
 
-            // Send the request and retrieve the response
+            // Send the request and retrieve the response.
             $details = $api->getPaymentsClient()->requestPayment($payment);
 
             if (!$paymentMethod->hasPreviousChargeId()) {
