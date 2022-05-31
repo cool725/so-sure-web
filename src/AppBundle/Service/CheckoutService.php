@@ -1806,7 +1806,7 @@ class CheckoutService
      * Sets a policy's card token using the given card details.
      * @param Policy $policy     is the policy for whom to set the card token.
      * @param string $customerId is the customer id associated with the card.
-     * @param array  $card       is the array of card details.
+     * @param array  $card       is the array of card details created.
      */
     private function setCardToken(Policy $policy, $customerId, $card): void
     {
