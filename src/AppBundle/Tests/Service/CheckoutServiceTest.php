@@ -2033,9 +2033,4 @@ class CheckoutServiceTest extends WebTestCase
 
         self::assertNotEquals($originalId, $newId);
     }
-
-    public function testBastard()
-    {
-        self::assertTrue(true);
-    }
 }
