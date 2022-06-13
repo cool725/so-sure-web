@@ -9,6 +9,9 @@ cat > .git/hooks/pre-push << EOF
 
 set -e
 
+./build/phing.sh force:cs
+./build/run-phpstan.sh
+
 protected_branch='master'
 current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 
@@ -19,9 +22,5 @@ then
 else
     exit 0 # push will execute
 fi
-
-./build/phing.sh force:cs
-./build/run-phpstan.sh
-EOF
 
 chmod 755 .git/hooks/pre-push
