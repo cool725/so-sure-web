@@ -243,6 +243,9 @@ class GoCompare
         1749 => ['make' => 'Google', 'model' => 'Pixel 4 XL', 'memory' => 64],
         1750 => ['make' => 'Google', 'model' => 'Pixel 4 XL', 'memory' => 128],
         2069 => ['make' => 'Google', 'model' => 'Pixel 5', 'memory' => 128],
+        2435 => ['make' => 'Google', 'model' => 'Pixel 6', 'memory' => 128],
+        2436 => ['make' => 'Google', 'model' => 'Pixel 6 Pro', 'memory' => 128],
+        2437 => ['make' => 'Google', 'model' => 'Pixel 6 Pro', 'memory' => 256],
 
         1477 => ['make' => 'Nokia', 'model' => '7.1', 'memory' => 32],
         2067 => ['make' => 'Nokia', 'model' => '8.3 5G', 'memory' => 64],
