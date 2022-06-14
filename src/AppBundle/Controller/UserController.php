@@ -1312,6 +1312,7 @@ class UserController extends BaseController
      *
      * @Route("/welcome", name="user_welcome")
      * @Route("/welcome/b", name="user_welcome_two")
+     * @Route("/welcome/c", name="user_welcome_three")
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Route("/complete", name="user_instore")
      * @Route("/complete/{id}", name="user_instore_id")
@@ -1385,6 +1386,8 @@ class UserController extends BaseController
             $template = 'AppBundle:User:validationRequired.html.twig';
         } elseif ($request->get('_route') == 'user_welcome_two') {
             $template = 'AppBundle:User:welcomeReferralB.html.twig';
+        } elseif ($request->get('_route') == 'user_welcome_three') {
+            $template = 'AppBundle:User:welcomeReferralC.html.twig';
         }
 
         // Get scode
